@@ -953,7 +953,7 @@
 // ─── SUPABASE CONFIG ───────────────────────────────────────────
 const SUPABASE_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk3NTEsImV4cCI6MjA4OTEwNTc1MX0.h4NClLHPJwnSkhMBccB8hpPJrrMU3hkKMCqHu4KNv8g';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ─── STATE ─────────────────────────────────────────────────────
 let leads = [];
@@ -1048,7 +1048,7 @@ async function addLead() {
   };
 
   // Save to Supabase
-  const { error } = await supabase.from('leads').insert([newLead]);
+  const { error } = await sb.from('leads').insert([newLead]);
   if(error) {
     console.error(error);
     showToast('❌ Failed to save lead');
