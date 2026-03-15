@@ -1844,11 +1844,11 @@ async function loadPerformance() {
     });
 
     const sorted = Object.entries(byRep).sort((a,b) => b[1].value - a[1].value);
-    const maxVal = sorted[0]?.[1]?.value || 1;
+    const maxVal = sorted[0] ? sorted[0][1].value : 1;
 
     perfList.innerHTML = sorted.map(([name, stats], i) => `
       <div class="perf-row">
-        <div class="perf-rank ${i===0?'gold':#''}">${i+1}</div>
+        <div class="perf-rank ${i===0 ? 'gold' : ''}">${i+1}</div>
         <div class="perf-bar-wrap">
           <div class="perf-name">${name}</div>
           <div class="perf-bar"><div class="perf-fill" style="width:${Math.round(stats.value/maxVal*100)}%"></div></div>
