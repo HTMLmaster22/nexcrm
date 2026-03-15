@@ -388,6 +388,67 @@
 
 
 
+
+  /* ADMIN PANEL */
+  .admin-badge {
+    background:linear-gradient(135deg,var(--accent),var(--accent3));
+    color:#fff; font-size:9px; font-weight:700; padding:2px 6px;
+    border-radius:4px; letter-spacing:0.5px; margin-left:6px;
+  }
+  .team-card {
+    background:var(--bg3); border:1px solid var(--border); border-radius:12px;
+    padding:16px; display:flex; align-items:center; gap:14px;
+    transition:border-color 0.2s;
+  }
+  .team-card:hover { border-color:rgba(59,130,246,0.3); }
+  .team-avatar-lg {
+    width:46px; height:46px; border-radius:12px; flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent),var(--accent3));
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; font-weight:700; color:#fff;
+  }
+  .team-info { flex:1; min-width:0; }
+  .team-name { font-size:14px; font-weight:600; color:var(--text); }
+  .team-email { font-size:11px; color:var(--text2); margin-top:2px; }
+  .team-role-badge {
+    font-size:10px; font-weight:600; padding:3px 8px; border-radius:20px;
+    margin-top:5px; display:inline-block;
+  }
+  .role-admin { background:rgba(139,92,246,0.2); color:#c4b5fd; }
+  .role-manager { background:rgba(59,130,246,0.2); color:#93c5fd; }
+  .role-sales { background:rgba(16,185,129,0.2); color:#6ee7b7; }
+  .role-inactive { background:rgba(148,163,184,0.15); color:#94a3b8; }
+  .team-actions { display:flex; gap:6px; }
+  .perf-row {
+    display:flex; align-items:center; gap:12px;
+    padding:12px 0; border-bottom:1px solid var(--border);
+  }
+  .perf-row:last-child { border-bottom:none; }
+  .perf-rank {
+    width:28px; height:28px; border-radius:8px;
+    background:var(--bg3); display:flex; align-items:center;
+    justify-content:center; font-size:12px; font-weight:700; color:var(--text2);
+    flex-shrink:0;
+  }
+  .perf-rank.gold { background:rgba(245,158,11,0.2); color:var(--warning); }
+  .perf-bar-wrap { flex:1; }
+  .perf-name { font-size:13px; font-weight:600; color:var(--text); margin-bottom:4px; }
+  .perf-bar { height:5px; background:var(--bg3); border-radius:10px; overflow:hidden; }
+  .perf-fill { height:100%; border-radius:10px; background:linear-gradient(to right,var(--accent),var(--accent2)); }
+  .perf-val { font-size:13px; font-weight:700; color:var(--success); min-width:60px; text-align:right; }
+  .admin-tabs { display:flex; gap:8px; margin-bottom:20px; }
+  .admin-tab {
+    padding:8px 18px; border-radius:10px; border:1px solid var(--border);
+    background:none; color:var(--text2); cursor:pointer; font-size:13px;
+    font-family:'DM Sans',sans-serif; font-weight:600; transition:all 0.2s;
+  }
+  .admin-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .select-input {
+    background:var(--bg3); border:1px solid var(--border); border-radius:8px;
+    padding:5px 10px; color:var(--text); font-family:'DM Sans',sans-serif;
+    font-size:12px; outline:none; cursor:pointer;
+  }
+
   /* EDIT/DELETE/NOTES */
   .action-btn {
     width:28px; height:28px; border-radius:7px; border:none; cursor:pointer;
@@ -521,6 +582,13 @@
     </div>
     <div class="nav-item" onclick="nav('contacts',this)">
       <span class="icon">👥</span><span>Contacts</span>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Admin</div>
+    <div class="nav-item" onclick="nav('admin',this)" id="admin-nav-item" style="display:none">
+      <span class="icon">⚙️</span><span>Admin Panel<span class="admin-badge">ADMIN</span></span>
     </div>
   </div>
 
@@ -987,6 +1055,100 @@
       </div>
     </div>
 
+
+    <!-- ADMIN PANEL -->
+    <div class="page" id="page-admin">
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="adminTab('team',this)">👥 Team Members</button>
+        <button class="admin-tab" onclick="adminTab('allleads',this)">🎯 All Leads</button>
+        <button class="admin-tab" onclick="adminTab('performance',this)">📊 Performance</button>
+      </div>
+
+      <!-- TEAM MEMBERS -->
+      <div id="admin-team">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div class="card-title">Team Members</div>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openAddMemberModal()">＋ Add Member</button>
+          </div>
+          <div id="team-list" style="display:flex;flex-direction:column;gap:10px">
+            <div style="text-align:center;padding:30px;color:var(--text2)">Loading team...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALL LEADS -->
+      <div id="admin-allleads" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">All Leads — All Users</div>
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadAllLeads()">🔄 Refresh</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th><th>Company</th><th>Source</th><th>Status</th>
+                  <th>Value</th><th>Assigned To</th><th>Owner</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-leads-tbody">
+                <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text2)">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERFORMANCE -->
+      <div id="admin-performance" style="display:none">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Sales Performance</div></div>
+            <div id="perf-list">
+              <div style="text-align:center;padding:30px;color:var(--text2)">Loading...</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">Team Stats</div></div>
+            <div id="team-stats">
+              <div style="text-align:center;padding:30px;color:var(--text2)">Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD MEMBER MODAL -->
+    <div class="modal-overlay" id="member-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Add Team Member</div>
+          <div class="modal-close" onclick="closeAddMemberModal()">✕</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" id="m-name" placeholder="Tariq Hassan" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" id="m-email" type="email" placeholder="tariq@company.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <select class="form-input" id="m-role">
+            <option value="sales">Sales Rep</option>
+            <option value="manager">Manager</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="closeAddMemberModal()">Cancel</button>
+          <button class="btn btn-primary" style="flex:2" onclick="addTeamMember()">💾 Add Member</button>
+        </div>
+      </div>
+    </div>
+
   </div><!-- end content -->
 </main>
 
@@ -1129,7 +1291,7 @@ async function loadLeads() {
 // ─── NAV ───────────────────────────────────────────────────────
 const titles = {
   dashboard:'Dashboard', leads:'Leads', pipeline:'Pipeline',
-  contacts:'Contacts', campaigns:'Campaigns', analytics:'Analytics'
+  contacts:'Contacts', campaigns:'Campaigns', analytics:'Analytics', admin:'Admin Panel'
 };
 function nav(page, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -1139,6 +1301,7 @@ function nav(page, el) {
   document.getElementById('page-title').textContent = titles[page];
   if(page === 'leads') loadLeads();
   if(page === 'contacts') loadContacts();
+  if(page === 'admin') { loadTeam(); }
 }
 
 // ─── MODAL ─────────────────────────────────────────────────────
@@ -1273,6 +1436,7 @@ function loginSuccess(data) {
   document.getElementById('auth-overlay').style.display = 'none';
   document.querySelector('.user-name').textContent = currentUser.email.split('@')[0];
   document.querySelector('.user-role').textContent = currentUser.email;
+  checkAdminStatus();
 }
 
 function logout() {
@@ -1473,6 +1637,246 @@ async function deleteContact(id) {
     await loadContacts();
     showToast('🗑️ Contact deleted');
   } catch(e) { console.error(e); showToast('❌ Error'); }
+}
+
+
+// ─── ADMIN ─────────────────────────────────────────────────────
+let isAdmin = false;
+let allLeads = [];
+let teamMembers = [];
+
+async function checkAdminStatus() {
+  if(!currentUser) return;
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/admins?user_id=eq.' + currentUser.id + '&select=*', { headers: HEADERS });
+    const data = await r.json();
+    if(r.ok && data.length > 0) {
+      isAdmin = true;
+      document.getElementById('admin-nav-item').style.display = 'flex';
+    }
+  } catch(e) { console.error(e); }
+}
+
+function adminTab(tab, el) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('admin-team').style.display = tab === 'team' ? 'block' : 'none';
+  document.getElementById('admin-allleads').style.display = tab === 'allleads' ? 'block' : 'none';
+  document.getElementById('admin-performance').style.display = tab === 'performance' ? 'block' : 'none';
+  if(tab === 'team') loadTeam();
+  if(tab === 'allleads') loadAllLeads();
+  if(tab === 'performance') loadPerformance();
+}
+
+// ─── TEAM ──────────────────────────────────────────────────────
+async function loadTeam() {
+  const list = document.getElementById('team-list');
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/team_members?select=*&order=id.asc', { headers: HEADERS });
+    const data = await r.json();
+    if(!r.ok || data.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No team members yet — add your first one!</div>';
+      return;
+    }
+    teamMembers = data;
+    list.innerHTML = data.map(m => `
+      <div class="team-card">
+        <div class="team-avatar-lg">${(m.name||'?')[0].toUpperCase()}</div>
+        <div class="team-info">
+          <div class="team-name">${m.name||'—'}</div>
+          <div class="team-email">${m.email||'—'}</div>
+          <span class="team-role-badge role-${m.active ? m.role : 'inactive'}">${m.active ? m.role.toUpperCase() : 'INACTIVE'}</span>
+        </div>
+        <div class="team-actions">
+          <select class="select-input" onchange="changeRole(${m.id}, this.value)">
+            <option value="sales" ${m.role==='sales'?'selected':''}>Sales Rep</option>
+            <option value="manager" ${m.role==='manager'?'selected':''}>Manager</option>
+            <option value="admin" ${m.role==='admin'?'selected':''}>Admin</option>
+          </select>
+          <button class="action-btn ${m.active ? 'btn-delete' : 'btn-edit'}" onclick="toggleMember(${m.id}, ${m.active})" title="${m.active ? 'Deactivate' : 'Activate'}">
+            ${m.active ? '🚫' : '✅'}
+          </button>
+          <button class="action-btn btn-delete" onclick="removeMember(${m.id})" title="Remove">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { console.error(e); list.innerHTML = '<div style="color:var(--danger);padding:20px">Error loading team</div>'; }
+}
+
+async function changeRole(id, role) {
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + id, {
+      method: 'PATCH', headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ role })
+    });
+    showToast('✅ Role updated!');
+    loadTeam();
+  } catch(e) { showToast('❌ Error updating role'); }
+}
+
+async function toggleMember(id, active) {
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + id, {
+      method: 'PATCH', headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ active: !active })
+    });
+    showToast(active ? '🚫 Member deactivated' : '✅ Member activated');
+    loadTeam();
+  } catch(e) { showToast('❌ Error'); }
+}
+
+async function removeMember(id) {
+  if(!confirm('Remove this team member?')) return;
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + id, {
+      method: 'DELETE', headers: HEADERS
+    });
+    showToast('🗑️ Member removed');
+    loadTeam();
+  } catch(e) { showToast('❌ Error'); }
+}
+
+function openAddMemberModal() {
+  document.getElementById('member-modal').classList.add('open');
+}
+function closeAddMemberModal() {
+  document.getElementById('member-modal').classList.remove('open');
+  ['m-name','m-email'].forEach(id => document.getElementById(id).value = '');
+}
+document.getElementById('member-modal').addEventListener('click', function(e) {
+  if(e.target === this) closeAddMemberModal();
+});
+
+async function addTeamMember() {
+  const name = document.getElementById('m-name').value.trim();
+  const email = document.getElementById('m-email').value.trim();
+  const role = document.getElementById('m-role').value;
+  if(!name || !email) { showToast('❌ Fill in all fields'); return; }
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/team_members', {
+      method: 'POST', headers: HEADERS,
+      body: JSON.stringify({ name, email, role, active: true })
+    });
+    if(!r.ok) { showToast('❌ Failed to add member'); return; }
+    showToast('✅ Team member added!');
+    closeAddMemberModal();
+    loadTeam();
+  } catch(e) { showToast('❌ Error'); }
+}
+
+// ─── ALL LEADS (ADMIN VIEW) ────────────────────────────────────
+async function loadAllLeads() {
+  const tbody = document.getElementById('admin-leads-tbody');
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text2)">Loading...</td></tr>';
+  try {
+    // Admin uses service role style - fetch all leads ignoring RLS
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc', {
+      headers: { ...HEADERS, 'Accept': 'application/json' }
+    });
+    const data = await r.json();
+    allLeads = data || [];
+    if(allLeads.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text2)">No leads found</td></tr>';
+      return;
+    }
+    tbody.innerHTML = allLeads.map(l => `
+      <tr>
+        <td><div style="font-weight:600">${l.name||'—'}</div></td>
+        <td><div style="color:var(--text2)">${l.company||'—'}</div></td>
+        <td><span class="source-tag">${l.source||'—'}</span></td>
+        <td><span class="status-pill ${statusClass[l.status]||'pill-new'}">${l.status||'New'}</span></td>
+        <td><span style="font-weight:600;color:var(--success)">${l.value||'—'}</span></td>
+        <td>
+          <select class="select-input" onchange="reassignLead(${l.id}, this.value)">
+            ${['Tariq Hassan','Nora Al-Qahtani','Khalid Al-Dosari','Sara Al-Mutairi'].map(name =>
+              `<option ${l.assigned===name?'selected':''}>${name}</option>`
+            ).join('')}
+          </select>
+        </td>
+        <td><div style="color:var(--text2);font-size:11px">${l.user_id ? l.user_id.substring(0,8)+'...' : 'unknown'}</div></td>
+        <td>
+          <button class="action-btn btn-delete" onclick="adminDeleteLead(${l.id})" title="Delete">🗑️</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch(e) { console.error(e); tbody.innerHTML = '<tr><td colspan="8" style="color:var(--danger);padding:20px">Error loading leads</td></tr>'; }
+}
+
+async function reassignLead(id, assigned) {
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + id, {
+      method: 'PATCH', headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ assigned })
+    });
+    showToast('✅ Lead reassigned to ' + assigned);
+  } catch(e) { showToast('❌ Error reassigning'); }
+}
+
+async function adminDeleteLead(id) {
+  if(!confirm('Delete this lead?')) return;
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + id, {
+      method: 'DELETE', headers: HEADERS
+    });
+    showToast('🗑️ Lead deleted');
+    loadAllLeads();
+  } catch(e) { showToast('❌ Error'); }
+}
+
+// ─── PERFORMANCE ───────────────────────────────────────────────
+async function loadPerformance() {
+  const perfList = document.getElementById('perf-list');
+  const teamStats = document.getElementById('team-stats');
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*', { headers: HEADERS });
+    const data = await r.json();
+    if(!r.ok) return;
+
+    // Group by assigned
+    const byRep = {};
+    data.forEach(l => {
+      const rep = l.assigned || 'Unassigned';
+      if(!byRep[rep]) byRep[rep] = { count:0, value:0, won:0 };
+      byRep[rep].count++;
+      const val = parseInt((l.value||'0').replace(/[$,]/g,'')) || 0;
+      byRep[rep].value += val;
+      if(l.status === 'Won') byRep[rep].won++;
+    });
+
+    const sorted = Object.entries(byRep).sort((a,b) => b[1].value - a[1].value);
+    const maxVal = sorted[0]?.[1]?.value || 1;
+
+    perfList.innerHTML = sorted.map(([name, stats], i) => `
+      <div class="perf-row">
+        <div class="perf-rank ${i===0?'gold':#''}">${i+1}</div>
+        <div class="perf-bar-wrap">
+          <div class="perf-name">${name}</div>
+          <div class="perf-bar"><div class="perf-fill" style="width:${Math.round(stats.value/maxVal*100)}%"></div></div>
+        </div>
+        <div class="perf-val">$${stats.value.toLocaleString()}</div>
+      </div>
+    `).join('');
+
+    const totalLeads = data.length;
+    const totalValue = data.reduce((s,l) => s + (parseInt((l.value||'0').replace(/[$,]/g,''))||0), 0);
+    const wonLeads = data.filter(l => l.status==='Won').length;
+    const convRate = totalLeads > 0 ? Math.round(wonLeads/totalLeads*100) : 0;
+
+    teamStats.innerHTML = `
+      <div class="stat-card" style="margin-bottom:12px">
+        <div class="stat-label">Total Leads</div>
+        <div class="stat-value">${totalLeads}</div>
+      </div>
+      <div class="stat-card" style="margin-bottom:12px">
+        <div class="stat-label">Total Pipeline Value</div>
+        <div class="stat-value">$${totalValue.toLocaleString()}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Conversion Rate</div>
+        <div class="stat-value">${convRate}%</div>
+      </div>
+    `;
+  } catch(e) { console.error(e); }
 }
 
 // ─── INIT ──────────────────────────────────────────────────────
