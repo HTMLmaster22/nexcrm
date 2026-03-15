@@ -1127,7 +1127,8 @@ async function addLead() {
     status,
     value: value ? '$' + parseInt(value).toLocaleString() : '—',
     assigned,
-    date: months[now.getMonth()] + ' ' + now.getDate()
+    date: months[now.getMonth()] + ' ' + now.getDate(),
+    user_id: currentUser ? currentUser.id : null
   };
 
   // Save to Supabase
