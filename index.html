@@ -1001,17 +1001,13 @@ function renderLeads() {
 async function loadLeads() {
   const tbody = document.getElementById('leads-tbody');
   tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text2)">Loading leads...</td></tr>`;
-  const { data, error } = await sb
-    .from('leads')
-    .select('*')
-    .order('id', { ascending: false });
-  if(error) {
-    console.error(error);
-    showToast('❌ Failed to load leads');
-    return;
-  }
-  leads = data || [];
-  renderLeads();
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc', { headers: HEADERS });
+    const data = await r.json();
+    if (!r.ok) { showToast('❌ Failed to load leads'); console.error(data); return; }
+    leads = data || [];
+    renderLeads();
+  } catch(e) { console.error(e); showToast('❌ Failed to load leads'); }
 }
 
 // ─── NAV ───────────────────────────────────────────────────────
@@ -1063,12 +1059,10 @@ async function addLead() {
   };
 
   // Save to Supabase
-  const { error } = await sb.from('leads').insert([newLead]);
-  if(error) {
-    console.error(error);
-    showToast('❌ Failed to save lead');
-    return;
-  }
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads', { method: 'POST', headers: HEADERS, body: JSON.stringify(newLead) });
+    if (!r.ok) { const e = await r.json(); console.error(e); showToast('❌ Failed to save lead'); return; }
+  } catch(e) { console.error(e); showToast('❌ Failed to save lead'); return; }
 
   // Reload from DB
   await loadLeads();
