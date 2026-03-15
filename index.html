@@ -987,7 +987,7 @@ function renderLeads() {
 async function loadLeads() {
   const tbody = document.getElementById('leads-tbody');
   tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text2)">Loading leads...</td></tr>`;
-  const { data, error } = await supabase
+  const { data, error } = await sb
     .from('leads')
     .select('*')
     .order('id', { ascending: false });
