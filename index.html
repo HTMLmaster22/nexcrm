@@ -386,6 +386,79 @@
   .page.active .stat-card:nth-child(3) { animation-delay:0.1s; }
   .page.active .stat-card:nth-child(4) { animation-delay:0.15s; }
 
+
+  /* AUTH */
+  .auth-overlay {
+    position:fixed; inset:0; background:var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    z-index:999; flex-direction:column;
+  }
+  .auth-box {
+    background:var(--bg2); border:1px solid var(--border);
+    border-radius:20px; padding:40px; width:420px; max-width:95vw;
+    animation:slideUp 0.4s ease;
+  }
+  .auth-logo {
+    display:flex; align-items:center; gap:10px; margin-bottom:28px; justify-content:center;
+    font-family:'Syne',sans-serif; font-weight:800; font-size:24px; color:var(--text);
+  }
+  .auth-title { font-family:'Syne',sans-serif; font-weight:700; font-size:22px; text-align:center; margin-bottom:6px; }
+  .auth-sub { font-size:14px; color:var(--text2); text-align:center; margin-bottom:28px; }
+  .auth-tabs { display:flex; gap:8px; margin-bottom:24px; background:var(--bg3); border-radius:10px; padding:4px; }
+  .auth-tab {
+    flex:1; padding:8px; border-radius:8px; border:none; cursor:pointer;
+    font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600;
+    background:none; color:var(--text2); transition:all 0.2s;
+  }
+  .auth-tab.active { background:var(--accent); color:#fff; }
+  .auth-form { display:flex; flex-direction:column; gap:14px; }
+  .auth-input {
+    background:var(--bg3); border:1px solid var(--border); border-radius:10px;
+    padding:12px 16px; color:var(--text); font-family:'DM Sans',sans-serif;
+    font-size:14px; outline:none; transition:border-color 0.2s; width:100%;
+  }
+  .auth-input:focus { border-color:var(--accent); }
+  .auth-btn {
+    padding:13px; border-radius:10px; border:none; cursor:pointer;
+    font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700;
+    transition:all 0.2s;
+  }
+  .auth-btn-primary {
+    background:linear-gradient(135deg,var(--accent),var(--accent3));
+    color:#fff; box-shadow:0 4px 15px rgba(59,130,246,0.3);
+  }
+  .auth-btn-primary:hover { transform:translateY(-1px); }
+  .auth-btn-google {
+    background:var(--bg3); color:var(--text); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .auth-btn-google:hover { border-color:var(--accent); }
+  .auth-divider {
+    display:flex; align-items:center; gap:12px; margin:4px 0;
+    font-size:12px; color:var(--text2);
+  }
+  .auth-divider::before, .auth-divider::after {
+    content:''; flex:1; height:1px; background:var(--border);
+  }
+  .auth-error {
+    background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);
+    border-radius:8px; padding:10px 14px; font-size:13px; color:#f87171;
+    display:none;
+  }
+  .auth-error.show { display:block; }
+  .auth-success {
+    background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3);
+    border-radius:8px; padding:10px 14px; font-size:13px; color:#6ee7b7;
+    display:none; text-align:center;
+  }
+  .auth-success.show { display:block; }
+  .user-logout {
+    font-size:11px; color:var(--text2); cursor:pointer; padding:4px 8px;
+    border-radius:6px; border:1px solid var(--border); background:none;
+    transition:all 0.2s; margin-top:6px; width:100%;
+  }
+  .user-logout:hover { border-color:var(--danger); color:var(--danger); }
+
   /* RESPONSIVE */
   @media(max-width:900px) {
     .sidebar { width:64px; }
@@ -440,8 +513,7 @@
       <div class="user-info">
         <div class="user-name">Ahmed Al-Rashid</div>
         <div class="user-role">Sales Manager</div>
-      </div>
-    </div>
+    <button class="user-logout" onclick="logout()">Sign Out</button>
   </div>
 </nav>
 
@@ -1079,6 +1151,111 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+
+// ─── AUTH ──────────────────────────────────────────────────────
+let currentTab = 'login';
+let currentUser = null;
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.auth-tab').forEach((t,i) => {
+    t.classList.toggle('active', (tab==='login' && i===0)||(tab==='signup' && i===1));
+  });
+  document.getElementById('auth-name').style.display = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('auth-submit-btn').textContent = tab === 'login' ? 'Sign In' : 'Create Account';
+  document.getElementById('auth-error').classList.remove('show');
+  document.getElementById('auth-success').classList.remove('show');
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg; el.classList.add('show');
+  document.getElementById('auth-success').classList.remove('show');
+}
+
+function showAuthSuccess(msg) {
+  const el = document.getElementById('auth-success');
+  el.textContent = msg; el.classList.add('show');
+  document.getElementById('auth-error').classList.remove('show');
+}
+
+async function handleAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const btn = document.getElementById('auth-submit-btn');
+  if(!email || !password) { showAuthError('Please fill in all fields'); return; }
+  btn.textContent = 'Please wait...'; btn.disabled = true;
+
+  const endpoint = currentTab === 'login'
+    ? SUPABASE_URL + '/auth/v1/token?grant_type=password'
+    : SUPABASE_URL + '/auth/v1/signup';
+
+  const body = currentTab === 'login'
+    ? { email, password }
+    : { email, password, data: { full_name: document.getElementById('auth-name').value } };
+
+  try {
+    const r = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
+      body: JSON.stringify(body)
+    });
+    const data = await r.json();
+    if(!r.ok) { showAuthError(data.error_description || data.msg || 'Something went wrong'); }
+    else if(currentTab === 'signup') { showAuthSuccess('Account created! Please check your email to confirm, then sign in.'); }
+    else { loginSuccess(data); }
+  } catch(e) { showAuthError('Network error, please try again'); }
+  btn.textContent = currentTab === 'login' ? 'Sign In' : 'Create Account';
+  btn.disabled = false;
+}
+
+async function handleGoogle() {
+  try {
+    const r = await fetch(SUPABASE_URL + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(window.location.href), {
+      headers: { 'apikey': SUPABASE_KEY }
+    });
+    const data = await r.json();
+    if(data.url) window.location.href = data.url;
+  } catch(e) { showAuthError('Google login unavailable'); }
+}
+
+function loginSuccess(data) {
+  currentUser = data.user;
+  HEADERS['Authorization'] = 'Bearer ' + data.access_token;
+  document.getElementById('auth-overlay').style.display = 'none';
+  document.querySelector('.user-name').textContent = currentUser.email.split('@')[0];
+  document.querySelector('.user-role').textContent = currentUser.email;
+}
+
+function logout() {
+  currentUser = null;
+  HEADERS['Authorization'] = 'Bearer ' + SUPABASE_KEY;
+  document.getElementById('auth-overlay').style.display = 'flex';
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-password').value = '';
+}
+
+// Check for existing session on load
+async function checkSession() {
+  const hash = window.location.hash;
+  if(hash.includes('access_token')) {
+    const params = new URLSearchParams(hash.substring(1));
+    const token = params.get('access_token');
+    if(token) {
+      const r = await fetch(SUPABASE_URL + '/auth/v1/user', {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token }
+      });
+      if(r.ok) {
+        const user = await r.json();
+        loginSuccess({ user, access_token: token });
+        window.history.replaceState({}, '', window.location.pathname);
+        return;
+      }
+    }
+  }
+}
+checkSession();
+
 // ─── INIT ──────────────────────────────────────────────────────
 loadLeads();
 
@@ -1091,5 +1268,38 @@ setTimeout(() => {
   });
 }, 200);
 </script>
+
+<!-- AUTH OVERLAY -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="logo-icon">N</div>
+      NexCRM
+    </div>
+    <div class="auth-title">Welcome back</div>
+    <div class="auth-sub">Sign in to access your CRM</div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Sign In</button>
+      <button class="auth-tab" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <div class="auth-error" id="auth-error"></div>
+    <div class="auth-success" id="auth-success"></div>
+
+    <div class="auth-form">
+      <input class="auth-input" id="auth-email" type="email" placeholder="Email address" />
+      <input class="auth-input" id="auth-password" type="password" placeholder="Password" />
+      <input class="auth-input" id="auth-name" type="text" placeholder="Full name" style="display:none" />
+      <button class="auth-btn auth-btn-primary" id="auth-submit-btn" onclick="handleAuth()">Sign In</button>
+      <div class="auth-divider">or</div>
+      <button class="auth-btn auth-btn-google" onclick="handleGoogle()">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
