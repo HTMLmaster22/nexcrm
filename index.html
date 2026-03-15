@@ -387,6 +387,34 @@
   .page.active .stat-card:nth-child(4) { animation-delay:0.15s; }
 
 
+
+  /* EDIT/DELETE/NOTES */
+  .action-btn {
+    width:28px; height:28px; border-radius:7px; border:none; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-size:13px; transition:all 0.2s;
+  }
+  .btn-edit { background:rgba(59,130,246,0.15); color:var(--accent); }
+  .btn-edit:hover { background:rgba(59,130,246,0.3); }
+  .btn-delete { background:rgba(239,68,68,0.15); color:var(--danger); }
+  .btn-delete:hover { background:rgba(239,68,68,0.3); }
+  .btn-note { background:rgba(245,158,11,0.15); color:var(--warning); }
+  .btn-note:hover { background:rgba(245,158,11,0.3); }
+  .notes-row { display:none; }
+  .notes-row td { padding:0 14px 12px; }
+  .notes-box {
+    background:var(--bg3); border:1px solid var(--border); border-radius:8px;
+    padding:10px 12px; font-size:12px; color:var(--text2); width:100%;
+    font-family:'DM Sans',sans-serif; resize:vertical; outline:none;
+    transition:border-color 0.2s; min-height:60px;
+  }
+  .notes-box:focus { border-color:var(--accent); color:var(--text); }
+  .notes-save-btn {
+    margin-top:6px; padding:5px 14px; border-radius:7px; border:none;
+    background:var(--accent); color:#fff; font-size:12px; font-weight:600;
+    cursor:pointer; font-family:'DM Sans',sans-serif;
+  }
+
   /* AUTH */
   .auth-overlay {
     position:fixed; inset:0; background:var(--bg);
@@ -729,6 +757,7 @@
                 <th>Value</th>
                 <th>Assigned To</th>
                 <th>Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="leads-tbody"></tbody>
@@ -783,47 +812,51 @@
         <div class="card-header">
           <div class="card-title">All Contacts</div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px">🔽 Filter</button>
-            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px">＋ Add Contact</button>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openContactModal()">＋ Add Contact</button>
           </div>
         </div>
-        <div class="contacts-grid">
-          <div class="contact-card">
-            <div class="contact-avatar">M</div>
-            <div class="contact-name">Mohammed Al-Otaibi</div>
-            <div class="contact-company">Tamimi Motors</div>
-            <div class="contact-tags"><span class="status-pill pill-won">Won</span></div>
+        <div class="contacts-grid" id="contacts-grid">
+          <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">Loading contacts...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD CONTACT MODAL -->
+    <div class="modal-overlay" id="contact-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Add New Contact</div>
+          <div class="modal-close" onclick="closeContactModal()">✕</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input class="form-input" id="c-fname" placeholder="Mohammed" />
           </div>
-          <div class="contact-card">
-            <div class="contact-avatar">S</div>
-            <div class="contact-name">Saleh Al-Ghamdi</div>
-            <div class="contact-company">Saleh Cars Group</div>
-            <div class="contact-tags"><span class="status-pill pill-active">Active</span></div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input class="form-input" id="c-lname" placeholder="Al-Otaibi" />
           </div>
-          <div class="contact-card">
-            <div class="contact-avatar">F</div>
-            <div class="contact-name">Fatima Al-Zahrani</div>
-            <div class="contact-company">Alora Beauty Care</div>
-            <div class="contact-tags"><span class="status-pill pill-warm">Warm</span></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Company</label>
+          <input class="form-input" id="c-company" placeholder="Company name" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input class="form-input" id="c-phone" placeholder="+966 5X XXX XXXX" />
           </div>
-          <div class="contact-card">
-            <div class="contact-avatar">K</div>
-            <div class="contact-name">Khalid Al-Mutairi</div>
-            <div class="contact-company">Vision Tech KSA</div>
-            <div class="contact-tags"><span class="status-pill pill-new">New</span></div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select class="form-input" id="c-status">
+              <option>New</option><option>Active</option><option>Warm</option><option>Cold</option><option>Won</option>
+            </select>
           </div>
-          <div class="contact-card">
-            <div class="contact-avatar">N</div>
-            <div class="contact-name">Nora Al-Qahtani</div>
-            <div class="contact-company">Meras Hospitality</div>
-            <div class="contact-tags"><span class="status-pill pill-active">Active</span></div>
-          </div>
-          <div class="contact-card">
-            <div class="contact-avatar">A</div>
-            <div class="contact-name">Abdullah Al-Harbi</div>
-            <div class="contact-company">Dentex Clinics</div>
-            <div class="contact-tags"><span class="status-pill pill-cold">Cold</span></div>
-          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="closeContactModal()">Cancel</button>
+          <button class="btn btn-primary" style="flex:2" onclick="saveContact()">💾 Save Contact</button>
         </div>
       </div>
     </div>
@@ -1056,7 +1089,7 @@ function renderLeads() {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text2)">No leads yet — add your first one!</td></tr>`;
     return;
   }
-  tbody.innerHTML = leads.map(l => `
+  tbody.innerHTML = leads.map((l,i) => `
     <tr>
       <td><div style="font-weight:600">${l.name}</div></td>
       <td><div style="color:var(--text2)">${l.company||'—'}</div></td>
@@ -1065,6 +1098,17 @@ function renderLeads() {
       <td><span style="font-weight:600;color:var(--success)">${l.value||'—'}</span></td>
       <td><div style="color:var(--text2);font-size:12px">${l.assigned||'—'}</div></td>
       <td><div style="color:var(--text2);font-size:12px">${l.date||'—'}</div></td>
+      <td>
+        <button class="action-btn btn-note" onclick="toggleNote(${l.id})" title="Notes">📝</button>
+        <button class="action-btn btn-edit" onclick="editLead(${l.id})" title="Edit">✏️</button>
+        <button class="action-btn btn-delete" onclick="deleteLead(${l.id})" title="Delete">🗑️</button>
+      </td>
+    </tr>
+    <tr class="notes-row" id="note-row-${l.id}">
+      <td colspan="8">
+        <textarea class="notes-box" id="note-text-${l.id}" placeholder="Add follow-up notes...">${l.notes||''}</textarea>
+        <button class="notes-save-btn" onclick="saveNote(${l.id})">💾 Save Note</button>
+      </td>
     </tr>
   `).join('');
 }
@@ -1094,6 +1138,7 @@ function nav(page, el) {
   el.classList.add('active');
   document.getElementById('page-title').textContent = titles[page];
   if(page === 'leads') loadLeads();
+  if(page === 'contacts') loadContacts();
 }
 
 // ─── MODAL ─────────────────────────────────────────────────────
@@ -1102,6 +1147,8 @@ function openModal() {
 }
 function closeModal() {
   document.getElementById('modal').classList.remove('open');
+  const btn = document.querySelector('#modal .btn-primary');
+  if(btn) { btn.textContent = '💾 Save Lead'; btn.onclick = addLead; }
 }
 document.getElementById('modal').addEventListener('click', function(e) {
   if(e.target === this) closeModal();
@@ -1256,6 +1303,177 @@ async function checkSession() {
   }
 }
 checkSession();
+
+
+// ─── EDIT LEAD ─────────────────────────────────────────────────
+function editLead(id) {
+  const lead = leads.find(l => l.id === id);
+  if(!lead) return;
+  // Pre-fill the modal
+  const nameParts = (lead.name || '').split(' ');
+  document.getElementById('f-fname').value = nameParts[0] || '';
+  document.getElementById('f-lname').value = nameParts.slice(1).join(' ') || '';
+  document.getElementById('f-company').value = lead.company || '';
+  document.getElementById('f-source').value = lead.source || 'WhatsApp';
+  document.getElementById('f-status').value = lead.status || 'New';
+  document.getElementById('f-value').value = (lead.value || '').replace('$','').replace(',','');
+  document.getElementById('f-assign').value = lead.assigned || 'Tariq Hassan';
+  // Change save button to update
+  const btn = document.querySelector('#modal .btn-primary');
+  btn.textContent = '💾 Update Lead';
+  btn.onclick = () => updateLead(id);
+  openModal();
+}
+
+async function updateLead(id) {
+  const fname = document.getElementById('f-fname').value.trim();
+  const lname = document.getElementById('f-lname').value.trim();
+  const company = document.getElementById('f-company').value.trim();
+  const source = document.getElementById('f-source').value;
+  const status = document.getElementById('f-status').value;
+  const value = document.getElementById('f-value').value;
+  const assigned = document.getElementById('f-assign').value;
+  if(!fname) return;
+  const updated = {
+    name: fname + ' ' + lname,
+    company: company || '—',
+    source, status,
+    value: value ? '$' + parseInt(value).toLocaleString() : '—',
+    assigned
+  };
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(updated)
+    });
+    if(!r.ok) { showToast('❌ Failed to update'); return; }
+    await loadLeads();
+    closeModal();
+    // Reset save button
+    const btn = document.querySelector('#modal .btn-primary');
+    btn.textContent = '💾 Save Lead';
+    btn.onclick = addLead;
+    showToast('✅ Lead updated!');
+  } catch(e) { console.error(e); showToast('❌ Error updating lead'); }
+}
+
+// ─── DELETE LEAD ───────────────────────────────────────────────
+async function deleteLead(id) {
+  if(!confirm('Delete this lead? This cannot be undone.')) return;
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + id, {
+      method: 'DELETE', headers: HEADERS
+    });
+    if(!r.ok) { showToast('❌ Failed to delete'); return; }
+    await loadLeads();
+    showToast('🗑️ Lead deleted');
+  } catch(e) { console.error(e); showToast('❌ Error deleting lead'); }
+}
+
+// ─── NOTES ─────────────────────────────────────────────────────
+function toggleNote(id) {
+  const row = document.getElementById('note-row-' + id);
+  if(!row) return;
+  row.style.display = row.style.display === 'table-row' ? 'none' : 'table-row';
+}
+
+async function saveNote(id) {
+  const notes = document.getElementById('note-text-' + id).value;
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ notes })
+    });
+    if(!r.ok) { showToast('❌ Failed to save note'); return; }
+    const lead = leads.find(l => l.id === id);
+    if(lead) lead.notes = notes;
+    showToast('📝 Note saved!');
+  } catch(e) { console.error(e); showToast('❌ Error saving note'); }
+}
+
+// ─── CONTACTS ──────────────────────────────────────────────────
+let contacts = [];
+
+function openContactModal() {
+  document.getElementById('contact-modal').classList.add('open');
+}
+function closeContactModal() {
+  document.getElementById('contact-modal').classList.remove('open');
+  ['c-fname','c-lname','c-company','c-phone'].forEach(id => document.getElementById(id).value = '');
+}
+document.getElementById('contact-modal').addEventListener('click', function(e) {
+  if(e.target === this) closeContactModal();
+});
+
+async function loadContacts() {
+  const grid = document.getElementById('contacts-grid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">Loading contacts...</div>';
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/contacts?select=*&order=id.desc', { headers: HEADERS });
+    const data = await r.json();
+    if(!r.ok) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">No contacts yet</div>'; return; }
+    contacts = data || [];
+    renderContacts();
+  } catch(e) { console.error(e); }
+}
+
+function renderContacts() {
+  const grid = document.getElementById('contacts-grid');
+  if(contacts.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">No contacts yet — add your first one!</div>';
+    return;
+  }
+  grid.innerHTML = contacts.map(c => `
+    <div class="contact-card" style="position:relative">
+      <button onclick="deleteContact(${c.id})" style="position:absolute;top:10px;right:10px;background:rgba(239,68,68,0.15);border:none;border-radius:6px;width:24px;height:24px;cursor:pointer;color:var(--danger);font-size:12px">✕</button>
+      <div class="contact-avatar">${(c.name||'?')[0].toUpperCase()}</div>
+      <div class="contact-name">${c.name||'—'}</div>
+      <div class="contact-company">${c.company||'—'}</div>
+      ${c.phone ? `<div style="font-size:11px;color:var(--text2);margin:4px 0">${c.phone}</div>` : ''}
+      <div class="contact-tags"><span class="status-pill ${statusClass[c.status]||'pill-new'}">${c.status||'New'}</span></div>
+    </div>
+  `).join('');
+}
+
+async function saveContact() {
+  const fname = document.getElementById('c-fname').value.trim();
+  const lname = document.getElementById('c-lname').value.trim();
+  const company = document.getElementById('c-company').value.trim();
+  const phone = document.getElementById('c-phone').value.trim();
+  const status = document.getElementById('c-status').value;
+  if(!fname) { document.getElementById('c-fname').focus(); return; }
+  const newContact = {
+    name: fname + ' ' + lname,
+    company: company || '—',
+    phone, status,
+    user_id: currentUser ? currentUser.id : null
+  };
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/contacts', {
+      method: 'POST',
+      headers: HEADERS,
+      body: JSON.stringify(newContact)
+    });
+    if(!r.ok) { const e = await r.json(); console.error(e); showToast('❌ Failed to save contact'); return; }
+    await loadContacts();
+    closeContactModal();
+    showToast('✅ Contact saved!');
+  } catch(e) { console.error(e); showToast('❌ Error saving contact'); }
+}
+
+async function deleteContact(id) {
+  if(!confirm('Delete this contact?')) return;
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/contacts?id=eq.' + id, {
+      method: 'DELETE', headers: HEADERS
+    });
+    if(!r.ok) { showToast('❌ Failed to delete'); return; }
+    await loadContacts();
+    showToast('🗑️ Contact deleted');
+  } catch(e) { console.error(e); showToast('❌ Error'); }
+}
 
 // ─── INIT ──────────────────────────────────────────────────────
 loadLeads();
