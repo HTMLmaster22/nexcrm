@@ -656,6 +656,83 @@
   .user-logout:hover { border-color:var(--danger); color:var(--danger); }
 
 
+
+  /* ─── REMINDERS ───────────────────────────────────────────── */
+  .notif-btn { position:relative; }
+  .reminder-dropdown {
+    display:none; position:absolute; top:48px; right:0;
+    width:320px; background:var(--bg2); border:1px solid var(--border);
+    border-radius:16px; z-index:500; overflow:hidden;
+    box-shadow:0 10px 40px rgba(0,0,0,0.3);
+    animation:slideUp 0.2s ease;
+  }
+  .reminder-dropdown.open { display:block; }
+  .rd-header {
+    padding:14px 16px; border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .rd-title { font-size:13px; font-weight:700; color:var(--text); }
+  .rd-count { font-size:11px; color:var(--text2); }
+  .rd-item {
+    display:flex; align-items:center; gap:10px;
+    padding:12px 16px; border-bottom:1px solid rgba(59,130,246,0.06);
+    transition:background 0.15s; cursor:pointer;
+  }
+  .rd-item:hover { background:var(--bg3); }
+  .rd-item:last-child { border-bottom:none; }
+  .rd-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .rd-overdue { background:var(--danger); }
+  .rd-today { background:var(--warning); }
+  .rd-upcoming { background:var(--success); }
+  .rd-info { flex:1; min-width:0; }
+  .rd-name { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rd-note { font-size:11px; color:var(--text2); margin-top:2px; }
+  .rd-time { font-size:11px; font-weight:600; white-space:nowrap; }
+  .rd-time.overdue { color:var(--danger); }
+  .rd-time.today { color:var(--warning); }
+  .rd-time.upcoming { color:var(--success); }
+  .rd-done {
+    width:24px; height:24px; border-radius:6px; border:1px solid var(--border);
+    background:none; cursor:pointer; color:var(--text2); font-size:12px;
+    display:flex; align-items:center; justify-content:center; transition:all 0.2s;
+    flex-shrink:0;
+  }
+  .rd-done:hover { background:rgba(16,185,129,0.15); color:var(--success); border-color:var(--success); }
+  .rd-empty { padding:24px 16px; text-align:center; font-size:13px; color:var(--text2); }
+  .rd-footer { padding:10px 16px; border-top:1px solid var(--border); text-align:center; }
+  .rd-footer-btn { font-size:12px; color:var(--accent); cursor:pointer; background:none; border:none; font-family:'DM Sans',sans-serif; }
+
+  /* Reminder row in leads table */
+  .reminder-row { display:none; }
+  .reminder-row td { padding:0 14px 12px; }
+  .reminder-form {
+    background:var(--bg3); border:1px solid var(--border); border-radius:10px;
+    padding:12px 14px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+  }
+  .reminder-form input[type=text] {
+    flex:1; min-width:160px; background:var(--bg2); border:1px solid var(--border);
+    border-radius:8px; padding:7px 12px; color:var(--text); font-size:12px;
+    font-family:'DM Sans',sans-serif; outline:none;
+  }
+  .reminder-form input[type=date] {
+    background:var(--bg2); border:1px solid var(--border); border-radius:8px;
+    padding:7px 12px; color:var(--text); font-size:12px;
+    font-family:'DM Sans',sans-serif; outline:none; cursor:pointer;
+  }
+  .reminder-form input:focus { border-color:var(--accent); }
+  .set-reminder-btn {
+    padding:7px 14px; border-radius:8px; border:none;
+    background:var(--accent); color:#fff; font-size:12px; font-weight:600;
+    cursor:pointer; font-family:'DM Sans',sans-serif; white-space:nowrap;
+    transition:all 0.2s;
+  }
+  .set-reminder-btn:hover { opacity:0.9; }
+  .existing-reminder {
+    font-size:11px; padding:5px 10px; border-radius:6px;
+    background:rgba(245,158,11,0.15); color:var(--warning);
+    border:1px solid rgba(245,158,11,0.2);
+  }
+
   /* ─── MOBILE OPTIMIZATION ─────────────────────────────────── */
   /* Bottom nav for mobile */
   .mobile-nav {
@@ -902,7 +979,20 @@
       <input placeholder="Search leads, contacts..." />
     </div>
     <button class="lang-btn" id="lang-toggle" onclick="toggleLang()">🇸🇦 عربي</button>
-    <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+    <div class="notif-btn" onclick="toggleReminders(event)" style="cursor:pointer">
+      🔔<div class="notif-dot" id="notif-dot" style="display:none"></div>
+      <span id="notif-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center"></span>
+      <div class="reminder-dropdown" id="reminder-dropdown">
+        <div class="rd-header">
+          <div class="rd-title">🔔 Follow-up Reminders</div>
+          <div class="rd-count" id="rd-count"></div>
+        </div>
+        <div id="rd-list"><div class="rd-empty">Loading...</div></div>
+        <div class="rd-footer">
+          <button class="rd-footer-btn" onclick="nav('leads', document.querySelector('.nav-item'))">View all leads →</button>
+        </div>
+      </div>
+    </div>
     <button class="btn btn-primary" onclick="openModal()">＋ Add Lead</button>
   </div>
 
@@ -1813,14 +1903,26 @@ function renderLeads() {
       </td>
       <td>
         <button class="action-btn btn-note" onclick="toggleNote(${l.id})" title="Notes">📝</button>
+        <button class="action-btn" style="background:rgba(245,158,11,0.15);color:var(--warning)" onclick="toggleReminderRow(${l.id})" title="Set Reminder">🔔</button>
         <button class="action-btn btn-edit" onclick="editLead(${l.id})" title="Edit">✏️</button>
         <button class="action-btn btn-delete" onclick="deleteLead(${l.id})" title="Delete">🗑️</button>
       </td>
     </tr>
     <tr class="notes-row" id="note-row-${l.id}">
-      <td colspan="8">
+      <td colspan="9">
         <textarea class="notes-box" id="note-text-${l.id}" placeholder="Add follow-up notes...">${l.notes||''}</textarea>
         <button class="notes-save-btn" onclick="saveNote(${l.id})">💾 Save Note</button>
+      </td>
+    </tr>
+    <tr class="reminder-row" id="reminder-row-${l.id}">
+      <td colspan="9">
+        <div class="reminder-form">
+          <span style="font-size:12px;font-weight:600;color:var(--text2)">🔔 Set Reminder:</span>
+          <input type="text" id="rem-note-${l.id}" placeholder="e.g. Call about pricing" />
+          <input type="date" id="rem-date-${l.id}" min="${new Date().toISOString().split('T')[0]}" />
+          <button class="set-reminder-btn" onclick="setReminder(${l.id})">Set Reminder</button>
+          ${l.reminder_date ? `<span class="existing-reminder">⏰ ${new Date(l.reminder_date).toLocaleDateString()} — ${l.reminder_note||'Follow up'}</span>` : ''}
+        </div>
       </td>
     </tr>
   `).join('');
@@ -1966,6 +2068,147 @@ function applyMobileLayout() {
 // Run immediately and on resize
 applyMobileLayout();
 window.addEventListener('resize', applyMobileLayout);
+
+
+// ─── REMINDERS ─────────────────────────────────────────────────
+let reminders = [];
+
+function toggleReminderRow(id) {
+  const row = document.getElementById('reminder-row-' + id);
+  if(!row) return;
+  row.style.display = row.style.display === 'table-row' ? 'none' : 'table-row';
+  if(row.style.display === 'table-row') {
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('rem-date-' + id);
+    if(dateInput && !dateInput.value) dateInput.value = today;
+  }
+}
+
+async function setReminder(id) {
+  const note = document.getElementById('rem-note-' + id).value.trim();
+  const date = document.getElementById('rem-date-' + id).value;
+  if(!date) { showToast('❌ Pick a date for the reminder'); return; }
+
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ reminder_date: date, reminder_note: note || 'Follow up' })
+    });
+    if(!r.ok) { showToast('❌ Failed to set reminder'); return; }
+    const lead = leads.find(l => l.id === id);
+    if(lead) { lead.reminder_date = date; lead.reminder_note = note; }
+    toggleReminderRow(id);
+    showToast('🔔 Reminder set for ' + new Date(date + 'T00:00:00').toLocaleDateString());
+    loadReminders();
+  } catch(e) { showToast('❌ Error setting reminder'); }
+}
+
+async function loadReminders() {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const r = await fetch(
+      SUPABASE_URL + '/rest/v1/leads?select=id,name,reminder_date,reminder_note&reminder_date=not.is.null&order=reminder_date.asc',
+      { headers: HEADERS }
+    );
+    const data = await r.json();
+    if(!r.ok) return;
+    reminders = (data || []).filter(l => l.reminder_date);
+    updateReminderBadge();
+    renderReminderDropdown();
+  } catch(e) { console.error(e); }
+}
+
+function updateReminderBadge() {
+  const today = new Date().toISOString().split('T')[0];
+  const dueCount = reminders.filter(r => r.reminder_date <= today).length;
+  const badge = document.getElementById('notif-badge');
+  const dot = document.getElementById('notif-dot');
+  if(badge) {
+    if(dueCount > 0) {
+      badge.textContent = dueCount;
+      badge.style.display = 'flex';
+      if(dot) dot.style.display = 'none';
+    } else {
+      badge.style.display = 'none';
+      if(dot) dot.style.display = reminders.length > 0 ? 'block' : 'none';
+    }
+  }
+}
+
+function renderReminderDropdown() {
+  const list = document.getElementById('rd-list');
+  const count = document.getElementById('rd-count');
+  if(!list) return;
+
+  const today = new Date().toISOString().split('T')[0];
+  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
+  if(reminders.length === 0) {
+    list.innerHTML = '<div class="rd-empty">No reminders set — add one from the Leads table 🔔</div>';
+    if(count) count.textContent = '';
+    return;
+  }
+
+  const dueCount = reminders.filter(r => r.reminder_date <= today).length;
+  if(count) count.textContent = dueCount > 0 ? dueCount + ' due today' : reminders.length + ' upcoming';
+
+  list.innerHTML = reminders.slice(0, 8).map(r => {
+    let dotClass, timeClass, timeLabel;
+    if(r.reminder_date < today) {
+      dotClass = 'rd-overdue'; timeClass = 'overdue';
+      const days = Math.floor((new Date(today) - new Date(r.reminder_date)) / 86400000);
+      timeLabel = days === 1 ? 'Yesterday' : days + ' days ago';
+    } else if(r.reminder_date === today) {
+      dotClass = 'rd-today'; timeClass = 'today'; timeLabel = 'Today';
+    } else if(r.reminder_date === tomorrow) {
+      dotClass = 'rd-upcoming'; timeClass = 'upcoming'; timeLabel = 'Tomorrow';
+    } else {
+      dotClass = 'rd-upcoming'; timeClass = 'upcoming';
+      timeLabel = new Date(r.reminder_date + 'T00:00:00').toLocaleDateString();
+    }
+    return `
+      <div class="rd-item">
+        <div class="rd-dot ${dotClass}"></div>
+        <div class="rd-info">
+          <div class="rd-name">${r.name || 'Unknown'}</div>
+          <div class="rd-note">${r.reminder_note || 'Follow up'}</div>
+        </div>
+        <div class="rd-time ${timeClass}">${timeLabel}</div>
+        <button class="rd-done" onclick="dismissReminder(${r.id}, event)" title="Mark done">✓</button>
+      </div>`;
+  }).join('');
+}
+
+async function dismissReminder(id, e) {
+  e.stopPropagation();
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ reminder_date: null, reminder_note: null })
+    });
+    reminders = reminders.filter(r => r.id !== id);
+    updateReminderBadge();
+    renderReminderDropdown();
+    showToast('✅ Reminder dismissed!');
+  } catch(e) { showToast('❌ Error dismissing'); }
+}
+
+function toggleReminders(e) {
+  e.stopPropagation();
+  const dd = document.getElementById('reminder-dropdown');
+  dd.classList.toggle('open');
+  if(dd.classList.contains('open')) loadReminders();
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  const dd = document.getElementById('reminder-dropdown');
+  if(dd && dd.classList.contains('open') && !dd.closest('.notif-btn').contains(e.target)) {
+    dd.classList.remove('open');
+  }
+});
 
 // ─── MOBILE NAV ────────────────────────────────────────────────
 function mobileNav(page, el) {
@@ -2270,6 +2513,7 @@ function loginSuccess(data) {
   document.querySelector('.user-role').textContent = currentUser.email;
   checkAdminStatus();
   applyMobileLayout();
+  setTimeout(loadReminders, 500);
 }
 
 function logout() {
