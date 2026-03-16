@@ -1212,57 +1212,68 @@
 
     <!-- CAMPAIGNS -->
     <div class="page" id="page-campaigns">
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">Marketing Campaigns</div>
-          <button class="btn btn-primary" style="font-size:12px;padding:6px 14px">＋ New Campaign</button>
+      <div class="grid-2" style="margin-bottom:20px">
+        <!-- COMPOSE EMAIL -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">✉️ New Email Campaign</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Campaign Name</label>
+            <input class="form-input" id="camp-name" placeholder="e.g. Ramadan Offer 2025" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Send To</label>
+            <select class="form-input" id="camp-filter">
+              <option value="all">All Leads</option>
+              <option value="New">New Leads Only</option>
+              <option value="Warm">Warm Leads Only</option>
+              <option value="Active">Active Leads Only</option>
+              <option value="Cold">Cold Leads Only</option>
+              <option value="Won">Won Clients Only</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Subject</label>
+            <input class="form-input" id="camp-subject" placeholder="e.g. Special Offer Just For You 🎁" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Message</label>
+            <textarea class="form-input" id="camp-body" rows="6" placeholder="Write your email message here...&#10;&#10;You can use {name} to personalize with the lead's name." style="resize:vertical;min-height:140px"></textarea>
+          </div>
+          <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
+            💡 Use <b style="color:var(--accent)">{name}</b> in your message to personalize with each lead's name
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-ghost" style="flex:1" onclick="previewCampaign()">👁 Preview</button>
+            <button class="btn btn-primary" style="flex:2" onclick="sendCampaign()">🚀 Send Campaign</button>
+          </div>
         </div>
-        <div class="campaign-card">
-          <div class="campaign-header">
-            <div>
-              <div class="campaign-name">🌙 Ramadan 2025 Offer</div>
-              <div class="campaign-type">WhatsApp + Instagram · Running</div>
-            </div>
-            <span class="status-pill pill-active">🟢 Active</span>
+
+        <!-- CAMPAIGN HISTORY -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 Campaign History</div>
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadCampaignHistory()">🔄</button>
           </div>
-          <div class="campaign-stats">
-            <div class="c-stat"><div class="c-stat-val">24,800</div><div class="c-stat-lbl">Reach</div></div>
-            <div class="c-stat"><div class="c-stat-val">4.2%</div><div class="c-stat-lbl">Click Rate</div></div>
-            <div class="c-stat"><div class="c-stat-val">312</div><div class="c-stat-lbl">Leads</div></div>
-            <div class="c-stat"><div class="c-stat-val">$2,400</div><div class="c-stat-lbl">Spent</div></div>
-            <div class="c-stat"><div class="c-stat-val" style="color:var(--success)">8.5x</div><div class="c-stat-lbl">ROAS</div></div>
+          <div id="campaign-history">
+            <div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>
           </div>
         </div>
-        <div class="campaign-card">
-          <div class="campaign-header">
-            <div>
-              <div class="campaign-name">🚗 Auto Sector Campaign</div>
-              <div class="campaign-type">Google Ads + TikTok · Running</div>
-            </div>
-            <span class="status-pill pill-active">🟢 Active</span>
+      </div>
+
+      <!-- PREVIEW MODAL -->
+      <div class="modal-overlay" id="preview-modal">
+        <div class="modal" style="max-width:560px">
+          <div class="modal-header">
+            <div class="modal-title">📧 Email Preview</div>
+            <div class="modal-close" onclick="closePreview()">✕</div>
           </div>
-          <div class="campaign-stats">
-            <div class="c-stat"><div class="c-stat-val">18,200</div><div class="c-stat-lbl">Reach</div></div>
-            <div class="c-stat"><div class="c-stat-val">3.8%</div><div class="c-stat-lbl">Click Rate</div></div>
-            <div class="c-stat"><div class="c-stat-val">228</div><div class="c-stat-lbl">Leads</div></div>
-            <div class="c-stat"><div class="c-stat-val">$3,100</div><div class="c-stat-lbl">Spent</div></div>
-            <div class="c-stat"><div class="c-stat-val" style="color:var(--success)">6.2x</div><div class="c-stat-lbl">ROAS</div></div>
+          <div id="preview-content" style="background:var(--bg3);border-radius:12px;padding:20px;margin-bottom:16px">
           </div>
-        </div>
-        <div class="campaign-card">
-          <div class="campaign-header">
-            <div>
-              <div class="campaign-name">🏥 Healthcare Q1 Push</div>
-              <div class="campaign-type">Email + SMS · Completed</div>
-            </div>
-            <span class="status-pill pill-cold">⚪ Ended</span>
-          </div>
-          <div class="campaign-stats">
-            <div class="c-stat"><div class="c-stat-val">9,400</div><div class="c-stat-lbl">Reach</div></div>
-            <div class="c-stat"><div class="c-stat-val">5.1%</div><div class="c-stat-lbl">Click Rate</div></div>
-            <div class="c-stat"><div class="c-stat-val">148</div><div class="c-stat-lbl">Leads</div></div>
-            <div class="c-stat"><div class="c-stat-val">$1,200</div><div class="c-stat-lbl">Spent</div></div>
-            <div class="c-stat"><div class="c-stat-val" style="color:var(--success)">4.8x</div><div class="c-stat-lbl">ROAS</div></div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-ghost" style="flex:1" onclick="closePreview()">Edit</button>
+            <button class="btn btn-primary" style="flex:2" onclick="closePreview();sendCampaign(true)">🚀 Looks Good — Send!</button>
           </div>
         </div>
       </div>
@@ -1745,6 +1756,11 @@
 </div>
 
 <script>
+// ─── RESEND EMAIL CONFIG ───────────────────────────────────────
+const RESEND_API_KEY = 're_ejpfMweg_3yjBD6cCVuBkpfLCgLhytMd2';
+const FROM_EMAIL = 'onboarding@resend.dev';
+const FROM_NAME = 'NexCRM';
+
 // ─── SUPABASE CONFIG (direct fetch, no library) ────────────────
 const SUPABASE_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk3NTEsImV4cCI6MjA4OTEwNTc1MX0.h4NClLHPJwnSkhMBccB8hpPJrrMU3hkKMCqHu4KNv8g';
@@ -1837,6 +1853,7 @@ function nav(page, el) {
   if(page === 'leads') loadLeads();
   if(page === 'contacts') loadContacts();
   if(page === 'admin') { loadTeam(); }
+  if(page === 'campaigns') { loadCampaignHistory(); }
 }
 
 // ─── MODAL ─────────────────────────────────────────────────────
@@ -2587,6 +2604,175 @@ async function unblockClient(userId) {
   } catch(e) { showToast('❌ Error unblocking client'); }
 }
 
+
+
+// ─── EMAIL CAMPAIGNS ───────────────────────────────────────────
+let isSending = false;
+
+async function getFilteredLeads(filter) {
+  try {
+    const url = filter === 'all'
+      ? SUPABASE_URL + '/rest/v1/leads?select=name,company,assigned&order=id.desc'
+      : SUPABASE_URL + '/rest/v1/leads?select=name,company,assigned&status=eq.' + filter + '&order=id.desc';
+    const r = await fetch(url, { headers: HEADERS });
+    const data = await r.json();
+    return r.ok ? (data || []) : [];
+  } catch(e) { return []; }
+}
+
+function previewCampaign() {
+  const subject = document.getElementById('camp-subject').value.trim();
+  const body = document.getElementById('camp-body').value.trim();
+  const name = document.getElementById('camp-name').value.trim();
+  const filter = document.getElementById('camp-filter').value;
+  if(!subject || !body) { showToast('❌ Fill in subject and message'); return; }
+
+  const previewBody = body.replace(/{name}/g, 'Mohammed Al-Otaibi');
+  const filterLabel = document.getElementById('camp-filter').options[document.getElementById('camp-filter').selectedIndex].text;
+
+  document.getElementById('preview-content').innerHTML = `
+    <div style="margin-bottom:12px;font-size:12px;color:var(--text2)">
+      <b>To:</b> ${filterLabel} &nbsp;|&nbsp; <b>From:</b> ${FROM_NAME} &lt;${FROM_EMAIL}&gt;
+    </div>
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+      ${subject}
+    </div>
+    <div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">${previewBody}</div>
+    <div style="margin-top:16px;font-size:11px;color:var(--text2);padding-top:12px;border-top:1px solid var(--border)">
+      Sent via NexCRM · Unsubscribe
+    </div>
+  `;
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+function closePreview() {
+  document.getElementById('preview-modal').classList.remove('open');
+}
+
+async function sendCampaign(confirmed = false) {
+  if(isSending) return;
+  const name = document.getElementById('camp-name').value.trim();
+  const subject = document.getElementById('camp-subject').value.trim();
+  const body = document.getElementById('camp-body').value.trim();
+  const filter = document.getElementById('camp-filter').value;
+
+  if(!name) { showToast('❌ Enter campaign name'); return; }
+  if(!subject) { showToast('❌ Enter email subject'); return; }
+  if(!body) { showToast('❌ Write your email message'); return; }
+
+  // Get leads to send to
+  const targetLeads = await getFilteredLeads(filter);
+  if(targetLeads.length === 0) { showToast('❌ No leads found for this filter'); return; }
+
+  // Get leads with emails from contacts table
+  const leadsWithEmails = targetLeads.filter(l => l.email);
+
+  // Since leads may not have emails, we send to what we have
+  // For demo, we'll show count and send
+  if(!confirmed) {
+    const filterLabel = document.getElementById('camp-filter').options[document.getElementById('camp-filter').selectedIndex].text;
+    if(!confirm(`Send "${name}" to ${targetLeads.length} leads (${filterLabel})?
+
+Note: Only leads with email addresses will receive the email.`)) return;
+  }
+
+  isSending = true;
+  const btn = document.querySelector('#page-campaigns .btn-primary');
+  const originalText = btn.textContent;
+  btn.textContent = '⏳ Sending...';
+  btn.disabled = true;
+
+  let sent = 0;
+  let failed = 0;
+
+  // Send emails via Resend
+  for(const lead of targetLeads) {
+    if(!lead.email) continue;
+    const personalizedBody = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    try {
+      const r = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + RESEND_API_KEY
+        },
+        body: JSON.stringify({
+          from: FROM_NAME + ' <' + FROM_EMAIL + '>',
+          to: [lead.email],
+          subject: subject,
+          html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+            <div style="background:linear-gradient(135deg,#0B1C3F,#132852);padding:20px;border-radius:12px;margin-bottom:20px;text-align:center">
+              <h1 style="color:#C9963A;margin:0;font-size:24px">NexCRM</h1>
+            </div>
+            <div style="font-size:15px;line-height:1.8;color:#333;white-space:pre-wrap">${personalizedBody}</div>
+            <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;font-size:12px;color:#999;text-align:center">
+              Sent via NexCRM · ${new Date().getFullYear()}
+            </div>
+          </div>`
+        })
+      });
+      if(r.ok) sent++;
+      else failed++;
+    } catch(e) { failed++; }
+  }
+
+  // Save campaign to Supabase
+  await fetch(SUPABASE_URL + '/rest/v1/campaigns', {
+    method: 'POST',
+    headers: HEADERS,
+    body: JSON.stringify({
+      name, subject, body, filter,
+      sent_count: sent,
+      total_count: targetLeads.length,
+      user_id: currentUser ? currentUser.id : null,
+      sent_at: new Date().toISOString()
+    })
+  });
+
+  isSending = false;
+  btn.textContent = originalText;
+  btn.disabled = false;
+
+  if(targetLeads.filter(l => l.email).length === 0) {
+    showToast('⚠️ Campaign saved! Add emails to leads to send emails.');
+  } else {
+    showToast(`✅ Campaign sent! ${sent} delivered, ${failed} failed.`);
+  }
+
+  // Clear form
+  ['camp-name','camp-subject','camp-body'].forEach(id => document.getElementById(id).value = '');
+  loadCampaignHistory();
+}
+
+async function loadCampaignHistory() {
+  const el = document.getElementById('campaign-history');
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/campaigns?select=*&order=id.desc&limit=10', { headers: HEADERS });
+    const data = await r.json();
+    if(!r.ok || !data.length) {
+      el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>';
+      return;
+    }
+    el.innerHTML = data.map(c => `
+      <div style="padding:12px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${c.name}</div>
+          <span class="status-pill pill-active" style="font-size:10px">${c.sent_count || 0} sent</span>
+        </div>
+        <div style="font-size:12px;color:var(--text2)">${c.subject}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px">
+          ${c.filter === 'all' ? 'All leads' : c.filter + ' leads'} · 
+          ${new Date(c.sent_at).toLocaleDateString()}
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No campaigns yet</div>';
+  }
+}
+
+// Load campaign history when campaigns page opens
+const _origNav = nav;
 
 // ─── AI LEAD SCORING ───────────────────────────────────────────
 const scoreLabels = {
