@@ -476,6 +476,60 @@
     cursor:pointer; font-family:'DM Sans',sans-serif;
   }
 
+
+  /* RTL / ARABIC */
+  body.rtl { direction: rtl; }
+  body.rtl .sidebar { left: auto; right: 0; border-right: none; border-left: 1px solid var(--border); }
+  body.rtl .main { margin-left: 0; margin-right: 240px; }
+  body.rtl .nav-item .icon { margin-left: 0; }
+  body.rtl .badge { margin-left: 0; margin-right: auto; }
+  body.rtl .topbar-title { text-align: right; }
+  body.rtl .card-header { flex-direction: row-reverse; }
+  body.rtl .stat-card { text-align: right; }
+  body.rtl .stat-icon { left: 18px; right: auto; }
+  body.rtl table { direction: rtl; }
+  body.rtl th, body.rtl td { text-align: right; }
+  body.rtl .source-tag { direction: ltr; display: inline-block; }
+  body.rtl .form-label { text-align: right; display: block; }
+  body.rtl .form-row { direction: rtl; }
+  body.rtl .modal { direction: rtl; }
+  body.rtl .modal-header { flex-direction: row-reverse; }
+  body.rtl .btn { flex-direction: row-reverse; }
+  body.rtl .logo { flex-direction: row-reverse; }
+  body.rtl .user-card { flex-direction: row-reverse; }
+  body.rtl .sidebar-bottom { direction: rtl; }
+  body.rtl .activity-item { flex-direction: row-reverse; }
+  body.rtl .activity-text { text-align: right; }
+  body.rtl .legend-item { flex-direction: row-reverse; }
+  body.rtl .pipeline { direction: rtl; }
+  body.rtl .deal-meta { flex-direction: row-reverse; }
+  body.rtl .contact-card { direction: rtl; }
+  body.rtl .progress-bar { direction: ltr; }
+  body.rtl .mini-chart { direction: ltr; }
+  body.rtl .chart-labels { direction: ltr; }
+  body.rtl .admin-tabs { flex-direction: row-reverse; }
+  body.rtl .team-card { flex-direction: row-reverse; }
+  body.rtl .team-actions { flex-direction: row-reverse; }
+  body.rtl .perf-row { flex-direction: row-reverse; }
+  body.rtl .perf-val { text-align: left; }
+  body.rtl .search-bar { flex-direction: row-reverse; }
+  body.rtl .notif-dot { left: 6px; right: auto; }
+  @media(max-width:900px) {
+    body.rtl .sidebar { right: 0; left: auto; }
+    body.rtl .main { margin-right: 64px; margin-left: 0; }
+  }
+
+  /* LANG TOGGLE BTN */
+  .lang-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 10px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); cursor: pointer; font-size: 13px;
+    font-family: 'DM Sans', sans-serif; font-weight: 600;
+    transition: all 0.2s;
+  }
+  .lang-btn:hover { border-color: var(--accent); color: var(--text); }
+
   /* AUTH */
   .auth-overlay {
     position:fixed; inset:0; background:var(--bg);
@@ -622,6 +676,7 @@
       <span style="color:var(--text2);font-size:14px">🔍</span>
       <input placeholder="Search leads, contacts..." />
     </div>
+    <button class="lang-btn" id="lang-toggle" onclick="toggleLang()">🇸🇦 عربي</button>
     <div class="notif-btn">🔔<div class="notif-dot"></div></div>
     <button class="btn btn-primary" onclick="openModal()">＋ Add Lead</button>
   </div>
@@ -1610,6 +1665,187 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+
+
+// ─── TRANSLATIONS ──────────────────────────────────────────────
+let currentLang = 'en';
+
+const t = {
+  en: {
+    dashboard: 'Dashboard', leads: 'Leads', pipeline: 'Pipeline',
+    contacts: 'Contacts', campaigns: 'Campaigns', analytics: 'Analytics',
+    admin: 'Admin Panel',
+    main: 'MAIN', marketing: 'MARKETING', adminLabel: 'ADMIN',
+    addLead: '＋ Add Lead', search: 'Search leads, contacts...',
+    allLeads: 'All Leads', addContact: '＋ Add Contact',
+    signOut: 'Sign Out', welcomeBack: 'Welcome back',
+    signInSub: 'Sign in to access your CRM',
+    signIn: 'Sign In', createAccount: 'Create Account',
+    orText: 'or', googleBtn: 'Continue with Google',
+    totalLeads: 'TOTAL LEADS', revenue: 'REVENUE',
+    convRate: 'CONVERSION RATE', adSpend: 'AD SPEND',
+    monthlyPerf: 'Monthly Performance', leadVsConv: 'Leads vs Conversions',
+    thisYear: 'This Year', leadSources: 'Lead Sources',
+    recentActivity: 'Recent Activity', salesPerf: 'Sales Team Performance',
+    newToday: 'NEW TODAY', hotLeads: 'HOT LEADS',
+    converted: 'CONVERTED', lost: 'LOST',
+    name: 'NAME', company: 'COMPANY', source: 'SOURCE',
+    status: 'STATUS', value: 'VALUE', assignedTo: 'ASSIGNED TO', date: 'DATE', actions: 'ACTIONS',
+    addNewLead: 'Add New Lead', firstName: 'FIRST NAME', lastName: 'LAST NAME',
+    companyLabel: 'COMPANY', sourceLabel: 'SOURCE', statusLabel: 'STATUS',
+    dealValue: 'DEAL VALUE ($)', assignLabel: 'ASSIGNED TO',
+    cancel: 'Cancel', saveLead: '💾 Save Lead',
+    langBtn: '🇸🇦 عربي',
+  },
+  ar: {
+    dashboard: 'لوحة التحكم', leads: 'العملاء', pipeline: 'خط المبيعات',
+    contacts: 'جهات الاتصال', campaigns: 'الحملات', analytics: 'التحليلات',
+    admin: 'لوحة الإدارة',
+    main: 'الرئيسية', marketing: 'التسويق', adminLabel: 'الإدارة',
+    addLead: '＋ إضافة عميل', search: 'ابحث عن عملاء...',
+    allLeads: 'جميع العملاء', addContact: '＋ إضافة جهة اتصال',
+    signOut: 'تسجيل الخروج', welcomeBack: 'مرحباً بعودتك',
+    signInSub: 'سجل دخولك للوصول إلى نظام CRM',
+    signIn: 'تسجيل الدخول', createAccount: 'إنشاء حساب',
+    orText: 'أو', googleBtn: 'الدخول عبر جوجل',
+    totalLeads: 'إجمالي العملاء', revenue: 'الإيرادات',
+    convRate: 'معدل التحويل', adSpend: 'الإنفاق الإعلاني',
+    monthlyPerf: 'الأداء الشهري', leadVsConv: 'العملاء مقابل التحويلات',
+    thisYear: 'هذا العام', leadSources: 'مصادر العملاء',
+    recentActivity: 'النشاط الأخير', salesPerf: 'أداء فريق المبيعات',
+    newToday: 'جديد اليوم', hotLeads: 'عملاء ساخنون',
+    converted: 'تم التحويل', lost: 'خسارة',
+    name: 'الاسم', company: 'الشركة', source: 'المصدر',
+    status: 'الحالة', value: 'القيمة', assignedTo: 'مسؤول المبيعات', date: 'التاريخ', actions: 'إجراءات',
+    addNewLead: 'إضافة عميل جديد', firstName: 'الاسم الأول', lastName: 'اسم العائلة',
+    companyLabel: 'الشركة', sourceLabel: 'المصدر', statusLabel: 'الحالة',
+    dealValue: 'قيمة الصفقة ($)', assignLabel: 'مسؤول المبيعات',
+    cancel: 'إلغاء', saveLead: '💾 حفظ العميل',
+    langBtn: '🇬🇧 English',
+  }
+};
+
+function toggleLang() {
+  currentLang = currentLang === 'en' ? 'ar' : 'en';
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const lang = t[currentLang];
+  const isAr = currentLang === 'ar';
+
+  // Toggle RTL
+  document.body.classList.toggle('rtl', isAr);
+
+  // Lang button
+  document.getElementById('lang-toggle').textContent = lang.langBtn;
+
+  // Topbar
+  const addLeadBtn = document.querySelector('.topbar .btn-primary');
+  if(addLeadBtn) addLeadBtn.textContent = lang.addLead;
+  const searchInput = document.querySelector('.search-bar input');
+  if(searchInput) searchInput.placeholder = lang.search;
+
+  // Nav labels
+  const navLabels = document.querySelectorAll('.nav-label');
+  const labelMap = [lang.main, lang.adminLabel, lang.marketing];
+  navLabels.forEach((el, i) => { if(labelMap[i]) el.textContent = labelMap[i]; });
+
+  // Nav items
+  const navItems = document.querySelectorAll('.nav-item span:last-child');
+  const navKeys = ['dashboard','leads','pipeline','contacts','adminLabel','campaigns','analytics'];
+  document.querySelectorAll('.nav-item').forEach(item => {
+    const onclick = item.getAttribute('onclick') || '';
+    if(onclick.includes("'dashboard'")) item.querySelector('span:not(.icon):not(.badge)').textContent = lang.dashboard;
+    else if(onclick.includes("'leads'")) item.querySelector('span:not(.icon):not(.badge)').textContent = lang.leads;
+    else if(onclick.includes("'pipeline'")) item.querySelector('span:not(.icon):not(.badge)').textContent = lang.pipeline;
+    else if(onclick.includes("'contacts'")) item.querySelector('span:not(.icon):not(.badge)').textContent = lang.contacts;
+    else if(onclick.includes("'campaigns'")) item.querySelector('span:not(.icon):not(.badge)').textContent = lang.campaigns;
+    else if(onclick.includes("'analytics'")) item.querySelector('span:not(.icon):not(.badge)').textContent = lang.analytics;
+  });
+
+  // Page titles
+  const titles = {
+    dashboard: lang.dashboard, leads: lang.leads, pipeline: lang.pipeline,
+    contacts: lang.contacts, campaigns: lang.campaigns, analytics: lang.analytics, admin: lang.admin
+  };
+  Object.assign(window._titles || {}, titles);
+
+  // Dashboard stat labels
+  const statLabels = document.querySelectorAll('.stat-label');
+  const statKeys = [lang.totalLeads, lang.revenue, lang.convRate, lang.adSpend];
+  statLabels.forEach((el, i) => { if(statKeys[i]) el.textContent = statKeys[i]; });
+
+  // Card titles
+  document.querySelectorAll('.card-title').forEach(el => {
+    const txt = el.textContent.trim();
+    if(txt === 'Monthly Performance' || txt === 'الأداء الشهري') el.textContent = lang.monthlyPerf;
+    else if(txt === 'Lead Sources' || txt === 'مصادر العملاء') el.textContent = lang.leadSources;
+    else if(txt === 'Recent Activity' || txt === 'النشاط الأخير') el.textContent = lang.recentActivity;
+    else if(txt === 'Sales Team Performance' || txt === 'أداء فريق المبيعات') el.textContent = lang.salesPerf;
+    else if(txt === 'All Leads' || txt === 'جميع العملاء') el.textContent = lang.allLeads;
+    else if(txt === 'All Contacts' || txt === 'جميع جهات الاتصال') el.textContent = lang.contacts;
+  });
+
+  // Table headers
+  document.querySelectorAll('thead th').forEach(th => {
+    const txt = th.textContent.trim();
+    if(txt === 'Name' || txt === 'الاسم') th.textContent = lang.name;
+    else if(txt === 'Company' || txt === 'الشركة') th.textContent = lang.company;
+    else if(txt === 'Source' || txt === 'المصدر') th.textContent = lang.source;
+    else if(txt === 'Status' || txt === 'الحالة') th.textContent = lang.status;
+    else if(txt === 'Value' || txt === 'القيمة') th.textContent = lang.value;
+    else if(txt === 'Assigned To' || txt === 'مسؤول المبيعات') th.textContent = lang.assignedTo;
+    else if(txt === 'Date' || txt === 'التاريخ') th.textContent = lang.date;
+    else if(txt === 'Actions' || txt === 'إجراءات') th.textContent = lang.actions;
+  });
+
+  // Modal
+  document.querySelector('#modal .modal-title').textContent = lang.addNewLead;
+  document.querySelectorAll('#modal .form-label').forEach(el => {
+    const txt = el.textContent.trim();
+    if(txt === 'First Name' || txt === 'الاسم الأول') el.textContent = lang.firstName;
+    else if(txt === 'Last Name' || txt === 'اسم العائلة') el.textContent = lang.lastName;
+    else if(txt === 'Company' || txt === 'الشركة') el.textContent = lang.companyLabel;
+    else if(txt === 'Source' || txt === 'المصدر') el.textContent = lang.sourceLabel;
+    else if(txt === 'Status' || txt === 'الحالة') el.textContent = lang.statusLabel;
+    else if(txt === 'Deal Value ($)' || txt === 'قيمة الصفقة ($)') el.textContent = lang.dealValue;
+    else if(txt === 'Assigned To' || txt === 'مسؤول المبيعات') el.textContent = lang.assignLabel;
+  });
+  document.querySelector('#modal .btn-ghost').textContent = lang.cancel;
+  const saveBtn = document.querySelector('#modal .btn-primary');
+  if(saveBtn && !saveBtn.disabled) saveBtn.textContent = lang.saveLead;
+
+  // Sign out button
+  const signOutBtn = document.querySelector('.user-logout');
+  if(signOutBtn) signOutBtn.textContent = lang.signOut;
+
+  // Auth overlay
+  document.querySelector('.auth-title').textContent = lang.welcomeBack;
+  document.querySelector('.auth-sub').textContent = lang.signInSub;
+  document.querySelectorAll('.auth-tab').forEach((tab, i) => {
+    tab.textContent = i === 0 ? lang.signIn : lang.createAccount;
+  });
+  document.querySelector('.auth-btn-google').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> ${lang.googleBtn}`;
+
+  // Update page title in topbar
+  const activeNav = document.querySelector('.nav-item.active');
+  if(activeNav) {
+    const onclick = activeNav.getAttribute('onclick') || '';
+    const pageKey = Object.keys(titles).find(k => onclick.includes("'"+k+"'"));
+    if(pageKey) document.getElementById('page-title').textContent = titles[pageKey];
+  }
+
+  // Save preference
+  localStorage.setItem('nexcrm_lang', currentLang);
+}
+
+// Load saved language preference
+const savedLang = localStorage.getItem('nexcrm_lang');
+if(savedLang && savedLang !== 'en') {
+  currentLang = savedLang;
+  document.addEventListener('DOMContentLoaded', applyTranslations);
+}
 
 // ─── AUTH ──────────────────────────────────────────────────────
 let currentTab = 'login';
