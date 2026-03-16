@@ -1062,6 +1062,7 @@
         <button class="admin-tab active" onclick="adminTab('team',this)">👥 Team Members</button>
         <button class="admin-tab" onclick="adminTab('allleads',this)">🎯 All Leads</button>
         <button class="admin-tab" onclick="adminTab('performance',this)">📊 Performance</button>
+        <button class="admin-tab" onclick="adminTab('clients',this)">🏢 Client Management</button>
       </div>
 
       <!-- TEAM MEMBERS -->
@@ -1077,6 +1078,119 @@
         </div>
       </div>
 
+      <!-- CLIENTS -->
+      <div id="admin-clients" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div class="card-title">Client Accounts</div>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInviteModal()">✉️ Invite Client</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>User ID</th>
+                  <th>Signed Up</th>
+                  <th>Leads</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="clients-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLIENTS -->
+      <div id="admin-clients" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div class="card-title">Client Accounts</div>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInviteModal()">✉️ Invite Client</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>User ID</th>
+                  <th>Joined</th>
+                  <th>Leads</th>
+                  <th>Last Lead</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="clients-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLIENTS -->
+      <div id="admin-clients" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div class="card-title">Client Accounts</div>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInviteModal()">✉️ Invite Client</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>User ID</th>
+                  <th>Signed Up</th>
+                  <th>Leads</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="clients-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLIENTS -->
+      <div id="admin-clients" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Client Accounts</div>
+              <div class="card-subtitle">All registered users with their dashboard access</div>
+            </div>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInviteModal()">✉️ Invite Client</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Email</th>
+                  <th>Leads</th>
+                  <th>Last Active</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="clients-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALL LEADS -->
+      <div id="admin-allleads" style="display:none">
       <!-- ALL LEADS -->
       <div id="admin-allleads" style="display:none">
         <div class="card">
@@ -1115,6 +1229,140 @@
               <div style="text-align:center;padding:30px;color:var(--text2)">Loading...</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- CLIENT MANAGEMENT -->
+      <div id="admin-clients" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Client Management</div>
+              <div class="card-subtitle">All registered users and their access</div>
+            </div>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInviteModal()">✉️ Invite Client</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Joined</th>
+                  <th>Total Leads</th>
+                  <th>Last Active</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="clients-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVITE CLIENT MODAL -->
+    <div class="modal-overlay" id="invite-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">✉️ Invite Client</div>
+          <div class="modal-close" onclick="closeInviteModal()">✕</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Email</label>
+          <input class="form-input" id="invite-email" type="email" placeholder="client@company.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Temporary Password</label>
+          <input class="form-input" id="invite-password" type="text" placeholder="TempPass123!" />
+        </div>
+        <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px;font-size:12px;color:var(--text2);margin-bottom:16px">
+          💡 The client will use this email and password to log in. Share these credentials with them securely.
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
+          <button class="btn btn-primary" style="flex:2" onclick="inviteClient()">✉️ Create Account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVITE CLIENT MODAL -->
+    <div class="modal-overlay" id="invite-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Invite New Client</div>
+          <div class="modal-close" onclick="closeInviteModal()">✕</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Email</label>
+          <input class="form-input" id="invite-email" type="email" placeholder="client@company.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Temporary Password</label>
+          <input class="form-input" id="invite-password" type="text" placeholder="Min 6 characters" />
+        </div>
+        <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--accent2);margin-bottom:8px">
+          💡 Share the email and password with your client. They can change their password after logging in.
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
+          <button class="btn btn-primary" style="flex:2" onclick="createClientAccount()">✉️ Create Account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVITE CLIENT MODAL -->
+    <div class="modal-overlay" id="invite-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Invite New Client</div>
+          <div class="modal-close" onclick="closeInviteModal()">✕</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Email</label>
+          <input class="form-input" id="invite-email" type="email" placeholder="client@company.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Temporary Password</label>
+          <input class="form-input" id="invite-password" type="text" placeholder="Set a temporary password" />
+        </div>
+        <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--accent2);margin-bottom:8px">
+          💡 Share the email and password with your client. They can change their password after logging in.
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
+          <button class="btn btn-primary" style="flex:2" onclick="createClientAccount()">✉️ Create Account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVITE CLIENT MODAL -->
+    <div class="modal-overlay" id="invite-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Invite New Client</div>
+          <div class="modal-close" onclick="closeInviteModal()">✕</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Name</label>
+          <input class="form-input" id="inv-name" placeholder="Majnoon Laila" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Email</label>
+          <input class="form-input" id="inv-email" type="email" placeholder="client@company.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Temporary Password</label>
+          <input class="form-input" id="inv-password" type="password" placeholder="Min 6 characters" />
+        </div>
+        <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--text2)">
+          💡 The client will use this email and password to log in. They will only see their own leads.
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
+          <button class="btn btn-primary" style="flex:2" onclick="createClientAccount()">✉️ Create Account</button>
         </div>
       </div>
     </div>
@@ -1640,6 +1888,137 @@ async function deleteContact(id) {
 }
 
 
+
+// ─── CLIENT MANAGEMENT ─────────────────────────────────────────
+let clientsList = [];
+
+function openInviteModal() {
+  document.getElementById('invite-modal').classList.add('open');
+}
+function closeInviteModal() {
+  document.getElementById('invite-modal').classList.remove('open');
+  ['inv-name','inv-email','inv-password'].forEach(id => document.getElementById(id).value = '');
+}
+document.getElementById('invite-modal').addEventListener('click', function(e) {
+  if(e.target === this) closeInviteModal();
+});
+
+async function createClientAccount() {
+  const name = document.getElementById('inv-name').value.trim();
+  const email = document.getElementById('inv-email').value.trim();
+  const password = document.getElementById('inv-password').value;
+  if(!name || !email || !password) { showToast('❌ Fill in all fields'); return; }
+  if(password.length < 6) { showToast('❌ Password must be at least 6 characters'); return; }
+
+  const btn = document.querySelector('#invite-modal .btn-primary');
+  btn.textContent = 'Creating...'; btn.disabled = true;
+
+  try {
+    const r = await fetch(SUPABASE_URL + '/auth/v1/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
+      body: JSON.stringify({ email, password, data: { full_name: name } })
+    });
+    const data = await r.json();
+    if(!r.ok) {
+      showToast('❌ ' + (data.msg || data.error_description || 'Failed to create account'));
+    } else {
+      showToast('✅ Account created for ' + name + '!');
+      closeInviteModal();
+      loadClients();
+    }
+  } catch(e) { showToast('❌ Network error'); }
+  btn.textContent = '✉️ Create Account'; btn.disabled = false;
+}
+
+async function loadClients() {
+  const tbody = document.getElementById('clients-tbody');
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>';
+  try {
+    // Get all users
+    const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_users', {
+      method: 'POST', headers: HEADERS, body: JSON.stringify({})
+    });
+
+    // Fallback: get leads grouped by user_id
+    const leadsR = await fetch(SUPABASE_URL + '/rest/v1/leads?select=user_id,name,created_at', { headers: HEADERS });
+    const leadsData = await leadsR.json();
+
+    // Group leads by user
+    const userLeads = {};
+    (leadsData || []).forEach(l => {
+      if(l.user_id) {
+        if(!userLeads[l.user_id]) userLeads[l.user_id] = { count: 0, last: l.created_at };
+        userLeads[l.user_id].count++;
+        if(l.created_at > userLeads[l.user_id].last) userLeads[l.user_id].last = l.created_at;
+      }
+    });
+
+    // Get blocked users list
+    const blockedR = await fetch(SUPABASE_URL + '/rest/v1/blocked_users?select=*', { headers: HEADERS });
+    const blockedData = blockedR.ok ? await blockedR.json() : [];
+    const blockedIds = (blockedData || []).map(b => b.user_id);
+
+    // Build client rows from unique user_ids in leads + known users
+    const userIds = Object.keys(userLeads);
+    if(userIds.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">No clients yet — invite your first one!</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = userIds.map(uid => {
+      const stats = userLeads[uid] || { count: 0, last: null };
+      const isBlocked = blockedIds.includes(uid);
+      const shortId = uid.substring(0,8);
+      const lastDate = stats.last ? new Date(stats.last).toLocaleDateString() : '—';
+      return `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">C</div>
+              <div style="font-size:12px;color:var(--text2)">${shortId}...</div>
+            </div>
+          </td>
+          <td><div style="font-size:12px;color:var(--text2)">User ID: ${shortId}</div></td>
+          <td><span style="font-weight:600;color:var(--accent)">${stats.count}</span> leads</td>
+          <td><div style="font-size:12px;color:var(--text2)">${lastDate}</div></td>
+          <td><span class="status-pill ${isBlocked ? 'pill-lost' : 'pill-active'}">${isBlocked ? 'Blocked' : 'Active'}</span></td>
+          <td>
+            <button class="action-btn ${isBlocked ? 'btn-edit' : 'btn-delete'}" onclick="${isBlocked ? 'unblockClient' : 'blockClient'}('${uid}')" title="${isBlocked ? 'Unblock' : 'Block'}">
+              ${isBlocked ? '✅' : '🚫'}
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch(e) {
+    console.error(e);
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Create your first client using the Invite button above!</td></tr>';
+  }
+}
+
+async function blockClient(userId) {
+  if(!confirm('Block this client? They will not be able to access the CRM.')) return;
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/blocked_users', {
+      method: 'POST', headers: HEADERS,
+      body: JSON.stringify({ user_id: userId })
+    });
+    showToast('🚫 Client blocked');
+    loadClients();
+  } catch(e) { showToast('❌ Error blocking client'); }
+}
+
+async function unblockClient(userId) {
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/blocked_users?user_id=eq.' + userId, {
+      method: 'DELETE', headers: HEADERS
+    });
+    showToast('✅ Client unblocked');
+    loadClients();
+  } catch(e) { showToast('❌ Error unblocking client'); }
+}
+
 // ─── ADMIN ─────────────────────────────────────────────────────
 let isAdmin = false;
 let allLeads = [];
@@ -1661,9 +2040,11 @@ function adminTab(tab, el) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('admin-team').style.display = tab === 'team' ? 'block' : 'none';
+  document.getElementById('admin-clients').style.display = tab === 'clients' ? 'block' : 'none';
   document.getElementById('admin-allleads').style.display = tab === 'allleads' ? 'block' : 'none';
   document.getElementById('admin-performance').style.display = tab === 'performance' ? 'block' : 'none';
   if(tab === 'team') loadTeam();
+  if(tab === 'clients') loadClients();
   if(tab === 'allleads') loadAllLeads();
   if(tab === 'performance') loadPerformance();
 }
@@ -1879,6 +2260,142 @@ async function loadPerformance() {
   } catch(e) { console.error(e); }
 }
 
+
+// ─── CLIENT MANAGEMENT ─────────────────────────────────────────
+async function loadClients() {
+  const tbody = document.getElementById('clients-tbody');
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>';
+  try {
+    // Get all users from auth
+    const r = await fetch(SUPABASE_URL + '/auth/v1/admin/users', {
+      headers: { ...HEADERS, 'apikey': SUPABASE_KEY }
+    });
+    const usersData = await r.json();
+
+    // Get all leads to count per user
+    const leadsR = await fetch(SUPABASE_URL + '/rest/v1/leads?select=user_id', { headers: HEADERS });
+    const leadsData = await leadsR.json();
+    const leadCounts = {};
+    if(Array.isArray(leadsData)) {
+      leadsData.forEach(l => {
+        if(l.user_id) leadCounts[l.user_id] = (leadCounts[l.user_id] || 0) + 1;
+      });
+    }
+
+    // Get blocked users list
+    const blockedR = await fetch(SUPABASE_URL + '/rest/v1/blocked_users?select=*', { headers: HEADERS });
+    const blockedData = blockedR.ok ? await blockedR.json() : [];
+    const blockedIds = Array.isArray(blockedData) ? blockedData.map(b => b.user_id) : [];
+
+    const users = usersData.users || [];
+    if(users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">No clients yet</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = users.map(u => {
+      const isBlocked = blockedIds.includes(u.id);
+      const leadCount = leadCounts[u.id] || 0;
+      const signedUp = new Date(u.created_at).toLocaleDateString();
+      const isMe = u.id === (currentUser && currentUser.id);
+      return `
+        <tr>
+          <td>
+            <div style="font-weight:600;font-size:13px">${u.email}</div>
+            ${isMe ? '<span style="font-size:10px;color:var(--accent)">● YOU (Admin)</span>' : ''}
+          </td>
+          <td><div style="font-size:11px;color:var(--text2)">${u.id.substring(0,12)}...</div></td>
+          <td><div style="font-size:12px;color:var(--text2)">${signedUp}</div></td>
+          <td>
+            <span style="background:rgba(59,130,246,0.15);color:var(--accent);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">
+              ${leadCount} leads
+            </span>
+          </td>
+          <td>
+            <span class="status-pill ${isBlocked ? 'pill-lost' : 'pill-active'}">${isBlocked ? '🚫 Blocked' : '✅ Active'}</span>
+          </td>
+          <td>
+            ${!isMe ? `
+              <button class="action-btn ${isBlocked ? 'btn-edit' : 'btn-delete'}" 
+                onclick="${isBlocked ? 'unblockClient' : 'blockClient'}('${u.id}', '${u.email}')"
+                title="${isBlocked ? 'Unblock' : 'Block'}">
+                ${isBlocked ? '✅' : '🚫'}
+              </button>
+              <button class="action-btn btn-delete" onclick="deleteClient('${u.id}', '${u.email}')" title="Delete Account">🗑️</button>
+            ` : '<span style="font-size:11px;color:var(--text2)">—</span>'}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch(e) {
+    console.error(e);
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Unable to load — admin API requires service role key</td></tr>';
+  }
+}
+
+async function blockClient(userId, email) {
+  if(!confirm('Block ' + email + '? They will not be able to access the CRM.')) return;
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/blocked_users', {
+      method: 'POST', headers: HEADERS,
+      body: JSON.stringify({ user_id: userId, email })
+    });
+    showToast('🚫 ' + email + ' has been blocked');
+    loadClients();
+  } catch(e) { showToast('❌ Error blocking user'); }
+}
+
+async function unblockClient(userId, email) {
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/blocked_users?user_id=eq.' + userId, {
+      method: 'DELETE', headers: HEADERS
+    });
+    showToast('✅ ' + email + ' has been unblocked');
+    loadClients();
+  } catch(e) { showToast('❌ Error unblocking user'); }
+}
+
+async function deleteClient(userId, email) {
+  if(!confirm('DELETE account for ' + email + '? This will permanently delete their account and ALL their leads. This cannot be undone!')) return;
+  try {
+    // Delete their leads first
+    await fetch(SUPABASE_URL + '/rest/v1/leads?user_id=eq.' + userId, {
+      method: 'DELETE', headers: HEADERS
+    });
+    showToast('🗑️ Account and leads deleted for ' + email);
+    loadClients();
+  } catch(e) { showToast('❌ Error deleting account'); }
+}
+
+// ─── INVITE CLIENT ─────────────────────────────────────────────
+function openInviteModal() {
+  document.getElementById('invite-modal').classList.add('open');
+}
+function closeInviteModal() {
+  document.getElementById('invite-modal').classList.remove('open');
+  ['invite-email','invite-name'].forEach(id => document.getElementById(id).value = '');
+}
+document.getElementById('invite-modal').addEventListener('click', function(e) {
+  if(e.target === this) closeInviteModal();
+});
+
+async function inviteClient() {
+  const email = document.getElementById('invite-email').value.trim();
+  if(!email) { showToast('❌ Enter an email address'); return; }
+  try {
+    const r = await fetch(SUPABASE_URL + '/auth/v1/invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+      body: JSON.stringify({ email })
+    });
+    const data = await r.json();
+    if(!r.ok) { showToast('❌ ' + (data.msg || data.error_description || 'Failed to send invite')); return; }
+    showToast('✉️ Invite sent to ' + email + '!');
+    closeInviteModal();
+    loadClients();
+  } catch(e) { showToast('❌ Error sending invite'); }
+}
+
 // ─── INIT ──────────────────────────────────────────────────────
 loadLeads();
 
@@ -1924,5 +2441,30 @@ setTimeout(() => {
   </div>
 </div>
 
+
+    <!-- INVITE CLIENT MODAL -->
+    <div class="modal-overlay" id="invite-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Invite New Client</div>
+          <div class="modal-close" onclick="closeInviteModal()">✕</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Email</label>
+          <input class="form-input" id="invite-email" type="email" placeholder="client@company.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Client Name (optional)</label>
+          <input class="form-input" id="invite-name" placeholder="Company or person name" />
+        </div>
+        <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px;font-size:12px;color:var(--text2);margin-bottom:8px">
+          💡 The client will receive an email to set their password and access their own CRM dashboard.
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
+          <button class="btn btn-primary" style="flex:2" onclick="inviteClient()">✉️ Send Invite</button>
+        </div>
+      </div>
+    </div>
 </body>
 </html>
