@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>NexCRM — Sales & Marketing Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 <style>
@@ -1866,6 +1866,29 @@ function showToast(msg) {
 
 
 
+
+
+// ─── MOBILE DETECTION ──────────────────────────────────────────
+function isMobile() {
+  return window.innerWidth <= 900 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+}
+
+function applyMobileLayout() {
+  if(isMobile()) {
+    document.querySelector('.sidebar') && (document.querySelector('.sidebar').style.display = 'none');
+    document.querySelector('.topbar') && (document.querySelector('.topbar').style.display = 'none');
+    document.querySelector('.mobile-nav') && (document.querySelector('.mobile-nav').style.display = 'block');
+    document.querySelector('.mobile-fab') && (document.querySelector('.mobile-fab').style.display = 'flex');
+    document.querySelector('.mobile-header') && (document.querySelector('.mobile-header').style.display = 'flex');
+    document.querySelector('.main') && Object.assign(document.querySelector('.main').style, {
+      marginLeft: '0', marginRight: '0', paddingTop: '64px', paddingBottom: '90px'
+    });
+  }
+}
+
+// Run immediately and on resize
+applyMobileLayout();
+window.addEventListener('resize', applyMobileLayout);
 
 // ─── MOBILE NAV ────────────────────────────────────────────────
 function mobileNav(page, el) {
