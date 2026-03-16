@@ -1035,16 +1035,22 @@
   <div class="topbar">
     <div class="topbar-title" id="page-title">Dashboard</div>
     <div class="search-bar">
-      <span style="color:var(--text2);font-size:14px">🔍</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text2);flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input placeholder="Search leads, contacts..." />
     </div>
-    <button class="lang-btn" id="lang-toggle" onclick="toggleLang()">🇸🇦 عربي</button>
+    <button class="lang-btn" id="lang-toggle" onclick="toggleLang()" style="gap:6px;font-size:12px;padding:7px 12px">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span id="lang-label">عربي</span>
+    </button>
     <div class="notif-btn" onclick="toggleReminders(event)" style="cursor:pointer">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot" id="notif-dot" style="display:none"></div>
       <span id="notif-badge" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center"></span>
       <div class="reminder-dropdown" id="reminder-dropdown">
         <div class="rd-header">
-          <div class="rd-title">🔔 Follow-up Reminders</div>
+          <div class="rd-title" style="display:flex;align-items:center;gap:7px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Follow-up Reminders
+          </div>
           <div class="rd-count" id="rd-count"></div>
         </div>
         <div id="rd-list"><div class="rd-empty">Loading...</div></div>
@@ -3041,7 +3047,7 @@ function applyTranslations() {
   document.body.classList.toggle('rtl', isAr);
 
   // Lang button
-  document.getElementById('lang-toggle').textContent = lang.langBtn;
+  const langLabel = document.getElementById('lang-label'); if(langLabel) langLabel.textContent = isAr ? 'English' : 'عربي';
 
   // Topbar
   const addLeadBtn = document.querySelector('.topbar .btn-primary');
