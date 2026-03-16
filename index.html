@@ -700,22 +700,23 @@
     color:var(--text); display:flex; align-items:center; gap:8px; flex:1;
   }
 
-  @media(max-width:768px) {
+  @media(max-width:900px) {
     /* Hide desktop elements */
     .sidebar { display:none !important; }
     .topbar { display:none !important; }
 
     /* Show mobile elements */
-    .mobile-nav { display:block; }
-    .mobile-fab { display:flex; }
-    .mobile-header { display:flex; }
+    .mobile-nav { display:block !important; }
+    .mobile-fab { display:flex !important; }
+    .mobile-header { display:flex !important; }
 
     /* Adjust main */
     .main {
       margin-left:0 !important;
       margin-right:0 !important;
-      padding-top:56px;
-      padding-bottom:80px;
+      margin-top:0 !important;
+      padding-top:64px !important;
+      padding-bottom:90px !important;
     }
 
     /* Content padding */
