@@ -1870,7 +1870,11 @@ function showToast(msg) {
 
 // ─── MOBILE DETECTION ──────────────────────────────────────────
 function isMobile() {
-  return window.innerWidth <= 900 || /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  return (
+    /Android|iPhone|iPad|iPod|Mobile|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    ('ontouchstart' in window) ||
+    (navigator.maxTouchPoints > 0)
+  );
 }
 
 function applyMobileLayout() {
@@ -2215,6 +2219,7 @@ function loginSuccess(data) {
   document.querySelector('.user-name').textContent = currentUser.email.split('@')[0];
   document.querySelector('.user-role').textContent = currentUser.email;
   checkAdminStatus();
+  applyMobileLayout();
 }
 
 function logout() {
