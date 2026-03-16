@@ -1874,15 +1874,38 @@ function isMobile() {
 }
 
 function applyMobileLayout() {
-  if(isMobile()) {
-    document.querySelector('.sidebar') && (document.querySelector('.sidebar').style.display = 'none');
-    document.querySelector('.topbar') && (document.querySelector('.topbar').style.display = 'none');
-    document.querySelector('.mobile-nav') && (document.querySelector('.mobile-nav').style.display = 'block');
-    document.querySelector('.mobile-fab') && (document.querySelector('.mobile-fab').style.display = 'flex');
-    document.querySelector('.mobile-header') && (document.querySelector('.mobile-header').style.display = 'flex');
-    document.querySelector('.main') && Object.assign(document.querySelector('.main').style, {
-      marginLeft: '0', marginRight: '0', paddingTop: '64px', paddingBottom: '90px'
-    });
+  const mobile = isMobile();
+  const sidebar = document.querySelector('.sidebar');
+  const topbar = document.querySelector('.topbar');
+  const nav = document.getElementById('mobile-nav-bar');
+  const fab = document.getElementById('mobile-fab-btn');
+  const header = document.getElementById('mobile-header');
+  const main = document.querySelector('.main');
+
+  if(mobile) {
+    if(sidebar) sidebar.style.display = 'none';
+    if(topbar) topbar.style.display = 'none';
+    if(nav) nav.style.display = 'block';
+    if(fab) fab.style.display = 'flex';
+    if(header) header.style.display = 'flex';
+    if(main) {
+      main.style.marginLeft = '0';
+      main.style.marginRight = '0';
+      main.style.paddingTop = '64px';
+      main.style.paddingBottom = '90px';
+    }
+  } else {
+    if(sidebar) sidebar.style.display = '';
+    if(topbar) topbar.style.display = '';
+    if(nav) nav.style.display = 'none';
+    if(fab) fab.style.display = 'none';
+    if(header) header.style.display = 'none';
+    if(main) {
+      main.style.marginLeft = '';
+      main.style.marginRight = '';
+      main.style.paddingTop = '';
+      main.style.paddingBottom = '';
+    }
   }
 }
 
