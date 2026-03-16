@@ -1920,28 +1920,28 @@ function applyMobileLayout() {
   const main = document.querySelector('.main');
 
   if(mobile) {
-    if(sidebar) sidebar.style.display = 'none';
-    if(topbar) topbar.style.display = 'none';
-    if(nav) nav.style.display = 'block';
-    if(fab) fab.style.display = 'flex';
-    if(header) header.style.display = 'flex';
+    if(sidebar) sidebar.style.cssText += 'display:none!important';
+    if(topbar) topbar.style.cssText += 'display:none!important';
+    if(nav) { nav.style.display = 'block'; nav.style.setProperty('display','block','important'); }
+    if(fab) { fab.style.display = 'flex'; fab.style.setProperty('display','flex','important'); }
+    if(header) { header.style.display = 'flex'; header.style.setProperty('display','flex','important'); }
     if(main) {
-      main.style.marginLeft = '0';
-      main.style.marginRight = '0';
-      main.style.paddingTop = '64px';
-      main.style.paddingBottom = '90px';
+      main.style.setProperty('margin-left','0','important');
+      main.style.setProperty('margin-right','0','important');
+      main.style.setProperty('padding-top','64px','important');
+      main.style.setProperty('padding-bottom','90px','important');
     }
   } else {
-    if(sidebar) sidebar.style.display = '';
-    if(topbar) topbar.style.display = '';
+    if(sidebar) sidebar.style.cssText = sidebar.style.cssText.replace('display:none!important','');
+    if(topbar) topbar.style.cssText = topbar.style.cssText.replace('display:none!important','');
     if(nav) nav.style.display = 'none';
     if(fab) fab.style.display = 'none';
     if(header) header.style.display = 'none';
     if(main) {
-      main.style.marginLeft = '';
-      main.style.marginRight = '';
-      main.style.paddingTop = '';
-      main.style.paddingBottom = '';
+      main.style.removeProperty('margin-left');
+      main.style.removeProperty('margin-right');
+      main.style.removeProperty('padding-top');
+      main.style.removeProperty('padding-bottom');
     }
   }
 }
@@ -3185,5 +3185,60 @@ setTimeout(() => {
         </div>
       </div>
     </div>
+
+<!-- MOBILE HEADER -->
+<div class="mobile-header" id="mobile-header" style="display:none;position:fixed;top:0;left:0;right:0;height:56px;background:#0f1629;border-bottom:1px solid rgba(59,130,246,0.15);z-index:150;align-items:center;padding:0 16px;gap:12px;">
+  <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#f0f4ff;display:flex;align-items:center;gap:8px;flex:1">
+    <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff">N</div>
+    NexCRM
+  </div>
+  <div style="width:34px;height:34px;border-radius:10px;background:#151e35;border:1px solid rgba(59,130,246,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;font-size:16px;">🔔<div style="position:absolute;top:6px;right:6px;width:8px;height:8px;border-radius:50%;background:#ef4444;border:2px solid #0f1629;"></div></div>
+</div>
+
+<!-- MOBILE FAB -->
+<button id="mobile-fab-btn" onclick="openModal()" style="display:none;position:fixed;bottom:80px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border:none;cursor:pointer;z-index:150;box-shadow:0 4px 20px rgba(59,130,246,0.4);font-size:26px;color:#fff;align-items:center;justify-content:center;">＋</button>
+
+<!-- MOBILE BOTTOM NAV -->
+<div id="mobile-nav-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#0f1629;border-top:1px solid rgba(59,130,246,0.15);z-index:200;padding:8px 0 12px;">
+  <div style="display:flex;justify-content:space-around;align-items:center;">
+    <button onclick="mobileNav('dashboard',this)" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;border-radius:10px;cursor:pointer;background:none;border:none;color:#3b82f6;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;min-width:52px" id="mnav-dashboard">
+      <span style="font-size:20px">⚡</span><span>Home</span>
+    </button>
+    <button onclick="mobileNav('leads',this)" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;border-radius:10px;cursor:pointer;background:none;border:none;color:#8899bb;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;min-width:52px" id="mnav-leads">
+      <span style="font-size:20px">🎯</span><span>Leads</span>
+    </button>
+    <button onclick="mobileNav('pipeline',this)" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;border-radius:10px;cursor:pointer;background:none;border:none;color:#8899bb;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;min-width:52px" id="mnav-pipeline">
+      <span style="font-size:20px">📊</span><span>Pipeline</span>
+    </button>
+    <button onclick="mobileNav('contacts',this)" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;border-radius:10px;cursor:pointer;background:none;border:none;color:#8899bb;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;min-width:52px" id="mnav-contacts">
+      <span style="font-size:20px">👥</span><span>Contacts</span>
+    </button>
+    <button onclick="toggleMobileMenu()" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;border-radius:10px;cursor:pointer;background:none;border:none;color:#8899bb;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;min-width:52px">
+      <span style="font-size:20px">☰</span><span>More</span>
+    </button>
+  </div>
+</div>
+
+<!-- MOBILE MORE MENU -->
+<div id="mobile-menu" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;" onclick="toggleMobileMenu()">
+  <div style="position:absolute;bottom:0;left:0;right:0;background:#0f1629;border-radius:20px 20px 0 0;padding:20px;" onclick="event.stopPropagation()">
+    <div style="width:40px;height:4px;background:rgba(59,130,246,0.2);border-radius:2px;margin:0 auto 20px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <button onclick="mobileNav('campaigns',null);toggleMobileMenu()" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px;border-radius:12px;cursor:pointer;background:#151e35;border:1px solid rgba(59,130,246,0.15);color:#8899bb;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;">
+        <span style="font-size:24px">📣</span><span>Campaigns</span>
+      </button>
+      <button onclick="mobileNav('analytics',null);toggleMobileMenu()" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px;border-radius:12px;cursor:pointer;background:#151e35;border:1px solid rgba(59,130,246,0.15);color:#8899bb;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;">
+        <span style="font-size:24px">📈</span><span>Analytics</span>
+      </button>
+      <button id="mobile-admin-btn" onclick="mobileNav('admin',null);toggleMobileMenu()" style="display:none;flex-direction:column;align-items:center;gap:6px;padding:16px;border-radius:12px;cursor:pointer;background:#151e35;border:1px solid rgba(59,130,246,0.15);color:#8899bb;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;">
+        <span style="font-size:24px">⚙️</span><span>Admin</span>
+      </button>
+      <button onclick="logout();toggleMobileMenu()" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px;border-radius:12px;cursor:pointer;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;">
+        <span style="font-size:24px">🚪</span><span>Sign Out</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
