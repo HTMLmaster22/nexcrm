@@ -803,6 +803,39 @@
     .grid-2, .grid-3 { grid-template-columns:1fr; }
     .contacts-grid { grid-template-columns:1fr 1fr; }
   }
+
+  /* ── TRUE MOBILE (any touch device or narrow screen) ── */
+  @media screen and (max-width: 768px),
+  screen and (max-device-width: 768px) {
+    .sidebar { display:none !important; }
+    .topbar { display:none !important; }
+    .main { margin-left:0 !important; margin-right:0 !important; padding-top:60px !important; padding-bottom:80px !important; }
+    .content { padding:12px !important; }
+    .stats-grid { grid-template-columns:1fr 1fr !important; gap:8px !important; }
+    .grid-2, .grid-3 { grid-template-columns:1fr !important; }
+    .contacts-grid { grid-template-columns:1fr 1fr !important; }
+    .stat-value { font-size:20px !important; }
+    .table-wrap { overflow-x:auto !important; }
+    table { min-width:500px; }
+    .pipeline { flex-direction:column; }
+    .modal { width:94vw !important; padding:18px !important; }
+    .form-row { grid-template-columns:1fr !important; }
+    .admin-tabs { flex-wrap:wrap; }
+    #mobile-header { display:flex !important; }
+    #mobile-nav-bar { display:block !important; }
+    #mobile-fab-btn { display:flex !important; }
+  }
+
+  /* Poco X7 Pro & high-DPI Android phones */
+  @media screen and (max-width: 430px) {
+    .sidebar { display:none !important; }
+    .topbar { display:none !important; }
+    .main { margin-left:0 !important; margin-right:0 !important; padding-top:60px !important; padding-bottom:80px !important; }
+    #mobile-header { display:flex !important; }
+    #mobile-nav-bar { display:block !important; }
+    #mobile-fab-btn { display:flex !important; }
+  }
+
 </style>
 </head>
 <body>
