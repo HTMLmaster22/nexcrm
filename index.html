@@ -3937,15 +3937,13 @@ function openCalendarModal() {
 }
 
 async function loadCalendar() {
-  showLoader('Loading calendar...');
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/content_calendar?select=*&order=post_date.asc', { headers: HEADERS });
     const data = await r.json();
-    hideLoader();
-    if(!r.ok) return;
+    if(!r.ok) { renderCalendar(); return; }
     calendarPosts = data || [];
     renderCalendar();
-  } catch(e) { hideLoader(); }
+  } catch(e) { renderCalendar(); }
 }
 
 function filterCalendar(filter, el) {
@@ -4028,15 +4026,13 @@ function openDeliverableModal() {
 }
 
 async function loadDeliverables() {
-  showLoader('Loading deliverables...');
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/deliverables?select=*&order=id.desc', { headers:HEADERS });
     const data = await r.json();
-    hideLoader();
-    if(!r.ok) return;
+    if(!r.ok) { renderDeliverables(); return; }
     deliverablesList = data || [];
     renderDeliverables();
-  } catch(e) { hideLoader(); }
+  } catch(e) { renderDeliverables(); }
 }
 
 function renderDeliverables() {
@@ -4139,15 +4135,13 @@ function openInvoiceModal() {
 }
 
 async function loadInvoices() {
-  showLoader('Loading invoices...');
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/invoices?select=*&order=id.desc', { headers:HEADERS });
     const data = await r.json();
-    hideLoader();
-    if(!r.ok) return;
+    if(!r.ok) { renderInvoices(); return; }
     invoicesList = data || [];
     renderInvoices();
-  } catch(e) { hideLoader(); }
+  } catch(e) { renderInvoices(); }
 }
 
 function renderInvoices() {
