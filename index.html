@@ -659,6 +659,60 @@
 
 
 
+
+  /* ─── CONTENT CALENDAR ──────────────────────────────────────── */
+  .platform-badge {
+    display:inline-flex; align-items:center; gap:4px;
+    padding:3px 8px; border-radius:6px; font-size:11px; font-weight:600;
+  }
+  .platform-ig { background:rgba(225,48,108,0.15); color:#e1306c; }
+  .platform-tt { background:rgba(0,0,0,0.2); color:#aaa; border:1px solid rgba(255,255,255,0.1); }
+  .platform-sc { background:rgba(255,252,0,0.15); color:#e6d800; }
+  .platform-x  { background:rgba(255,255,255,0.1); color:#aaa; }
+  .platform-fb { background:rgba(24,119,242,0.15); color:#1877f2; }
+  .content-status {
+    display:inline-block; padding:3px 10px; border-radius:20px;
+    font-size:11px; font-weight:600;
+  }
+  .status-draft { background:rgba(148,163,184,0.15); color:#94a3b8; }
+  .status-approved { background:rgba(59,130,246,0.15); color:#93c5fd; }
+  .status-scheduled { background:rgba(245,158,11,0.15); color:#fcd34d; }
+  .status-posted { background:rgba(16,185,129,0.15); color:#6ee7b7; }
+
+  /* ─── DELIVERABLES ───────────────────────────────────────────── */
+  .deliverable-progress {
+    height:8px; background:var(--bg3); border-radius:10px; overflow:hidden; margin:8px 0;
+  }
+  .deliverable-fill {
+    height:100%; border-radius:10px;
+    background:linear-gradient(to right,var(--accent),var(--accent2));
+    transition:width 0.5s ease;
+  }
+  .deliverable-card {
+    background:var(--bg3); border:1px solid var(--border); border-radius:12px;
+    padding:16px; margin-bottom:12px; transition:border-color 0.2s;
+  }
+  .deliverable-card:hover { border-color:rgba(59,130,246,0.3); }
+
+  /* ─── INVOICES ───────────────────────────────────────────────── */
+  .invoice-card {
+    background:var(--bg3); border:1px solid var(--border); border-radius:12px;
+    padding:16px; margin-bottom:12px; display:flex; align-items:center; gap:16px;
+    transition:border-color 0.2s;
+  }
+  .invoice-card:hover { border-color:rgba(59,130,246,0.3); }
+  .invoice-amount { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; }
+  .invoice-paid { color:var(--success); }
+  .invoice-unpaid { color:var(--warning); }
+  .invoice-overdue { color:var(--danger); }
+  .pay-btn {
+    padding:6px 14px; border-radius:8px; border:none; cursor:pointer;
+    font-size:12px; font-weight:600; font-family:'DM Sans',sans-serif;
+    background:rgba(16,185,129,0.15); color:var(--success);
+    border:1px solid rgba(16,185,129,0.3); transition:all 0.2s;
+  }
+  .pay-btn:hover { background:rgba(16,185,129,0.25); }
+
   /* ─── LOADING SPINNER ─────────────────────────────────────── */
   .page-loader {
     position:fixed; inset:0; background:rgba(10,15,30,0.5);
@@ -1044,7 +1098,15 @@
     <div class="nav-label">Marketing</div>
     <div class="nav-item" onclick="nav('campaigns',this)">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span><span>Campaigns</span>
-      <span class="badge green">3</span>
+    </div>
+    <div class="nav-item" onclick="nav('calendar',this)">
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>Content Calendar</span>
+    </div>
+    <div class="nav-item" onclick="nav('deliverables',this)">
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span>Deliverables</span>
+    </div>
+    <div class="nav-item" onclick="nav('invoices',this)">
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span>Invoices</span>
     </div>
     <div class="nav-item" onclick="nav('analytics',this)">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span>Analytics</span>
@@ -2216,6 +2278,237 @@
       </div>
     </div>
 
+
+    <!-- CONTENT CALENDAR -->
+    <div class="page" id="page-calendar">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Content Calendar</div>
+            <div class="card-subtitle">Schedule and track your social media posts</div>
+          </div>
+          <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openCalendarModal()">＋ Add Post</button>
+        </div>
+
+        <!-- Stats row -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="calendar-stats">
+          <div class="stat-card"><div class="stat-label">Total Posts</div><div class="stat-value" id="cal-total">0</div></div>
+          <div class="stat-card"><div class="stat-label">Posted</div><div class="stat-value" style="color:var(--success)" id="cal-posted">0</div></div>
+          <div class="stat-card"><div class="stat-label">Scheduled</div><div class="stat-value" style="color:var(--warning)" id="cal-scheduled">0</div></div>
+          <div class="stat-card"><div class="stat-label">Pending Approval</div><div class="stat-value" style="color:var(--accent)" id="cal-pending">0</div></div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="admin-tab active" onclick="filterCalendar('all',this)">All</button>
+          <button class="admin-tab" onclick="filterCalendar('Draft',this)">Draft</button>
+          <button class="admin-tab" onclick="filterCalendar('Approved',this)">Approved</button>
+          <button class="admin-tab" onclick="filterCalendar('Scheduled',this)">Scheduled</button>
+          <button class="admin-tab" onclick="filterCalendar('Posted',this)">Posted</button>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Post Date</th><th>Platform</th><th>Content Type</th>
+                <th>Caption</th><th>Caption Status</th><th>Visual Status</th>
+                <th>Assigned To</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="calendar-tbody">
+              <tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text2)">No posts yet — add your first one!</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELIVERABLES TRACKER -->
+    <div class="page" id="page-deliverables">
+      <div class="grid-2" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Deliverables Tracker</div>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openDeliverableModal()">＋ Add Service</button>
+          </div>
+          <div id="deliverables-list">
+            <div style="text-align:center;padding:40px;color:var(--text2)">No deliverables yet</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Monthly Summary</div></div>
+          <div id="deliverables-summary">
+            <div style="text-align:center;padding:40px;color:var(--text2)">Add deliverables to see summary</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVOICE TRACKER -->
+    <div class="page" id="page-invoices">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+        <div class="stat-card"><div class="stat-label">Total Invoiced</div><div class="stat-value" id="inv-total">$0</div></div>
+        <div class="stat-card"><div class="stat-label">Paid</div><div class="stat-value" style="color:var(--success)" id="inv-paid">$0</div></div>
+        <div class="stat-card"><div class="stat-label">Outstanding</div><div class="stat-value" style="color:var(--warning)" id="inv-outstanding">$0</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Invoice Tracker</div>
+          <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInvoiceModal()">＋ New Invoice</button>
+        </div>
+        <div id="invoices-list">
+          <div style="text-align:center;padding:40px;color:var(--text2)">No invoices yet</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDAR MODAL -->
+    <div class="modal-overlay" id="calendar-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Add Content Post</div>
+          <div class="modal-close" onclick="document.getElementById('calendar-modal').classList.remove('open')">✕</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Post Date</label>
+            <input class="form-input" id="cal-date" type="date" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Platform</label>
+            <select class="form-input" id="cal-platform">
+              <option>Instagram</option><option>TikTok</option><option>Snapchat</option>
+              <option>X (Twitter)</option><option>Facebook</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Content Type</label>
+            <select class="form-input" id="cal-type">
+              <option>Reel</option><option>Story</option><option>Feed Post</option>
+              <option>TikTok Video</option><option>Carousel</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assigned To</label>
+            <input class="form-input" id="cal-assigned" placeholder="e.g. Tariq" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Caption / Description</label>
+          <textarea class="form-input" id="cal-caption" rows="3" placeholder="Write caption here..." style="resize:vertical"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Caption Status</label>
+            <select class="form-input" id="cal-caption-status">
+              <option>Draft</option><option>Approved</option><option>Scheduled</option><option>Posted</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Visual Status</label>
+            <select class="form-input" id="cal-visual-status">
+              <option>Pending</option><option>In Progress</option><option>Ready</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('calendar-modal').classList.remove('open')">Cancel</button>
+          <button class="btn btn-primary" style="flex:2" onclick="saveCalendarPost()">💾 Save Post</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELIVERABLE MODAL -->
+    <div class="modal-overlay" id="deliverable-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Add Deliverable</div>
+          <div class="modal-close" onclick="document.getElementById('deliverable-modal').classList.remove('open')">✕</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Service Name</label>
+          <input class="form-input" id="del-name" placeholder="e.g. Instagram Posts" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Contracted</label>
+            <input class="form-input" id="del-contracted" type="number" placeholder="22" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Delivered</label>
+            <input class="form-input" id="del-delivered" type="number" placeholder="14" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Client Name</label>
+            <input class="form-input" id="del-client" placeholder="e.g. Majnoon Laila" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Month</label>
+            <input class="form-input" id="del-month" type="month" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Approval Status</label>
+          <select class="form-input" id="del-status">
+            <option>In Progress</option><option>Pending Approval</option><option>Approved</option><option>Completed</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('deliverable-modal').classList.remove('open')">Cancel</button>
+          <button class="btn btn-primary" style="flex:2" onclick="saveDeliverable()">💾 Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVOICE MODAL -->
+    <div class="modal-overlay" id="invoice-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">New Invoice</div>
+          <div class="modal-close" onclick="document.getElementById('invoice-modal').classList.remove('open')">✕</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Client Name</label>
+            <input class="form-input" id="inv-client" placeholder="e.g. Majnoon Laila" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Invoice #</label>
+            <input class="form-input" id="inv-number" placeholder="INV-001" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Amount ($)</label>
+            <input class="form-input" id="inv-amount" type="number" placeholder="5000" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Due Date</label>
+            <input class="form-input" id="inv-due" type="date" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Service Description</label>
+          <input class="form-input" id="inv-desc" placeholder="e.g. Social media management — March 2026" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-input" id="inv-status">
+            <option>Unpaid</option><option>Paid</option><option>Overdue</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('invoice-modal').classList.remove('open')">Cancel</button>
+          <button class="btn btn-primary" style="flex:2" onclick="saveInvoice()">💾 Save Invoice</button>
+        </div>
+      </div>
+    </div>
+
   </div><!-- end content -->
 </main>
 
@@ -2391,7 +2684,8 @@ async function loadLeads() {
 // ─── NAV ───────────────────────────────────────────────────────
 const titles = {
   dashboard:'Dashboard', leads:'Leads', pipeline:'Pipeline',
-  contacts:'Contacts', campaigns:'Campaigns', analytics:'Analytics', admin:'Admin Panel'
+  contacts:'Contacts', campaigns:'Campaigns', analytics:'Analytics', admin:'Admin Panel',
+  calendar:'Content Calendar', deliverables:'Deliverables', invoices:'Invoices'
 };
 function nav(page, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -2403,6 +2697,9 @@ function nav(page, el) {
   if(page === 'contacts') loadContacts();
   if(page === 'admin') { loadTeam(); }
   if(page === 'campaigns') { loadCampaignHistory(); }
+  if(page === 'calendar') { loadCalendar(); }
+  if(page === 'deliverables') { loadDeliverables(); }
+  if(page === 'invoices') { loadInvoices(); }
 }
 
 // ─── MODAL ─────────────────────────────────────────────────────
@@ -3622,6 +3919,317 @@ async function unblockClient(userId) {
 }
 
 
+
+
+// ─── CONTENT CALENDAR ──────────────────────────────────────────
+let calendarPosts = [];
+let calendarFilter = 'all';
+
+const platformClass = {
+  'Instagram':'platform-ig','TikTok':'platform-tt','Snapchat':'platform-sc',
+  'X (Twitter)':'platform-x','Facebook':'platform-fb'
+};
+
+function openCalendarModal() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('cal-date').value = today;
+  document.getElementById('calendar-modal').classList.add('open');
+}
+
+async function loadCalendar() {
+  showLoader('Loading calendar...');
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/content_calendar?select=*&order=post_date.asc', { headers: HEADERS });
+    const data = await r.json();
+    hideLoader();
+    if(!r.ok) return;
+    calendarPosts = data || [];
+    renderCalendar();
+  } catch(e) { hideLoader(); }
+}
+
+function filterCalendar(filter, el) {
+  calendarFilter = filter;
+  document.querySelectorAll('#page-calendar .admin-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const filtered = calendarFilter === 'all' ? calendarPosts : calendarPosts.filter(p => p.caption_status === calendarFilter);
+  const tbody = document.getElementById('calendar-tbody');
+
+  // Update stats
+  document.getElementById('cal-total').textContent = calendarPosts.length;
+  document.getElementById('cal-posted').textContent = calendarPosts.filter(p => p.caption_status === 'Posted').length;
+  document.getElementById('cal-scheduled').textContent = calendarPosts.filter(p => p.caption_status === 'Scheduled').length;
+  document.getElementById('cal-pending').textContent = calendarPosts.filter(p => p.caption_status === 'Approved').length;
+
+  if(!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text2)">No posts found</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(p => `
+    <tr>
+      <td style="font-weight:600;white-space:nowrap">${p.post_date ? new Date(p.post_date + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '—'}</td>
+      <td><span class="platform-badge ${platformClass[p.platform]||''}">${p.platform||'—'}</span></td>
+      <td><span style="font-size:12px;color:var(--text2)">${p.content_type||'—'}</span></td>
+      <td style="max-width:200px"><div style="font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px" title="${p.caption||''}">${p.caption||'—'}</div></td>
+      <td><span class="content-status status-${(p.caption_status||'draft').toLowerCase()}">${p.caption_status||'Draft'}</span></td>
+      <td><span class="content-status ${p.visual_status==='Ready'?'status-posted':p.visual_status==='In Progress'?'status-approved':'status-draft'}">${p.visual_status||'Pending'}</span></td>
+      <td style="font-size:12px;color:var(--text2)">${p.assigned_to||'—'}</td>
+      <td>
+        <button class="action-btn btn-delete" onclick="deleteCalendarPost(${p.id})" title="Delete">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+async function saveCalendarPost() {
+  const post = {
+    post_date: document.getElementById('cal-date').value,
+    platform: document.getElementById('cal-platform').value,
+    content_type: document.getElementById('cal-type').value,
+    caption: document.getElementById('cal-caption').value.trim(),
+    caption_status: document.getElementById('cal-caption-status').value,
+    visual_status: document.getElementById('cal-visual-status').value,
+    assigned_to: document.getElementById('cal-assigned').value.trim(),
+    user_id: currentUser ? currentUser.id : null
+  };
+  if(!post.post_date) { showToast('❌ Pick a post date'); return; }
+  showLoader('Saving...');
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/content_calendar', { method:'POST', headers:HEADERS, body:JSON.stringify(post) });
+    hideLoader();
+    if(!r.ok) { showToast('❌ Failed to save'); return; }
+    document.getElementById('calendar-modal').classList.remove('open');
+    showToast('✅ Post added to calendar!');
+    loadCalendar();
+  } catch(e) { hideLoader(); showToast('❌ Error'); }
+}
+
+async function deleteCalendarPost(id) {
+  if(!confirm('Delete this post?')) return;
+  await fetch(SUPABASE_URL + '/rest/v1/content_calendar?id=eq.' + id, { method:'DELETE', headers:HEADERS });
+  showToast('🗑️ Post deleted');
+  loadCalendar();
+}
+
+// ─── DELIVERABLES TRACKER ──────────────────────────────────────
+let deliverablesList = [];
+
+function openDeliverableModal() {
+  const now = new Date();
+  document.getElementById('del-month').value = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  document.getElementById('deliverable-modal').classList.add('open');
+}
+
+async function loadDeliverables() {
+  showLoader('Loading deliverables...');
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/deliverables?select=*&order=id.desc', { headers:HEADERS });
+    const data = await r.json();
+    hideLoader();
+    if(!r.ok) return;
+    deliverablesList = data || [];
+    renderDeliverables();
+  } catch(e) { hideLoader(); }
+}
+
+function renderDeliverables() {
+  const list = document.getElementById('deliverables-list');
+  const summary = document.getElementById('deliverables-summary');
+
+  if(!deliverablesList.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No deliverables yet — add your first service!</div>';
+    summary.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">Add deliverables to see summary</div>';
+    return;
+  }
+
+  list.innerHTML = deliverablesList.map(d => {
+    const pct = d.contracted > 0 ? Math.round((d.delivered / d.contracted) * 100) : 0;
+    const pending = d.contracted - d.delivered;
+    const statusColor = d.status === 'Completed' ? 'var(--success)' : d.status === 'Approved' ? 'var(--accent)' : d.status === 'Pending Approval' ? 'var(--warning)' : 'var(--text2)';
+    return `
+      <div class="deliverable-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text)">${d.service_name}</div>
+            <div style="font-size:12px;color:var(--text2)">${d.client_name} · ${d.month||'—'}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:11px;font-weight:600;color:${statusColor};background:rgba(59,130,246,0.05);padding:3px 10px;border-radius:20px;border:1px solid ${statusColor}33">${d.status}</span>
+            <button class="action-btn btn-delete" onclick="deleteDeliverable(${d.id})">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div style="display:flex;gap:20px;margin-bottom:6px">
+          <span style="font-size:12px;color:var(--text2)">Contracted: <b style="color:var(--text)">${d.contracted}</b></span>
+          <span style="font-size:12px;color:var(--text2)">Delivered: <b style="color:var(--success)">${d.delivered}</b></span>
+          <span style="font-size:12px;color:var(--text2)">Pending: <b style="color:var(--warning)">${pending}</b></span>
+          <span style="font-size:12px;color:var(--text2)"><b style="color:var(--accent)">${pct}%</b> complete</span>
+        </div>
+        <div class="deliverable-progress"><div class="deliverable-fill" style="width:${pct}%"></div></div>
+      </div>
+    `;
+  }).join('');
+
+  // Summary
+  const totalContracted = deliverablesList.reduce((s,d) => s + (d.contracted||0), 0);
+  const totalDelivered = deliverablesList.reduce((s,d) => s + (d.delivered||0), 0);
+  const totalPending = totalContracted - totalDelivered;
+  const overallPct = totalContracted > 0 ? Math.round(totalDelivered/totalContracted*100) : 0;
+
+  summary.innerHTML = `
+    <div style="text-align:center;padding:20px 0">
+      <div style="font-size:48px;font-weight:800;font-family:'Syne',sans-serif;color:var(--accent)">${overallPct}%</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:20px">Overall completion</div>
+      <div class="deliverable-progress" style="margin-bottom:20px"><div class="deliverable-fill" style="width:${overallPct}%"></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div class="stat-card"><div class="stat-label">Contracted</div><div class="stat-value">${totalContracted}</div></div>
+      <div class="stat-card"><div class="stat-label">Delivered</div><div class="stat-value" style="color:var(--success)">${totalDelivered}</div></div>
+      <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-value" style="color:var(--warning)">${totalPending}</div></div>
+    </div>
+  `;
+}
+
+async function saveDeliverable() {
+  const d = {
+    service_name: document.getElementById('del-name').value.trim(),
+    contracted: parseInt(document.getElementById('del-contracted').value) || 0,
+    delivered: parseInt(document.getElementById('del-delivered').value) || 0,
+    client_name: document.getElementById('del-client').value.trim(),
+    month: document.getElementById('del-month').value,
+    status: document.getElementById('del-status').value,
+    user_id: currentUser ? currentUser.id : null
+  };
+  if(!d.service_name) { showToast('❌ Enter service name'); return; }
+  showLoader('Saving...');
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/deliverables', { method:'POST', headers:HEADERS, body:JSON.stringify(d) });
+    hideLoader();
+    if(!r.ok) { showToast('❌ Failed to save'); return; }
+    document.getElementById('deliverable-modal').classList.remove('open');
+    showToast('✅ Deliverable saved!');
+    loadDeliverables();
+  } catch(e) { hideLoader(); showToast('❌ Error'); }
+}
+
+async function deleteDeliverable(id) {
+  if(!confirm('Delete this deliverable?')) return;
+  await fetch(SUPABASE_URL + '/rest/v1/deliverables?id=eq.' + id, { method:'DELETE', headers:HEADERS });
+  showToast('🗑️ Deleted');
+  loadDeliverables();
+}
+
+// ─── INVOICE TRACKER ───────────────────────────────────────────
+let invoicesList = [];
+
+function openInvoiceModal() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('inv-due').value = today;
+  const count = invoicesList.length + 1;
+  document.getElementById('inv-number').value = 'INV-' + String(count).padStart(3,'0');
+  document.getElementById('invoice-modal').classList.add('open');
+}
+
+async function loadInvoices() {
+  showLoader('Loading invoices...');
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/invoices?select=*&order=id.desc', { headers:HEADERS });
+    const data = await r.json();
+    hideLoader();
+    if(!r.ok) return;
+    invoicesList = data || [];
+    renderInvoices();
+  } catch(e) { hideLoader(); }
+}
+
+function renderInvoices() {
+  const list = document.getElementById('invoices-list');
+
+  // Stats
+  const total = invoicesList.reduce((s,i) => s + (i.amount||0), 0);
+  const paid = invoicesList.filter(i => i.status==='Paid').reduce((s,i) => s + (i.amount||0), 0);
+  const outstanding = total - paid;
+  document.getElementById('inv-total').textContent = '$' + total.toLocaleString();
+  document.getElementById('inv-paid').textContent = '$' + paid.toLocaleString();
+  document.getElementById('inv-outstanding').textContent = '$' + outstanding.toLocaleString();
+
+  if(!invoicesList.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No invoices yet</div>';
+    return;
+  }
+
+  list.innerHTML = invoicesList.map(inv => {
+    const isOverdue = inv.status === 'Unpaid' && inv.due_date && new Date(inv.due_date) < new Date();
+    const status = isOverdue ? 'Overdue' : inv.status;
+    const amtClass = status === 'Paid' ? 'invoice-paid' : status === 'Overdue' ? 'invoice-overdue' : 'invoice-unpaid';
+    return `
+      <div class="invoice-card">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+            <div style="font-size:13px;font-weight:700;color:var(--text)">${inv.invoice_number||'—'}</div>
+            <span class="content-status ${status==='Paid'?'status-posted':status==='Overdue'?'status-draft':'status-scheduled'}">${status}</span>
+          </div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px">${inv.client_name||'—'}</div>
+          <div style="font-size:12px;color:var(--text2)">${inv.description||'—'}</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px">Due: ${inv.due_date ? new Date(inv.due_date + 'T00:00:00').toLocaleDateString() : '—'}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="invoice-amount ${amtClass}">$${(inv.amount||0).toLocaleString()}</div>
+          ${status !== 'Paid' ? `<button class="pay-btn" onclick="markPaid(${inv.id})" style="margin-top:8px">Mark Paid</button>` : '<div style="font-size:11px;color:var(--success);margin-top:8px">✓ Paid</div>'}
+          <button class="action-btn btn-delete" onclick="deleteInvoice(${inv.id})" style="margin-top:6px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function saveInvoice() {
+  const inv = {
+    client_name: document.getElementById('inv-client').value.trim(),
+    invoice_number: document.getElementById('inv-number').value.trim(),
+    amount: parseFloat(document.getElementById('inv-amount').value) || 0,
+    due_date: document.getElementById('inv-due').value,
+    description: document.getElementById('inv-desc').value.trim(),
+    status: document.getElementById('inv-status').value,
+    user_id: currentUser ? currentUser.id : null
+  };
+  if(!inv.client_name) { showToast('❌ Enter client name'); return; }
+  showLoader('Saving...');
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/invoices', { method:'POST', headers:HEADERS, body:JSON.stringify(inv) });
+    hideLoader();
+    if(!r.ok) { showToast('❌ Failed to save'); return; }
+    document.getElementById('invoice-modal').classList.remove('open');
+    showToast('✅ Invoice saved!');
+    loadInvoices();
+  } catch(e) { hideLoader(); showToast('❌ Error'); }
+}
+
+async function markPaid(id) {
+  await fetch(SUPABASE_URL + '/rest/v1/invoices?id=eq.' + id, {
+    method:'PATCH', headers:{ ...HEADERS, 'Prefer':'return=minimal' },
+    body:JSON.stringify({ status:'Paid', paid_at: new Date().toISOString() })
+  });
+  showToast('✅ Invoice marked as paid!');
+  loadInvoices();
+}
+
+async function deleteInvoice(id) {
+  if(!confirm('Delete this invoice?')) return;
+  await fetch(SUPABASE_URL + '/rest/v1/invoices?id=eq.' + id, { method:'DELETE', headers:HEADERS });
+  showToast('🗑️ Invoice deleted');
+  loadInvoices();
+}
 
 // ─── EMAIL CAMPAIGNS ───────────────────────────────────────────
 let isSending = false;
