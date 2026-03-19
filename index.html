@@ -658,6 +658,37 @@
 
 
 
+
+  /* ─── LOADING SPINNER ─────────────────────────────────────── */
+  .page-loader {
+    position:fixed; inset:0; background:rgba(10,15,30,0.7);
+    backdrop-filter:blur(4px); z-index:400;
+    display:none; align-items:center; justify-content:center;
+    flex-direction:column; gap:16px;
+  }
+  .page-loader.show { display:flex; }
+  .spinner {
+    width:44px; height:44px; border-radius:50%;
+    border:3px solid rgba(59,130,246,0.15);
+    border-top:3px solid var(--accent);
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .spinner-text {
+    font-size:13px; color:var(--text2); font-family:'DM Sans',sans-serif;
+    animation:fadeInOut 1.5s ease infinite;
+  }
+  @keyframes fadeInOut { 0%,100%{opacity:0.5} 50%{opacity:1} }
+
+  /* Inline skeleton loader for tables */
+  .skeleton {
+    background:linear-gradient(90deg,var(--bg3) 25%,var(--bg2) 50%,var(--bg3) 75%);
+    background-size:200% 100%;
+    animation:shimmer 1.5s infinite;
+    border-radius:6px; height:14px;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
   /* ─── CSV IMPORT ──────────────────────────────────────────── */
   .import-modal { width:620px !important; max-width:96vw; }
   .drop-zone {
@@ -2344,8 +2375,9 @@ function renderLeads() {
 
 // ─── LOAD LEADS FROM SUPABASE ──────────────────────────────────
 async function loadLeads() {
+  showLoader('Loading leads...');
   const tbody = document.getElementById('leads-tbody');
-  tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text2)">Loading leads...</td></tr>`;
+  tbody.innerHTML = '';
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc', { headers: HEADERS });
     const data = await r.json();
@@ -2364,7 +2396,7 @@ function nav(page, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  el.classList.add('active');
+  if(el) el.classList.add('active');
   document.getElementById('page-title').textContent = titles[page];
   if(page === 'leads') loadLeads();
   if(page === 'contacts') loadContacts();
@@ -2410,10 +2442,11 @@ async function addLead() {
   };
 
   // Save to Supabase
+  showLoader('Saving lead...');
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads', { method: 'POST', headers: HEADERS, body: JSON.stringify(newLead) });
-    if (!r.ok) { const e = await r.json(); console.error(e); showToast('❌ Failed to save lead'); return; }
-  } catch(e) { console.error(e); showToast('❌ Failed to save lead'); return; }
+    if (!r.ok) { const e = await r.json(); console.error(e); showToast('❌ Failed to save lead'); hideLoader(); return; }
+  } catch(e) { console.error(e); showToast('❌ Failed to save lead'); hideLoader(); return; }
 
   // Reload from DB
   await loadLeads();
@@ -2786,6 +2819,19 @@ function downloadTemplate(format) {
     URL.revokeObjectURL(url);
   }
   showToast('📥 Template downloaded!');
+}
+
+
+// ─── LOADER ────────────────────────────────────────────────────
+function showLoader(text) {
+  const loader = document.getElementById('page-loader');
+  const txt = document.getElementById('spinner-text');
+  if(loader) loader.classList.add('show');
+  if(txt) txt.textContent = text || 'Loading...';
+}
+function hideLoader() {
+  const loader = document.getElementById('page-loader');
+  if(loader) loader.classList.remove('show');
 }
 
 // ─── REMINDERS ─────────────────────────────────────────────────
@@ -3367,15 +3413,17 @@ document.getElementById('contact-modal').addEventListener('click', function(e) {
 });
 
 async function loadContacts() {
+  showLoader('Loading contacts...');
   const grid = document.getElementById('contacts-grid');
-  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">Loading contacts...</div>';
+  grid.innerHTML = '';
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/contacts?select=*&order=id.desc', { headers: HEADERS });
     const data = await r.json();
     if(!r.ok) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">No contacts yet</div>'; return; }
     contacts = data || [];
     renderContacts();
-  } catch(e) { console.error(e); }
+    hideLoader();
+  } catch(e) { console.error(e); hideLoader(); }
 }
 
 function renderContacts() {
@@ -3918,6 +3966,7 @@ function adminTab(tab, el) {
 
 // ─── TEAM ──────────────────────────────────────────────────────
 async function loadTeam() {
+  showLoader('Loading team...');
   const list = document.getElementById('team-list');
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/team_members?select=*&order=id.asc', { headers: HEADERS });
@@ -3927,6 +3976,7 @@ async function loadTeam() {
       return;
     }
     teamMembers = data;
+    hideLoader();
     list.innerHTML = data.map(m => `
       <div class="team-card">
         <div class="team-avatar-lg">${(m.name||'?')[0].toUpperCase()}</div>
@@ -4416,6 +4466,13 @@ setTimeout(() => {
         </div>
       </div>
     </div>
+
+
+<!-- PAGE LOADER -->
+<div class="page-loader" id="page-loader">
+  <div class="spinner"></div>
+  <div class="spinner-text" id="spinner-text">Loading...</div>
+</div>
 
 <!-- MOBILE HEADER -->
 <div class="mobile-header" id="mobile-header" style="display:none;position:fixed;top:0;left:0;right:0;height:56px;background:#0f1629;border-bottom:1px solid rgba(59,130,246,0.15);z-index:150;align-items:center;padding:0 16px;gap:12px;">
