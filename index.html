@@ -661,10 +661,11 @@
 
   /* ─── LOADING SPINNER ─────────────────────────────────────── */
   .page-loader {
-    position:fixed; inset:0; background:rgba(10,15,30,0.7);
-    backdrop-filter:blur(4px); z-index:400;
+    position:fixed; inset:0; background:rgba(10,15,30,0.5);
+    backdrop-filter:blur(2px); z-index:400;
     display:none; align-items:center; justify-content:center;
     flex-direction:column; gap:16px;
+    pointer-events:none;
   }
   .page-loader.show { display:flex; }
   .spinner {
@@ -3971,12 +3972,12 @@ async function loadTeam() {
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/team_members?select=*&order=id.asc', { headers: HEADERS });
     const data = await r.json();
+    hideLoader();
     if(!r.ok || data.length === 0) {
       list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No team members yet — add your first one!</div>';
       return;
     }
     teamMembers = data;
-    hideLoader();
     list.innerHTML = data.map(m => `
       <div class="team-card">
         <div class="team-avatar-lg">${(m.name||'?')[0].toUpperCase()}</div>
@@ -3998,7 +3999,7 @@ async function loadTeam() {
         </div>
       </div>
     `).join('');
-  } catch(e) { console.error(e); list.innerHTML = '<div style="color:var(--danger);padding:20px">Error loading team</div>'; }
+  } catch(e) { hideLoader(); console.error(e); list.innerHTML = '<div style="color:var(--danger);padding:20px">Error loading team</div>'; }
 }
 
 async function changeRole(id, role) {
