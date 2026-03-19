@@ -2824,16 +2824,22 @@ function downloadTemplate(format) {
 
 
 // ─── LOADER ────────────────────────────────────────────────────
+let loaderTimeout = null;
 function showLoader(text) {
   const loader = document.getElementById('page-loader');
   const txt = document.getElementById('spinner-text');
   if(loader) loader.classList.add('show');
   if(txt) txt.textContent = text || 'Loading...';
+  // Safety: auto-hide after 3 seconds no matter what
+  if(loaderTimeout) clearTimeout(loaderTimeout);
+  loaderTimeout = setTimeout(hideLoader, 3000);
 }
 function hideLoader() {
+  if(loaderTimeout) { clearTimeout(loaderTimeout); loaderTimeout = null; }
   const loader = document.getElementById('page-loader');
   if(loader) loader.classList.remove('show');
 }
+
 
 // ─── REMINDERS ─────────────────────────────────────────────────
 let reminders = [];
