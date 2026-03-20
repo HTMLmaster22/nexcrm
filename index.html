@@ -1357,6 +1357,7 @@
               <tr>
                 <th>Name</th>
                 <th>Company</th>
+                <th>Phone</th>
                 <th>Source</th>
                 <th>Status</th>
                 <th>Value</th>
@@ -2277,7 +2278,6 @@
         </div>
       </div>
     </div>
-    </div>
 
 
     <!-- CONTENT CALENDAR -->
@@ -2622,6 +2622,7 @@ function renderLeads() {
     <tr>
       <td><div style="font-weight:600">${l.name}</div></td>
       <td><div style="color:var(--text2)">${l.company||'—'}</div></td>
+      <td><div style="color:var(--accent);font-size:12px">${l.phone||'—'}</div></td>
       <td><span class="source-tag">${l.source||'—'}</span></td>
       <td><span class="status-pill ${statusClass[l.status]||'pill-new'}">${l.status||'New'}</span></td>
       <td><span style="font-weight:600;color:var(--success)">${l.value||'—'}</span></td>
