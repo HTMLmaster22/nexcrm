@@ -4809,64 +4809,65 @@ async function loadPerformance() {
 // ─── CLIENT MANAGEMENT ─────────────────────────────────────────
 async function loadClients() {
   const tbody = document.getElementById('clients-tbody');
-  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>';
   try {
-    // Get all users from auth
-    const r = await fetch(SUPABASE_URL + '/auth/v1/admin/users', {
-      headers: { ...HEADERS, 'apikey': SUPABASE_KEY }
+    const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_users', {
+      method: 'POST', headers: HEADERS, body: JSON.stringify({})
     });
-    const usersData = await r.json();
+    const users = r.ok ? await r.json() : [];
 
-    // Get all leads to count per user
-    const leadsR = await fetch(SUPABASE_URL + '/rest/v1/leads?select=user_id', { headers: HEADERS });
+    const leadsR = await fetch(SUPABASE_URL + '/rest/v1/leads?select=user_id,created_at', { headers: HEADERS });
     const leadsData = await leadsR.json();
     const leadCounts = {};
+    const lastLeadDate = {};
     if(Array.isArray(leadsData)) {
       leadsData.forEach(l => {
-        if(l.user_id) leadCounts[l.user_id] = (leadCounts[l.user_id] || 0) + 1;
+        if(l.user_id) {
+          leadCounts[l.user_id] = (leadCounts[l.user_id] || 0) + 1;
+          if(!lastLeadDate[l.user_id] || l.created_at > lastLeadDate[l.user_id]) lastLeadDate[l.user_id] = l.created_at;
+        }
       });
     }
 
-    // Get blocked users list
     const blockedR = await fetch(SUPABASE_URL + '/rest/v1/blocked_users?select=*', { headers: HEADERS });
     const blockedData = blockedR.ok ? await blockedR.json() : [];
     const blockedIds = Array.isArray(blockedData) ? blockedData.map(b => b.user_id) : [];
 
-    const users = usersData.users || [];
-    if(users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">No clients yet</td></tr>';
+    if(!users || users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">No clients yet</td></tr>';
       return;
     }
 
     tbody.innerHTML = users.map(u => {
       const isBlocked = blockedIds.includes(u.id);
       const leadCount = leadCounts[u.id] || 0;
-      const signedUp = new Date(u.created_at).toLocaleDateString();
+      const lastLead = lastLeadDate[u.id] ? new Date(lastLeadDate[u.id]).toLocaleDateString() : '—';
+      const joinDate = u.created_at ? new Date(u.created_at).toLocaleDateString() : '—';
       const isMe = u.id === (currentUser && currentUser.id);
+      const initial = (u.email || 'C')[0].toUpperCase();
       return `
         <tr>
           <td>
-            <div style="font-weight:600;font-size:13px">${u.email}</div>
-            ${isMe ? '<span style="font-size:10px;color:var(--accent)">● YOU (Admin)</span>' : ''}
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">${initial}</div>
+              <div>
+                <div style="font-weight:600;font-size:13px">${u.email||'—'}</div>
+                ${isMe ? '<span style="font-size:10px;color:var(--accent)">● YOU (Admin)</span>' : ''}
+              </div>
+            </div>
           </td>
-          <td><div style="font-size:11px;color:var(--text2)">${u.id.substring(0,12)}...</div></td>
-          <td><div style="font-size:12px;color:var(--text2)">${signedUp}</div></td>
-          <td>
-            <span style="background:rgba(59,130,246,0.15);color:var(--accent);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">
-              ${leadCount} leads
-            </span>
-          </td>
-          <td>
-            <span class="status-pill ${isBlocked ? 'pill-lost' : 'pill-active'}">${isBlocked ? '🚫 Blocked' : '✅ Active'}</span>
-          </td>
+          <td><div style="font-size:11px;color:var(--text2)">${u.id ? u.id.substring(0,12)+'...' : '—'}</div></td>
+          <td><div style="font-size:12px;color:var(--text2)">${joinDate}</div></td>
+          <td><span style="background:rgba(59,130,246,0.15);color:var(--accent);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${leadCount}</span></td>
+          <td><div style="font-size:12px;color:var(--text2)">${lastLead}</div></td>
+          <td><span class="status-pill ${isBlocked ? 'pill-lost' : 'pill-active'}">${isBlocked ? '🚫 Blocked' : '✅ Active'}</span></td>
           <td>
             ${!isMe ? `
-              <button class="action-btn ${isBlocked ? 'btn-edit' : 'btn-delete'}" 
+              <button class="action-btn ${isBlocked ? 'btn-edit' : 'btn-delete'}"
                 onclick="${isBlocked ? 'unblockClient' : 'blockClient'}('${u.id}', '${u.email}')"
                 title="${isBlocked ? 'Unblock' : 'Block'}">
                 ${isBlocked ? '✅' : '🚫'}
               </button>
-              <button class="action-btn btn-delete" onclick="deleteClient('${u.id}', '${u.email}')" title="Delete Account">🗑️</button>
             ` : '<span style="font-size:11px;color:var(--text2)">—</span>'}
           </td>
         </tr>
@@ -4874,7 +4875,7 @@ async function loadClients() {
     }).join('');
   } catch(e) {
     console.error(e);
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Unable to load — admin API requires service role key</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">Error loading clients</td></tr>';
   }
 }
 
