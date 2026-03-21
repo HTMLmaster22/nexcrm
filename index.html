@@ -2662,7 +2662,55 @@ function renderOrgSwitcher() {
 function switchOrg(orgId) {
   currentOrg = userOrgs.find(o => o.id === orgId);
   loadLeads();
+  renderOrgsList();
   showToast('Switched to ' + (currentOrg ? currentOrg.name : 'org'));
+}
+
+function renderOrgsList() {
+  const el = document.getElementById('orgs-list');
+  if(!el) return;
+  if(!userOrgs || userOrgs.length === 0) { el.innerHTML = ''; return; }
+  el.innerHTML = userOrgs.map(o => `
+    <div onclick="switchOrg('${o.id}')" style="background:var(--bg3);border:1px solid ${(currentOrg && currentOrg.id === o.id) ? 'var(--accent)' : 'var(--border)'};border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all 0.2s">
+      <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff">${o.name[0].toUpperCase()}</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${o.name}</div>
+        <div style="font-size:11px;color:var(--text2)">${o.role}</div>
+      </div>
+      ${(currentOrg && currentOrg.id === o.id) ? '<span style="margin-left:auto;font-size:10px;background:rgba(59,130,246,0.2);color:var(--accent);padding:2px 8px;border-radius:20px;font-weight:600">Active</span>' : ''}
+    </div>
+  `).join('');
+}
+
+async function openNewOrgModal() {
+  document.getElementById('new-org-modal').classList.add('open');
+  const inp = document.getElementById('new-org-name');
+  if(inp) inp.value = '';
+}
+
+async function createOrg() {
+  const name = document.getElementById('new-org-name').value.trim();
+  if(!name) { showToast('❌ Enter org name'); return; }
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/organizations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SERVICE_KEY, 'Authorization': 'Bearer ' + SERVICE_KEY, 'Prefer': 'return=representation' },
+      body: JSON.stringify({ name })
+    });
+    const data = await r.json();
+    if(!r.ok) { showToast('❌ Failed to create org'); return; }
+    const newOrg = { id: data[0].id, name: data[0].name, role: 'admin' };
+    userOrgs.push(newOrg);
+    await fetch(SUPABASE_URL + '/rest/v1/org_members', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SERVICE_KEY, 'Authorization': 'Bearer ' + SERVICE_KEY, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ org_id: newOrg.id, user_id: currentUser.id, role: 'admin' })
+    });
+    renderOrgSwitcher();
+    renderOrgsList();
+    document.getElementById('new-org-modal').classList.remove('open');
+    showToast('✅ Organization "' + name + '" created!');
+  } catch(e) { showToast('❌ Network error'); }
 }
 const sb = {
   from: (table) => ({
@@ -3988,7 +4036,9 @@ async function loadClients() {
   tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>';
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_users', {
-      method: 'POST', headers: HEADERS, body: JSON.stringify({})
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SERVICE_KEY, 'Authorization': 'Bearer ' + SERVICE_KEY },
+      body: JSON.stringify({})
     });
     const users = r.ok ? await r.json() : [];
 
@@ -4948,7 +4998,9 @@ async function loadClients() {
   tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>';
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_users', {
-      method: 'POST', headers: HEADERS, body: JSON.stringify({})
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SERVICE_KEY, 'Authorization': 'Bearer ' + SERVICE_KEY },
+      body: JSON.stringify({})
     });
     const users = r.ok ? await r.json() : [];
 
