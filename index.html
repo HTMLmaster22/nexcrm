@@ -1086,6 +1086,7 @@
     <span>NexCRM</span>
   </div>
 
+  <div id="org-switcher" style="display:none;margin-bottom:8px"></div>
   <div class="nav-section">
     <div class="nav-label">Main</div>
     <div class="nav-item active" onclick="nav('dashboard',this)">
@@ -1816,8 +1817,13 @@
               <div class="card-title">Client Management</div>
               <div class="card-subtitle">All registered users and their access</div>
             </div>
-            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInviteModal()">✉️ Invite Client</button>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="openNewOrgModal()">🏢 New Organization</button>
+              <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInviteModal()">✉️ Invite Client</button>
+            </div>
           </div>
+          <!-- Orgs list -->
+          <div id="orgs-list" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:0 2px"></div>
           <div class="table-wrap">
             <table>
               <thead>
@@ -2266,8 +2272,14 @@
           <label class="form-label">Temporary Password</label>
           <input class="form-input" id="inv-password" type="password" placeholder="Min 6 characters" />
         </div>
+        <div class="form-group">
+          <label class="form-label">Assign to Organization</label>
+          <select class="form-input" id="inv-org">
+            <option value="">— Select Organization —</option>
+          </select>
+        </div>
         <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--text2)">
-          💡 The client will use this email and password to log in. They will only see their own leads.
+          💡 The client will use this email and password to log in. They will only see their own org leads.
         </div>
         <div style="display:flex;gap:10px">
           <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
@@ -2614,6 +2626,44 @@ const FROM_NAME = 'NexCRM';
 const SUPABASE_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk3NTEsImV4cCI6MjA4OTEwNTc1MX0.h4NClLHPJwnSkhMBccB8hpPJrrMU3hkKMCqHu4KNv8g';
 const HEADERS = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Prefer': 'return=minimal' };
+const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzUyOTc1MSwiZXhwIjoyMDg5MTA1NzUxfQ.ZnNNOCWhILGeIApHN5KfjEb-DAOXZGHAQQoGt0fl1QQ';
+let currentOrg = null;
+let userOrgs = [];
+async function loadUserOrgs() {
+  if(!currentUser) return;
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + currentUser.id + '&select=org_id,role,organizations(id,name)', { headers: HEADERS });
+    const data = await r.json();
+    if(r.ok && data && data.length > 0) {
+      userOrgs = data.map(m => ({ id: m.organizations.id, name: m.organizations.name, role: m.role }));
+      currentOrg = userOrgs[0];
+      renderOrgSwitcher();
+    }
+  } catch(e) { console.error('Org load error:', e); }
+}
+async function loadAdminOrgs() {
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/organizations?select=*&order=name.asc', { headers: HEADERS });
+    const data = await r.json();
+    if(r.ok && data && data.length > 0) {
+      userOrgs = data.map(o => ({ id: o.id, name: o.name, role: 'admin' }));
+      currentOrg = userOrgs[0];
+      renderOrgSwitcher();
+    }
+  } catch(e) { console.error(e); }
+}
+function renderOrgSwitcher() {
+  const switcher = document.getElementById('org-switcher');
+  if(!switcher) return;
+  if(userOrgs.length === 0) { switcher.style.display = 'none'; return; }
+  switcher.style.display = 'block';
+  switcher.innerHTML = '<div style="padding:0 12px;margin-bottom:8px"><div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Workspace</div><select onchange="switchOrg(this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:DM Sans,sans-serif;font-size:13px;outline:none;cursor:pointer">' + userOrgs.map(o => '<option value="' + o.id + '"' + (currentOrg && currentOrg.id === o.id ? ' selected' : '') + '>' + o.name + '</option>').join('') + '</select></div>';
+}
+function switchOrg(orgId) {
+  currentOrg = userOrgs.find(o => o.id === orgId);
+  loadLeads();
+  showToast('Switched to ' + (currentOrg ? currentOrg.name : 'org'));
+}
 const sb = {
   from: (table) => ({
     select: (cols) => ({
@@ -2741,7 +2791,7 @@ async function loadLeads() {
   const tbody = document.getElementById('leads-tbody');
   tbody.innerHTML = '';
   try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc', { headers: HEADERS });
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + (currentOrg && !isAdmin ? '&org_id=eq.' + currentOrg.id : (currentOrg ? '&org_id=eq.' + currentOrg.id : '')), { headers: HEADERS });
     const data = await r.json();
     if (!r.ok) { showToast('❌ Failed to load leads'); console.error(data); return; }
     leads = data || [];
@@ -2804,7 +2854,8 @@ async function addLead() {
     value: value ? '$' + parseInt(value).toLocaleString() : '—',
     assigned,
     date: months[now.getMonth()] + ' ' + now.getDate(),
-    user_id: currentUser ? currentUser.id : null
+    user_id: currentUser ? currentUser.id : null,
+    org_id: currentOrg ? currentOrg.id : null
   };
 
   // Save to Supabase
@@ -3879,6 +3930,12 @@ async function deleteContact(id) {
 let clientsList = [];
 
 function openInviteModal() {
+  // Populate org dropdown
+  const sel = document.getElementById('inv-org');
+  if(sel) {
+    sel.innerHTML = '<option value="">— Select Organization —</option>' +
+      userOrgs.map(o => '<option value="' + o.id + '">' + o.name + '</option>').join('');
+  }
   document.getElementById('invite-modal').classList.add('open');
 }
 function closeInviteModal() {
@@ -3908,7 +3965,17 @@ async function createClientAccount() {
     if(!r.ok) {
       showToast('❌ ' + (data.msg || data.message || data.error_description || 'Failed to create account'));
     } else {
-      showToast('✅ Account created for ' + name + '!');
+      const newUserId = data.id;
+      const orgId = document.getElementById('inv-org') ? document.getElementById('inv-org').value : '';
+      // Add user to selected org
+      if(orgId && newUserId) {
+        await fetch(SUPABASE_URL + '/rest/v1/org_members', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': SERVICE_KEY, 'Authorization': 'Bearer ' + SERVICE_KEY, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ org_id: orgId, user_id: newUserId, role: 'member' })
+        });
+      }
+      showToast('✅ Account created for ' + name + (orgId ? ' & added to org!' : '!'));
       closeInviteModal();
       loadClients();
     }
@@ -3917,6 +3984,7 @@ async function createClientAccount() {
 }
 
 async function loadClients() {
+  renderOrgsList();
   const tbody = document.getElementById('clients-tbody');
   tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>';
   try {
@@ -4638,6 +4706,11 @@ async function checkAdminStatus() {
     if(r.ok && data.length > 0) {
       isAdmin = true;
       document.getElementById('admin-nav-item').style.display = 'flex';
+      // Admin loads all orgs
+      await loadAdminOrgs();
+    } else {
+      // Regular user loads their orgs
+      await loadUserOrgs();
     }
   } catch(e) { console.error(e); }
 }
@@ -4871,6 +4944,7 @@ async function loadPerformance() {
 
 // ─── CLIENT MANAGEMENT ─────────────────────────────────────────
 async function loadClients() {
+  renderOrgsList();
   const tbody = document.getElementById('clients-tbody');
   tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>';
   try {
@@ -5159,6 +5233,24 @@ setTimeout(() => {
       </div>
     </div>
 
+
+<!-- NEW ORG MODAL -->
+<div class="modal-overlay" id="new-org-modal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <div class="modal-title">🏢 New Organization</div>
+      <div class="modal-close" onclick="document.getElementById('new-org-modal').classList.remove('open')">✕</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Organization Name</label>
+      <input class="form-input" id="new-org-name" placeholder="e.g. Mazen Motors" />
+    </div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('new-org-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-primary" style="flex:2" onclick="createOrg()">🏢 Create Org</button>
+    </div>
+  </div>
+</div>
 
 <!-- PAGE LOADER -->
 <div class="page-loader" id="page-loader">
