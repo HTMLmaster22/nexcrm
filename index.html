@@ -3889,25 +3889,24 @@ document.getElementById('invite-modal').addEventListener('click', function(e) {
   if(e.target === this) closeInviteModal();
 });
 
+const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzUyOTc1MSwiZXhwIjoyMDg5MTA1NzUxfQ.ZnNNOCWhILGeIApHN5KfjEb-DAOXZGHAQQoGt0fl1QQ';
 async function createClientAccount() {
   const name = document.getElementById('inv-name').value.trim();
   const email = document.getElementById('inv-email').value.trim();
   const password = document.getElementById('inv-password').value;
   if(!name || !email || !password) { showToast('❌ Fill in all fields'); return; }
   if(password.length < 6) { showToast('❌ Password must be at least 6 characters'); return; }
-
   const btn = document.querySelector('#invite-modal .btn-primary');
   btn.textContent = 'Creating...'; btn.disabled = true;
-
   try {
-    const r = await fetch(SUPABASE_URL + '/auth/v1/signup', {
+    const r = await fetch(SUPABASE_URL + '/auth/v1/admin/users', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
-      body: JSON.stringify({ email, password, data: { full_name: name } })
+      headers: { 'Content-Type': 'application/json', 'apikey': SERVICE_KEY, 'Authorization': 'Bearer ' + SERVICE_KEY },
+      body: JSON.stringify({ email, password, email_confirm: true, user_metadata: { full_name: name } })
     });
     const data = await r.json();
     if(!r.ok) {
-      showToast('❌ ' + (data.msg || data.error_description || 'Failed to create account'));
+      showToast('❌ ' + (data.msg || data.message || data.error_description || 'Failed to create account'));
     } else {
       showToast('✅ Account created for ' + name + '!');
       closeInviteModal();
