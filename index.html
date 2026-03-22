@@ -4755,7 +4755,7 @@ function renderPipeline() {
       const init = (l.assigned||'?')[0].toUpperCase();
       const nextStatuses = { new:['Warm','Won','Lost'], warm:['New','Active','Won','Lost'], active:['Won','Lost'], won:['Active'], lost:['New','Warm'] };
       const nextBtns = (nextStatuses[stage]||[]).map(s =>
-        '<button onclick="event.stopPropagation();quickStatus(' + l.id + ','' + s + '')" style="font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;margin-right:3px">→ ' + s + '</button>'
+        '<button onclick="event.stopPropagation();quickStatus(' + l.id + ',&quot;' + s + '&quot;)" style="font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;margin-right:3px">→ ' + s + '</button>'
       ).join('');
       return '<div class="deal-card" onclick="editLead(' + l.id + ')">' +
         '<div class="deal-name">' + (l.name||'—') + '</div>' +
