@@ -1723,6 +1723,7 @@
                   <th>Joined</th>
                   <th>Leads</th>
                   <th>Last Lead</th>
+                  <th>Organization</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -3942,16 +3943,34 @@ async function createClientAccount() {
 async function loadClients() {
   renderOrgsList();
   const tbody = document.getElementById('clients-tbody');
-  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>';
   try {
+    // Get all users via service key
     const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': SERVICE_KEY, 'Authorization': 'Bearer ' + SERVICE_KEY },
       body: JSON.stringify({})
     });
-    const users = r.ok ? await r.json() : [];
+    const allUsers = r.ok ? await r.json() : [];
 
-    const leadsR = await fetch(SUPABASE_URL + '/rest/v1/leads?select=user_id,created_at', { headers: HEADERS });
+    // Get org members for current org to filter users
+    let orgMemberIds = [];
+    if(currentOrg) {
+      const omR = await fetch(SUPABASE_URL + '/rest/v1/org_members?org_id=eq.' + currentOrg.id + '&select=user_id', { headers: HEADERS });
+      const omData = omR.ok ? await omR.json() : [];
+      orgMemberIds = (omData || []).map(m => m.user_id);
+    }
+
+    // Filter users to only those in current org (admin always included)
+    const users = (allUsers || []).filter(u =>
+      u.id === currentUser.id || // always show yourself
+      !currentOrg || // if no org selected show all
+      orgMemberIds.includes(u.id)
+    );
+
+    // Get leads count per user for current org
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const leadsR = await fetch(SUPABASE_URL + '/rest/v1/leads?select=user_id,created_at' + orgFilter, { headers: HEADERS });
     const leadsData = leadsR.ok ? await leadsR.json() : [];
     const userLeads = {};
     (leadsData || []).forEach(l => {
@@ -3967,40 +3986,51 @@ async function loadClients() {
     const blockedIds = (blockedData || []).map(b => b.user_id);
 
     if(!users || users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">No clients yet</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">No users in this organization yet</td></tr>';
       return;
     }
 
     tbody.innerHTML = users.map(u => {
       const stats = userLeads[u.id] || { count: 0, last: null };
       const isBlocked = blockedIds.includes(u.id);
+      const isMe = u.id === currentUser.id;
       const initial = (u.email || 'C')[0].toUpperCase();
       const joinDate = u.created_at ? new Date(u.created_at).toLocaleDateString() : '—';
       const lastDate = stats.last ? new Date(stats.last).toLocaleDateString() : '—';
+      const orgName = currentOrg ? currentOrg.name : '—';
       return `
         <tr>
           <td>
             <div style="display:flex;align-items:center;gap:8px">
               <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">${initial}</div>
-              <div style="font-size:13px;font-weight:600;color:var(--text)">${u.email||'—'}</div>
+              <div>
+                <div style="font-weight:600;font-size:13px">${u.email||'—'}</div>
+                ${isMe ? '<span style="font-size:10px;color:var(--accent)">● YOU (Admin)</span>' : ''}
+              </div>
             </div>
           </td>
           <td><div style="font-size:11px;color:var(--text2)">${u.id ? u.id.substring(0,8)+'...' : '—'}</div></td>
           <td><div style="font-size:12px;color:var(--text2)">${joinDate}</div></td>
-          <td><span style="font-weight:600;color:var(--accent)">${stats.count}</span></td>
+          <td><span style="background:rgba(59,130,246,0.15);color:var(--accent);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${stats.count}</span></td>
           <td><div style="font-size:12px;color:var(--text2)">${lastDate}</div></td>
-          <td><span class="status-pill ${isBlocked ? 'pill-lost' : 'pill-active'}">${isBlocked ? 'Blocked' : 'Active'}</span></td>
+          <td><span style="background:rgba(59,130,246,0.1);color:var(--accent2);border:1px solid rgba(59,130,246,0.2);padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600">${orgName}</span></td>
+          <td><span class="status-pill ${isBlocked ? 'pill-lost' : 'pill-active'}">${isBlocked ? '🚫 Blocked' : '✅ Active'}</span></td>
           <td>
-            <button class="action-btn ${isBlocked ? 'btn-edit' : 'btn-delete'}" onclick="${isBlocked ? 'unblockClient' : 'blockClient'}('${u.id}')" title="${isBlocked ? 'Unblock' : 'Block'}">
-              ${isBlocked ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>' : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>'}
-            </button>
+            ${isMe ? '<span style="font-size:11px;color:var(--text2)">—</span>' : `
+              <button class="action-btn ${isBlocked ? 'btn-edit' : 'btn-note'}" onclick="${isBlocked ? 'unblockClient' : 'blockClient'}('${u.id}', '${u.email}')" title="${isBlocked ? 'Unblock' : 'Block'}" style="margin-right:4px">
+                ${isBlocked ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>' : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>'}
+              </button>
+              <button class="action-btn btn-delete" onclick="deleteClient('${u.id}', '${u.email}')" title="Delete Account">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+              </button>
+            `}
           </td>
         </tr>
       `;
     }).join('');
   } catch(e) {
     console.error(e);
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text2)">Error loading clients</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">Error loading clients</td></tr>';
   }
 }
 
@@ -4999,15 +5029,26 @@ async function unblockClient(userId, email) {
 }
 
 async function deleteClient(userId, email) {
-  if(!confirm('DELETE account for ' + email + '? This will permanently delete their account and ALL their leads. This cannot be undone!')) return;
+  if(!confirm('DELETE account for ' + email + '? This permanently deletes their account, org membership and leads. Cannot be undone!')) return;
   try {
-    // Delete their leads first
-    await fetch(SUPABASE_URL + '/rest/v1/leads?user_id=eq.' + userId, {
-      method: 'DELETE', headers: HEADERS
+    // Remove from org_members
+    await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + userId, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'apikey': SERVICE_KEY, 'Authorization': 'Bearer ' + SERVICE_KEY }
     });
-    showToast('🗑️ Account and leads deleted for ' + email);
+    // Delete their leads
+    await fetch(SUPABASE_URL + '/rest/v1/leads?user_id=eq.' + userId, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'apikey': SERVICE_KEY, 'Authorization': 'Bearer ' + SERVICE_KEY }
+    });
+    // Delete the auth user
+    await fetch(SUPABASE_URL + '/auth/v1/admin/users/' + userId, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', 'apikey': SERVICE_KEY, 'Authorization': 'Bearer ' + SERVICE_KEY }
+    });
+    showToast('🗑️ Account deleted for ' + email);
     loadClients();
-  } catch(e) { showToast('❌ Error deleting account'); }
+  } catch(e) { console.error(e); showToast('❌ Error deleting account'); }
 }
 
 // ─── INVITE CLIENT ─────────────────────────────────────────────
