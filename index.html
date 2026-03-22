@@ -1333,24 +1333,24 @@
     <div class="page" id="page-leads">
       <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
         <div class="stat-card">
-          <div class="stat-label">New Today</div>
-          <div class="stat-value">24</div>
-          <div class="stat-change up">▲ 8 more than yesterday</div>
+          <div class="stat-label">Total Leads</div>
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-change up" id="stat-total-sub">Loading...</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Hot Leads</div>
-          <div class="stat-value">47</div>
-          <div class="stat-change up">▲ Need follow-up</div>
+          <div class="stat-label">New</div>
+          <div class="stat-value" id="stat-new">—</div>
+          <div class="stat-change up">▲ Awaiting contact</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Converted</div>
-          <div class="stat-value">312</div>
-          <div class="stat-change up">▲ 24.7% rate</div>
+          <div class="stat-label">Converted / Won</div>
+          <div class="stat-value" id="stat-won" style="color:var(--success)">—</div>
+          <div class="stat-change up" id="stat-rate">Loading...</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Lost</div>
-          <div class="stat-value">89</div>
-          <div class="stat-change down">▼ 6.9% rate</div>
+          <div class="stat-value" id="stat-lost" style="color:var(--danger)">—</div>
+          <div class="stat-change down">▼ Closed lost</div>
         </div>
       </div>
       <div class="card">
@@ -2729,12 +2729,31 @@ async function loadLeads() {
   const tbody = document.getElementById('leads-tbody');
   tbody.innerHTML = '';
   try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + (currentOrg && !isAdmin ? '&org_id=eq.' + currentOrg.id : (currentOrg ? '&org_id=eq.' + currentOrg.id : '')), { headers: HEADERS });
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + orgFilter, { headers: HEADERS });
     const data = await r.json();
-    if (!r.ok) { showToast('❌ Failed to load leads'); console.error(data); return; }
+    if (!r.ok) { showToast('❌ Failed to load leads'); console.error(data); hideLoader(); return; }
     leads = data || [];
     renderLeads();
+    updateLeadStats();
   } catch(e) { console.error(e); showToast('❌ Failed to load leads'); }
+  hideLoader();
+}
+
+function updateLeadStats() {
+  const total = leads.length;
+  const newLeads = leads.filter(l => l.status === 'New').length;
+  const won = leads.filter(l => l.status === 'Won' || l.status === 'Active').length;
+  const lost = leads.filter(l => l.status === 'Lost').length;
+  const rate = total > 0 ? Math.round((won / total) * 100) : 0;
+
+  const el = (id) => document.getElementById(id);
+  if(el('stat-total')) el('stat-total').textContent = total;
+  if(el('stat-total-sub')) el('stat-total-sub').textContent = currentOrg ? '📂 ' + currentOrg.name : 'All leads';
+  if(el('stat-new')) el('stat-new').textContent = newLeads;
+  if(el('stat-won')) el('stat-won').textContent = won;
+  if(el('stat-rate')) el('stat-rate').textContent = '▲ ' + rate + '% conversion rate';
+  if(el('stat-lost')) el('stat-lost').textContent = lost;
 }
 
 // ─── NAV ───────────────────────────────────────────────────────
