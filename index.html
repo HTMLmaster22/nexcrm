@@ -2343,6 +2343,8 @@ async function addLead() {
   await loadLeads();
   closeModal();
   ['f-fname','f-lname','f-company','f-value'].forEach(id => document.getElementById(id).value = '');
+  const pipelinePage = document.getElementById('page-pipeline');
+  if(pipelinePage && pipelinePage.classList.contains('active')) renderPipeline();
   showToast('✅ Lead saved to database!');
 }
 
@@ -3279,6 +3281,12 @@ async function updateLead(id) {
     const btn = document.querySelector('#modal .btn-primary');
     btn.textContent = '💾 Save Lead';
     btn.onclick = addLead;
+    // Re-render pipeline if on pipeline page
+    const pipelinePage = document.getElementById('page-pipeline');
+    if(pipelinePage && pipelinePage.classList.contains('active')) renderPipeline();
+    // Re-render analytics if on analytics page
+    const analyticsPage = document.getElementById('page-analytics');
+    if(analyticsPage && analyticsPage.classList.contains('active')) renderAnalytics();
     showToast('✅ Lead updated!');
   } catch(e) { console.error(e); showToast('❌ Error updating lead'); }
 }
@@ -3292,6 +3300,8 @@ async function deleteLead(id) {
     });
     if(!r.ok) { showToast('❌ Failed to delete'); return; }
     await loadLeads();
+    const pipelinePage = document.getElementById('page-pipeline');
+    if(pipelinePage && pipelinePage.classList.contains('active')) renderPipeline();
     showToast('🗑️ Lead deleted');
   } catch(e) { console.error(e); showToast('❌ Error deleting lead'); }
 }
@@ -4743,14 +4753,38 @@ function renderPipeline() {
     col.innerHTML = items.map(l => {
       const val = parseInt((l.value||'0').replace(/[$,]/g,''))||0;
       const init = (l.assigned||'?')[0].toUpperCase();
+      const nextStatuses = { new:['Warm','Won','Lost'], warm:['New','Active','Won','Lost'], active:['Won','Lost'], won:['Active'], lost:['New','Warm'] };
+      const nextBtns = (nextStatuses[stage]||[]).map(s =>
+        '<button onclick="event.stopPropagation();quickStatus(' + l.id + ','' + s + '')" style="font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;margin-right:3px">→ ' + s + '</button>'
+      ).join('');
       return '<div class="deal-card" onclick="editLead(' + l.id + ')">' +
         '<div class="deal-name">' + (l.name||'—') + '</div>' +
         (val > 0 ? '<div class="deal-value">$' + val.toLocaleString() + '</div>' : '') +
         '<div class="deal-meta"><div class="deal-avatar">' + init + '</div>' +
         (l.assigned||'Unassigned') + ' · ' + (l.source||'—') + '</div>' +
+        (nextBtns ? '<div style="margin-top:8px">' + nextBtns + '</div>' : '') +
         '</div>';
     }).join('');
   });
+}
+
+// ─── QUICK STATUS CHANGE ───────────────────────────────────────
+async function quickStatus(id, newStatus) {
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status: newStatus })
+    });
+    if(!r.ok) { showToast('❌ Failed to update status'); return; }
+    // Update locally for instant UI update
+    const lead = leads.find(l => l.id === id);
+    if(lead) lead.status = newStatus;
+    renderPipeline();
+    renderLeads();
+    updateLeadStats();
+    showToast('✅ Moved to ' + newStatus);
+  } catch(e) { showToast('❌ Error'); }
 }
 
 // ─── ANALYTICS ─────────────────────────────────────────────────
