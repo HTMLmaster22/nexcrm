@@ -1181,26 +1181,26 @@
         <div class="stat-card">
           <div class="stat-icon" style="background:rgba(59,130,246,0.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
           <div class="stat-label">Total Leads</div>
-          <div class="stat-value">1,284</div>
-          <div class="stat-change up">▲ 18% this month</div>
+          <div class="stat-value" id="dash-total">—</div>
+          <div class="stat-change up" id="dash-total-sub">Loading...</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon" style="background:rgba(16,185,129,0.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-          <div class="stat-label">Revenue</div>
-          <div class="stat-value">$84,200</div>
-          <div class="stat-change up">▲ 30% vs last month</div>
+          <div class="stat-label">Pipeline Value</div>
+          <div class="stat-value" id="dash-revenue">—</div>
+          <div class="stat-change up" id="dash-revenue-sub">Total deal value</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon" style="background:rgba(245,158,11,0.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div>
           <div class="stat-label">Conversion Rate</div>
-          <div class="stat-value">24.7%</div>
-          <div class="stat-change up">▲ 4.2% improvement</div>
+          <div class="stat-value" id="dash-conv">—</div>
+          <div class="stat-change up" id="dash-conv-sub">Won / Total leads</div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon" style="background:rgba(139,92,246,0.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-          <div class="stat-label">Ad Spend</div>
-          <div class="stat-value">$12,400</div>
-          <div class="stat-change down">▼ 12% reduced</div>
+          <div class="stat-icon" style="background:rgba(16,185,129,0.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="stat-label">Won Leads</div>
+          <div class="stat-value" id="dash-won" style="color:var(--success)">—</div>
+          <div class="stat-change up">▲ Closed deals</div>
         </div>
       </div>
 
@@ -2529,6 +2529,7 @@ async function loadUserOrgs() {
       userOrgs = data.map(m => ({ id: m.organizations.id, name: m.organizations.name, role: m.role }));
       currentOrg = userOrgs[0];
       renderOrgSwitcher();
+      loadDashboard();
     }
   } catch(e) { console.error('Org load error:', e); }
 }
@@ -2540,6 +2541,7 @@ async function loadAdminOrgs() {
       userOrgs = data.map(o => ({ id: o.id, name: o.name, role: 'admin' }));
       currentOrg = userOrgs[0];
       renderOrgSwitcher();
+      loadDashboard();
     }
   } catch(e) { console.error(e); }
 }
@@ -2553,6 +2555,7 @@ function renderOrgSwitcher() {
 function switchOrg(orgId) {
   currentOrg = userOrgs.find(o => o.id === orgId);
   loadLeads();
+  loadDashboard();
   renderOrgsList();
   showToast('Switched to ' + (currentOrg ? currentOrg.name : 'org'));
 }
@@ -2769,6 +2772,7 @@ function nav(page, el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if(el) el.classList.add('active');
   document.getElementById('page-title').textContent = titles[page];
+  if(page === 'dashboard') loadDashboard();
   if(page === 'leads') loadLeads();
   if(page === 'contacts') loadContacts();
   if(page === 'admin') { loadTeam(); }
@@ -3379,6 +3383,7 @@ function mobileNav(page, el) {
   document.getElementById('page-title') && (document.getElementById('page-title').textContent = titles[page] || page);
 
   // Load data
+  if(page === 'dashboard') loadDashboard();
   if(page === 'leads') loadLeads();
   if(page === 'contacts') loadContacts();
   if(page === 'admin') loadTeam();
@@ -4874,18 +4879,44 @@ async function adminDeleteLead(id) {
 }
 
 // ─── PERFORMANCE ───────────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*' + orgFilter, { headers: HEADERS });
+    const data = await r.json();
+    if(!r.ok || !Array.isArray(data)) return;
+
+    const total = data.length;
+    const won = data.filter(l => l.status === 'Won').length;
+    const totalValue = data.reduce((s,l) => s + (parseInt((l.value||'0').replace(/[$,]/g,''))||0), 0);
+    const convRate = total > 0 ? Math.round(won/total*100) : 0;
+    const orgName = currentOrg ? currentOrg.name : 'All';
+
+    const el = id => document.getElementById(id);
+    if(el('dash-total')) el('dash-total').textContent = total.toLocaleString();
+    if(el('dash-total-sub')) el('dash-total-sub').textContent = '📂 ' + orgName;
+    if(el('dash-revenue')) el('dash-revenue').textContent = '$' + totalValue.toLocaleString();
+    if(el('dash-revenue-sub')) el('dash-revenue-sub').textContent = 'Total pipeline value';
+    if(el('dash-conv')) el('dash-conv').textContent = convRate + '%';
+    if(el('dash-conv-sub')) el('dash-conv-sub').textContent = won + ' won out of ' + total;
+    if(el('dash-won')) el('dash-won').textContent = won;
+  } catch(e) { console.error(e); }
+}
+
 async function loadPerformance() {
   const perfList = document.getElementById('perf-list');
   const teamStats = document.getElementById('team-stats');
   try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*', { headers: HEADERS });
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*' + orgFilter, { headers: HEADERS });
     const data = await r.json();
-    if(!r.ok) return;
+    if(!r.ok || !Array.isArray(data)) return;
 
-    // Group by assigned
+    // Group by assigned sales rep (exclude org names)
     const byRep = {};
     data.forEach(l => {
-      const rep = l.assigned || 'Unassigned';
+      const rep = (l.assigned || 'Unassigned').trim();
+      if(!rep) return;
       if(!byRep[rep]) byRep[rep] = { count:0, value:0, won:0 };
       byRep[rep].count++;
       const val = parseInt((l.value||'0').replace(/[$,]/g,'')) || 0;
@@ -4896,16 +4927,20 @@ async function loadPerformance() {
     const sorted = Object.entries(byRep).sort((a,b) => b[1].value - a[1].value);
     const maxVal = sorted[0] ? sorted[0][1].value : 1;
 
-    perfList.innerHTML = sorted.map(([name, stats], i) => `
-      <div class="perf-row">
-        <div class="perf-rank ${i===0 ? 'gold' : ''}">${i+1}</div>
-        <div class="perf-bar-wrap">
-          <div class="perf-name">${name}</div>
-          <div class="perf-bar"><div class="perf-fill" style="width:${Math.round(stats.value/maxVal*100)}%"></div></div>
+    if(sorted.length === 0) {
+      perfList.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No performance data yet</div>';
+    } else {
+      perfList.innerHTML = sorted.map(([name, stats], i) => `
+        <div class="perf-row">
+          <div class="perf-rank ${i===0 ? 'gold' : ''}">${i+1}</div>
+          <div class="perf-bar-wrap">
+            <div class="perf-name">${name}</div>
+            <div class="perf-bar"><div class="perf-fill" style="width:${Math.round(stats.value/maxVal*100)}%"></div></div>
+          </div>
+          <div class="perf-val">$${stats.value.toLocaleString()}</div>
         </div>
-        <div class="perf-val">$${stats.value.toLocaleString()}</div>
-      </div>
-    `).join('');
+      `).join('');
+    }
 
     const totalLeads = data.length;
     const totalValue = data.reduce((s,l) => s + (parseInt((l.value||'0').replace(/[$,]/g,''))||0), 0);
