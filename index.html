@@ -2454,8 +2454,9 @@ function closeImportModal() {
   resetImport();
 }
 
-document.getElementById('import-modal').addEventListener('click', function(e) {
-  if(e.target === this) closeImportModal();
+document.addEventListener('DOMContentLoaded', function() {
+  const im = document.getElementById('import-modal');
+  if(im) im.addEventListener('click', function(e) { if(e.target === this) closeImportModal(); });
 });
 
 function resetImport() {
@@ -3448,8 +3449,9 @@ function closeInviteModal() {
   document.getElementById('invite-modal').classList.remove('open');
   ['inv-name','inv-email','inv-password'].forEach(id => document.getElementById(id).value = '');
 }
-document.getElementById('invite-modal').addEventListener('click', function(e) {
-  if(e.target === this) closeInviteModal();
+document.addEventListener('DOMContentLoaded', function() {
+  const inv = document.getElementById('invite-modal');
+  if(inv) inv.addEventListener('click', function(e) { if(e.target === this) closeInviteModal(); });
 });
 
 async function createClientAccount() {
@@ -4642,14 +4644,11 @@ function openInviteModal() {
 }
 function closeInviteModal() {
   document.getElementById('invite-modal').classList.remove('open');
-  ['invite-email','invite-name'].forEach(id => document.getElementById(id).value = '');
+  ['invite-email','invite-name'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
 }
-document.getElementById('invite-modal').addEventListener('click', function(e) {
-  if(e.target === this) closeInviteModal();
-});
 
 async function inviteClient() {
-  const email = document.getElementById('invite-email').value.trim();
+  const email = document.getElementById('invite-email') ? document.getElementById('invite-email').value.trim() : '';
   if(!email) { showToast('❌ Enter an email address'); return; }
   try {
     const r = await fetch(SUPABASE_URL + '/auth/v1/invite', {
