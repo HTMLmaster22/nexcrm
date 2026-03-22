@@ -1353,35 +1353,33 @@
         <div class="card-header">
           <div>
             <div class="card-title">Sales Pipeline</div>
-            <div class="card-subtitle">Drag deals between stages to update status</div>
+            <div class="card-subtitle">Your real leads organized by status</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center">
-            <span style="font-size:13px;color:var(--text2)">Total:</span>
-            <span style="font-size:16px;font-weight:700;color:var(--success)">$186,400</span>
+            <span style="font-size:13px;color:var(--text2)">Total Pipeline:</span>
+            <span style="font-size:16px;font-weight:700;color:var(--success)" id="pipeline-total">$0</span>
           </div>
         </div>
-        <div class="pipeline">
+        <div class="pipeline" id="pipeline-board">
           <div class="pipeline-col">
-            <div class="pipeline-col-header stage-new"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> New Leads <span class="count">8</span></div>
-            <div class="deal-card"><div class="deal-name">Al-Noor Trading</div><div class="deal-value">$12,000</div><div class="deal-meta"><div class="deal-avatar">K</div>Khalid · Instagram</div></div>
-            <div class="deal-card"><div class="deal-name">Tamimi Motors</div><div class="deal-value">$34,500</div><div class="deal-meta"><div class="deal-avatar">T</div>Tariq · Google Ads</div></div>
-            <div class="deal-card"><div class="deal-name">Saudi Coffee House</div><div class="deal-value">$8,200</div><div class="deal-meta"><div class="deal-avatar">N</div>Nora · WhatsApp</div></div>
+            <div class="pipeline-col-header stage-new">➕ New <span class="count" id="pipe-count-new">0</span></div>
+            <div id="pipe-col-new"></div>
           </div>
           <div class="pipeline-col">
-            <div class="pipeline-col-header stage-contact"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.6 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.81a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Contacted <span class="count">6</span></div>
-            <div class="deal-card"><div class="deal-name">Riyadh Real Estate</div><div class="deal-value">$55,000</div><div class="deal-meta"><div class="deal-avatar">T</div>Tariq · Referral</div></div>
-            <div class="deal-card"><div class="deal-name">AlBaik Franchise</div><div class="deal-value">$22,000</div><div class="deal-meta"><div class="deal-avatar">S</div>Sara · TikTok</div></div>
+            <div class="pipeline-col-header stage-contact">📞 Warm <span class="count" id="pipe-count-warm">0</span></div>
+            <div id="pipe-col-warm"></div>
           </div>
           <div class="pipeline-col">
-            <div class="pipeline-col-header stage-proposal"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> Proposal Sent <span class="count">4</span></div>
-            <div class="deal-card"><div class="deal-name">Meras Hospitality</div><div class="deal-value">$18,700</div><div class="deal-meta"><div class="deal-avatar">N</div>Nora · LinkedIn</div></div>
-            <div class="deal-card"><div class="deal-name">Vision Tech KSA</div><div class="deal-value">$28,000</div><div class="deal-meta"><div class="deal-avatar">K</div>Khalid · Google</div></div>
+            <div class="pipeline-col-header stage-proposal">📄 Active <span class="count" id="pipe-count-active">0</span></div>
+            <div id="pipe-col-active"></div>
           </div>
           <div class="pipeline-col">
-            <div class="pipeline-col-header stage-closed"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Closed Won <span class="count">12</span></div>
-            <div class="deal-card"><div class="deal-name">Saleh Cars Group</div><div class="deal-value">$8,000</div><div class="deal-meta"><div class="deal-avatar">T</div>Tariq · Direct</div></div>
-            <div class="deal-card"><div class="deal-name">Dentex Clinics</div><div class="deal-value">$5,200</div><div class="deal-meta"><div class="deal-avatar">S</div>Sara · Facebook</div></div>
-            <div class="deal-card"><div class="deal-name">Alora Beauty</div><div class="deal-value">$3,800</div><div class="deal-meta"><div class="deal-avatar">N</div>Nora · Instagram</div></div>
+            <div class="pipeline-col-header stage-closed">✅ Won <span class="count" id="pipe-count-won">0</span></div>
+            <div id="pipe-col-won"></div>
+          </div>
+          <div class="pipeline-col">
+            <div class="pipeline-col-header" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.2)">❌ Lost <span class="count" id="pipe-count-lost">0</span></div>
+            <div id="pipe-col-lost"></div>
           </div>
         </div>
       </div>
@@ -1515,66 +1513,34 @@
     <div class="page" id="page-analytics">
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-label">Conversion Rate (CR)</div>
-          <div class="stat-value">24.7%</div>
-          <div class="stat-change up">▲ Industry avg: 18%</div>
+          <div class="stat-label">Conversion Rate</div>
+          <div class="stat-value" id="an-conv">—</div>
+          <div class="stat-change up" id="an-conv-sub">Won / Total leads</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Customer Acq. Cost (CAC)</div>
-          <div class="stat-value">$38</div>
-          <div class="stat-change up">▼ Down from $44</div>
+          <div class="stat-label">Total Pipeline Value</div>
+          <div class="stat-value" id="an-value">—</div>
+          <div class="stat-change up">▲ All deal values</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Return on Ad Spend (ROAS)</div>
-          <div class="stat-value">7.2x</div>
-          <div class="stat-change up">▲ Excellent</div>
+          <div class="stat-label">Total Leads</div>
+          <div class="stat-value" id="an-total">—</div>
+          <div class="stat-change up" id="an-total-sub">In current workspace</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Customer Lifetime Value</div>
-          <div class="stat-value">$1,840</div>
-          <div class="stat-change up">▲ 12% growth</div>
+          <div class="stat-label">Won Leads</div>
+          <div class="stat-value" id="an-won" style="color:var(--success)">—</div>
+          <div class="stat-change up">▲ Closed deals</div>
         </div>
       </div>
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><div class="card-title">Channel Performance</div></div>
-          <div class="analytics-bar-row">
-            <div class="analytics-label">WhatsApp</div>
-            <div class="analytics-bar-wrap"><div class="analytics-bar-fill" style="width:88%;background:linear-gradient(to right,#25d366,#128c7e)"></div></div>
-            <div class="analytics-value">35%</div>
-          </div>
-          <div class="analytics-bar-row">
-            <div class="analytics-label">Instagram</div>
-            <div class="analytics-bar-wrap"><div class="analytics-bar-fill" style="width:65%;background:linear-gradient(to right,#f56040,#e1306c)"></div></div>
-            <div class="analytics-value">25%</div>
-          </div>
-          <div class="analytics-bar-row">
-            <div class="analytics-label">Google Ads</div>
-            <div class="analytics-bar-wrap"><div class="analytics-bar-fill" style="width:50%;background:linear-gradient(to right,#4285f4,#34a853)"></div></div>
-            <div class="analytics-value">20%</div>
-          </div>
-          <div class="analytics-bar-row">
-            <div class="analytics-label">TikTok</div>
-            <div class="analytics-bar-wrap"><div class="analytics-bar-fill" style="width:50%;background:linear-gradient(to right,#010101,#ff0050)"></div></div>
-            <div class="analytics-value">20%</div>
-          </div>
+          <div class="card-header"><div class="card-title">Lead Sources Breakdown</div></div>
+          <div id="an-sources"><div style="text-align:center;padding:30px;color:var(--text2)">Loading...</div></div>
         </div>
         <div class="card">
-          <div class="card-header"><div class="card-title">Funnel Overview</div></div>
-          <div style="margin-top:8px">
-            <div style="background:linear-gradient(to right,rgba(59,130,246,0.3),rgba(59,130,246,0.1));border-radius:10px;padding:12px 16px;margin-bottom:8px;font-size:13px;display:flex;justify-content:space-between">
-              <span>👁 Impressions</span><span style="font-weight:700">124,800</span>
-            </div>
-            <div style="background:linear-gradient(to right,rgba(139,92,246,0.3),rgba(139,92,246,0.1));border-radius:10px;padding:12px 16px;margin-bottom:8px;font-size:13px;display:flex;justify-content:space-between;margin:0 20px 8px">
-              <span>🖱 Clicks</span><span style="font-weight:700">8,240</span>
-            </div>
-            <div style="background:linear-gradient(to right,rgba(245,158,11,0.3),rgba(245,158,11,0.1));border-radius:10px;padding:12px 16px;margin-bottom:8px;font-size:13px;display:flex;justify-content:space-between;margin:0 40px 8px">
-              <span>📋 Leads</span><span style="font-weight:700" id="funnel-leads">—</span>
-            </div>
-            <div style="background:linear-gradient(to right,rgba(16,185,129,0.3),rgba(16,185,129,0.1));border-radius:10px;padding:12px 16px;font-size:13px;display:flex;justify-content:space-between;margin:0 60px">
-              <span>✅ Converted</span><span style="font-weight:700;color:var(--success)">317</span>
-            </div>
-          </div>
+          <div class="card-header"><div class="card-title">Lead Status Breakdown</div></div>
+          <div id="an-statuses"><div style="text-align:center;padding:30px;color:var(--text2)">Loading...</div></div>
         </div>
       </div>
     </div>
@@ -2030,8 +1996,7 @@
       <div class="form-group">
         <label class="form-label">Assigned To</label>
         <select class="form-input" id="f-assign">
-          <option>Tariq Hassan</option><option>Nora Al-Qahtani</option>
-          <option>Khalid Al-Dosari</option><option>Sara Al-Mutairi</option>
+          <option value="">— Select Team Member —</option>
         </select>
       </div>
     </div>
@@ -2283,6 +2248,7 @@ async function loadLeads() {
     updateLeadStats();
     renderActivityFeed();
     renderDashTeamPerf();
+    populateAssignDropdown();
   } catch(e) { console.error(e); showToast('❌ Failed to load leads'); }
   hideLoader();
 }
@@ -2317,6 +2283,8 @@ function nav(page, el) {
   document.getElementById('page-title').textContent = titles[page];
   if(page === 'dashboard') loadDashboard();
   if(page === 'leads') loadLeads();
+  if(page === 'pipeline') renderPipeline();
+  if(page === 'analytics') renderAnalytics();
   if(page === 'contacts') loadContacts();
   if(page === 'admin') { loadTeam(); }
   if(page === 'campaigns') { loadCampaignHistory(); }
@@ -2327,6 +2295,7 @@ function nav(page, el) {
 
 // ─── MODAL ─────────────────────────────────────────────────────
 function openModal() {
+  populateAssignDropdown();
   document.getElementById('modal').classList.add('open');
 }
 function closeModal() {
@@ -2929,6 +2898,8 @@ function mobileNav(page, el) {
   // Load data
   if(page === 'dashboard') loadDashboard();
   if(page === 'leads') loadLeads();
+  if(page === 'pipeline') renderPipeline();
+  if(page === 'analytics') renderAnalytics();
   if(page === 'contacts') loadContacts();
   if(page === 'admin') loadTeam();
 }
@@ -4742,6 +4713,112 @@ function renderDashTeamPerf() {
   el.innerHTML = sorted.map(([name,val],i) =>
     '<div style="margin-top:' + (i?'14':'8') + 'px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px">' + name + '</span><span style="font-size:12px;color:var(--success);font-weight:600">$' + val.toLocaleString() + '</span></div><div class="progress-bar"><div class="progress-fill" style="width:' + Math.round(val/max*100) + '%"></div></div></div>'
   ).join('');
+}
+
+
+// ─── PIPELINE ──────────────────────────────────────────────────
+function renderPipeline() {
+  const stages = { New:'new', Warm:'warm', Active:'active', Won:'won', Lost:'lost', Cold:'warm' };
+  const cols = { new:[], warm:[], active:[], won:[], lost:[] };
+  let total = 0;
+
+  leads.forEach(l => {
+    const stage = stages[l.status] || 'new';
+    cols[stage].push(l);
+    total += parseInt((l.value||'0').replace(/[$,]/g,''))||0;
+  });
+
+  const el = id => document.getElementById(id);
+  if(el('pipeline-total')) el('pipeline-total').textContent = '$' + total.toLocaleString();
+
+  Object.entries(cols).forEach(([stage, items]) => {
+    const col = el('pipe-col-' + stage);
+    const count = el('pipe-count-' + stage);
+    if(count) count.textContent = items.length;
+    if(!col) return;
+    if(items.length === 0) {
+      col.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:12px">No leads</div>';
+      return;
+    }
+    col.innerHTML = items.map(l => {
+      const val = parseInt((l.value||'0').replace(/[$,]/g,''))||0;
+      const init = (l.assigned||'?')[0].toUpperCase();
+      return '<div class="deal-card" onclick="editLead(' + l.id + ')">' +
+        '<div class="deal-name">' + (l.name||'—') + '</div>' +
+        (val > 0 ? '<div class="deal-value">$' + val.toLocaleString() + '</div>' : '') +
+        '<div class="deal-meta"><div class="deal-avatar">' + init + '</div>' +
+        (l.assigned||'Unassigned') + ' · ' + (l.source||'—') + '</div>' +
+        '</div>';
+    }).join('');
+  });
+}
+
+// ─── ANALYTICS ─────────────────────────────────────────────────
+function renderAnalytics() {
+  const el = id => document.getElementById(id);
+  if(!leads || leads.length === 0) {
+    ['an-conv','an-value','an-total','an-won'].forEach(id => { if(el(id)) el(id).textContent = '0'; });
+    if(el('an-sources')) el('an-sources').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No data yet</div>';
+    if(el('an-statuses')) el('an-statuses').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No data yet</div>';
+    return;
+  }
+
+  const total = leads.length;
+  const won = leads.filter(l => l.status === 'Won').length;
+  const lost = leads.filter(l => l.status === 'Lost').length;
+  const totalVal = leads.reduce((s,l) => s + (parseInt((l.value||'0').replace(/[$,]/g,''))||0), 0);
+  const convRate = total > 0 ? Math.round(won/total*100) : 0;
+
+  if(el('an-conv')) el('an-conv').textContent = convRate + '%';
+  if(el('an-conv-sub')) el('an-conv-sub').textContent = won + ' won out of ' + total;
+  if(el('an-value')) el('an-value').textContent = '$' + totalVal.toLocaleString();
+  if(el('an-total')) el('an-total').textContent = total;
+  if(el('an-won')) el('an-won').textContent = won;
+
+  // Sources breakdown
+  const bySrc = {};
+  leads.forEach(l => { const s = l.source||'Unknown'; bySrc[s] = (bySrc[s]||0) + 1; });
+  const srcColors = { Instagram:'#e1306c', TikTok:'#ff2d55', Snapchat:'#e6d800', Facebook:'#1877f2', WhatsApp:'#25d366', 'Google Ads':'#4285f4' };
+  const srcSorted = Object.entries(bySrc).sort((a,b)=>b[1]-a[1]);
+  const maxSrc = srcSorted[0] ? srcSorted[0][1] : 1;
+  if(el('an-sources')) el('an-sources').innerHTML = srcSorted.map(([src, cnt]) => {
+    const pct = Math.round(cnt/total*100);
+    const color = srcColors[src] || '#3b82f6';
+    return '<div class="analytics-bar-row"><div class="analytics-label">' + src + '</div>' +
+      '<div class="analytics-bar-wrap"><div class="analytics-bar-fill" style="width:' + Math.round(cnt/maxSrc*100) + '%;background:' + color + '"></div></div>' +
+      '<div class="analytics-value">' + pct + '%</div></div>';
+  }).join('');
+
+  // Status breakdown
+  const byStat = {};
+  leads.forEach(l => { const s = l.status||'New'; byStat[s] = (byStat[s]||0) + 1; });
+  const statColors = { New:'#3b82f6', Warm:'#f59e0b', Active:'#06b6d4', Won:'#10b981', Lost:'#ef4444', Cold:'#94a3b8' };
+  const statSorted = Object.entries(byStat).sort((a,b)=>b[1]-a[1]);
+  const maxStat = statSorted[0] ? statSorted[0][1] : 1;
+  if(el('an-statuses')) el('an-statuses').innerHTML = statSorted.map(([stat, cnt]) => {
+    const pct = Math.round(cnt/total*100);
+    const color = statColors[stat] || '#3b82f6';
+    return '<div class="analytics-bar-row"><div class="analytics-label">' + stat + '</div>' +
+      '<div class="analytics-bar-wrap"><div class="analytics-bar-fill" style="width:' + Math.round(cnt/maxStat*100) + '%;background:' + color + '"></div></div>' +
+      '<div class="analytics-value">' + pct + '%</div></div>';
+  }).join('');
+}
+
+// ─── POPULATE ASSIGN DROPDOWN FROM TEAM ───────────────────────
+async function populateAssignDropdown() {
+  const sel = document.getElementById('f-assign');
+  if(!sel) return;
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/team_members?select=name&active=eq.true&order=name.asc', { headers: HEADERS });
+    const data = await r.json();
+    if(r.ok && data && data.length > 0) {
+      sel.innerHTML = '<option value="">— Assign To —</option>' + data.map(m => '<option value="' + m.name + '">' + m.name + '</option>').join('');
+    } else {
+      sel.innerHTML = '<option value="">— No team members yet —</option>';
+    }
+  } catch(e) {
+    sel.innerHTML = '<option value="">— Assign To —</option>';
+  }
 }
 
 </script>
