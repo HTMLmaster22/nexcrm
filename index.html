@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%233b82f6'/><text y='.9em' font-size='72' font-family='Arial' font-weight='900' fill='white' x='50%' text-anchor='middle' dominant-baseline='hanging'>N</text></svg>" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>NexCRM — Sales & Marketing Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -1147,7 +1148,7 @@
     <div class="topbar-title" id="page-title">Dashboard</div>
     <div class="search-bar">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text2);flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input placeholder="Search leads, contacts..." />
+      <input id="global-search" placeholder="Search leads, contacts..." oninput="handleSearch(this.value)" />
     </div>
     <button class="lang-btn" id="lang-toggle" onclick="toggleLang()" style="gap:6px;font-size:12px;padding:7px 12px">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
@@ -1263,68 +1264,14 @@
           <div class="card-header">
             <div class="card-title">Recent Activity</div>
           </div>
-          <div class="activity-item">
-            <div class="activity-dot dot-green"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-            <div>
-              <div class="activity-text"><b>Mohammed Al-Otaibi</b> closed a deal worth $8,400</div>
-              <div class="activity-time">2 min ago</div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="activity-dot dot-blue"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
-            <div>
-              <div class="activity-text">New lead from <b>Instagram</b> — Saleh Trading Co.</div>
-              <div class="activity-time">14 min ago</div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="activity-dot dot-purple"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-            <div>
-              <div class="activity-text">Automation triggered for 12 warm leads — Follow-up sequence</div>
-              <div class="activity-time">1 hour ago</div>
-            </div>
-          </div>
-          <div class="activity-item">
-            <div class="activity-dot dot-yellow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-            <div>
-              <div class="activity-text">Campaign <b>"Ramadan 2025"</b> reached 4,200 impressions</div>
-              <div class="activity-time">3 hours ago</div>
-            </div>
-          </div>
+          <div id="activity-feed"><div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">Loading activity...</div></div>
         </div>
 
         <div class="card">
           <div class="card-header">
             <div class="card-title">Sales Team Performance</div>
           </div>
-          <div style="margin-top:8px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-              <span style="font-size:13px">Tariq Hassan</span>
-              <span style="font-size:12px;color:var(--success);font-weight:600">$22,400</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" style="width:88%"></div></div>
-          </div>
-          <div style="margin-top:14px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-              <span style="font-size:13px">Nora Al-Qahtani</span>
-              <span style="font-size:12px;color:var(--success);font-weight:600">$18,200</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" style="width:72%"></div></div>
-          </div>
-          <div style="margin-top:14px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-              <span style="font-size:13px">Khalid Al-Dosari</span>
-              <span style="font-size:12px;color:var(--warning);font-weight:600">$14,800</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" style="width:58%;background:linear-gradient(to right,var(--warning),#f97316)"></div></div>
-          </div>
-          <div style="margin-top:14px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-              <span style="font-size:13px">Sara Al-Mutairi</span>
-              <span style="font-size:12px;color:var(--text2);font-weight:600">$9,600</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" style="width:38%;background:linear-gradient(to right,var(--text2),#64748b)"></div></div>
-          </div>
+          <div id="dash-team-perf"><div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">Loading...</div></div>
         </div>
       </div>
     </div>
@@ -1622,7 +1569,7 @@
               <span>🖱 Clicks</span><span style="font-weight:700">8,240</span>
             </div>
             <div style="background:linear-gradient(to right,rgba(245,158,11,0.3),rgba(245,158,11,0.1));border-radius:10px;padding:12px 16px;margin-bottom:8px;font-size:13px;display:flex;justify-content:space-between;margin:0 40px 8px">
-              <span>📋 Leads</span><span style="font-weight:700">1,284</span>
+              <span>📋 Leads</span><span style="font-weight:700" id="funnel-leads">—</span>
             </div>
             <div style="background:linear-gradient(to right,rgba(16,185,129,0.3),rgba(16,185,129,0.1));border-radius:10px;padding:12px 16px;font-size:13px;display:flex;justify-content:space-between;margin:0 60px">
               <span>✅ Converted</span><span style="font-weight:700;color:var(--success)">317</span>
@@ -1739,412 +1686,6 @@
 
 
     <!-- IMPORT MODAL -->
-    <div class="modal-overlay" id="import-modal">
-      <div class="modal import-modal">
-        <div class="modal-header">
-          <div class="modal-title">Import Leads</div>
-          <div class="modal-close" onclick="closeImportModal()">✕</div>
-        </div>
-
-        <!-- Step 1: Upload -->
-        <div id="import-step-1">
-          <div class="template-btns">
-            <button class="template-btn" onclick="downloadTemplate('csv')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Download CSV Template
-            </button>
-            <button class="template-btn" onclick="downloadTemplate('xlsx')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Download Excel Template
-            </button>
-          </div>
-
-          <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
-            ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-            <div class="drop-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            </div>
-            <div class="drop-title">Drop your file here or click to browse</div>
-            <div class="drop-sub">Supports CSV, Excel (.xlsx), and tab-separated (.tsv) files</div>
-            <div class="format-badges">
-              <span class="format-badge">.csv</span>
-              <span class="format-badge">.xlsx</span>
-              <span class="format-badge">.xls</span>
-              <span class="format-badge">.tsv</span>
-              <span class="format-badge">.txt</span>
-            </div>
-          </div>
-          <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.tsv,.txt" style="display:none" onchange="handleFileSelect(event)" />
-
-          <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text2)">
-            💡 Your file should have columns: <b style="color:var(--accent)">name, company, source, status, value, email, phone</b> — any order, extra columns are ignored
-          </div>
-        </div>
-
-        <!-- Step 2: Preview & Map -->
-        <div id="import-step-2" style="display:none">
-          <div class="import-preview">
-            <div class="import-preview-title">
-              <span id="preview-title">Preview (first 5 rows)</span>
-              <button class="template-btn" style="padding:4px 10px" onclick="resetImport()">← Change file</button>
-            </div>
-            <div class="import-table-wrap">
-              <table class="import-table" id="preview-table"></table>
-            </div>
-          </div>
-
-          <div class="import-progress" id="import-progress">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-              <span style="font-size:13px;font-weight:600;color:var(--text)" id="progress-label">Importing...</span>
-              <span style="font-size:12px;color:var(--text2)" id="progress-pct">0%</span>
-            </div>
-            <div class="import-progress-bar">
-              <div class="import-progress-fill" id="progress-fill" style="width:0%"></div>
-            </div>
-            <div class="import-stats">
-              <div class="import-stat">Imported: <span class="ok" id="stat-ok">0</span></div>
-              <div class="import-stat">Skipped: <span class="skip" id="stat-skip">0</span></div>
-              <div class="import-stat">Errors: <span class="err" id="stat-err">0</span></div>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:10px">
-            <button class="btn btn-ghost" style="flex:1" onclick="resetImport()">Cancel</button>
-            <button class="btn btn-primary" style="flex:2" id="import-btn" onclick="startImport()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Import <span id="import-count">0</span> Leads
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- INVITE CLIENT MODAL -->
-    <div class="modal-overlay" id="invite-modal">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-title">✉️ Invite Client</div>
-          <div class="modal-close" onclick="closeInviteModal()">✕</div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Client Email</label>
-          <input class="form-input" id="invite-email" type="email" placeholder="client@company.com" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Temporary Password</label>
-          <input class="form-input" id="invite-password" type="text" placeholder="TempPass123!" />
-        </div>
-        <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px;font-size:12px;color:var(--text2);margin-bottom:16px">
-          💡 The client will use this email and password to log in. Share these credentials with them securely.
-        </div>
-        <div style="display:flex;gap:10px">
-          <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
-          <button class="btn btn-primary" style="flex:2" onclick="inviteClient()">✉️ Create Account</button>
-        </div>
-      </div>
-    </div>
-
-
-    <!-- IMPORT MODAL -->
-    <div class="modal-overlay" id="import-modal">
-      <div class="modal import-modal">
-        <div class="modal-header">
-          <div class="modal-title">Import Leads</div>
-          <div class="modal-close" onclick="closeImportModal()">✕</div>
-        </div>
-
-        <!-- Step 1: Upload -->
-        <div id="import-step-1">
-          <div class="template-btns">
-            <button class="template-btn" onclick="downloadTemplate('csv')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Download CSV Template
-            </button>
-            <button class="template-btn" onclick="downloadTemplate('xlsx')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Download Excel Template
-            </button>
-          </div>
-
-          <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
-            ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-            <div class="drop-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            </div>
-            <div class="drop-title">Drop your file here or click to browse</div>
-            <div class="drop-sub">Supports CSV, Excel (.xlsx), and tab-separated (.tsv) files</div>
-            <div class="format-badges">
-              <span class="format-badge">.csv</span>
-              <span class="format-badge">.xlsx</span>
-              <span class="format-badge">.xls</span>
-              <span class="format-badge">.tsv</span>
-              <span class="format-badge">.txt</span>
-            </div>
-          </div>
-          <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.tsv,.txt" style="display:none" onchange="handleFileSelect(event)" />
-
-          <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text2)">
-            💡 Your file should have columns: <b style="color:var(--accent)">name, company, source, status, value, email, phone</b> — any order, extra columns are ignored
-          </div>
-        </div>
-
-        <!-- Step 2: Preview & Map -->
-        <div id="import-step-2" style="display:none">
-          <div class="import-preview">
-            <div class="import-preview-title">
-              <span id="preview-title">Preview (first 5 rows)</span>
-              <button class="template-btn" style="padding:4px 10px" onclick="resetImport()">← Change file</button>
-            </div>
-            <div class="import-table-wrap">
-              <table class="import-table" id="preview-table"></table>
-            </div>
-          </div>
-
-          <div class="import-progress" id="import-progress">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-              <span style="font-size:13px;font-weight:600;color:var(--text)" id="progress-label">Importing...</span>
-              <span style="font-size:12px;color:var(--text2)" id="progress-pct">0%</span>
-            </div>
-            <div class="import-progress-bar">
-              <div class="import-progress-fill" id="progress-fill" style="width:0%"></div>
-            </div>
-            <div class="import-stats">
-              <div class="import-stat">Imported: <span class="ok" id="stat-ok">0</span></div>
-              <div class="import-stat">Skipped: <span class="skip" id="stat-skip">0</span></div>
-              <div class="import-stat">Errors: <span class="err" id="stat-err">0</span></div>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:10px">
-            <button class="btn btn-ghost" style="flex:1" onclick="resetImport()">Cancel</button>
-            <button class="btn btn-primary" style="flex:2" id="import-btn" onclick="startImport()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Import <span id="import-count">0</span> Leads
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- INVITE CLIENT MODAL -->
-    <div class="modal-overlay" id="invite-modal">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-title">Invite New Client</div>
-          <div class="modal-close" onclick="closeInviteModal()">✕</div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Client Email</label>
-          <input class="form-input" id="invite-email" type="email" placeholder="client@company.com" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Temporary Password</label>
-          <input class="form-input" id="invite-password" type="text" placeholder="Min 6 characters" />
-        </div>
-        <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--accent2);margin-bottom:8px">
-          💡 Share the email and password with your client. They can change their password after logging in.
-        </div>
-        <div style="display:flex;gap:10px;margin-top:8px">
-          <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
-          <button class="btn btn-primary" style="flex:2" onclick="createClientAccount()">✉️ Create Account</button>
-        </div>
-      </div>
-    </div>
-
-
-    <!-- IMPORT MODAL -->
-    <div class="modal-overlay" id="import-modal">
-      <div class="modal import-modal">
-        <div class="modal-header">
-          <div class="modal-title">Import Leads</div>
-          <div class="modal-close" onclick="closeImportModal()">✕</div>
-        </div>
-
-        <!-- Step 1: Upload -->
-        <div id="import-step-1">
-          <div class="template-btns">
-            <button class="template-btn" onclick="downloadTemplate('csv')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Download CSV Template
-            </button>
-            <button class="template-btn" onclick="downloadTemplate('xlsx')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Download Excel Template
-            </button>
-          </div>
-
-          <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
-            ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-            <div class="drop-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            </div>
-            <div class="drop-title">Drop your file here or click to browse</div>
-            <div class="drop-sub">Supports CSV, Excel (.xlsx), and tab-separated (.tsv) files</div>
-            <div class="format-badges">
-              <span class="format-badge">.csv</span>
-              <span class="format-badge">.xlsx</span>
-              <span class="format-badge">.xls</span>
-              <span class="format-badge">.tsv</span>
-              <span class="format-badge">.txt</span>
-            </div>
-          </div>
-          <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.tsv,.txt" style="display:none" onchange="handleFileSelect(event)" />
-
-          <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text2)">
-            💡 Your file should have columns: <b style="color:var(--accent)">name, company, source, status, value, email, phone</b> — any order, extra columns are ignored
-          </div>
-        </div>
-
-        <!-- Step 2: Preview & Map -->
-        <div id="import-step-2" style="display:none">
-          <div class="import-preview">
-            <div class="import-preview-title">
-              <span id="preview-title">Preview (first 5 rows)</span>
-              <button class="template-btn" style="padding:4px 10px" onclick="resetImport()">← Change file</button>
-            </div>
-            <div class="import-table-wrap">
-              <table class="import-table" id="preview-table"></table>
-            </div>
-          </div>
-
-          <div class="import-progress" id="import-progress">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-              <span style="font-size:13px;font-weight:600;color:var(--text)" id="progress-label">Importing...</span>
-              <span style="font-size:12px;color:var(--text2)" id="progress-pct">0%</span>
-            </div>
-            <div class="import-progress-bar">
-              <div class="import-progress-fill" id="progress-fill" style="width:0%"></div>
-            </div>
-            <div class="import-stats">
-              <div class="import-stat">Imported: <span class="ok" id="stat-ok">0</span></div>
-              <div class="import-stat">Skipped: <span class="skip" id="stat-skip">0</span></div>
-              <div class="import-stat">Errors: <span class="err" id="stat-err">0</span></div>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:10px">
-            <button class="btn btn-ghost" style="flex:1" onclick="resetImport()">Cancel</button>
-            <button class="btn btn-primary" style="flex:2" id="import-btn" onclick="startImport()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Import <span id="import-count">0</span> Leads
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- INVITE CLIENT MODAL -->
-    <div class="modal-overlay" id="invite-modal">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-title">Invite New Client</div>
-          <div class="modal-close" onclick="closeInviteModal()">✕</div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Client Email</label>
-          <input class="form-input" id="invite-email" type="email" placeholder="client@company.com" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Temporary Password</label>
-          <input class="form-input" id="invite-password" type="text" placeholder="Set a temporary password" />
-        </div>
-        <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--accent2);margin-bottom:8px">
-          💡 Share the email and password with your client. They can change their password after logging in.
-        </div>
-        <div style="display:flex;gap:10px;margin-top:8px">
-          <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
-          <button class="btn btn-primary" style="flex:2" onclick="createClientAccount()">✉️ Create Account</button>
-        </div>
-      </div>
-    </div>
-
-
-    <!-- IMPORT MODAL -->
-    <div class="modal-overlay" id="import-modal">
-      <div class="modal import-modal">
-        <div class="modal-header">
-          <div class="modal-title">Import Leads</div>
-          <div class="modal-close" onclick="closeImportModal()">✕</div>
-        </div>
-
-        <!-- Step 1: Upload -->
-        <div id="import-step-1">
-          <div class="template-btns">
-            <button class="template-btn" onclick="downloadTemplate('csv')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Download CSV Template
-            </button>
-            <button class="template-btn" onclick="downloadTemplate('xlsx')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Download Excel Template
-            </button>
-          </div>
-
-          <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
-            ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-            <div class="drop-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            </div>
-            <div class="drop-title">Drop your file here or click to browse</div>
-            <div class="drop-sub">Supports CSV, Excel (.xlsx), and tab-separated (.tsv) files</div>
-            <div class="format-badges">
-              <span class="format-badge">.csv</span>
-              <span class="format-badge">.xlsx</span>
-              <span class="format-badge">.xls</span>
-              <span class="format-badge">.tsv</span>
-              <span class="format-badge">.txt</span>
-            </div>
-          </div>
-          <input type="file" id="file-input" accept=".csv,.xlsx,.xls,.tsv,.txt" style="display:none" onchange="handleFileSelect(event)" />
-
-          <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--text2)">
-            💡 Your file should have columns: <b style="color:var(--accent)">name, company, source, status, value, email, phone</b> — any order, extra columns are ignored
-          </div>
-        </div>
-
-        <!-- Step 2: Preview & Map -->
-        <div id="import-step-2" style="display:none">
-          <div class="import-preview">
-            <div class="import-preview-title">
-              <span id="preview-title">Preview (first 5 rows)</span>
-              <button class="template-btn" style="padding:4px 10px" onclick="resetImport()">← Change file</button>
-            </div>
-            <div class="import-table-wrap">
-              <table class="import-table" id="preview-table"></table>
-            </div>
-          </div>
-
-          <div class="import-progress" id="import-progress">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-              <span style="font-size:13px;font-weight:600;color:var(--text)" id="progress-label">Importing...</span>
-              <span style="font-size:12px;color:var(--text2)" id="progress-pct">0%</span>
-            </div>
-            <div class="import-progress-bar">
-              <div class="import-progress-fill" id="progress-fill" style="width:0%"></div>
-            </div>
-            <div class="import-stats">
-              <div class="import-stat">Imported: <span class="ok" id="stat-ok">0</span></div>
-              <div class="import-stat">Skipped: <span class="skip" id="stat-skip">0</span></div>
-              <div class="import-stat">Errors: <span class="err" id="stat-err">0</span></div>
-            </div>
-          </div>
-
-          <div style="display:flex;gap:10px">
-            <button class="btn btn-ghost" style="flex:1" onclick="resetImport()">Cancel</button>
-            <button class="btn btn-primary" style="flex:2" id="import-btn" onclick="startImport()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Import <span id="import-count">0</span> Leads
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- INVITE CLIENT MODAL -->
     <div class="modal-overlay" id="invite-modal">
       <div class="modal">
         <div class="modal-header">
@@ -2740,6 +2281,8 @@ async function loadLeads() {
     leads = data || [];
     renderLeads();
     updateLeadStats();
+    renderActivityFeed();
+    renderDashTeamPerf();
   } catch(e) { console.error(e); showToast('❌ Failed to load leads'); }
   hideLoader();
 }
@@ -4900,6 +4443,13 @@ async function loadDashboard() {
     if(el('dash-conv')) el('dash-conv').textContent = convRate + '%';
     if(el('dash-conv-sub')) el('dash-conv-sub').textContent = won + ' won out of ' + total;
     if(el('dash-won')) el('dash-won').textContent = won;
+
+    // Use same data for activity + team perf
+    const saved = leads;
+    leads = data;
+    renderActivityFeed();
+    renderDashTeamPerf();
+    leads = saved;
   } catch(e) { console.error(e); }
 }
 
@@ -5126,6 +4676,75 @@ setTimeout(() => {
     setTimeout(() => b.style.width = w, 100);
   });
 }, 200);
+
+// ─── SEARCH ────────────────────────────────────────────────────
+function handleSearch(val) {
+  const q = val.toLowerCase().trim();
+  const leadsPage = document.getElementById('page-leads');
+  if(leadsPage && !leadsPage.classList.contains('active')) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    leadsPage.classList.add('active');
+    document.getElementById('page-title').textContent = 'Leads';
+  }
+  if(!q) { renderLeads(); return; }
+  const filtered = leads.filter(l =>
+    (l.name||'').toLowerCase().includes(q) ||
+    (l.company||'').toLowerCase().includes(q) ||
+    (l.phone||'').toLowerCase().includes(q) ||
+    (l.source||'').toLowerCase().includes(q) ||
+    (l.status||'').toLowerCase().includes(q) ||
+    (l.assigned||'').toLowerCase().includes(q)
+  );
+  const tbody = document.getElementById('leads-tbody');
+  if(filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text2)">No results for <b>' + val + '</b></td></tr>';
+    return;
+  }
+  const saved = leads;
+  leads = filtered;
+  renderLeads();
+  leads = saved;
+}
+
+// ─── REAL ACTIVITY FEED ────────────────────────────────────────
+function renderActivityFeed() {
+  const el = document.getElementById('activity-feed');
+  if(!el) return;
+  if(!leads || leads.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">No activity yet</div>';
+    return;
+  }
+  const recent = [...leads].sort((a,b) => (b.id||0)-(a.id||0)).slice(0,5);
+  el.innerHTML = recent.map(l => {
+    const src = l.source ? ' via <b>' + l.source + '</b>' : '';
+    const statusColors = { Won:'dot-green', New:'dot-blue', Warm:'dot-yellow', Lost:'dot-red', Cold:'dot-purple' };
+    const dot = statusColors[l.status] || 'dot-blue';
+    return '<div class="activity-item"><div class="activity-dot ' + dot + '" style="font-size:13px">🎯</div><div><div class="activity-text">New lead: <b>' + (l.name||'Unknown') + '</b>' + src + '</div><div class="activity-time">' + (l.date||'Recently') + ' · ' + (l.status||'New') + '</div></div></div>';
+  }).join('');
+}
+
+// ─── REAL TEAM PERFORMANCE ON DASHBOARD ───────────────────────
+function renderDashTeamPerf() {
+  const el = document.getElementById('dash-team-perf');
+  if(!el) return;
+  if(!leads || leads.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">No data yet</div>';
+    return;
+  }
+  const byRep = {};
+  leads.forEach(l => {
+    const rep = (l.assigned||'Unassigned').trim();
+    if(!byRep[rep]) byRep[rep] = 0;
+    byRep[rep] += parseInt((l.value||'0').replace(/[$,]/g,''))||0;
+  });
+  const sorted = Object.entries(byRep).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if(!sorted.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">No data yet</div>'; return; }
+  const max = sorted[0][1] || 1;
+  el.innerHTML = sorted.map(([name,val],i) =>
+    '<div style="margin-top:' + (i?'14':'8') + 'px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px">' + name + '</span><span style="font-size:12px;color:var(--success);font-weight:600">$' + val.toLocaleString() + '</span></div><div class="progress-bar"><div class="progress-fill" style="width:' + Math.round(val/max*100) + '%"></div></div></div>'
+  ).join('');
+}
+
 </script>
 
 <!-- AUTH OVERLAY -->
@@ -5238,29 +4857,7 @@ setTimeout(() => {
     </div>
 
     <!-- INVITE CLIENT MODAL -->
-    <div class="modal-overlay" id="invite-modal">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-title">Invite New Client</div>
-          <div class="modal-close" onclick="closeInviteModal()">✕</div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Client Email</label>
-          <input class="form-input" id="invite-email" type="email" placeholder="client@company.com" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Client Name (optional)</label>
-          <input class="form-input" id="invite-name" placeholder="Company or person name" />
-        </div>
-        <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px;font-size:12px;color:var(--text2);margin-bottom:8px">
-          💡 The client will receive an email to set their password and access their own CRM dashboard.
-        </div>
-        <div style="display:flex;gap:10px;margin-top:8px">
-          <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
-          <button class="btn btn-primary" style="flex:2" onclick="inviteClient()">✉️ Send Invite</button>
-        </div>
-      </div>
-    </div>
+
 
 
 <!-- NEW ORG MODAL -->
