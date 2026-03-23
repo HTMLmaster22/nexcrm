@@ -1225,19 +1225,19 @@
             </div>
             <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px">This Year</button>
           </div>
-          <div class="mini-chart">
-            <div class="bar" style="height:45%"></div>
-            <div class="bar" style="height:60%"></div>
-            <div class="bar" style="height:40%"></div>
-            <div class="bar" style="height:75%"></div>
-            <div class="bar" style="height:55%"></div>
-            <div class="bar" style="height:85%"></div>
-            <div class="bar" style="height:70%"></div>
-            <div class="bar" style="height:90%"></div>
-            <div class="bar" style="height:65%"></div>
-            <div class="bar" style="height:95%"></div>
-            <div class="bar" style="height:80%"></div>
-            <div class="bar" style="height:100%; opacity:1;"></div>
+          <div class="mini-chart" id="monthly-chart">
+            <div class="bar" style="height:10%"></div>
+            <div class="bar" style="height:10%"></div>
+            <div class="bar" style="height:10%"></div>
+            <div class="bar" style="height:10%"></div>
+            <div class="bar" style="height:10%"></div>
+            <div class="bar" style="height:10%"></div>
+            <div class="bar" style="height:10%"></div>
+            <div class="bar" style="height:10%"></div>
+            <div class="bar" style="height:10%"></div>
+            <div class="bar" style="height:10%"></div>
+            <div class="bar" style="height:10%"></div>
+            <div class="bar" style="height:10%"></div>
           </div>
           <div class="chart-labels">
             <div class="chart-label">Jan</div><div class="chart-label">Feb</div>
@@ -1253,18 +1253,15 @@
           <div class="card-header">
             <div class="card-title">Lead Sources</div>
           </div>
-          <div class="donut-wrap">
-            <div class="donut">
+          <div class="donut-wrap" id="donut-wrap">
+            <div class="donut" id="donut-chart">
               <div class="donut-inner">
-                <span>35%</span>
+                <span id="donut-top-pct">—</span>
                 <small>Top</small>
               </div>
             </div>
-            <div class="donut-legend">
-              <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>WhatsApp — 35%</div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--accent3)"></div>Instagram — 25%</div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--success)"></div>Google — 20%</div>
-              <div class="legend-item"><div class="legend-dot" style="background:var(--warning)"></div>TikTok — 20%</div>
+            <div class="donut-legend" id="donut-legend">
+              <div style="color:var(--text2);font-size:12px">Loading...</div>
             </div>
           </div>
         </div>
@@ -4438,11 +4435,13 @@ async function loadDashboard() {
     if(el('dash-conv-sub')) el('dash-conv-sub').textContent = won + ' won out of ' + total;
     if(el('dash-won')) el('dash-won').textContent = won;
 
-    // Use same data for activity + team perf
+    // Use same data for activity + team perf + chart + donut
     const saved = leads;
     leads = data;
     renderActivityFeed();
     renderDashTeamPerf();
+    renderMonthlyChart(data);
+    renderDonut(data);
     leads = saved;
   } catch(e) { console.error(e); }
 }
@@ -4722,9 +4721,13 @@ function renderDashTeamPerf() {
     el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">No data yet</div>';
     return;
   }
+  // Get valid org names to exclude them from team perf
+  const orgNames = userOrgs.map(o => o.name.toLowerCase());
   const byRep = {};
   leads.forEach(l => {
-    const rep = (l.assigned||'Unassigned').trim();
+    const rep = (l.assigned||'').trim();
+    if(!rep) return; // skip unassigned
+    if(orgNames.includes(rep.toLowerCase())) return; // skip org names
     if(!byRep[rep]) byRep[rep] = 0;
     byRep[rep] += parseInt((l.value||'0').replace(/[$,]/g,''))||0;
   });
@@ -4864,6 +4867,72 @@ async function populateAssignDropdown() {
   } catch(e) {
     sel.innerHTML = '<option value="">— Assign To —</option>';
   }
+}
+
+
+// ─── MONTHLY CHART ─────────────────────────────────────────────
+function renderMonthlyChart(data) {
+  const bars = document.querySelectorAll('#monthly-chart .bar');
+  if(!bars.length || !data || !data.length) return;
+
+  // Count leads per month
+  const months = new Array(12).fill(0);
+  data.forEach(l => {
+    if(!l.created_at) return;
+    const m = new Date(l.created_at).getMonth();
+    months[m]++;
+  });
+
+  const max = Math.max(...months, 1);
+  bars.forEach((bar, i) => {
+    const pct = Math.round((months[i] / max) * 100);
+    bar.style.height = Math.max(pct, 4) + '%';
+    bar.style.opacity = months[i] > 0 ? '1' : '0.3';
+    bar.title = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i] + ': ' + months[i] + ' leads';
+  });
+}
+
+// ─── DONUT CHART ───────────────────────────────────────────────
+function renderDonut(data) {
+  const donutEl = document.getElementById('donut-chart');
+  const legendEl = document.getElementById('donut-legend');
+  const topPct = document.getElementById('donut-top-pct');
+  if(!donutEl || !legendEl || !data || !data.length) return;
+
+  const srcColors = {
+    'Instagram':'#e1306c','TikTok':'#ff2d55','Snapchat':'#e6d800',
+    'Facebook':'#1877f2','WhatsApp':'#25d366','Google Ads':'#4285f4'
+  };
+  const fallbackColors = ['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4'];
+
+  const bySrc = {};
+  data.forEach(l => { const s = l.source||'Other'; bySrc[s] = (bySrc[s]||0) + 1; });
+  const total = data.length;
+  const sorted = Object.entries(bySrc).sort((a,b) => b[1]-a[1]);
+
+  if(sorted.length === 0) return;
+
+  // Build conic gradient
+  let deg = 0;
+  const gradParts = [];
+  sorted.forEach(([src, cnt], i) => {
+    const color = srcColors[src] || fallbackColors[i % fallbackColors.length];
+    const pct = cnt / total;
+    const endDeg = deg + pct * 360;
+    gradParts.push(color + ' ' + Math.round(deg) + 'deg ' + Math.round(endDeg) + 'deg');
+    deg = endDeg;
+  });
+
+  donutEl.style.background = 'conic-gradient(' + gradParts.join(',') + ')';
+
+  const topPctVal = Math.round(sorted[0][1]/total*100);
+  if(topPct) topPct.textContent = topPctVal + '%';
+
+  legendEl.innerHTML = sorted.slice(0,4).map(([src, cnt], i) => {
+    const color = srcColors[src] || fallbackColors[i % fallbackColors.length];
+    const pct = Math.round(cnt/total*100);
+    return '<div class="legend-item"><div class="legend-dot" style="background:' + color + '"></div>' + src + ' — ' + pct + '%</div>';
+  }).join('');
 }
 
 </script>
