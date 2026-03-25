@@ -1996,43 +1996,49 @@
     <div class="modal-overlay" id="vat-invoice-modal">
       <div class="modal" style="max-width:680px;max-height:90vh;overflow-y:auto">
         <div class="modal-header">
-          <div class="modal-title">0001F9FE VAT INVOICE 2014 06410627062A064806310629 06360631064A0628064A0629</DIV>
-          <DIV CLASS="MODAL-CLOSE" ONCLICK="DOCUMENT.GETELEMENTBYID('VAT-INVOICE-MODAL').CLASSLIST.REMOVE('OPEN')">2715</DIV>
-        </DIV>
-        <DIV STYLE="DISPLAY:GRID;GRID-TEMPLATE-COLUMNS:1FR 1FR;GAP:14PX;MARGIN-BOTTOM:16PX">
-          <DIV STYLE="GRID-COLUMN:1/-1"><DIV STYLE="FONT-SIZE:11PX;FONT-WEIGHT:700;COLOR:VAR(--ACCENT);TEXT-TRANSFORM:UPPERCASE;LETTER-SPACING:1PX;MARGIN-BOTTOM:10PX">SELLER 2014 064506390644064806450627062A 062706440628062706260639</DIV></DIV>
-          <DIV><LABEL CLASS="FORM-LABEL">COMPANY (EN)</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-SELLER-EN" PLACEHOLDER="YOUR COMPANY LTD"/></DIV>
-          <DIV><LABEL CLASS="FORM-LABEL">062706330645 062706440634063106430629</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-SELLER-AR" PLACEHOLDER="063406310643062A0643" DIR="RTL"/></DIV>
-          <DIV><LABEL CLASS="FORM-LABEL">VAT NUMBER 2014 063106420645 06360631064A0628064A</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-SELLER-VAT" PLACEHOLDER="300000000000003"/></DIV>
-          <DIV><LABEL CLASS="FORM-LABEL">CR NUMBER 2014 0633062C0644 062A062C06270631064A</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-SELLER-CR" PLACEHOLDER="1010000000"/></DIV>
-          <DIV STYLE="GRID-COLUMN:1/-1"><LABEL CLASS="FORM-LABEL">ADDRESS 2014 06390646064806270646</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-SELLER-ADDRESS" PLACEHOLDER="RIYADH, KSA"/></DIV>
-          <DIV STYLE="GRID-COLUMN:1/-1;MARGIN-TOP:8PX"><DIV STYLE="FONT-SIZE:11PX;FONT-WEIGHT:700;COLOR:VAR(--ACCENT);TEXT-TRANSFORM:UPPERCASE;LETTER-SPACING:1PX;MARGIN-BOTTOM:10PX">BUYER 2014 064506390644064806450627062A 0627064406450634062A0631064A</DIV></DIV>
-          <DIV><LABEL CLASS="FORM-LABEL">CLIENT NAME</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-BUYER-NAME" PLACEHOLDER="CLIENT CO"/></DIV>
-          <DIV><LABEL CLASS="FORM-LABEL">CLIENT VAT</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-BUYER-VAT" PLACEHOLDER="OPTIONAL"/></DIV>
-          <DIV STYLE="GRID-COLUMN:1/-1;MARGIN-TOP:8PX"><DIV STYLE="FONT-SIZE:11PX;FONT-WEIGHT:700;COLOR:VAR(--ACCENT);TEXT-TRANSFORM:UPPERCASE;LETTER-SPACING:1PX;MARGIN-BOTTOM:10PX">INVOICE DETAILS</DIV></DIV>
-          <DIV><LABEL CLASS="FORM-LABEL">INVOICE #</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-INV-NUMBER" PLACEHOLDER="INV-001"/></DIV>
-          <DIV><LABEL CLASS="FORM-LABEL">DATE</LABEL><INPUT CLASS="FORM-INPUT" TYPE="DATE" ID="VAT-INV-DATE"/></DIV>
-          <DIV STYLE="GRID-COLUMN:1/-1;MARGIN-TOP:8PX">
-            <DIV STYLE="FONT-SIZE:11PX;FONT-WEIGHT:700;COLOR:VAR(--ACCENT);TEXT-TRANSFORM:UPPERCASE;LETTER-SPACING:1PX;MARGIN-BOTTOM:10PX">SERVICES 2014 06270644062E062F06450627062A</DIV>
-            <DIV ID="VAT-ITEMS"><DIV CLASS="VAT-ITEM-ROW" STYLE="DISPLAY:GRID;GRID-TEMPLATE-COLUMNS:2FR 1FR 1FR AUTO;GAP:8PX;MARGIN-BOTTOM:8PX"><INPUT CLASS="FORM-INPUT" PLACEHOLDER="SERVICE DESCRIPTION" ONINPUT="CALCVAT()"/><INPUT CLASS="FORM-INPUT" TYPE="NUMBER" PLACEHOLDER="QTY" VALUE="1" ONINPUT="CALCVAT()"/><INPUT CLASS="FORM-INPUT" TYPE="NUMBER" PLACEHOLDER="UNIT PRICE SAR" ONINPUT="CALCVAT()"/><BUTTON ONCLICK="REMOVEVATITEM(THIS)" STYLE="BACKGROUND:RGBA(239,68,68,0.15);BORDER:1PX SOLID RGBA(239,68,68,0.3);BORDER-RADIUS:8PX;PADDING:8PX 10PX;COLOR:#EF4444;CURSOR:POINTER">2715</BUTTON></DIV></DIV>
-            <BUTTON ONCLICK="ADDVATITEM()" STYLE="BACKGROUND:RGBA(59,130,246,0.1);BORDER:1PX DASHED RGBA(59,130,246,0.3);BORDER-RADIUS:8PX;PADDING:8PX 16PX;COLOR:VAR(--ACCENT);FONT-SIZE:12PX;CURSOR:POINTER;WIDTH:100%;MARGIN-TOP:4PX">+ ADD ITEM</BUTTON>
-          </DIV>
-          <DIV STYLE="GRID-COLUMN:1/-1;MARGIN-TOP:12PX;BACKGROUND:VAR(--BG3);BORDER-RADIUS:12PX;PADDING:16PX">
-            <DIV STYLE="DISPLAY:FLEX;JUSTIFY-CONTENT:SPACE-BETWEEN;MARGIN-BOTTOM:8PX;FONT-SIZE:13PX;COLOR:VAR(--TEXT2)"><SPAN>SUBTOTAL</SPAN><SPAN ID="VAT-SUBTOTAL">SAR 0.00</SPAN></DIV>
-            <DIV STYLE="DISPLAY:FLEX;JUSTIFY-CONTENT:SPACE-BETWEEN;MARGIN-BOTTOM:8PX;FONT-SIZE:13PX;COLOR:VAR(--WARNING)"><SPAN>VAT 15%</SPAN><SPAN ID="VAT-TAX">SAR 0.00</SPAN></DIV>
-            <DIV STYLE="DISPLAY:FLEX;JUSTIFY-CONTENT:SPACE-BETWEEN;FONT-SIZE:16PX;FONT-WEIGHT:800;COLOR:VAR(--TEXT);BORDER-TOP:1PX SOLID VAR(--BORDER);PADDING-TOP:10PX"><SPAN>TOTAL</SPAN><SPAN ID="VAT-TOTAL">SAR 0.00</SPAN></DIV>
-          </DIV>
-          <DIV STYLE="GRID-COLUMN:1/-1;MARGIN-TOP:8PX"><DIV STYLE="FONT-SIZE:11PX;FONT-WEIGHT:700;COLOR:VAR(--ACCENT);TEXT-TRANSFORM:UPPERCASE;LETTER-SPACING:1PX;MARGIN-BOTTOM:10PX">BANK DETAILS</DIV></DIV>
-          <DIV><LABEL CLASS="FORM-LABEL">BANK NAME</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-BANK-NAME" PLACEHOLDER="AL RAJHI BANK"/></DIV>
-          <DIV><LABEL CLASS="FORM-LABEL">IBAN</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-BANK-IBAN" PLACEHOLDER="SA00..."/></DIV>
-        </DIV>
-        <DIV STYLE="DISPLAY:FLEX;GAP:10PX;MARGIN-TOP:8PX">
-          <BUTTON ONCLICK="GENERATEVATINVOICE()" CLASS="BTN BTN-PRIMARY" STYLE="FLEX:2;PADDING:12PX">0001F9FE GENERATE PDF INVOICE</BUTTON>
-          <BUTTON ONCLICK="DOCUMENT.GETELEMENTBYID('VAT-INVOICE-MODAL').CLASSLIST.REMOVE('OPEN')" CLASS="BTN BTN-GHOST" STYLE="FLEX:1;PADDING:12PX">CANCEL</BUTTON>
-        </DIV>
-      </DIV>
-    </DIV>
-
+          <div class="modal-title">VAT Invoice - فاتورة ضريبية</div>
+          <div class="modal-close" onclick="document.getElementById('vat-invoice-modal').classList.remove('open')">&#x2715;</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+          <div style="grid-column:1/-1"><div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Seller Info</div></div>
+          <div><label class="form-label">Company Name (EN)</label><input class="form-input" id="vat-seller-en" placeholder="Your Company Ltd"/></div>
+          <div><label class="form-label">Company Name (AR)</label><input class="form-input" id="vat-seller-ar" placeholder="شركتك" dir="rtl"/></div>
+          <div><label class="form-label">VAT Number</label><input class="form-input" id="vat-seller-vat" placeholder="300000000000003"/></div>
+          <div><label class="form-label">CR Number</label><input class="form-input" id="vat-seller-cr" placeholder="1010000000"/></div>
+          <div style="grid-column:1/-1"><label class="form-label">Address</label><input class="form-input" id="vat-seller-address" placeholder="Riyadh, Saudi Arabia"/></div>
+          <div style="grid-column:1/-1;margin-top:8px"><div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Buyer Info</div></div>
+          <div><label class="form-label">Client Name</label><input class="form-input" id="vat-buyer-name" placeholder="Client Company"/></div>
+          <div><label class="form-label">Client VAT Number</label><input class="form-input" id="vat-buyer-vat" placeholder="Optional"/></div>
+          <div style="grid-column:1/-1;margin-top:8px"><div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Invoice Details</div></div>
+          <div><label class="form-label">Invoice Number</label><input class="form-input" id="vat-inv-number" placeholder="INV-001"/></div>
+          <div><label class="form-label">Date</label><input class="form-input" type="date" id="vat-inv-date"/></div>
+          <div style="grid-column:1/-1;margin-top:8px">
+            <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Services</div>
+            <div id="vat-items">
+              <div class="vat-item-row" style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:8px">
+                <input class="form-input" placeholder="Service description" oninput="calcVAT()"/>
+                <input class="form-input" type="number" placeholder="Qty" value="1" oninput="calcVAT()"/>
+                <input class="form-input" type="number" placeholder="Unit price SAR" oninput="calcVAT()"/>
+                <button onclick="removeVATItem(this)" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:8px 10px;color:#ef4444;cursor:pointer">X</button>
+              </div>
+            </div>
+            <button onclick="addVATItem()" style="background:rgba(59,130,246,0.1);border:1px dashed rgba(59,130,246,0.3);border-radius:8px;padding:8px 16px;color:var(--accent);font-size:12px;cursor:pointer;width:100%;margin-top:4px">+ Add Item</button>
+          </div>
+          <div style="grid-column:1/-1;margin-top:12px;background:var(--bg3);border-radius:12px;padding:16px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;color:var(--text2)"><span>Subtotal</span><span id="vat-subtotal">SAR 0.00</span></div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px;color:var(--warning)"><span>VAT 15%</span><span id="vat-tax">SAR 0.00</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;color:var(--text);border-top:1px solid var(--border);padding-top:10px"><span>Total</span><span id="vat-total">SAR 0.00</span></div>
+          </div>
+          <div style="grid-column:1/-1;margin-top:8px"><div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Bank Details</div></div>
+          <div><label class="form-label">Bank Name</label><input class="form-input" id="vat-bank-name" placeholder="Al Rajhi Bank"/></div>
+          <div><label class="form-label">IBAN</label><input class="form-input" id="vat-bank-iban" placeholder="SA00..."/></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button onclick="generateVATInvoice()" class="btn btn-primary" style="flex:2;padding:12px">Generate PDF Invoice</button>
+          <button onclick="document.getElementById('vat-invoice-modal').classList.remove('open')" class="btn btn-ghost" style="flex:1;padding:12px">Cancel</button>
+        </div>
+      </div>
+    </div>
     <!-- INVOICE MODAL -->
     <div class="modal-overlay" id="invoice-modal">
       <div class="modal">
@@ -5641,6 +5647,10 @@ function autoApplyBranding() {
   const b = getBranding(currentOrg.id);
   if(b && (b.name || b.color)) applyBranding(b);
 }
+</script>
+</body>
+</html>
+<script>
 // ─── VAT INVOICE GENERATOR ────────────────────────────────────
 function openVATInvoiceModal() {
   const today = new Date().toISOString().split('T')[0];
@@ -5820,7 +5830,4 @@ function generateVATInvoice() {
   win.document.write(html);
   win.document.close();
 }
-
 </script>
-</body>
-</html>
