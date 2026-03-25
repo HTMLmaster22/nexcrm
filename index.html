@@ -1879,7 +1879,10 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title">Invoice Tracker</div>
-          <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInvoiceModal()">＋ New Invoice</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="openVATInvoiceModal()">🧾 VAT Invoice</button>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInvoiceModal()">＋ New Invoice</button>
+          </div>
         </div>
         <div id="invoices-list">
           <div style="text-align:center;padding:40px;color:var(--text2)">No invoices yet</div>
@@ -1988,6 +1991,47 @@
         </div>
       </div>
     </div>
+
+    <!-- VAT INVOICE MODAL -->
+    <div class="modal-overlay" id="vat-invoice-modal">
+      <div class="modal" style="max-width:680px;max-height:90vh;overflow-y:auto">
+        <div class="modal-header">
+          <div class="modal-title">0001F9FE VAT INVOICE 2014 06410627062A064806310629 06360631064A0628064A0629</DIV>
+          <DIV CLASS="MODAL-CLOSE" ONCLICK="DOCUMENT.GETELEMENTBYID('VAT-INVOICE-MODAL').CLASSLIST.REMOVE('OPEN')">2715</DIV>
+        </DIV>
+        <DIV STYLE="DISPLAY:GRID;GRID-TEMPLATE-COLUMNS:1FR 1FR;GAP:14PX;MARGIN-BOTTOM:16PX">
+          <DIV STYLE="GRID-COLUMN:1/-1"><DIV STYLE="FONT-SIZE:11PX;FONT-WEIGHT:700;COLOR:VAR(--ACCENT);TEXT-TRANSFORM:UPPERCASE;LETTER-SPACING:1PX;MARGIN-BOTTOM:10PX">SELLER 2014 064506390644064806450627062A 062706440628062706260639</DIV></DIV>
+          <DIV><LABEL CLASS="FORM-LABEL">COMPANY (EN)</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-SELLER-EN" PLACEHOLDER="YOUR COMPANY LTD"/></DIV>
+          <DIV><LABEL CLASS="FORM-LABEL">062706330645 062706440634063106430629</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-SELLER-AR" PLACEHOLDER="063406310643062A0643" DIR="RTL"/></DIV>
+          <DIV><LABEL CLASS="FORM-LABEL">VAT NUMBER 2014 063106420645 06360631064A0628064A</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-SELLER-VAT" PLACEHOLDER="300000000000003"/></DIV>
+          <DIV><LABEL CLASS="FORM-LABEL">CR NUMBER 2014 0633062C0644 062A062C06270631064A</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-SELLER-CR" PLACEHOLDER="1010000000"/></DIV>
+          <DIV STYLE="GRID-COLUMN:1/-1"><LABEL CLASS="FORM-LABEL">ADDRESS 2014 06390646064806270646</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-SELLER-ADDRESS" PLACEHOLDER="RIYADH, KSA"/></DIV>
+          <DIV STYLE="GRID-COLUMN:1/-1;MARGIN-TOP:8PX"><DIV STYLE="FONT-SIZE:11PX;FONT-WEIGHT:700;COLOR:VAR(--ACCENT);TEXT-TRANSFORM:UPPERCASE;LETTER-SPACING:1PX;MARGIN-BOTTOM:10PX">BUYER 2014 064506390644064806450627062A 0627064406450634062A0631064A</DIV></DIV>
+          <DIV><LABEL CLASS="FORM-LABEL">CLIENT NAME</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-BUYER-NAME" PLACEHOLDER="CLIENT CO"/></DIV>
+          <DIV><LABEL CLASS="FORM-LABEL">CLIENT VAT</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-BUYER-VAT" PLACEHOLDER="OPTIONAL"/></DIV>
+          <DIV STYLE="GRID-COLUMN:1/-1;MARGIN-TOP:8PX"><DIV STYLE="FONT-SIZE:11PX;FONT-WEIGHT:700;COLOR:VAR(--ACCENT);TEXT-TRANSFORM:UPPERCASE;LETTER-SPACING:1PX;MARGIN-BOTTOM:10PX">INVOICE DETAILS</DIV></DIV>
+          <DIV><LABEL CLASS="FORM-LABEL">INVOICE #</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-INV-NUMBER" PLACEHOLDER="INV-001"/></DIV>
+          <DIV><LABEL CLASS="FORM-LABEL">DATE</LABEL><INPUT CLASS="FORM-INPUT" TYPE="DATE" ID="VAT-INV-DATE"/></DIV>
+          <DIV STYLE="GRID-COLUMN:1/-1;MARGIN-TOP:8PX">
+            <DIV STYLE="FONT-SIZE:11PX;FONT-WEIGHT:700;COLOR:VAR(--ACCENT);TEXT-TRANSFORM:UPPERCASE;LETTER-SPACING:1PX;MARGIN-BOTTOM:10PX">SERVICES 2014 06270644062E062F06450627062A</DIV>
+            <DIV ID="VAT-ITEMS"><DIV CLASS="VAT-ITEM-ROW" STYLE="DISPLAY:GRID;GRID-TEMPLATE-COLUMNS:2FR 1FR 1FR AUTO;GAP:8PX;MARGIN-BOTTOM:8PX"><INPUT CLASS="FORM-INPUT" PLACEHOLDER="SERVICE DESCRIPTION" ONINPUT="CALCVAT()"/><INPUT CLASS="FORM-INPUT" TYPE="NUMBER" PLACEHOLDER="QTY" VALUE="1" ONINPUT="CALCVAT()"/><INPUT CLASS="FORM-INPUT" TYPE="NUMBER" PLACEHOLDER="UNIT PRICE SAR" ONINPUT="CALCVAT()"/><BUTTON ONCLICK="REMOVEVATITEM(THIS)" STYLE="BACKGROUND:RGBA(239,68,68,0.15);BORDER:1PX SOLID RGBA(239,68,68,0.3);BORDER-RADIUS:8PX;PADDING:8PX 10PX;COLOR:#EF4444;CURSOR:POINTER">2715</BUTTON></DIV></DIV>
+            <BUTTON ONCLICK="ADDVATITEM()" STYLE="BACKGROUND:RGBA(59,130,246,0.1);BORDER:1PX DASHED RGBA(59,130,246,0.3);BORDER-RADIUS:8PX;PADDING:8PX 16PX;COLOR:VAR(--ACCENT);FONT-SIZE:12PX;CURSOR:POINTER;WIDTH:100%;MARGIN-TOP:4PX">+ ADD ITEM</BUTTON>
+          </DIV>
+          <DIV STYLE="GRID-COLUMN:1/-1;MARGIN-TOP:12PX;BACKGROUND:VAR(--BG3);BORDER-RADIUS:12PX;PADDING:16PX">
+            <DIV STYLE="DISPLAY:FLEX;JUSTIFY-CONTENT:SPACE-BETWEEN;MARGIN-BOTTOM:8PX;FONT-SIZE:13PX;COLOR:VAR(--TEXT2)"><SPAN>SUBTOTAL</SPAN><SPAN ID="VAT-SUBTOTAL">SAR 0.00</SPAN></DIV>
+            <DIV STYLE="DISPLAY:FLEX;JUSTIFY-CONTENT:SPACE-BETWEEN;MARGIN-BOTTOM:8PX;FONT-SIZE:13PX;COLOR:VAR(--WARNING)"><SPAN>VAT 15%</SPAN><SPAN ID="VAT-TAX">SAR 0.00</SPAN></DIV>
+            <DIV STYLE="DISPLAY:FLEX;JUSTIFY-CONTENT:SPACE-BETWEEN;FONT-SIZE:16PX;FONT-WEIGHT:800;COLOR:VAR(--TEXT);BORDER-TOP:1PX SOLID VAR(--BORDER);PADDING-TOP:10PX"><SPAN>TOTAL</SPAN><SPAN ID="VAT-TOTAL">SAR 0.00</SPAN></DIV>
+          </DIV>
+          <DIV STYLE="GRID-COLUMN:1/-1;MARGIN-TOP:8PX"><DIV STYLE="FONT-SIZE:11PX;FONT-WEIGHT:700;COLOR:VAR(--ACCENT);TEXT-TRANSFORM:UPPERCASE;LETTER-SPACING:1PX;MARGIN-BOTTOM:10PX">BANK DETAILS</DIV></DIV>
+          <DIV><LABEL CLASS="FORM-LABEL">BANK NAME</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-BANK-NAME" PLACEHOLDER="AL RAJHI BANK"/></DIV>
+          <DIV><LABEL CLASS="FORM-LABEL">IBAN</LABEL><INPUT CLASS="FORM-INPUT" ID="VAT-BANK-IBAN" PLACEHOLDER="SA00..."/></DIV>
+        </DIV>
+        <DIV STYLE="DISPLAY:FLEX;GAP:10PX;MARGIN-TOP:8PX">
+          <BUTTON ONCLICK="GENERATEVATINVOICE()" CLASS="BTN BTN-PRIMARY" STYLE="FLEX:2;PADDING:12PX">0001F9FE GENERATE PDF INVOICE</BUTTON>
+          <BUTTON ONCLICK="DOCUMENT.GETELEMENTBYID('VAT-INVOICE-MODAL').CLASSLIST.REMOVE('OPEN')" CLASS="BTN BTN-GHOST" STYLE="FLEX:1;PADDING:12PX">CANCEL</BUTTON>
+        </DIV>
+      </DIV>
+    </DIV>
 
     <!-- INVOICE MODAL -->
     <div class="modal-overlay" id="invoice-modal">
@@ -5600,3 +5644,184 @@ function autoApplyBranding() {
 </script>
 </body>
 </html>
+<script>
+// ─── VAT INVOICE GENERATOR ────────────────────────────────────
+function openVATInvoiceModal() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('vat-inv-date').value = today;
+  const count = (invoicesList.length || 0) + 1;
+  document.getElementById('vat-inv-number').value = 'INV-' + String(count).padStart(3,'0');
+  // Pre-fill seller from branding if available
+  const b = currentOrg ? getBranding(currentOrg.id) : {};
+  if(b.name) document.getElementById('vat-seller-ar').value = b.name;
+  calcVAT();
+  document.getElementById('vat-invoice-modal').classList.add('open');
+}
+
+function addVATItem() {
+  const row = document.createElement('div');
+  row.className = 'vat-item-row';
+  row.style.cssText = 'display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:8px';
+  row.innerHTML = `<input class="form-input" placeholder="Service description" oninput="calcVAT()"/>
+    <input class="form-input" type="number" placeholder="Qty" value="1" oninput="calcVAT()"/>
+    <input class="form-input" type="number" placeholder="Unit price SAR" oninput="calcVAT()"/>
+    <button onclick="removeVATItem(this)" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:8px 10px;color:#ef4444;cursor:pointer">✕</button>`;
+  document.getElementById('vat-items').appendChild(row);
+}
+
+function removeVATItem(btn) {
+  const rows = document.querySelectorAll('.vat-item-row');
+  if(rows.length > 1) { btn.closest('.vat-item-row').remove(); calcVAT(); }
+}
+
+function calcVAT() {
+  let subtotal = 0;
+  document.querySelectorAll('.vat-item-row').forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const qty = parseFloat(inputs[1]?.value) || 0;
+    const price = parseFloat(inputs[2]?.value) || 0;
+    subtotal += qty * price;
+  });
+  const tax = subtotal * 0.15;
+  const total = subtotal + tax;
+  document.getElementById('vat-subtotal').textContent = 'SAR ' + subtotal.toFixed(2);
+  document.getElementById('vat-tax').textContent = 'SAR ' + tax.toFixed(2);
+  document.getElementById('vat-total').textContent = 'SAR ' + total.toFixed(2);
+}
+
+function generateVATInvoice() {
+  const sellerEN = document.getElementById('vat-seller-en').value || 'Your Company';
+  const sellerAR = document.getElementById('vat-seller-ar').value || '';
+  const sellerVAT = document.getElementById('vat-seller-vat').value || '';
+  const sellerCR = document.getElementById('vat-seller-cr').value || '';
+  const sellerAddr = document.getElementById('vat-seller-address').value || '';
+  const buyerName = document.getElementById('vat-buyer-name').value || 'Client';
+  const buyerVAT = document.getElementById('vat-buyer-vat').value || '';
+  const invNumber = document.getElementById('vat-inv-number').value || 'INV-001';
+  const invDate = document.getElementById('vat-inv-date').value || new Date().toISOString().split('T')[0];
+  const bankName = document.getElementById('vat-bank-name').value || '';
+  const bankIBAN = document.getElementById('vat-bank-iban').value || '';
+
+  // Build items
+  let subtotal = 0;
+  const itemRows = [];
+  document.querySelectorAll('.vat-item-row').forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const desc = inputs[0]?.value || '';
+    const qty = parseFloat(inputs[1]?.value) || 0;
+    const price = parseFloat(inputs[2]?.value) || 0;
+    const lineTotal = qty * price;
+    subtotal += lineTotal;
+    if(desc) itemRows.push({ desc, qty, price, lineTotal });
+  });
+  const tax = subtotal * 0.15;
+  const total = subtotal + tax;
+
+  // QR code data (ZATCA TLV format simplified)
+  const qrData = `${sellerEN}|${sellerVAT}|${invDate}|${total.toFixed(2)}|${tax.toFixed(2)}`;
+  const qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(qrData)}`;
+
+  const html = `<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Tajawal:wght@400;700;800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#f8fafc;color:#1e293b}
+  .page{width:794px;margin:20px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 30px rgba(0,0,0,0.1)}
+  @media print{body{background:#fff}.page{margin:0;border-radius:0;box-shadow:none;width:100%}.no-print{display:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- HEADER -->
+  <div style="background:linear-gradient(135deg,#1e293b,#0f172a);padding:36px 44px;display:flex;justify-content:space-between;align-items:flex-start">
+    <div>
+      <div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-0.5px">${sellerEN}</div>
+      ${sellerAR ? `<div style="font-family:'Tajawal',sans-serif;font-size:18px;font-weight:700;color:rgba(255,255,255,0.7);margin-top:4px;direction:rtl">${sellerAR}</div>` : ''}
+      <div style="margin-top:12px;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.8">
+        ${sellerVAT ? `VAT: ${sellerVAT}<br/>` : ''}
+        ${sellerCR ? `CR: ${sellerCR}<br/>` : ''}
+        ${sellerAddr}
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:11px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px">Tax Invoice — فاتورة ضريبية</div>
+      <div style="font-size:32px;font-weight:900;color:#fff">${invNumber}</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:4px">${new Date(invDate+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}</div>
+    </div>
+  </div>
+
+  <!-- BILL TO -->
+  <div style="padding:28px 44px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #f1f5f9">
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Bill To — فاتورة إلى</div>
+      <div style="font-size:18px;font-weight:700;color:#0f172a">${buyerName}</div>
+      ${buyerVAT ? `<div style="font-size:12px;color:#64748b;margin-top:4px">VAT: ${buyerVAT}</div>` : ''}
+    </div>
+    <img src="${qrURL}" style="width:100px;height:100px;border-radius:8px;border:1px solid #e2e8f0" alt="QR Code"/>
+  </div>
+
+  <!-- ITEMS TABLE -->
+  <div style="padding:28px 44px">
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:#f8fafc">
+          <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-radius:8px 0 0 8px">Description</th>
+          <th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px">Qty</th>
+          <th style="padding:12px 16px;text-align:right;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px">Unit Price</th>
+          <th style="padding:12px 16px;text-align:right;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-radius:0 8px 8px 0">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${itemRows.map((item,i) => `
+        <tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:14px 16px;font-size:14px;color:#1e293b;font-weight:500">${item.desc}</td>
+          <td style="padding:14px 16px;font-size:14px;color:#475569;text-align:center">${item.qty}</td>
+          <td style="padding:14px 16px;font-size:14px;color:#475569;text-align:right">SAR ${item.price.toFixed(2)}</td>
+          <td style="padding:14px 16px;font-size:14px;font-weight:600;color:#1e293b;text-align:right">SAR ${item.lineTotal.toFixed(2)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TOTALS + BANK -->
+  <div style="padding:0 44px 36px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:end">
+    ${(bankName || bankIBAN) ? `
+    <div style="background:#f8fafc;border-radius:12px;padding:20px">
+      <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Bank Details — البنك</div>
+      ${bankName ? `<div style="font-size:13px;color:#475569;margin-bottom:4px"><span style="font-weight:600">Bank:</span> ${bankName}</div>` : ''}
+      ${bankIBAN ? `<div style="font-size:13px;color:#475569;font-family:monospace"><span style="font-weight:600">IBAN:</span> ${bankIBAN}</div>` : ''}
+    </div>` : '<div></div>'}
+    <div style="background:#0f172a;border-radius:12px;padding:20px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;color:rgba(255,255,255,0.6)">
+        <span>Subtotal</span><span>SAR ${subtotal.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;color:#fbbf24">
+        <span>VAT 15% — ضريبة القيمة المضافة</span><span>SAR ${tax.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:800;color:#fff;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;margin-top:4px">
+        <span>Total — الإجمالي</span><span>SAR ${total.toFixed(2)}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="background:#f8fafc;padding:16px 44px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #e2e8f0">
+    <div style="font-size:11px;color:#94a3b8">This is a computer-generated VAT invoice compliant with ZATCA regulations</div>
+    <div style="font-size:11px;color:#94a3b8">Powered by NexCRM</div>
+  </div>
+</div>
+
+<div class="no-print" style="position:fixed;bottom:24px;right:24px;display:flex;gap:10px">
+  <button onclick="window.print()" style="background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.3)">🖨️ Print / Save PDF</button>
+  <button onclick="window.close()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:12px;padding:14px 20px;font-size:15px;cursor:pointer">✕</button>
+</div>
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+}
+</script>
