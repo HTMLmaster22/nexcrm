@@ -5641,10 +5641,6 @@ function autoApplyBranding() {
   const b = getBranding(currentOrg.id);
   if(b && (b.name || b.color)) applyBranding(b);
 }
-</script>
-</body>
-</html>
-<script>
 // ─── VAT INVOICE GENERATOR ────────────────────────────────────
 function openVATInvoiceModal() {
   const today = new Date().toISOString().split('T')[0];
@@ -5824,4 +5820,7 @@ function generateVATInvoice() {
   win.document.write(html);
   win.document.close();
 }
+
 </script>
+</body>
+</html>
