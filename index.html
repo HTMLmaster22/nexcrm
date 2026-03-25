@@ -1519,6 +1519,15 @@
 
     <!-- ANALYTICS -->
     <div class="page" id="page-analytics">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:20px;font-weight:800;color:var(--text)">Analytics</div>
+          <div style="font-size:13px;color:var(--text2);margin-top:2px" id="report-org-label">Current workspace</div>
+        </div>
+        <button onclick="generatePDFReport()" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(99,102,241,0.4);transition:all 0.2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+          📄 <span>Generate PDF Report</span>
+        </button>
+      </div>
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-label">Conversion Rate</div>
@@ -5167,6 +5176,201 @@ window.addEventListener('appinstalled', () => {
   if(installBtn) installBtn.style.display = 'none';
   deferredPrompt = null;
 });
+
+// ─── PDF REPORT GENERATOR ─────────────────────────────────────
+function generatePDFReport() {
+  const orgName = currentOrg ? currentOrg.name : 'NexCRM';
+  const now = new Date();
+  const monthName = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  const monthAr = now.toLocaleString('ar-SA', { month: 'long', year: 'numeric' });
+
+  // Get leads data
+  const reportLeads = leads.length > 0 ? leads : (window.allLeads || []);
+  const total = reportLeads.length;
+  const won = reportLeads.filter(l => l.status === 'Won').length;
+  const lost = reportLeads.filter(l => l.status === 'Lost').length;
+  const active = reportLeads.filter(l => l.status === 'Active').length;
+  const warm = reportLeads.filter(l => l.status === 'Warm').length;
+  const newL = reportLeads.filter(l => l.status === 'New').length;
+  const convRate = total > 0 ? Math.round((won / total) * 100) : 0;
+  const pipelineVal = reportLeads.reduce((s, l) => s + (parseFloat(l.value) || 0), 0);
+
+  // Sources breakdown
+  const sourceCounts = {};
+  reportLeads.forEach(l => {
+    const src = l.source || 'Unknown';
+    sourceCounts[src] = (sourceCounts[src] || 0) + 1;
+  });
+  const sortedSources = Object.entries(sourceCounts).sort((a,b) => b[1]-a[1]);
+
+  // Top 5 leads
+  const top5 = reportLeads.slice(0, 5);
+
+  // Auto insight
+  let insight = '';
+  if(sortedSources.length > 0) {
+    const topSrc = sortedSources[0];
+    const pct = Math.round((topSrc[1] / total) * 100);
+    insight = `${topSrc[0]} brought ${pct}% of leads this month — focus more budget here.`;
+  }
+  if(convRate >= 30) insight += ` Conversion rate is strong at ${convRate}%.`;
+  else if(convRate < 15 && total > 5) insight += ` Conversion rate needs attention — follow up faster on warm leads.`;
+
+  const sourceColors = {
+    'Instagram':'#E1306C','TikTok':'#010101','Snapchat':'#FFFC00',
+    'Facebook':'#1877F2','WhatsApp':'#25D366','Google Ads':'#4285F4',
+    'انستقرام':'#E1306C','تيك توك':'#010101','سناب شات':'#FFFC00',
+    'واتساب':'#25D366','توصية من صديق':'#8B5CF6'
+  };
+
+  const sourceRows = sortedSources.map(([src, cnt]) => {
+    const pct = total > 0 ? Math.round((cnt/total)*100) : 0;
+    const color = sourceColors[src] || '#3b82f6';
+    return `
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div style="width:110px;font-size:12px;color:#444;font-weight:600">${src}</div>
+        <div style="flex:1;height:10px;background:#f0f0f0;border-radius:10px;overflow:hidden">
+          <div style="width:${pct}%;height:100%;background:${color};border-radius:10px"></div>
+        </div>
+        <div style="width:50px;text-align:right;font-size:12px;font-weight:700;color:#222">${cnt} <span style="color:#888;font-weight:400">(${pct}%)</span></div>
+      </div>`;
+  }).join('');
+
+  const top5Rows = top5.map((l,i) => `
+    <tr style="border-bottom:1px solid #f0f0f0">
+      <td style="padding:10px 8px;font-size:12px;color:#444">${i+1}</td>
+      <td style="padding:10px 8px;font-size:13px;font-weight:600;color:#222">${l.name || '—'}</td>
+      <td style="padding:10px 8px;font-size:12px;color:#555">${l.phone || '—'}</td>
+      <td style="padding:10px 8px;font-size:12px;color:#555">${l.source || '—'}</td>
+      <td style="padding:10px 8px">
+        <span style="background:${l.status==='Won'?'#dcfce7':l.status==='Lost'?'#fee2e2':l.status==='Active'?'#dbeafe':'#fef9c3'};color:${l.status==='Won'?'#16a34a':l.status==='Lost'?'#dc2626':l.status==='Active'?'#2563eb':'#854d0e'};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">${l.status || 'New'}</span>
+      </td>
+      <td style="padding:10px 8px;font-size:12px;font-weight:700;color:#222">${l.value ? 'SAR ' + Number(l.value).toLocaleString() : '—'}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; background:#fff; color:#222; }
+  .page { width:794px; min-height:1123px; margin:0 auto; padding:48px 52px; background:#fff; }
+  @media print {
+    body { margin:0; }
+    .page { width:100%; padding:32px 40px; }
+    .no-print { display:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:24px;border-bottom:3px solid #3b82f6;margin-bottom:32px">
+    <div>
+      <div style="font-size:11px;font-weight:600;color:#3b82f6;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px">Monthly Performance Report</div>
+      <div style="font-size:28px;font-weight:900;color:#0f172a">${orgName}</div>
+      <div style="font-size:14px;color:#64748b;margin-top:4px">${monthName} &nbsp;·&nbsp; ${monthAr}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:22px;font-weight:900;color:#3b82f6;letter-spacing:-1px">NexCRM</div>
+      <div style="font-size:11px;color:#94a3b8;margin-top:2px">Powered by NexCRM</div>
+      <div style="font-size:11px;color:#94a3b8">Generated ${now.toLocaleDateString('en-GB')}</div>
+    </div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px">
+    <div style="background:linear-gradient(135deg,#3b82f6,#6366f1);border-radius:14px;padding:20px;color:#fff">
+      <div style="font-size:11px;font-weight:600;opacity:0.8;text-transform:uppercase;letter-spacing:1px">Total Leads</div>
+      <div style="font-size:36px;font-weight:900;margin-top:6px">${total}</div>
+      <div style="font-size:11px;opacity:0.7;margin-top:4px">All submissions</div>
+    </div>
+    <div style="background:linear-gradient(135deg,#10b981,#059669);border-radius:14px;padding:20px;color:#fff">
+      <div style="font-size:11px;font-weight:600;opacity:0.8;text-transform:uppercase;letter-spacing:1px">Conversion Rate</div>
+      <div style="font-size:36px;font-weight:900;margin-top:6px">${convRate}%</div>
+      <div style="font-size:11px;opacity:0.7;margin-top:4px">${won} won deals</div>
+    </div>
+    <div style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:14px;padding:20px;color:#fff">
+      <div style="font-size:11px;font-weight:600;opacity:0.8;text-transform:uppercase;letter-spacing:1px">Pipeline Value</div>
+      <div style="font-size:28px;font-weight:900;margin-top:6px">SAR ${pipelineVal.toLocaleString()}</div>
+      <div style="font-size:11px;opacity:0.7;margin-top:4px">Total deal value</div>
+    </div>
+    <div style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);border-radius:14px;padding:20px;color:#fff">
+      <div style="font-size:11px;font-weight:600;opacity:0.8;text-transform:uppercase;letter-spacing:1px">Won Deals</div>
+      <div style="font-size:36px;font-weight:900;margin-top:6px">${won}</div>
+      <div style="font-size:11px;opacity:0.7;margin-top:4px">${lost} lost · ${active} active</div>
+    </div>
+  </div>
+
+  <!-- PIPELINE STATUS -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px">
+    <div style="border:1px solid #e2e8f0;border-radius:14px;padding:24px">
+      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:20px">Lead Sources Breakdown</div>
+      ${sourceRows || '<div style="color:#94a3b8;font-size:13px">No source data</div>'}
+    </div>
+    <div style="border:1px solid #e2e8f0;border-radius:14px;padding:24px">
+      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:20px">Pipeline Status</div>
+      ${[['New', newL, '#f59e0b'],['Warm', warm, '#3b82f6'],['Active', active, '#8b5cf6'],['Won', won, '#10b981'],['Lost', lost, '#ef4444']].map(([s,c,col]) => `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0"></div>
+          <div style="flex:1;font-size:12px;color:#444;font-weight:600">${s}</div>
+          <div style="font-size:13px;font-weight:800;color:#222">${c}</div>
+          <div style="font-size:11px;color:#94a3b8">${total>0?Math.round(c/total*100):0}%</div>
+        </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- TOP LEADS TABLE -->
+  <div style="border:1px solid #e2e8f0;border-radius:14px;padding:24px;margin-bottom:28px">
+    <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:16px">Top Leads</div>
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:#f8fafc">
+          <th style="padding:10px 8px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px">#</th>
+          <th style="padding:10px 8px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px">Name</th>
+          <th style="padding:10px 8px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px">Phone</th>
+          <th style="padding:10px 8px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px">Source</th>
+          <th style="padding:10px 8px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px">Status</th>
+          <th style="padding:10px 8px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px">Value</th>
+        </tr>
+      </thead>
+      <tbody>${top5Rows || '<tr><td colspan="6" style="padding:20px;text-align:center;color:#94a3b8">No leads data</td></tr>'}</tbody>
+    </table>
+  </div>
+
+  <!-- INSIGHT BOX -->
+  ${insight ? `
+  <div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(99,102,241,0.08));border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:20px;margin-bottom:28px;display:flex;gap:14px;align-items:flex-start">
+    <div style="font-size:22px">💡</div>
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">AI Insight</div>
+      <div style="font-size:14px;color:#334155;line-height:1.6">${insight}</div>
+    </div>
+  </div>` : ''}
+
+  <!-- FOOTER -->
+  <div style="border-top:1px solid #e2e8f0;padding-top:16px;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:11px;color:#94a3b8">This report was auto-generated by NexCRM · Confidential</div>
+    <div style="font-size:11px;color:#94a3b8">${orgName} · ${now.toLocaleDateString('en-GB')}</div>
+  </div>
+
+</div>
+
+<!-- PRINT BUTTON -->
+<div class="no-print" style="position:fixed;bottom:30px;right:30px;display:flex;gap:10px">
+  <button onclick="window.print()" style="background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(99,102,241,0.4)">🖨️ Print / Save PDF</button>
+  <button onclick="window.close()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:12px;padding:14px 20px;font-size:15px;cursor:pointer">✕ Close</button>
+</div>
+
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+}
 </script>
 </body>
 </html>
