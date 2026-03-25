@@ -5723,9 +5723,15 @@ function generateVATInvoice() {
   const tax = subtotal * 0.15;
   const total = subtotal + tax;
 
-  // QR code data (ZATCA TLV format simplified)
-  const qrData = `${sellerEN}|${sellerVAT}|${invDate}|${total.toFixed(2)}|${tax.toFixed(2)}`;
-  const qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(qrData)}`;
+  // QR code — ZATCA TLV Base64 encoding
+  function tlv(tag, value) {
+    const enc = new TextEncoder();
+    const valBytes = enc.encode(value);
+    return String.fromCharCode(tag, valBytes.length) + Array.from(valBytes).map(b => String.fromCharCode(b)).join('');
+  }
+  const tlvStr = tlv(1, sellerEN) + tlv(2, sellerVAT) + tlv(3, invDate + 'T00:00:00Z') + tlv(4, total.toFixed(2)) + tlv(5, tax.toFixed(2));
+  const qrData = btoa(tlvStr);
+  const qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrData)}`;
 
   const html = `<!DOCTYPE html>
 <html dir="ltr">
