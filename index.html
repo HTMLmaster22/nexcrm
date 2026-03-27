@@ -5666,6 +5666,64 @@ function autoApplyBranding() {
 }
 </script>
 </body>
+
+<!-- ONBOARDING MODAL -->
+<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:24px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.5);animation:onboardIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both">
+    <div style="height:3px;background:var(--bg3)"><div id="ob-progress" style="height:100%;background:linear-gradient(90deg,var(--accent),#8b5cf6);border-radius:3px;transition:width 0.4s ease;width:25%"></div></div>
+    <div id="ob-slides" style="padding:40px 40px 28px">
+      <div id="ob-slide-1">
+        <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:22px;box-shadow:0 8px 24px rgba(99,102,241,0.35)">👋</div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px" id="ob-welcome-title">Welcome aboard!</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px">Your CRM is ready. Let us show you how it works in 30 seconds so you can start turning leads into customers today.</div>
+        <div style="background:var(--bg3);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;background:linear-gradient(135deg,#10b981,#059669);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✓</div><div><div style="font-size:13px;font-weight:700;color:var(--text)">Your workspace is set up</div><div style="font-size:12px;color:var(--text2);margin-top:1px" id="ob-org-name">Ready to receive leads</div></div></div>
+      </div>
+      <div id="ob-slide-2" style="display:none">
+        <div style="width:60px;height:60px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:22px;box-shadow:0 8px 24px rgba(245,158,11,0.35)">⚡</div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">Leads come in automatically</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Every time someone fills your form, their info instantly appears here. No manual entry needed.</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">New leads appear in <strong>Leads</strong> and <strong>Pipeline</strong></div></div>
+          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">You get a <strong>Telegram notification</strong> instantly</div></div>
+          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">Contact fast — <strong>response time drives conversions</strong></div></div>
+        </div>
+      </div>
+      <div id="ob-slide-3" style="display:none">
+        <div style="width:60px;height:60px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:22px;box-shadow:0 8px 24px rgba(139,92,246,0.35)">🎯</div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">Move leads through your pipeline</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Update lead status as you progress. Your pipeline keeps the whole team focused on what matters.</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">New</div></div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Warm</div></div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#8b5cf6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Active</div></div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Won</div></div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#ef4444;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Lost</div></div>
+        </div>
+      </div>
+      <div id="ob-slide-4" style="display:none">
+        <div style="width:60px;height:60px;background:linear-gradient(135deg,#10b981,#059669);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:22px;box-shadow:0 8px 24px rgba(16,185,129,0.35)">🚀</div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">You are all set!</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Generate reports, create VAT invoices, track response times — everything to run your business like a pro.</div>
+        <div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08));border:1px solid rgba(99,102,241,0.15);border-radius:14px;padding:16px 18px">
+          <div style="font-size:12px;color:var(--text2);line-height:2.1">📋 <strong style="color:var(--text)">Leads</strong> — view all incoming leads<br/>🔀 <strong style="color:var(--text)">Pipeline</strong> — visual deal tracker<br/>📄 <strong style="color:var(--text)">Analytics</strong> — generate PDF reports<br/>🧾 <strong style="color:var(--text)">Invoices</strong> — Saudi VAT compliant</div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 40px 30px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;gap:5px" id="ob-dots">
+        <div style="width:18px;height:5px;border-radius:3px;background:var(--accent);transition:all 0.3s"></div>
+        <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
+        <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
+        <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button onclick="closeOnboarding()" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;padding:8px 12px;border-radius:8px">Skip</button>
+        <button id="ob-next-btn" onclick="nextOnboardingSlide()" style="background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;border-radius:11px;padding:11px 26px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,0.4)">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+<style>@keyframes onboardIn{from{opacity:0;transform:scale(0.92) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}</style>
 </html>
 <script>
 // ─── VAT INVOICE GENERATOR ────────────────────────────────────
@@ -6142,4 +6200,73 @@ if(typeof renderAnalytics === 'function') {
     setTimeout(renderResponseTime, 200);
   };
 }
+</script>
+<script>
+// ─── ONBOARDING ───────────────────────────────────────────────
+let obCurrentSlide = 1;
+const obTotalSlides = 4;
+
+function showOnboarding() {
+  if(!currentUser) return;
+  const key = 'nexcrm_onboarded_' + currentUser.id;
+  if(localStorage.getItem(key)) return; // already seen
+  // Set org name in welcome slide
+  const orgName = currentOrg ? currentOrg.name : '';
+  if(orgName) {
+    const el = document.getElementById('ob-org-name');
+    if(el) el.textContent = orgName + ' workspace is ready';
+    const title = document.getElementById('ob-welcome-title');
+    if(title) title.textContent = 'Welcome, ' + orgName + '!';
+  }
+  obCurrentSlide = 1;
+  updateOnboardingUI();
+  const overlay = document.getElementById('onboarding-overlay');
+  if(overlay) { overlay.style.display = 'flex'; }
+}
+
+function closeOnboarding() {
+  const overlay = document.getElementById('onboarding-overlay');
+  if(overlay) {
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => { overlay.style.display = 'none'; overlay.style.opacity = '1'; }, 300);
+  }
+  if(currentUser) localStorage.setItem('nexcrm_onboarded_' + currentUser.id, '1');
+}
+
+function nextOnboardingSlide() {
+  if(obCurrentSlide >= obTotalSlides) { closeOnboarding(); return; }
+  obCurrentSlide++;
+  updateOnboardingUI();
+}
+
+function updateOnboardingUI() {
+  // Show correct slide
+  for(let i = 1; i <= obTotalSlides; i++) {
+    const slide = document.getElementById('ob-slide-' + i);
+    if(slide) slide.style.display = i === obCurrentSlide ? 'block' : 'none';
+  }
+  // Progress bar
+  const prog = document.getElementById('ob-progress');
+  if(prog) prog.style.width = (obCurrentSlide / obTotalSlides * 100) + '%';
+  // Dots
+  const dots = document.getElementById('ob-dots');
+  if(dots) {
+    const dotEls = dots.children;
+    for(let i = 0; i < dotEls.length; i++) {
+      dotEls[i].style.width = i === obCurrentSlide - 1 ? '18px' : '5px';
+      dotEls[i].style.background = i === obCurrentSlide - 1 ? 'var(--accent)' : 'var(--bg3)';
+    }
+  }
+  // Next button text
+  const btn = document.getElementById('ob-next-btn');
+  if(btn) btn.textContent = obCurrentSlide === obTotalSlides ? "Let's go! 🚀" : 'Next →';
+}
+
+// Hook into loadUserOrgs — show after orgs load for non-admin
+const _origLoadUserOrgs = loadUserOrgs;
+loadUserOrgs = async function() {
+  await _origLoadUserOrgs.apply(this, arguments);
+  setTimeout(showOnboarding, 800);
+};
 </script>
