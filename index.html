@@ -5857,3 +5857,172 @@ function generateVATInvoice() {
   win.document.close();
 }
 </script>
+
+<script>
+// ─── HIJRI CALENDAR ENGINE ────────────────────────────────────
+// Accurate Gregorian → Hijri conversion (Umm al-Qura algorithm)
+function toHijri(date) {
+  if(!date) return '';
+  try {
+    const d = (date instanceof Date) ? date : new Date(date + (date.length === 10 ? 'T00:00:00' : ''));
+    if(isNaN(d)) return '';
+    // Use Intl API for accurate Hijri conversion
+    const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    }).format(d);
+    return hijri;
+  } catch(e) { return ''; }
+}
+
+function toHijriShort(date) {
+  if(!date) return '';
+  try {
+    const d = (date instanceof Date) ? date : new Date(date + (date.length === 10 ? 'T00:00:00' : ''));
+    if(isNaN(d)) return '';
+    const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
+      day: 'numeric', month: 'short', year: 'numeric'
+    }).format(d);
+    return hijri;
+  } catch(e) { return ''; }
+}
+
+// Format date showing both Gregorian + Hijri
+function dualDate(dateStr) {
+  if(!dateStr) return '—';
+  try {
+    const d = new Date(dateStr + (dateStr.length === 10 ? 'T00:00:00' : ''));
+    if(isNaN(d)) return dateStr;
+    const greg = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const hijri = toHijriShort(d);
+    return `<span style="line-height:1.6">${greg}<br/><span style="font-size:10px;color:var(--text2);font-family:'Tajawal',sans-serif;direction:rtl">${hijri}</span></span>`;
+  } catch(e) { return dateStr; }
+}
+
+function dualDateText(dateStr) {
+  if(!dateStr) return '—';
+  try {
+    const d = new Date(dateStr + (dateStr.length === 10 ? 'T00:00:00' : ''));
+    if(isNaN(d)) return dateStr;
+    const greg = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const hijri = toHijriShort(d);
+    return `${greg} · ${hijri}`;
+  } catch(e) { return dateStr; }
+}
+
+// Patch all date displays after render
+function patchHijriDates() {
+  // Leads table dates
+  document.querySelectorAll('#leads-tbody tr td:nth-child(8)').forEach(td => {
+    const txt = td.textContent.trim();
+    if(txt && txt !== '—' && !td.querySelector('span span')) {
+      const hijri = toHijriShort(txt);
+      if(hijri) td.innerHTML = `<span style="line-height:1.6;font-size:12px;color:var(--text2)">${txt}<br/><span style="font-size:10px;font-family:'Tajawal',sans-serif;direction:rtl;color:var(--accent)">${hijri}</span></span>`;
+    }
+  });
+
+  // Invoice due dates
+  document.querySelectorAll('.invoice-card').forEach(card => {
+    const dueLine = Array.from(card.querySelectorAll('div')).find(d => d.textContent.startsWith('Due:'));
+    if(dueLine && !dueLine.dataset.hijriPatched) {
+      const match = dueLine.textContent.match(/Due: (.+)/);
+      if(match) {
+        const dateStr = match[1];
+        try {
+          const d = new Date(dateStr);
+          if(!isNaN(d)) {
+            const hijri = toHijriShort(d);
+            if(hijri) {
+              dueLine.innerHTML = `Due: ${dateStr} <span style="font-size:10px;font-family:'Tajawal',sans-serif;direction:rtl;color:var(--accent)">· ${hijri}</span>`;
+              dueLine.dataset.hijriPatched = '1';
+            }
+          }
+        } catch(e) {}
+      }
+    }
+  });
+
+  // Reminder dates
+  document.querySelectorAll('.existing-reminder').forEach(el => {
+    if(!el.dataset.hijriPatched) {
+      const match = el.textContent.match(/⏰ ([^—]+)/);
+      if(match) {
+        try {
+          const d = new Date(match[1].trim());
+          if(!isNaN(d)) {
+            const hijri = toHijriShort(d);
+            if(hijri) {
+              el.innerHTML = el.innerHTML + ` <span style="font-size:10px;font-family:'Tajawal',sans-serif;direction:rtl;color:var(--accent)">${hijri}</span>`;
+              el.dataset.hijriPatched = '1';
+            }
+          }
+        } catch(e) {}
+      }
+    }
+  });
+}
+
+// Add Hijri date widget to dashboard
+function renderHijriWidget() {
+  const existing = document.getElementById('hijri-widget');
+  if(existing) return;
+  const now = new Date();
+  const hijriFull = toHijri(now);
+  const gregFull = now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  // Find dashboard stats grid to prepend widget
+  const dashPage = document.getElementById('page-dashboard');
+  if(!dashPage) return;
+  const widget = document.createElement('div');
+  widget.id = 'hijri-widget';
+  widget.style.cssText = 'background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15));border:1px solid rgba(59,130,246,0.2);border-radius:14px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px';
+  widget.innerHTML = `
+    <div>
+      <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px">Today's Date</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text)">${gregFull}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;direction:rtl">التاريخ الهجري</div>
+      <div style="font-size:16px;font-weight:800;color:var(--text);font-family:'Tajawal',sans-serif;direction:rtl">${hijriFull}</div>
+    </div>
+  `;
+  dashPage.insertBefore(widget, dashPage.firstChild);
+}
+
+// Hook into existing render functions
+const _origRenderLeads = window.renderLeads;
+if(typeof renderLeads === 'function') {
+  const origRL = renderLeads;
+  window.renderLeads = function() {
+    origRL.apply(this, arguments);
+    setTimeout(patchHijriDates, 100);
+  };
+}
+
+const _origRenderInvoices = window.renderInvoices;
+if(typeof renderInvoices === 'function') {
+  const origRI = renderInvoices;
+  window.renderInvoices = function() {
+    origRI.apply(this, arguments);
+    setTimeout(patchHijriDates, 100);
+  };
+}
+
+// Run on page navigation
+const _origNav = window.nav;
+if(typeof nav === 'function') {
+  const origNav = nav;
+  window.nav = function(page, el) {
+    origNav.apply(this, arguments);
+    if(page === 'dashboard') setTimeout(renderHijriWidget, 200);
+    setTimeout(patchHijriDates, 300);
+  };
+}
+
+// Init on load
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    renderHijriWidget();
+    patchHijriDates();
+  }, 1500);
+});
+</script>
