@@ -1872,7 +1872,7 @@
     <!-- INVOICE TRACKER -->
     <div class="page" id="page-invoices">
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
-        <div class="stat-card"><div class="stat-label">Total Invoiced</div><div class="stat-value" id="inv-total">$0</div></div>
+        <div class="stat-card"><div class="stat-label">Total Invoiced</div><div class="stat-value" id="inv-total">SAR 0</div></div>
         <div class="stat-card"><div class="stat-label">Paid</div><div class="stat-value" style="color:var(--success)" id="inv-paid">$0</div></div>
         <div class="stat-card"><div class="stat-label">Outstanding</div><div class="stat-value" style="color:var(--warning)" id="inv-outstanding">$0</div></div>
       </div>
@@ -2058,7 +2058,7 @@
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Amount ($)</label>
+            <label class="form-label">Amount (SAR)</label>
             <input class="form-input" id="inv-amount" type="number" placeholder="5000" />
           </div>
           <div class="form-group">
@@ -2126,7 +2126,7 @@
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Deal Value ($)</label>
+        <label class="form-label">Deal Value (SAR)</label>
         <input class="form-input" id="f-value" type="number" placeholder="5000" />
       </div>
       <div class="form-group">
@@ -2462,7 +2462,7 @@ async function addLead() {
     company: company || '—',
     source,
     status,
-    value: value ? '$' + parseInt(value).toLocaleString() : '—',
+    value: value ? 'SAR ' + parseInt(value).toLocaleString() : '—',
     assigned,
     date: months[now.getMonth()] + ' ' + now.getDate(),
     user_id: currentUser ? currentUser.id : null,
@@ -2764,7 +2764,7 @@ async function startImport() {
       company: r.company || '—',
       source: r.source || 'Import',
       status: r.status || 'New',
-      value: r.value ? (r.value.includes('$') ? r.value : '$' + parseFloat(r.value.replace(/[^0-9.]/g,'')||0).toLocaleString()) : '—',
+      value: r.value ? (r.value.includes('SAR') ? r.value : 'SAR ' + parseFloat(r.value.replace(/[^0-9.]/g,'')||0).toLocaleString()) : '—',
       email: r.email || null,
       assigned: r.assigned || 'Unassigned',
       notes: r.notes || null,
@@ -3204,7 +3204,7 @@ function applyTranslations() {
     else if(txt === 'Company' || txt === 'الشركة') el.textContent = lang.companyLabel;
     else if(txt === 'Source' || txt === 'المصدر') el.textContent = lang.sourceLabel;
     else if(txt === 'Status' || txt === 'الحالة') el.textContent = lang.statusLabel;
-    else if(txt === 'Deal Value ($)' || txt === 'قيمة الصفقة ($)') el.textContent = lang.dealValue;
+    else if(txt === 'Deal Value (SAR)' || txt === 'قيمة الصفقة ($)') el.textContent = lang.dealValue;
     else if(txt === 'Assigned To' || txt === 'مسؤول المبيعات') el.textContent = lang.assignLabel;
   });
   document.querySelector('#modal .btn-ghost').textContent = lang.cancel;
@@ -3402,7 +3402,7 @@ async function updateLead(id) {
     name: fname + ' ' + lname,
     company: company || '—',
     source, status,
-    value: value ? '$' + parseInt(value).toLocaleString() : '—',
+    value: value ? 'SAR ' + parseInt(value).toLocaleString() : '—',
     assigned
   };
   try {
@@ -3957,9 +3957,9 @@ function renderInvoices() {
   const total = invoicesList.reduce((s,i) => s + (i.amount||0), 0);
   const paid = invoicesList.filter(i => i.status==='Paid').reduce((s,i) => s + (i.amount||0), 0);
   const outstanding = total - paid;
-  document.getElementById('inv-total').textContent = '$' + total.toLocaleString();
-  document.getElementById('inv-paid').textContent = '$' + paid.toLocaleString();
-  document.getElementById('inv-outstanding').textContent = '$' + outstanding.toLocaleString();
+  document.getElementById('inv-total').textContent = 'SAR ' + total.toLocaleString();
+  document.getElementById('inv-paid').textContent = 'SAR ' + paid.toLocaleString();
+  document.getElementById('inv-outstanding').textContent = 'SAR ' + outstanding.toLocaleString();
 
   if(!invoicesList.length) {
     list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No invoices yet</div>';
@@ -3982,7 +3982,7 @@ function renderInvoices() {
           <div style="font-size:11px;color:var(--text2);margin-top:4px">Due: ${inv.due_date ? new Date(inv.due_date + 'T00:00:00').toLocaleDateString() : '—'}</div>
         </div>
         <div style="text-align:right">
-          <div class="invoice-amount ${amtClass}">$${(inv.amount||0).toLocaleString()}</div>
+          <div class="invoice-amount ${amtClass}">SAR ${(inv.amount||0).toLocaleString()}</div>
           ${status !== 'Paid' ? `<button class="pay-btn" onclick="markPaid(${inv.id})" style="margin-top:8px">Mark Paid</button>` : '<div style="font-size:11px;color:var(--success);margin-top:8px">✓ Paid</div>'}
           <button class="action-btn btn-delete" onclick="deleteInvoice(${inv.id})" style="margin-top:6px">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
@@ -4560,7 +4560,7 @@ async function loadDashboard() {
     const el = id => document.getElementById(id);
     if(el('dash-total')) el('dash-total').textContent = total.toLocaleString();
     if(el('dash-total-sub')) el('dash-total-sub').textContent = '📂 ' + orgName;
-    if(el('dash-revenue')) el('dash-revenue').textContent = '$' + totalValue.toLocaleString();
+    if(el('dash-revenue')) el('dash-revenue').textContent = 'SAR ' + totalValue.toLocaleString();
     if(el('dash-revenue-sub')) el('dash-revenue-sub').textContent = 'Total pipeline value';
     if(el('dash-conv')) el('dash-conv').textContent = convRate + '%';
     if(el('dash-conv-sub')) el('dash-conv-sub').textContent = won + ' won out of ' + total;
@@ -4611,7 +4611,7 @@ async function loadPerformance() {
             <div class="perf-name">${name}</div>
             <div class="perf-bar"><div class="perf-fill" style="width:${Math.round(stats.value/maxVal*100)}%"></div></div>
           </div>
-          <div class="perf-val">$${stats.value.toLocaleString()}</div>
+          <div class="perf-val">SAR ${stats.value.toLocaleString()}</div>
         </div>
       `).join('');
     }
@@ -4884,7 +4884,7 @@ function renderPipeline() {
   });
 
   const el = id => document.getElementById(id);
-  if(el('pipeline-total')) el('pipeline-total').textContent = '$' + total.toLocaleString();
+  if(el('pipeline-total')) el('pipeline-total').textContent = 'SAR ' + total.toLocaleString();
 
   Object.entries(cols).forEach(([stage, items]) => {
     const col = el('pipe-col-' + stage);
@@ -4904,7 +4904,7 @@ function renderPipeline() {
       ).join('');
       return '<div class="deal-card" onclick="editLead(' + l.id + ')">' +
         '<div class="deal-name">' + (l.name||'—') + '</div>' +
-        (val > 0 ? '<div class="deal-value">$' + val.toLocaleString() + '</div>' : '') +
+        (val > 0 ? '<div class="deal-value">SAR ' + val.toLocaleString() + '</div>' : '') +
         '<div class="deal-meta"><div class="deal-avatar">' + init + '</div>' +
         (l.assigned||'Unassigned') + ' · ' + (l.source||'—') + '</div>' +
         (nextBtns ? '<div style="margin-top:8px">' + nextBtns + '</div>' : '') +
@@ -4950,7 +4950,7 @@ function renderAnalytics() {
 
   if(el('an-conv')) el('an-conv').textContent = convRate + '%';
   if(el('an-conv-sub')) el('an-conv-sub').textContent = won + ' won out of ' + total;
-  if(el('an-value')) el('an-value').textContent = '$' + totalVal.toLocaleString();
+  if(el('an-value')) el('an-value').textContent = 'SAR ' + totalVal.toLocaleString();
   if(el('an-total')) el('an-total').textContent = total;
   if(el('an-won')) el('an-won').textContent = won;
 
@@ -5657,9 +5657,23 @@ function openVATInvoiceModal() {
   document.getElementById('vat-inv-date').value = today;
   const count = (invoicesList.length || 0) + 1;
   document.getElementById('vat-inv-number').value = 'INV-' + String(count).padStart(3,'0');
-  // Pre-fill seller from branding if available
+  // Pre-fill seller from org branding
   const b = currentOrg ? getBranding(currentOrg.id) : {};
-  if(b.name) document.getElementById('vat-seller-ar').value = b.name;
+  const orgName = currentOrg ? currentOrg.name : '';
+  if(b.name) {
+    document.getElementById('vat-seller-ar').value = b.name;
+    document.getElementById('vat-seller-en').value = orgName || b.name;
+  } else if(orgName) {
+    document.getElementById('vat-seller-en').value = orgName;
+    document.getElementById('vat-seller-ar').value = orgName;
+  }
+  // Restore saved seller info if previously filled
+  const saved = JSON.parse(localStorage.getItem('nexcrm_vat_seller_' + (currentOrg ? currentOrg.id : '')) || '{}');
+  if(saved.vat) document.getElementById('vat-seller-vat').value = saved.vat;
+  if(saved.cr) document.getElementById('vat-seller-cr').value = saved.cr;
+  if(saved.address) document.getElementById('vat-seller-address').value = saved.address;
+  if(saved.bank) document.getElementById('vat-bank-name').value = saved.bank;
+  if(saved.iban) document.getElementById('vat-bank-iban').value = saved.iban;
   calcVAT();
   document.getElementById('vat-invoice-modal').classList.add('open');
 }
@@ -5704,6 +5718,12 @@ function generateVATInvoice() {
   const buyerName = document.getElementById('vat-buyer-name').value || 'Client';
   const buyerVAT = document.getElementById('vat-buyer-vat').value || '';
   const invNumber = document.getElementById('vat-inv-number').value || 'INV-001';
+  // Save seller info for next time
+  localStorage.setItem('nexcrm_vat_seller_' + (currentOrg ? currentOrg.id : ''), JSON.stringify({
+    vat: sellerVAT, cr: sellerCR, address: sellerAddr,
+    bank: document.getElementById('vat-bank-name').value,
+    iban: document.getElementById('vat-bank-iban').value
+  }));
   const invDate = document.getElementById('vat-inv-date').value || new Date().toISOString().split('T')[0];
   const bankName = document.getElementById('vat-bank-name').value || '';
   const bankIBAN = document.getElementById('vat-bank-iban').value || '';
