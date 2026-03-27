@@ -31,7 +31,77 @@
     --glow: 0 0 30px rgba(59,130,246,0.15);
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; transition:background 0.3s,color 0.3s; }
+
+  /* ─── LIGHT MODE ─────────────────────────────────────────── */
+  body.light-mode {
+    --bg: #f0f4f8;
+    --bg2: #ffffff;
+    --bg3: #e8edf5;
+    --text: #0f172a;
+    --text2: #64748b;
+    --border: rgba(59,130,246,0.15);
+    --success: #059669;
+    --warning: #d97706;
+    --danger: #dc2626;
+  }
+  body.light-mode .sidebar { background:#fff !important; border-right:1px solid #e2e8f0 !important; box-shadow:4px 0 20px rgba(0,0,0,0.06); }
+  body.light-mode .topbar { background:#fff !important; border-bottom:1px solid #e2e8f0 !important; }
+  body.light-mode .card { background:#fff !important; border-color:#e2e8f0 !important; box-shadow:0 2px 12px rgba(0,0,0,0.06) !important; }
+  body.light-mode .stat-card { background:#fff !important; border-color:#e2e8f0 !important; box-shadow:0 2px 12px rgba(0,0,0,0.06) !important; }
+  body.light-mode .modal { background:#fff !important; border-color:#e2e8f0 !important; }
+  body.light-mode .modal-overlay { background:rgba(15,23,42,0.6) !important; }
+  body.light-mode .form-input, body.light-mode .form-select, body.light-mode .form-textarea { background:#f8fafc !important; border-color:#cbd5e1 !important; color:#0f172a !important; }
+  body.light-mode table thead tr { background:#f1f5f9; }
+  body.light-mode table th { color:#475569 !important; border-color:#e2e8f0 !important; }
+  body.light-mode table td { border-color:#f1f5f9 !important; }
+  body.light-mode .nav-item:hover { background:#f1f5f9 !important; color:#0f172a !important; }
+  body.light-mode .nav-item.active { background:rgba(59,130,246,0.1) !important; color:var(--accent) !important; }
+  body.light-mode .search-bar { background:#f1f5f9 !important; border-color:#e2e8f0 !important; }
+  body.light-mode .deal-card { background:#fff !important; border-color:#e2e8f0 !important; }
+  body.light-mode .pipeline-col-header { background:#f1f5f9 !important; color:#475569 !important; }
+  body.light-mode .invoice-card { background:#fff !important; border-color:#e2e8f0 !important; }
+  body.light-mode .contact-card { background:#fff !important; border-color:#e2e8f0 !important; }
+  body.light-mode .campaign-card { background:#fff !important; border-color:#e2e8f0 !important; }
+  body.light-mode .reminder-dropdown { background:#fff !important; border-color:#e2e8f0 !important; box-shadow:0 8px 30px rgba(0,0,0,0.15) !important; }
+  body.light-mode .notes-box { background:#f8fafc !important; border-color:#cbd5e1 !important; color:#0f172a !important; }
+  body.light-mode .sidebar-bottom { border-top:1px solid #e2e8f0 !important; background:#fff !important; }
+  body.light-mode .lang-btn { background:#f1f5f9 !important; border-color:#e2e8f0 !important; color:#475569 !important; }
+  body.light-mode .btn-ghost { background:#f1f5f9 !important; border-color:#e2e8f0 !important; color:#475569 !important; }
+  body.light-mode .source-filter-btn { background:#f1f5f9 !important; border-color:#e2e8f0 !important; color:#64748b !important; }
+  body.light-mode .source-filter-btn.active { background:var(--accent) !important; color:#fff !important; }
+  body.light-mode .admin-tab { background:#f1f5f9 !important; border-color:#e2e8f0 !important; color:#64748b !important; }
+  body.light-mode .admin-tab.active { background:var(--accent) !important; color:#fff !important; }
+  body.light-mode .mobile-nav { background:#fff !important; border-top:1px solid #e2e8f0 !important; }
+  body.light-mode .stat-value { color:#0f172a !important; }
+  body.light-mode .stat-card::before { background:radial-gradient(circle,rgba(59,130,246,0.06),transparent 70%) !important; }
+  body.light-mode .donut-inner { background:#fff !important; }
+  body.light-mode .donut-inner span { color:#0f172a !important; }
+  body.light-mode .donut-inner small { color:#64748b !important; }
+  body.light-mode .pill-new { background:#fef3c7 !important; color:#92400e !important; }
+  body.light-mode .pill-warm { background:#dbeafe !important; color:#1e40af !important; }
+  body.light-mode .pill-active { background:#ede9fe !important; color:#5b21b6 !important; }
+  body.light-mode .pill-won { background:#d1fae5 !important; color:#065f46 !important; }
+  body.light-mode .pill-lost { background:#fee2e2 !important; color:#991b1b !important; }
+  body.light-mode .status-draft { background:#f1f5f9 !important; color:#475569 !important; }
+  body.light-mode .status-scheduled { background:#dbeafe !important; color:#1e40af !important; }
+  body.light-mode .status-posted { background:#d1fae5 !important; color:#065f46 !important; }
+  body.light-mode .status-approved { background:#ede9fe !important; color:#5b21b6 !important; }
+  body.light-mode .pipeline-col { background:#f8fafc !important; border-radius:12px; }
+  body.light-mode .topbar-title { color:#0f172a !important; }
+  body.light-mode .card-title { color:#0f172a !important; }
+  body.light-mode .card-subtitle { color:#64748b !important; }
+  body.light-mode .invoice-amount { color:#0f172a !important; }
+  body.light-mode #hijri-widget { background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08)) !important; }
+  body.light-mode .score-badge { background:#f1f5f9 !important; color:#475569 !important; border:1px solid #e2e8f0 !important; }
+  body.light-mode .perf-item { background:#f8fafc !important; border-color:#e2e8f0 !important; }
+  body.light-mode .page-loader { background:rgba(240,244,248,0.9) !important; }
+  body.light-mode .score-badge { background:#f1f5f9 !important; color:#475569 !important; }
+  body.light-mode .status-pill { filter:none; }
+  body.light-mode .analytics-bar-wrap { background:#e2e8f0 !important; }
+  body.light-mode .progress-fill { opacity:0.9; }
+  .theme-toggle { width:36px;height:36px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;color:var(--text2);flex-shrink:0; }
+  .theme-toggle:hover { background:var(--accent);color:#fff;border-color:var(--accent); }
 
   /* SIDEBAR */
   .sidebar {
@@ -327,7 +397,7 @@
   }
   .donut-inner {
     width:64px; height:64px; border-radius:50%;
-    background:var(--card); display:flex; flex-direction:column;
+    background:var(--bg2); display:flex; flex-direction:column;
     align-items:center; justify-content:center;
   }
   .donut-inner span { font-size:16px; font-weight:800; font-family:'Syne',sans-serif; }
@@ -1164,6 +1234,10 @@
     <button class="lang-btn" id="lang-toggle" onclick="toggleLang()" style="gap:6px;font-size:12px;padding:7px 12px">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
       <span id="lang-label">عربي</span>
+    </button>
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()" title="Toggle light/dark mode">
+      <svg id="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg id="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
     </button>
     <div class="notif-btn" onclick="toggleReminders(event)" style="cursor:pointer">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="notif-dot" id="notif-dot" style="display:none"></div>
@@ -6269,4 +6343,29 @@ loadUserOrgs = async function() {
   await _origLoadUserOrgs.apply(this, arguments);
   setTimeout(showOnboarding, 800);
 };
+</script>
+<script>
+// ─── LIGHT / DARK MODE TOGGLE ─────────────────────────────────
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('nexcrm_theme', isLight ? 'light' : 'dark');
+  updateThemeIcon(isLight);
+}
+
+function updateThemeIcon(isLight) {
+  const moon = document.getElementById('theme-icon-moon');
+  const sun = document.getElementById('theme-icon-sun');
+  if(moon) moon.style.display = isLight ? 'none' : 'block';
+  if(sun) sun.style.display = isLight ? 'block' : 'none';
+}
+
+// Apply saved theme on load
+(function() {
+  const saved = localStorage.getItem('nexcrm_theme');
+  if(saved === 'light') {
+    document.body.classList.add('light-mode');
+    // Icon update happens after DOM ready
+    document.addEventListener('DOMContentLoaded', () => updateThemeIcon(true));
+  }
+})();
 </script>
