@@ -1549,6 +1549,11 @@
           <div class="stat-value" id="an-won" style="color:var(--success)">—</div>
           <div class="stat-change up">▲ Closed deals</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-label">⚡ Avg Response Time</div>
+          <div class="stat-value" id="an-response-time" style="color:var(--warning)">—</div>
+          <div class="stat-change" id="an-response-sub">Time to first contact</div>
+        </div>
       </div>
       <div class="grid-2">
         <div class="card">
@@ -1558,6 +1563,18 @@
         <div class="card">
           <div class="card-header"><div class="card-title">Lead Status Breakdown</div></div>
           <div id="an-statuses"><div style="text-align:center;padding:30px;color:var(--text2)">Loading...</div></div>
+        </div>
+      </div>
+      <!-- RESPONSE TIME SECTION -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-header">
+          <div>
+            <div class="card-title">⚡ Lead Response Time Tracker</div>
+            <div class="card-subtitle">How fast are leads being contacted after submission?</div>
+          </div>
+        </div>
+        <div id="an-response-detail">
+          <div style="text-align:center;padding:30px;color:var(--text2)">Loading response data...</div>
         </div>
       </div>
     </div>
@@ -6025,4 +6042,104 @@ document.addEventListener('DOMContentLoaded', () => {
     patchHijriDates();
   }, 1500);
 });
+</script>
+<script>
+// ─── LEAD RESPONSE TIME TRACKER ───────────────────────────────
+function formatDuration(ms) {
+  if(ms < 0) return '—';
+  const mins = Math.floor(ms / 60000);
+  const hours = Math.floor(mins / 60);
+  const days = Math.floor(hours / 24);
+  if(days > 0) return days + 'd ' + (hours % 24) + 'h';
+  if(hours > 0) return hours + 'h ' + (mins % 60) + 'm';
+  if(mins > 0) return mins + 'm';
+  return '< 1m';
+}
+
+function getResponseColor(ms) {
+  const hours = ms / 3600000;
+  if(hours <= 1) return 'var(--success)';
+  if(hours <= 4) return 'var(--warning)';
+  return 'var(--danger)';
+}
+
+function getResponseLabel(ms) {
+  const hours = ms / 3600000;
+  if(hours <= 1) return '🟢 Excellent';
+  if(hours <= 4) return '🟡 Good';
+  if(hours <= 24) return '🟠 Slow';
+  return '🔴 Critical';
+}
+
+function renderResponseTime() {
+  const container = document.getElementById('an-response-detail');
+  const statEl = document.getElementById('an-response-time');
+  const subEl = document.getElementById('an-response-sub');
+  if(!container) return;
+
+  const now = new Date();
+  const contactedLeads = leads.filter(l => l.created_at && l.status && l.status !== 'New');
+  const waitingLeads = leads.filter(l => l.created_at && (!l.status || l.status === 'New'));
+
+  const waitingTimes = waitingLeads.map(l => {
+    const created = new Date(l.created_at);
+    const waitMs = now - created;
+    return { lead: l, waitMs };
+  }).sort((a,b) => b.waitMs - a.waitMs);
+
+  const avgWaitMs = waitingTimes.length > 0
+    ? waitingTimes.reduce((s,l) => s + l.waitMs, 0) / waitingTimes.length
+    : null;
+
+  if(statEl) {
+    if(waitingTimes.length > 0) {
+      statEl.textContent = formatDuration(avgWaitMs);
+      statEl.style.color = getResponseColor(avgWaitMs);
+    } else if(leads.length > 0) {
+      statEl.textContent = 'All contacted';
+      statEl.style.color = 'var(--success)';
+    } else {
+      statEl.textContent = '—';
+    }
+  }
+  if(subEl) subEl.textContent = waitingLeads.length + ' leads awaiting contact';
+
+  let html = '';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">';
+  html += '<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Contacted</div><div style="font-size:24px;font-weight:800;color:var(--success)">' + contactedLeads.length + '</div><div style="font-size:11px;color:var(--text2)">leads responded to</div></div>';
+  html += '<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Waiting</div><div style="font-size:24px;font-weight:800;color:var(--warning)">' + waitingLeads.length + '</div><div style="font-size:11px;color:var(--text2)">awaiting first contact</div></div>';
+  html += '<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Contact Rate</div><div style="font-size:24px;font-weight:800;color:var(--accent)">' + (leads.length > 0 ? Math.round(contactedLeads.length/leads.length*100) : 0) + '%</div><div style="font-size:11px;color:var(--text2)">of total leads</div></div>';
+  html += '</div>';
+
+  if(waitingTimes.length > 0) {
+    html += '<div style="margin-bottom:16px"><div style="font-size:12px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Leads Awaiting Contact — Oldest First</div>';
+    waitingTimes.slice(0, 10).forEach(function(item) {
+      var lead = item.lead, waitMs = item.waitMs;
+      var color = getResponseColor(waitMs);
+      var label = getResponseLabel(waitMs);
+      var pct = Math.min(100, (waitMs / (7 * 86400000)) * 100);
+      html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border-radius:10px;margin-bottom:8px;border:1px solid ' + (waitMs > 86400000 ? 'rgba(239,68,68,0.2)' : 'var(--border)') + '">';
+      html += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--text)">' + (lead.name||'—') + '</div><div style="font-size:11px;color:var(--text2);margin-top:2px">' + (lead.source||'—') + ' · ' + (lead.phone||'—') + '</div><div style="height:4px;background:var(--bg2);border-radius:4px;margin-top:6px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:' + color + ';border-radius:4px"></div></div></div>';
+      html += '<div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:800;color:' + color + '">' + formatDuration(waitMs) + '</div><div style="font-size:10px;color:var(--text2);margin-top:2px">' + label + '</div></div>';
+      html += '<a href="https://wa.me/' + (lead.phone||'').replace(/[^0-9]/g,'') + '" target="_blank" style="background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);border-radius:8px;padding:6px 10px;color:#25d366;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">WhatsApp</a>';
+      html += '</div>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div style="text-align:center;padding:24px;color:var(--success);font-weight:600">All leads have been contacted!</div>';
+  }
+
+  html += '<div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(99,102,241,0.08));border:1px solid rgba(99,102,241,0.15);border-radius:10px;padding:14px;display:flex;gap:10px;align-items:flex-start"><div style="font-size:18px">💡</div><div style="font-size:12px;color:var(--text2);line-height:1.6"><strong style="color:var(--text)">Pro tip:</strong> Leads contacted within 1 hour are <strong style="color:var(--accent)">7x more likely to convert</strong>. Set a team goal: respond to every new lead within 60 minutes.</div></div>';
+
+  container.innerHTML = html;
+}
+
+// Hook into renderAnalytics
+if(typeof renderAnalytics === 'function') {
+  var _origRA = renderAnalytics;
+  renderAnalytics = function() {
+    _origRA.apply(this, arguments);
+    setTimeout(renderResponseTime, 200);
+  };
+}
 </script>
