@@ -73,28 +73,6 @@
   body.light-mode .admin-tab { background:#f1f5f9 !important; border-color:#e2e8f0 !important; color:#64748b !important; }
   body.light-mode .admin-tab.active { background:var(--accent) !important; color:#fff !important; }
   body.light-mode .mobile-nav { background:#fff !important; border-top:1px solid #e2e8f0 !important; }
-  body.light-mode .stat-value { color:#0f172a !important; }
-  body.light-mode .stat-card::before { background:radial-gradient(circle,rgba(59,130,246,0.06),transparent 70%) !important; }
-  body.light-mode .donut-inner { background:#fff !important; }
-  body.light-mode .donut-inner span { color:#0f172a !important; }
-  body.light-mode .donut-inner small { color:#64748b !important; }
-  body.light-mode .pill-new { background:#fef3c7 !important; color:#92400e !important; }
-  body.light-mode .pill-warm { background:#dbeafe !important; color:#1e40af !important; }
-  body.light-mode .pill-active { background:#ede9fe !important; color:#5b21b6 !important; }
-  body.light-mode .pill-won { background:#d1fae5 !important; color:#065f46 !important; }
-  body.light-mode .pill-lost { background:#fee2e2 !important; color:#991b1b !important; }
-  body.light-mode .status-draft { background:#f1f5f9 !important; color:#475569 !important; }
-  body.light-mode .status-scheduled { background:#dbeafe !important; color:#1e40af !important; }
-  body.light-mode .status-posted { background:#d1fae5 !important; color:#065f46 !important; }
-  body.light-mode .status-approved { background:#ede9fe !important; color:#5b21b6 !important; }
-  body.light-mode .pipeline-col { background:#f8fafc !important; border-radius:12px; }
-  body.light-mode .topbar-title { color:#0f172a !important; }
-  body.light-mode .card-title { color:#0f172a !important; }
-  body.light-mode .card-subtitle { color:#64748b !important; }
-  body.light-mode .invoice-amount { color:#0f172a !important; }
-  body.light-mode #hijri-widget { background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08)) !important; }
-  body.light-mode .score-badge { background:#f1f5f9 !important; color:#475569 !important; border:1px solid #e2e8f0 !important; }
-  body.light-mode .perf-item { background:#f8fafc !important; border-color:#e2e8f0 !important; }
   body.light-mode .page-loader { background:rgba(240,244,248,0.9) !important; }
   body.light-mode .score-badge { background:#f1f5f9 !important; color:#475569 !important; }
   body.light-mode .status-pill { filter:none; }
@@ -397,7 +375,7 @@
   }
   .donut-inner {
     width:64px; height:64px; border-radius:50%;
-    background:var(--bg2); display:flex; flex-direction:column;
+    background:var(--card); display:flex; flex-direction:column;
     align-items:center; justify-content:center;
   }
   .donut-inner span { font-size:16px; font-weight:800; font-family:'Syne',sans-serif; }
@@ -4926,12 +4904,35 @@ function renderActivityFeed() {
     el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">No activity yet</div>';
     return;
   }
+
+  const sourceIcons = {
+    'instagram':  { bg:'#e1306c', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>' },
+    'انستقرام':   { bg:'#e1306c', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>' },
+    'tiktok':     { bg:'#010101', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>' },
+    'تيك توك':    { bg:'#010101', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>' },
+    'snapchat':   { bg:'#FFFC00', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="#000"><path d="M12.166 3C9.03 3 6.5 5.56 6.5 8.73c0 .38.04.76.1 1.12l-.63.08c-.3 0-.56-.06-.8-.18a.47.47 0 00-.46.04.5.5 0 00-.2.44c.03.44.42.77.87.9l.37.1c-.07.22-.14.47-.14.73 0 .6.3 1.13.77 1.46-.54.34-1.4 1.07-1.4 2.18 0 .1.01.2.03.3.6.12 1.15.44 1.56.92.26.3.43.64.5.99.1.02.2.03.31.03.37 0 .74-.1 1.08-.3.46-.27.97-.41 1.5-.41.52 0 1.02.13 1.47.38.35.2.72.3 1.1.3.1 0 .2 0 .3-.02.07-.35.24-.68.5-.98.41-.49.97-.81 1.58-.93.02-.1.03-.2.03-.3 0-1.1-.86-1.84-1.4-2.18.47-.33.77-.86.77-1.46 0-.26-.07-.5-.14-.73l.37-.1c.45-.13.84-.46.87-.9a.5.5 0 00-.2-.44.47.47 0 00-.46-.04c-.24.12-.5.18-.8.18l-.63-.08c.06-.36.1-.74.1-1.12C17.66 5.56 15.3 3 12.166 3z"/></svg>' },
+    'سناب شات':   { bg:'#FFFC00', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="#000"><path d="M12.166 3C9.03 3 6.5 5.56 6.5 8.73c0 .38.04.76.1 1.12l-.63.08c-.3 0-.56-.06-.8-.18a.47.47 0 00-.46.04.5.5 0 00-.2.44c.03.44.42.77.87.9l.37.1c-.07.22-.14.47-.14.73 0 .6.3 1.13.77 1.46-.54.34-1.4 1.07-1.4 2.18 0 .1.01.2.03.3.6.12 1.15.44 1.56.92.26.3.43.64.5.99.1.02.2.03.31.03.37 0 .74-.1 1.08-.3.46-.27.97-.41 1.5-.41.52 0 1.02.13 1.47.38.35.2.72.3 1.1.3.1 0 .2 0 .3-.02.07-.35.24-.68.5-.98.41-.49.97-.81 1.58-.93.02-.1.03-.2.03-.3 0-1.1-.86-1.84-1.4-2.18.47-.33.77-.86.77-1.46 0-.26-.07-.5-.14-.73l.37-.1c.45-.13.84-.46.87-.9a.5.5 0 00-.2-.44.47.47 0 00-.46-.04c-.24.12-.5.18-.8.18l-.63-.08c.06-.36.1-.74.1-1.12C17.66 5.56 15.3 3 12.166 3z"/></svg>' },
+    'whatsapp':   { bg:'#25D366', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>' },
+    'واتساب':     { bg:'#25D366', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>' },
+    'facebook':   { bg:'#1877F2', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>' },
+    'google ads': { bg:'#4285F4', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' },
+    'توصية من صديق': { bg:'#8b5cf6', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>' },
+  };
+
+  function getSourceIcon(source) {
+    if(!source) return { bg:'#3b82f6', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>' };
+    const key = source.toLowerCase().trim();
+    return sourceIcons[key] || { bg:'#3b82f6', svg:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>' };
+  }
+
   const recent = [...leads].sort((a,b) => (b.id||0)-(a.id||0)).slice(0,5);
   el.innerHTML = recent.map(l => {
     const src = l.source ? ' via <b>' + l.source + '</b>' : '';
-    const statusColors = { Won:'dot-green', New:'dot-blue', Warm:'dot-yellow', Lost:'dot-red', Cold:'dot-purple' };
-    const dot = statusColors[l.status] || 'dot-blue';
-    return '<div class="activity-item"><div class="activity-dot ' + dot + '" style="font-size:13px">🎯</div><div><div class="activity-text">New lead: <b>' + (l.name||'Unknown') + '</b>' + src + '</div><div class="activity-time">' + (l.date||'Recently') + ' · ' + (l.status||'New') + '</div></div></div>';
+    const icon = getSourceIcon(l.source);
+    return `<div class="activity-item">
+      <div style="width:36px;height:36px;border-radius:10px;background:${icon.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px ${icon.bg}55">${icon.svg}</div>
+      <div><div class="activity-text">New lead: <b>${l.name||'Unknown'}</b>${src}</div><div class="activity-time">${l.date||'Recently'} · ${l.status||'New'}</div></div>
+    </div>`;
   }).join('');
 }
 
