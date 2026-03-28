@@ -6657,7 +6657,10 @@ Write the message only, no explanation or preamble.`;
     });
 
     const data = await response.json();
-    const replyText = data.content[0].text.trim();
+    console.log('AI Reply response:', JSON.stringify(data));
+    const replyText = (data.content && data.content[0] && data.content[0].text)
+      ? data.content[0].text.trim()
+      : (data.error ? '❌ API Error: ' + (data.error.message || JSON.stringify(data.error)) : JSON.stringify(data));
 
     // Cache it
     aiReplyCached[aiReplyLang] = replyText;
