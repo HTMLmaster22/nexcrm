@@ -99,6 +99,7 @@
   body.light-mode .analytics-bar-wrap { background:#e2e8f0 !important; }
   body.light-mode .legend-item { color:#1e293b !important; font-weight:500 !important; }
   body.light-mode #donut-legend { color:#1e293b !important; }
+  .legend-item span { color: var(--text) !important; }
   body.light-mode .analytics-label { color:#475569 !important; }
   body.light-mode .analytics-value { color:#1e293b !important; }
   body.light-mode .donut-inner span { color:#1e293b !important; }
@@ -407,7 +408,7 @@
   .donut-inner span { font-size:16px; font-weight:800; font-family:'Syne',sans-serif; }
   .donut-inner small { font-size:9px; color:var(--text2); }
   .donut-legend { flex:1; }
-  .legend-item { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; }
+  .legend-item { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; color:var(--text); }
   .legend-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
 
   /* CAMPAIGN CARDS */
@@ -1349,7 +1350,7 @@
             <div class="donut" id="donut-chart">
               <div class="donut-inner">
                 <span id="donut-top-pct">—</span>
-                <small>Top</small>
+                <small id="donut-top-label">Top</small>
               </div>
             </div>
             <div class="donut-legend" id="donut-legend">
@@ -3370,6 +3371,22 @@ function applyTranslations() {
   localStorage.setItem('nexcrm_lang', currentLang);
 }
 
+// ─── NORMALIZE SOURCE NAMES (Arabic → Brand name) ─────────────
+const _srcDisplayMap = {
+  'instagram':'Instagram','انستقرام':'Instagram','انستغرام':'Instagram','انستفرام':'Instagram',
+  'tiktok':'TikTok','تيك توك':'TikTok','تيكتوك':'TikTok','تيك تيك':'TikTok',
+  'snapchat':'Snapchat','سناب شات':'Snapchat','سناب':'Snapchat','سناب شاتس':'Snapchat',
+  'facebook':'Facebook','فيسبوك':'Facebook','فيس بوك':'Facebook',
+  'whatsapp':'WhatsApp','واتساب':'WhatsApp','واتس اب':'WhatsApp','واتس':'WhatsApp',
+  'google ads':'Google Ads','جوجل':'Google Ads','اعلانات جوجل':'Google Ads','google':'Google Ads'
+};
+function normalizeSrcName(s) {
+  if(!s) return s;
+  const key = s.toLowerCase().trim();
+  return _srcDisplayMap[key] || s;
+}
+
+
 // Load saved language preference
 const savedLang = localStorage.getItem('nexcrm_lang');
 if(savedLang && savedLang !== 'en') {
@@ -4998,11 +5015,12 @@ function renderActivityFeed() {
 
   const recent = [...leads].sort((a,b) => (b.id||0)-(a.id||0)).slice(0,5);
   el.innerHTML = recent.map(l => {
-    const src = l.source ? ' via <b>' + l.source + '</b>' : '';
+    const srcNorm = l.source ? normalizeSrcName(l.source) : '';
+    const src = srcNorm ? ' via <b>' + srcNorm + '</b>' : '';
     const icon = getSourceIcon(l.source);
     return `<div class="activity-item">
       <div style="width:36px;height:36px;border-radius:10px;background:${icon.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px ${icon.bg}55">${icon.svg}</div>
-      <div><div class="activity-text">New lead: <b>${l.name||'Unknown'}</b>${src}</div><div class="activity-time">${l.date||'Recently'} · ${l.status||'New'}</div></div>
+      <div><div class="activity-text">New lead: <b>${l.name||'Unknown'}</b>${src}</div><div class="activity-time">${l.date ? new Date(l.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : 'Recently'} · ${l.status||'New'}</div></div>
     </div>`;
   }).join('');
 }
@@ -5206,20 +5224,6 @@ function renderDonut(data) {
 
   if(sorted.length === 0) return;
 
-  // Normalize Arabic source names to brand names
-  const srcDisplayMap = {
-    'instagram':'Instagram','انستقرام':'Instagram','انستغرام':'Instagram',
-    'tiktok':'TikTok','تيك توك':'TikTok','تيكتوك':'TikTok',
-    'snapchat':'Snapchat','سناب شات':'Snapchat','سناب':'Snapchat',
-    'facebook':'Facebook','فيسبوك':'Facebook','فيس بوك':'Facebook',
-    'whatsapp':'WhatsApp','واتساب':'WhatsApp','واتس اب':'WhatsApp',
-    'google ads':'Google Ads','جوجل':'Google Ads','اعلانات جوجل':'Google Ads'
-  };
-  function normalizeSrcName(s) {
-    const key = (s||'').toLowerCase().trim();
-    return srcDisplayMap[key] || s;
-  }
-
   // Build conic gradient
   let deg = 0;
   const gradParts = [];
@@ -5235,12 +5239,14 @@ function renderDonut(data) {
 
   const topPctVal = Math.round(sorted[0][1]/total*100);
   if(topPct) topPct.textContent = topPctVal + '%';
+  const topLabel = document.getElementById('donut-top-label');
+  if(topLabel) topLabel.textContent = normalizeSrcName(sorted[0][0]);
 
   legendEl.innerHTML = sorted.slice(0,4).map(([src, cnt], i) => {
     const normalized = normalizeSrcName(src);
     const color = srcColors[normalized] || srcColors[src] || fallbackColors[i % fallbackColors.length];
     const pct = Math.round(cnt/total*100);
-    return '<div class="legend-item"><div class="legend-dot" style="background:' + color + '"></div><span style="color:var(--text)">' + normalized + ' — ' + pct + '%</span></div>';
+    return '<div class="legend-item"><div class="legend-dot" style="background:' + color + '"></div><span style="color:var(--text);font-size:13px;font-weight:500">' + normalized + ' — ' + pct + '%</span></div>';
   }).join('');
 }
 
