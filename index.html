@@ -6556,255 +6556,6 @@ function updateThemeIcon(isLight) {
 }
 
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- WHATSAPP INBOX FEATURE                         -->
-<!-- ═══════════════════════════════════════════════ -->
-<style>
-#inbox-list .inbox-item {
-  display:flex;align-items:center;gap:10px;padding:12px 14px;
-  cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s;
-}
-#inbox-list .inbox-item:hover { background:var(--bg3); }
-#inbox-list .inbox-item.active { background:rgba(37,211,102,0.08);border-left:3px solid #25d366; }
-.inbox-avatar {
-  width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);
-  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;
-  color:#fff;flex-shrink:0;
-}
-.inbox-item-info { flex:1;min-width:0; }
-.inbox-item-name { font-weight:600;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-.inbox-item-preview { font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px; }
-.inbox-item-time { font-size:11px;color:var(--text2);flex-shrink:0; }
-.inbox-unread { width:8px;height:8px;background:#25d366;border-radius:50%;flex-shrink:0; }
-.msg-bubble {
-  max-width:65%;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.5;
-  word-break:break-word;position:relative;
-}
-.msg-out {
-  background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;
-  align-self:flex-end;border-bottom-right-radius:4px;
-}
-.msg-in {
-  background:var(--bg2);color:var(--text);border:1px solid var(--border);
-  align-self:flex-start;border-bottom-left-radius:4px;
-}
-.msg-time { font-size:10px;opacity:0.7;margin-top:4px;text-align:right; }
-.msg-note {
-  background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);
-  color:var(--text2);font-size:12px;padding:6px 12px;border-radius:8px;
-  align-self:center;font-style:italic;
-}
-body.light-mode .msg-in { background:#f0f0f0;border-color:#e0e0e0; }
-#inbox-list::-webkit-scrollbar { width:4px; }
-#inbox-list::-webkit-scrollbar-thumb { background:var(--border);border-radius:4px; }
-#inbox-messages::-webkit-scrollbar { width:4px; }
-#inbox-messages::-webkit-scrollbar-thumb { background:var(--border);border-radius:4px; }
-</style>
-
-<script>
-// ─── WHATSAPP INBOX ──────────────────────────────────────
-let inboxLeads = [];
-let inboxMessages = {};
-let activeInboxLead = null;
-
-async function loadInbox() {
-  const listEl = document.getElementById('inbox-list');
-  if (!listEl) return;
-  listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text2);font-size:13px">Loading...</div>';
-
-  try {
-    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
-    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + orgFilter, { headers: HEADERS });
-    const data = await r.json();
-    inboxLeads = data || [];
-
-    // Load messages for each lead from Supabase
-    await loadAllInboxMessages();
-    renderInboxList(inboxLeads);
-
-    const badge = document.getElementById('inbox-badge');
-    if (badge) badge.textContent = inboxLeads.length;
-
-  } catch(e) {
-    console.error(e);
-    listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger)">Failed to load</div>';
-  }
-}
-
-async function loadAllInboxMessages() {
-  try {
-    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
-    const r = await fetch(SUPABASE_URL + '/rest/v1/inbox_messages?select=*&order=created_at.asc' + orgFilter, { headers: HEADERS });
-    if (r.ok) {
-      const data = await r.json();
-      inboxMessages = {};
-      (data || []).forEach(m => {
-        if (!inboxMessages[m.lead_id]) inboxMessages[m.lead_id] = [];
-        inboxMessages[m.lead_id].push(m);
-      });
-    }
-  } catch(e) {
-    // Table may not exist yet — use simulated messages
-    inboxMessages = {};
-  }
-}
-
-function renderInboxList(leads) {
-  const listEl = document.getElementById('inbox-list');
-  if (!listEl) return;
-
-  if (!leads || leads.length === 0) {
-    listEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text2);font-size:13px">No leads yet</div>';
-    return;
-  }
-
-  listEl.innerHTML = leads.map(lead => {
-    const msgs = inboxMessages[lead.id] || [];
-    const lastMsg = msgs[msgs.length - 1];
-    const initials = (lead.name || '?').split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-    const preview = lastMsg ? lastMsg.message : (lead.notes || lead.source || 'No messages yet');
-    const time = lastMsg ? new Date(lastMsg.created_at).toLocaleTimeString('en', {hour:'2-digit',minute:'2-digit'}) : (lead.date || '');
-    const isActive = activeInboxLead && activeInboxLead.id === lead.id;
-
-    return `<div class="inbox-item${isActive ? ' active' : ''}" onclick="openInboxChat(${lead.id})">
-      <div class="inbox-avatar">${initials}</div>
-      <div class="inbox-item-info">
-        <div class="inbox-item-name">${lead.name || '—'}</div>
-        <div class="inbox-item-preview">${preview}</div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-        <div class="inbox-item-time">${time}</div>
-        ${msgs.length === 0 ? '<div class="inbox-unread"></div>' : ''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function filterInboxList(q) {
-  const filtered = q
-    ? inboxLeads.filter(l => (l.name||'').toLowerCase().includes(q.toLowerCase()) || (l.phone||'').includes(q))
-    : inboxLeads;
-  renderInboxList(filtered);
-}
-
-function openInboxChat(id) {
-  const lead = inboxLeads.find(l => l.id === id);
-  if (!lead) return;
-  activeInboxLead = lead;
-
-  // Update header
-  const initials = (lead.name || '?').split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
-  document.getElementById('inbox-avatar').textContent = initials;
-  document.getElementById('inbox-chat-name').textContent = lead.name || '—';
-  document.getElementById('inbox-chat-status').textContent = lead.phone ? lead.phone : (lead.source || 'Lead');
-  const waLink = document.getElementById('inbox-wa-link');
-  if (waLink && lead.phone) waLink.href = 'https://wa.me/' + lead.phone.replace(/[^0-9]/g,'');
-
-  // Re-render list to show active state
-  renderInboxList(inboxLeads);
-  renderInboxMessages(lead);
-
-  // Focus reply input
-  setTimeout(() => {
-    const input = document.getElementById('inbox-reply-input');
-    if (input) input.focus();
-  }, 100);
-}
-
-function renderInboxMessages(lead) {
-  const el = document.getElementById('inbox-messages');
-  if (!el) return;
-
-  const msgs = inboxMessages[lead.id] || [];
-
-  if (msgs.length === 0) {
-    // Show simulated initial message based on lead data
-    el.innerHTML = `
-      <div style="text-align:center;margin:10px 0">
-        <span style="background:var(--bg3);color:var(--text2);font-size:11px;padding:4px 12px;border-radius:20px">${lead.date || 'Recently'}</span>
-      </div>
-      <div class="msg-bubble msg-in">
-        <div>مرحبا، أنا مهتم بـ ${lead.value || 'منتجاتكم'}</div>
-        <div class="msg-time">${lead.date || ''} · via ${normalizeSrcName(lead.source) || 'WhatsApp'}</div>
-      </div>
-      ${lead.notes ? `<div class="msg-note">📝 Note: ${lead.notes}</div>` : ''}
-      <div style="text-align:center;margin:20px 0;color:var(--text2);font-size:12px">
-        Start the conversation by typing a reply below ↓
-      </div>`;
-  } else {
-    el.innerHTML = msgs.map(m => {
-      const isOut = m.direction === 'out';
-      const time = new Date(m.created_at).toLocaleTimeString('en', {hour:'2-digit', minute:'2-digit'});
-      return `<div class="msg-bubble ${isOut ? 'msg-out' : 'msg-in'}">
-        <div>${m.message}</div>
-        <div class="msg-time">${time}${isOut ? ' ✓✓' : ''}</div>
-      </div>`;
-    }).join('');
-  }
-
-  el.scrollTop = el.scrollHeight;
-}
-
-async function sendInboxMessage() {
-  const input = document.getElementById('inbox-reply-input');
-  if (!input || !activeInboxLead) return;
-  const msg = input.value.trim();
-  if (!msg) return;
-
-  input.value = '';
-  input.style.height = 'auto';
-
-  const now = new Date().toISOString();
-  const newMsg = {
-    lead_id: activeInboxLead.id,
-    message: msg,
-    direction: 'out',
-    created_at: now,
-    org_id: currentOrg ? currentOrg.id : null
-  };
-
-  // Add to local state
-  if (!inboxMessages[activeInboxLead.id]) inboxMessages[activeInboxLead.id] = [];
-  inboxMessages[activeInboxLead.id].push(newMsg);
-
-  // Render immediately
-  renderInboxMessages(activeInboxLead);
-  renderInboxList(inboxLeads);
-
-  // Try to save to Supabase (table may not exist yet)
-  try {
-    await fetch(SUPABASE_URL + '/rest/v1/inbox_messages', {
-      method: 'POST',
-      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify(newMsg)
-    });
-  } catch(e) {
-    // Silently continue — message shown locally
-  }
-
-  showToast('✅ Message sent!');
-}
-
-function inboxKeyDown(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendInboxMessage();
-  }
-}
-
-function autoResizeInbox(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-}
-
-// Hook into nav to load inbox when opened
-const _origNav = window.nav;
-if (typeof nav === 'function') {
-  window.nav = function(page, el) {
-    _origNav.apply(this, arguments);
-    if (page === 'inbox') setTimeout(loadInbox, 100);
-  };
-}
 </script>
 
 // Apply saved theme on load
@@ -7123,4 +6874,177 @@ function copyAIReply(btn, text) {
     });
   };
 })();
+</script>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- WHATSAPP INBOX FEATURE                         -->
+<!-- ═══════════════════════════════════════════════ -->
+<style>
+#inbox-list .inbox-item {
+  display:flex;align-items:center;gap:10px;padding:12px 14px;
+  cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s;
+}
+#inbox-list .inbox-item:hover { background:var(--bg3); }
+#inbox-list .inbox-item.active { background:rgba(37,211,102,0.08);border-left:3px solid #25d366; }
+.inbox-avatar {
+  width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;
+  color:#fff;flex-shrink:0;
+}
+.inbox-item-info { flex:1;min-width:0; }
+.inbox-item-name { font-weight:600;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.inbox-item-preview { font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px; }
+.inbox-item-time { font-size:11px;color:var(--text2);flex-shrink:0; }
+.inbox-unread { width:8px;height:8px;background:#25d366;border-radius:50%;flex-shrink:0; }
+.msg-bubble { max-width:65%;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.5;word-break:break-word; }
+.msg-out { background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;align-self:flex-end;border-bottom-right-radius:4px; }
+.msg-in { background:var(--bg2);color:var(--text);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px; }
+.msg-time { font-size:10px;opacity:0.7;margin-top:4px;text-align:right; }
+.msg-note { background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);color:var(--text2);font-size:12px;padding:6px 12px;border-radius:8px;align-self:center;font-style:italic; }
+body.light-mode .msg-in { background:#f0f0f0;border-color:#e0e0e0; }
+#inbox-list::-webkit-scrollbar,#inbox-messages::-webkit-scrollbar { width:4px; }
+#inbox-list::-webkit-scrollbar-thumb,#inbox-messages::-webkit-scrollbar-thumb { background:var(--border);border-radius:4px; }
+</style>
+
+<script>
+var inboxLeads = [];
+var inboxMessages = {};
+var activeInboxLead = null;
+
+async function loadInbox() {
+  var listEl = document.getElementById('inbox-list');
+  if (!listEl) return;
+  listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text2);font-size:13px">Loading...</div>';
+  try {
+    var orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    var r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + orgFilter, { headers: HEADERS });
+    var data = await r.json();
+    inboxLeads = data || [];
+    try {
+      var r2 = await fetch(SUPABASE_URL + '/rest/v1/inbox_messages?select=*&order=created_at.asc' + orgFilter, { headers: HEADERS });
+      if (r2.ok) {
+        var msgs = await r2.json();
+        inboxMessages = {};
+        (msgs || []).forEach(function(m) {
+          if (!inboxMessages[m.lead_id]) inboxMessages[m.lead_id] = [];
+          inboxMessages[m.lead_id].push(m);
+        });
+      }
+    } catch(e) { inboxMessages = {}; }
+    renderInboxList(inboxLeads);
+    var badge = document.getElementById('inbox-badge');
+    if (badge) badge.textContent = inboxLeads.length;
+  } catch(e) {
+    listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger)">Failed to load</div>';
+  }
+}
+
+function renderInboxList(leads) {
+  var listEl = document.getElementById('inbox-list');
+  if (!listEl) return;
+  if (!leads || leads.length === 0) {
+    listEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text2);font-size:13px">No leads yet</div>';
+    return;
+  }
+  listEl.innerHTML = leads.map(function(lead) {
+    var msgs = inboxMessages[lead.id] || [];
+    var lastMsg = msgs[msgs.length - 1];
+    var initials = (lead.name || '?').split(' ').map(function(n){return n[0];}).join('').substring(0,2).toUpperCase();
+    var preview = lastMsg ? lastMsg.message : (lead.notes || lead.source || 'No messages yet');
+    var time = lastMsg ? new Date(lastMsg.created_at).toLocaleTimeString('en', {hour:'2-digit',minute:'2-digit'}) : (lead.date || '');
+    var isActive = activeInboxLead && activeInboxLead.id === lead.id;
+    return '<div class="inbox-item' + (isActive ? ' active' : '') + '" onclick="openInboxChat(' + lead.id + ')">' +
+      '<div class="inbox-avatar">' + initials + '</div>' +
+      '<div class="inbox-item-info">' +
+        '<div class="inbox-item-name">' + (lead.name||'—') + '</div>' +
+        '<div class="inbox-item-preview">' + preview + '</div>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">' +
+        '<div class="inbox-item-time">' + time + '</div>' +
+        (msgs.length === 0 ? '<div class="inbox-unread"></div>' : '') +
+      '</div></div>';
+  }).join('');
+}
+
+function filterInboxList(q) {
+  var filtered = q ? inboxLeads.filter(function(l){ return (l.name||'').toLowerCase().includes(q.toLowerCase()) || (l.phone||'').includes(q); }) : inboxLeads;
+  renderInboxList(filtered);
+}
+
+function openInboxChat(id) {
+  var lead = inboxLeads.find(function(l){ return l.id === id; });
+  if (!lead) return;
+  activeInboxLead = lead;
+  var initials = (lead.name || '?').split(' ').map(function(n){return n[0];}).join('').substring(0,2).toUpperCase();
+  document.getElementById('inbox-avatar').textContent = initials;
+  document.getElementById('inbox-chat-name').textContent = lead.name || '—';
+  document.getElementById('inbox-chat-status').textContent = lead.phone || lead.source || 'Lead';
+  var waLink = document.getElementById('inbox-wa-link');
+  if (waLink && lead.phone) waLink.href = 'https://wa.me/' + lead.phone.replace(/[^0-9]/g,'');
+  renderInboxList(inboxLeads);
+  renderInboxMessages(lead);
+  setTimeout(function(){ var inp = document.getElementById('inbox-reply-input'); if(inp) inp.focus(); }, 100);
+}
+
+function renderInboxMessages(lead) {
+  var el = document.getElementById('inbox-messages');
+  if (!el) return;
+  var msgs = inboxMessages[lead.id] || [];
+  if (msgs.length === 0) {
+    el.innerHTML = '<div style="text-align:center;margin:10px 0"><span style="background:var(--bg3);color:var(--text2);font-size:11px;padding:4px 12px;border-radius:20px">' + (lead.date||'Recently') + '</span></div>' +
+      '<div class="msg-bubble msg-in"><div>مرحبا، أنا مهتم بـ ' + (lead.value||'منتجاتكم') + '</div><div class="msg-time">' + (lead.date||'') + ' · via ' + normalizeSrcName(lead.source||'') + '</div></div>' +
+      (lead.notes ? '<div class="msg-note">Note: ' + lead.notes + '</div>' : '') +
+      '<div style="text-align:center;margin:20px 0;color:var(--text2);font-size:12px">Type a reply below ↓</div>';
+  } else {
+    el.innerHTML = msgs.map(function(m) {
+      var isOut = m.direction === 'out';
+      var time = new Date(m.created_at).toLocaleTimeString('en', {hour:'2-digit',minute:'2-digit'});
+      return '<div class="msg-bubble ' + (isOut?'msg-out':'msg-in') + '"><div>' + m.message + '</div><div class="msg-time">' + time + (isOut?' ✓✓':'') + '</div></div>';
+    }).join('');
+  }
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendInboxMessage() {
+  var input = document.getElementById('inbox-reply-input');
+  if (!input || !activeInboxLead) return;
+  var msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  input.style.height = 'auto';
+  var now = new Date().toISOString();
+  var newMsg = { lead_id: activeInboxLead.id, message: msg, direction: 'out', created_at: now, org_id: currentOrg ? currentOrg.id : null };
+  if (!inboxMessages[activeInboxLead.id]) inboxMessages[activeInboxLead.id] = [];
+  inboxMessages[activeInboxLead.id].push(newMsg);
+  renderInboxMessages(activeInboxLead);
+  renderInboxList(inboxLeads);
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/inbox_messages', { method:'POST', headers:{...HEADERS,'Prefer':'return=minimal'}, body:JSON.stringify(newMsg) });
+  } catch(e) {}
+  showToast('Message sent!');
+}
+
+function inboxKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendInboxMessage(); }
+}
+
+function autoResizeInbox(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var origNav = window.nav;
+  if (typeof origNav === 'function') {
+    var _navWrapped = false;
+    if (!_navWrapped) {
+      _navWrapped = true;
+      var _navOrig = window.nav;
+      window.nav = function(page, el) {
+        _navOrig.apply(this, arguments);
+        if (page === 'inbox') setTimeout(loadInbox, 150);
+      };
+    }
+  }
+});
 </script>
