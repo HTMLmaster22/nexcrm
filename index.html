@@ -6335,11 +6335,10 @@ if(typeof renderInvoices === 'function') {
 }
 
 // Run on page navigation
-const _origNav = window.nav;
 if(typeof nav === 'function') {
-  const origNav = nav;
+  const _origNavHijri = nav;
   window.nav = function(page, el) {
-    origNav.apply(this, arguments);
+    _origNavHijri.apply(this, arguments);
     if(page === 'dashboard') setTimeout(renderHijriWidget, 200);
     setTimeout(patchHijriDates, 300);
   };
@@ -6558,12 +6557,12 @@ function updateThemeIcon(isLight) {
 
 </script>
 
+<script>
 // Apply saved theme on load
 (function() {
   const saved = localStorage.getItem('nexcrm_theme');
   if(saved === 'light') {
     document.body.classList.add('light-mode');
-    // Icon update happens after DOM ready
     document.addEventListener('DOMContentLoaded', () => updateThemeIcon(true));
   }
 })();
