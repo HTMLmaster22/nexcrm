@@ -97,7 +97,8 @@
   body.light-mode .score-badge { background:#f1f5f9 !important; color:#475569 !important; }
   body.light-mode .status-pill { filter:none; }
   body.light-mode .analytics-bar-wrap { background:#e2e8f0 !important; }
-  body.light-mode .legend-item { color:#1e293b !important; }
+  body.light-mode .legend-item { color:#1e293b !important; font-weight:500 !important; }
+  body.light-mode #donut-legend { color:#1e293b !important; }
   body.light-mode .analytics-label { color:#475569 !important; }
   body.light-mode .analytics-value { color:#1e293b !important; }
   body.light-mode .donut-inner span { color:#1e293b !important; }
@@ -3340,6 +3341,31 @@ function applyTranslations() {
     if(pageKey) document.getElementById('page-title').textContent = titles[pageKey];
   }
 
+  // Source filter buttons - keep brand names in both languages
+  document.querySelectorAll('.source-filter-btn').forEach(btn => {
+    const onclick = btn.getAttribute('onclick') || '';
+    if(onclick.includes("'all'")) btn.childNodes[btn.childNodes.length-1].textContent = isAr ? ' الكل' : ' All';
+  });
+
+  // Fix any remaining English/Arabic text in dashboard that wasn't caught
+  document.querySelectorAll('[data-en]').forEach(el => {
+    el.textContent = isAr ? el.getAttribute('data-ar') : el.getAttribute('data-en');
+  });
+
+  // Leads page sub-stats
+  document.querySelectorAll('.stat-change').forEach(el => {
+    const txt = el.textContent;
+    if(txt.includes('Won / Total leads') || txt.includes('من إجمالي العملاء')) 
+      el.textContent = isAr ? 'من إجمالي العملاء' : 'Won / Total leads';
+    if(txt.includes('This month') || txt.includes('هذا الشهر'))
+      el.textContent = isAr ? 'هذا الشهر' : 'This month';
+  });
+
+  // Re-render leads table headers direction
+  document.querySelectorAll('table').forEach(t => {
+    t.style.direction = isAr ? 'rtl' : 'ltr';
+  });
+
   // Save preference
   localStorage.setItem('nexcrm_lang', currentLang);
 }
@@ -5180,11 +5206,25 @@ function renderDonut(data) {
 
   if(sorted.length === 0) return;
 
+  // Normalize Arabic source names to brand names
+  const srcDisplayMap = {
+    'instagram':'Instagram','انستقرام':'Instagram','انستغرام':'Instagram',
+    'tiktok':'TikTok','تيك توك':'TikTok','تيكتوك':'TikTok',
+    'snapchat':'Snapchat','سناب شات':'Snapchat','سناب':'Snapchat',
+    'facebook':'Facebook','فيسبوك':'Facebook','فيس بوك':'Facebook',
+    'whatsapp':'WhatsApp','واتساب':'WhatsApp','واتس اب':'WhatsApp',
+    'google ads':'Google Ads','جوجل':'Google Ads','اعلانات جوجل':'Google Ads'
+  };
+  function normalizeSrcName(s) {
+    const key = (s||'').toLowerCase().trim();
+    return srcDisplayMap[key] || s;
+  }
+
   // Build conic gradient
   let deg = 0;
   const gradParts = [];
   sorted.forEach(([src, cnt], i) => {
-    const color = srcColors[src] || fallbackColors[i % fallbackColors.length];
+    const color = srcColors[normalizeSrcName(src)] || srcColors[src] || fallbackColors[i % fallbackColors.length];
     const pct = cnt / total;
     const endDeg = deg + pct * 360;
     gradParts.push(color + ' ' + Math.round(deg) + 'deg ' + Math.round(endDeg) + 'deg');
@@ -5197,9 +5237,10 @@ function renderDonut(data) {
   if(topPct) topPct.textContent = topPctVal + '%';
 
   legendEl.innerHTML = sorted.slice(0,4).map(([src, cnt], i) => {
-    const color = srcColors[src] || fallbackColors[i % fallbackColors.length];
+    const normalized = normalizeSrcName(src);
+    const color = srcColors[normalized] || srcColors[src] || fallbackColors[i % fallbackColors.length];
     const pct = Math.round(cnt/total*100);
-    return '<div class="legend-item"><div class="legend-dot" style="background:' + color + '"></div>' + src + ' — ' + pct + '%</div>';
+    return '<div class="legend-item"><div class="legend-dot" style="background:' + color + '"></div><span style="color:var(--text)">' + normalized + ' — ' + pct + '%</span></div>';
   }).join('');
 }
 
