@@ -7161,8 +7161,28 @@ async function submitAccessRequest() {
     return;
   }
 
-  btn.textContent = 'Sending...';
+  btn.textContent = 'Checking...';
   btn.disabled = true;
+
+  // ── Company name duplicate check ──
+  try {
+    const checkR = await fetch(
+      SUPABASE_URL + '/rest/v1/organizations?select=id,name&name=ilike.' + encodeURIComponent(company),
+      { headers: HEADERS }
+    );
+    const existing = await checkR.json();
+    if (existing && existing.length > 0) {
+      errEl.textContent = '⚠️ A company with this name already exists in NexCRM. Please contact the admin directly.';
+      errEl.style.display = 'block';
+      btn.textContent = 'Send Request →';
+      btn.disabled = false;
+      return;
+    }
+  } catch(e) {
+    // If check fails, continue anyway
+  }
+
+  btn.textContent = 'Sending...';
 
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/access_requests', {
@@ -7251,16 +7271,74 @@ async function loadAccessRequests() {
 }
 
 async function approveRequest(id, name, email, company) {
-  if (!confirm(`Approve ${name} (${email}) from ${company}?`)) return;
+  if (!confirm(`Approve ${name} (${email}) from ${company}?\n\nThis will:\n• Create a new workspace for "${company}"\n• Send ${email} an invite to set their password\n• Give them admin access to their workspace`)) return;
+
+  const btn = document.querySelector(`[onclick*="approveRequest('${id}'"]`);
+  if (btn) { btn.textContent = '⏳ Processing...'; btn.disabled = true; }
+
   try {
+    // Step 1: Check company doesn't already exist
+    const checkR = await fetch(
+      SUPABASE_URL + '/rest/v1/organizations?select=id,name&name=ilike.' + encodeURIComponent(company),
+      { headers: HEADERS }
+    );
+    const existing = await checkR.json();
+    if (existing && existing.length > 0) {
+      showToast('❌ Company "' + company + '" already exists! Cannot approve duplicate.');
+      if (btn) { btn.textContent = '✓ Approve'; btn.disabled = false; }
+      return;
+    }
+
+    // Step 2: Create the organization
+    const orgR = await fetch(SUPABASE_URL + '/rest/v1/organizations', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=representation' },
+      body: JSON.stringify({ name: company, created_at: new Date().toISOString() })
+    });
+    const orgData = await orgR.json();
+    const newOrg = Array.isArray(orgData) ? orgData[0] : orgData;
+
+    if (!newOrg || !newOrg.id) {
+      showToast('❌ Failed to create workspace. Check Supabase permissions.');
+      if (btn) { btn.textContent = '✓ Approve'; btn.disabled = false; }
+      return;
+    }
+
+    // Step 3: Invite user via Supabase Edge Function
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk3NTEsImV4cCI6MjA4OTEwNTc1MX0.h4NClLHPJwnSkhMBccB8hpPJrrMU3hkKMCqHu4KNv8g';
+    const inviteR = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/approve-user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + SUPABASE_ANON
+      },
+      body: JSON.stringify({ email, name, org_id: newOrg.id, company })
+    });
+
+    const inviteData = await inviteR.json();
+
+    // Step 4: Update request status to approved
     await fetch(SUPABASE_URL + '/rest/v1/access_requests?id=eq.' + id, {
       method: 'PATCH',
       headers: { ...HEADERS, 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status: 'approved', approved_at: new Date().toISOString() })
     });
-    showToast('✅ Request approved! Now add them as a team member.');
+
+    if (inviteR.ok) {
+      showToast('🎉 ' + name + ' approved! Invite email sent to ' + email);
+    } else {
+      // Org created but invite failed — still mark approved
+      showToast('✅ Workspace created for ' + company + '. Manually invite ' + email + ' via Supabase Auth.');
+    }
+
     loadAccessRequests();
-  } catch(e) { showToast('❌ Failed to approve'); }
+
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Approval failed: ' + e.message);
+    if (btn) { btn.textContent = '✓ Approve'; btn.disabled = false; }
+  }
 }
 
 async function rejectRequest(id) {
