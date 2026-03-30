@@ -4605,11 +4605,13 @@ function adminTab(tab, el) {
   document.getElementById('admin-allleads').style.display = tab === 'allleads' ? 'block' : 'none';
   document.getElementById('admin-performance').style.display = tab === 'performance' ? 'block' : 'none';
   document.getElementById('admin-branding').style.display = tab === 'branding' ? 'block' : 'none';
+  document.getElementById('admin-requests').style.display = tab === 'requests' ? 'block' : 'none';
   if(tab === 'team') loadTeam();
   if(tab === 'clients') loadClients();
   if(tab === 'allleads') loadAllLeads();
   if(tab === 'performance') loadPerformance();
   if(tab === 'branding') loadBrandingPanel();
+  if(tab === 'requests') loadAccessRequests();
 }
 
 // ─── TEAM ──────────────────────────────────────────────────────
