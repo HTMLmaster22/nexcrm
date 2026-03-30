@@ -3524,7 +3524,52 @@ function loginSuccess(data) {
   checkAdminStatus();
   applyMobileLayout();
   setTimeout(loadReminders, 500);
-  nav('dashboard', document.querySelector('.nav-item'));
+  // Check if user has an org — if not, show no-access screen
+  checkUserOrgAccess();
+}
+
+async function checkUserOrgAccess() {
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + currentUser.id + '&select=org_id,role,organizations(id,name)', { headers: HEADERS });
+    const data = await r.json();
+    if (r.ok && data && data.length > 0) {
+      // User has orgs — proceed normally
+      nav('dashboard', document.querySelector('.nav-item'));
+    } else {
+      // User has NO org — show no-access screen instead of dashboard
+      showNoOrgScreen();
+    }
+  } catch(e) {
+    console.error(e);
+    nav('dashboard', document.querySelector('.nav-item'));
+  }
+}
+
+function showNoOrgScreen() {
+  // Hide all nav pages and show a waiting screen
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const mainArea = document.querySelector('.main') || document.querySelector('#main') || document.querySelector('.content');
+  
+  // Inject a no-org overlay into the page
+  const existing = document.getElementById('no-org-screen');
+  if (existing) { existing.style.display = 'flex'; return; }
+
+  const screen = document.createElement('div');
+  screen.id = 'no-org-screen';
+  screen.style.cssText = 'position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;padding:24px;text-align:center';
+  screen.innerHTML = `
+    <div style="width:72px;height:72px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:8px">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    </div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:var(--text)">No Workspace Yet</div>
+    <div style="font-size:15px;color:var(--text2);max-width:400px;line-height:1.6">Your account has been created but you haven't been added to a workspace yet.<br/><br/>Contact your administrator to get access.</div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px 28px;margin-top:8px">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:8px">Contact admin:</div>
+      <a href="mailto:abdelrahman1it@gmail.com" style="color:var(--accent);font-weight:600;font-size:15px;text-decoration:none">abdelrahman1it@gmail.com</a>
+    </div>
+    <button onclick="logout();document.getElementById('no-org-screen').style.display='none'" style="margin-top:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:10px 24px;border-radius:10px;cursor:pointer;font-family:inherit;font-size:14px">Sign Out</button>
+  `;
+  document.body.appendChild(screen);
 }
 
 function logout() {
