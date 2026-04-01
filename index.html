@@ -3777,12 +3777,20 @@ async function deleteContact(id) {
 // ─── CLIENT MANAGEMENT ─────────────────────────────────────────
 let clientsList = [];
 
-function openInviteModal() {
-  // Populate org dropdown
+async function openInviteModal() {
+  // Load ALL orgs from Supabase
   const sel = document.getElementById('inv-org');
   if(sel) {
-    sel.innerHTML = '<option value="">— Select Organization —</option>' +
-      userOrgs.map(o => '<option value="' + o.id + '">' + o.name + '</option>').join('');
+    sel.innerHTML = '<option value="">Loading organizations...</option>';
+    try {
+      const r = await fetch(SUPABASE_URL + '/rest/v1/organizations?select=id,name&order=name.asc', { headers: HEADERS });
+      const orgs = await r.json();
+      sel.innerHTML = '<option value="">— Select Organization —</option>' +
+        (orgs || []).map(o => '<option value="' + o.id + '">' + o.name + '</option>').join('');
+    } catch(e) {
+      sel.innerHTML = '<option value="">— Select Organization —</option>' +
+        userOrgs.map(o => '<option value="' + o.id + '">' + o.name + '</option>').join('');
+    }
   }
   document.getElementById('invite-modal').classList.add('open');
 }
