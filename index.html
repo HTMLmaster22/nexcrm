@@ -6206,6 +6206,8 @@ function generateVATInvoice() {
   <button onclick="window.close()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:12px;padding:14px 20px;font-size:15px;cursor:pointer">✕</button>
 </div>
 
+</script>
+
 <!-- APPROVE WITH ORG PICKER MODAL -->
 <div id="approve-modal-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:460px;padding:28px">
@@ -6369,8 +6371,12 @@ async function confirmAssignUser() {
   }
 }
 </script>
-</body></html>`;
-
+<script>
+  // VAT window open continuation
+  // (This code is part of generateVATInvoice defined above)
+</script>
+<script>
+function _vatWindowOpen(html) {
   const win = window.open('', '_blank');
   win.document.write(html);
   win.document.close();
