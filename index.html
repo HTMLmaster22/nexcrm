@@ -4892,104 +4892,6 @@ async function loadPerformance() {
 }
 
 
-// ─── CLIENT MANAGEMENT ─────────────────────────────────────────
-async function loadClients() {
-  renderOrgsList();
-  const tbody = document.getElementById('clients-tbody');
-  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>';
-  try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SERVICE_KEY, 'Authorization': 'Bearer ' + SERVICE_KEY },
-      body: JSON.stringify({})
-    });
-    const users = r.ok ? await r.json() : [];
-
-    const leadsR = await fetch(SUPABASE_URL + '/rest/v1/leads?select=user_id,created_at', { headers: HEADERS });
-    const leadsData = await leadsR.json();
-    const leadCounts = {};
-    const lastLeadDate = {};
-    if(Array.isArray(leadsData)) {
-      leadsData.forEach(l => {
-        if(l.user_id) {
-          leadCounts[l.user_id] = (leadCounts[l.user_id] || 0) + 1;
-          if(!lastLeadDate[l.user_id] || l.created_at > lastLeadDate[l.user_id]) lastLeadDate[l.user_id] = l.created_at;
-        }
-      });
-    }
-
-    const blockedR = await fetch(SUPABASE_URL + '/rest/v1/blocked_users?select=*', { headers: HEADERS });
-    const blockedData = blockedR.ok ? await blockedR.json() : [];
-    const blockedIds = Array.isArray(blockedData) ? blockedData.map(b => b.user_id) : [];
-
-    if(!users || users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">No clients yet</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = users.map(u => {
-      const isBlocked = blockedIds.includes(u.id);
-      const leadCount = leadCounts[u.id] || 0;
-      const lastLead = lastLeadDate[u.id] ? new Date(lastLeadDate[u.id]).toLocaleDateString() : '—';
-      const joinDate = u.created_at ? new Date(u.created_at).toLocaleDateString() : '—';
-      const isMe = u.id === (currentUser && currentUser.id);
-      const initial = (u.email || 'C')[0].toUpperCase();
-      return `
-        <tr>
-          <td>
-            <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">${initial}</div>
-              <div>
-                <div style="font-weight:600;font-size:13px">${u.email||'—'}</div>
-                ${isMe ? '<span style="font-size:10px;color:var(--accent)">● YOU (Admin)</span>' : ''}
-              </div>
-            </div>
-          </td>
-          <td><div style="font-size:11px;color:var(--text2)">${u.id ? u.id.substring(0,12)+'...' : '—'}</div></td>
-          <td><div style="font-size:12px;color:var(--text2)">${joinDate}</div></td>
-          <td><span style="background:rgba(59,130,246,0.15);color:var(--accent);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${leadCount}</span></td>
-          <td><div style="font-size:12px;color:var(--text2)">${lastLead}</div></td>
-          <td><span class="status-pill ${isBlocked ? 'pill-lost' : 'pill-active'}">${isBlocked ? '🚫 Blocked' : '✅ Active'}</span></td>
-          <td>
-            ${!isMe ? `
-              <button class="action-btn ${isBlocked ? 'btn-edit' : 'btn-delete'}"
-                onclick="${isBlocked ? 'unblockClient' : 'blockClient'}('${u.id}', '${u.email}')"
-                title="${isBlocked ? 'Unblock' : 'Block'}">
-                ${isBlocked ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>'}
-              </button>
-            ` : '<span style="font-size:11px;color:var(--text2)">—</span>'}
-          </td>
-        </tr>
-      `;
-    }).join('');
-  } catch(e) {
-    console.error(e);
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">Error loading clients</td></tr>';
-  }
-}
-
-async function blockClient(userId, email) {
-  if(!confirm('Block ' + email + '? They will not be able to access the CRM.')) return;
-  try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/blocked_users', {
-      method: 'POST', headers: HEADERS,
-      body: JSON.stringify({ user_id: userId, email })
-    });
-    showToast('🚫 ' + email + ' has been blocked');
-    loadClients();
-  } catch(e) { showToast('❌ Error blocking user'); }
-}
-
-async function unblockClient(userId, email) {
-  try {
-    await fetch(SUPABASE_URL + '/rest/v1/blocked_users?user_id=eq.' + userId, {
-      method: 'DELETE', headers: HEADERS
-    });
-    showToast('✅ ' + email + ' has been unblocked');
-    loadClients();
-  } catch(e) { showToast('❌ Error unblocking user'); }
-}
-
 async function deleteClient(userId, email) {
   if(!confirm('DELETE account for ' + email + '? This permanently deletes their account, org membership and leads. Cannot be undone!')) return;
   try {
@@ -6218,11 +6120,7 @@ function generateVATInvoice() {
   <button onclick="window.print()" style="background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.3)">🖨️ Print / Save PDF</button>
   <button onclick="window.close()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:12px;padding:14px 20px;font-size:15px;cursor:pointer">✕</button>
 </div>
-</body></html>`;
-  const vatWin = window.open('', '_blank');
-  vatWin.document.write(html);
-  vatWin.document.close();
-}
+
 </script>
 
 <!-- APPROVE WITH ORG PICKER MODAL -->
