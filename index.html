@@ -6218,7 +6218,11 @@ function generateVATInvoice() {
   <button onclick="window.print()" style="background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.3)">🖨️ Print / Save PDF</button>
   <button onclick="window.close()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:12px;padding:14px 20px;font-size:15px;cursor:pointer">✕</button>
 </div>
-
+</body></html>`;
+  const vatWin = window.open('', '_blank');
+  vatWin.document.write(html);
+  vatWin.document.close();
+}
 </script>
 
 <!-- APPROVE WITH ORG PICKER MODAL -->
