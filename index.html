@@ -3860,11 +3860,10 @@ async function loadClients() {
       orgMemberIds = (omData || []).map(m => m.user_id);
     }
 
-    // Filter users to only those in current org (admin always included)
-    const users = (allUsers || []).filter(u =>
-      !currentOrg || // if no org selected show all
-      orgMemberIds.includes(u.id)
-    );
+    // Filter users to only those in current org
+    const users = !currentOrg
+      ? (allUsers || [])
+      : (allUsers || []).filter(u => orgMemberIds.includes(u.id));
 
     // Get leads count per user for current org
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
