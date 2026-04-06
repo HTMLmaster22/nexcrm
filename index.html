@@ -747,6 +747,33 @@
     display:none; text-align:center;
   }
   .auth-success.show { display:block; }
+
+  /* ── USER DROPDOWN ── */
+  .user-dropdown {
+    position:absolute; bottom:70px; left:12px; right:12px;
+    background:var(--bg2); border:1px solid var(--border);
+    border-radius:14px; padding:6px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.2);
+    z-index:500; display:none;
+    animation:slideUp 0.2s ease;
+  }
+  .user-dropdown.open { display:block; }
+  .user-dropdown-item {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:10px; cursor:pointer;
+    font-size:13px; font-weight:600; color:var(--text);
+    transition:background 0.15s; border:none; background:none;
+    width:100%; font-family:inherit; text-align:left;
+  }
+  .user-dropdown-item:hover { background:var(--bg3); }
+  .user-dropdown-item.danger { color:var(--danger); }
+  .user-dropdown-item.danger:hover { background:rgba(239,68,68,0.08); }
+  .user-dropdown-divider { height:1px; background:var(--border); margin:4px 0; }
+  .user-card { cursor:pointer; position:relative; }
+  .user-card:hover { background:var(--bg3) !important; }
+  .user-card-chevron { margin-left:auto; color:var(--text2); transition:transform 0.2s; flex-shrink:0; }
+  .user-card.open .user-card-chevron { transform:rotate(180deg); }
+
   .user-logout {
     font-size:11px; color:var(--text2); cursor:pointer; padding:4px 8px;
     border-radius:6px; border:1px solid var(--border); background:none;
@@ -1231,24 +1258,32 @@
     </div>
   </div>
 
-  <div class="nav-section">
-    <div class="nav-label">Account</div>
-    <div class="nav-item" onclick="nav('settings',this)" id="settings-nav-item">
-      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></span><span>Settings</span>
-    </div>
-  </div>
+  <div id="settings-nav-item" style="display:none"></div>
 
-  <div class="sidebar-bottom">
-    <div class="user-card">
-      <div class="avatar">A</div>
+  <div class="sidebar-bottom" style="position:relative">
+    <div class="user-dropdown" id="user-dropdown">
+      <button class="user-dropdown-item" onclick="nav('settings', document.getElementById('settings-nav-item')); toggleUserDropdown()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+        Settings
+      </button>
+      <button id="pwa-install-btn" onclick="installPWA()" class="user-dropdown-item" style="display:none">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Install App
+      </button>
+      <div class="user-dropdown-divider"></div>
+      <button class="user-dropdown-item danger" onclick="logout(); toggleUserDropdown()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
+    </div>
+    <div class="user-card" id="user-card-btn" onclick="toggleUserDropdown()">
+      <div class="avatar" id="sidebar-avatar">A</div>
       <div class="user-info">
-        <div class="user-name">Ahmed Al-Rashid</div>
-        <div class="user-role">Sales Manager</div>
-    <button id="pwa-install-btn" onclick="installPWA()" style="display:none;align-items:center;gap:8px;width:100%;margin-bottom:6px;padding:8px 12px;border-radius:8px;border:1px solid rgba(59,130,246,0.3);background:rgba(59,130,246,0.1);color:var(--accent);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Install App
-    </button>
-    <button class="user-logout" onclick="logout()">Sign Out</button>
+        <div class="user-name" id="sidebar-username">Loading...</div>
+        <div class="user-role" id="sidebar-userrole">—</div>
+      </div>
+      <svg class="user-card-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+    </div>
   </div>
 </nav>
 
@@ -3665,7 +3700,12 @@ function loginSuccess(data) {
   localStorage.setItem('nexcrm_token', data.access_token);
   localStorage.setItem('nexcrm_user', JSON.stringify(data.user));
   document.getElementById('auth-overlay').style.display = 'none';
-  document.querySelector('.user-name').textContent = currentUser.email.split('@')[0];
+  const uname = currentUser.email.split('@')[0];
+  document.querySelector('.user-name') && (document.querySelector('.user-name').textContent = uname);
+  const sbu = document.getElementById('sidebar-username');
+  const sba = document.getElementById('sidebar-avatar');
+  if (sbu) sbu.textContent = uname;
+  if (sba) sba.textContent = uname.charAt(0).toUpperCase();
   document.querySelector('.user-role').textContent = currentUser.email;
   checkAdminStatus();
   applyMobileLayout();
@@ -3762,6 +3802,24 @@ async function changePassword() {
   } catch(e) { showToast('❌ Error updating password'); }
 }
 
+
+// ─── USER DROPDOWN ────────────────────────────────────────────
+function toggleUserDropdown() {
+  const dd = document.getElementById('user-dropdown');
+  const card = document.getElementById('user-card-btn');
+  dd.classList.toggle('open');
+  card.classList.toggle('open');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('user-dropdown');
+  const card = document.getElementById('user-card-btn');
+  if (dd && dd.classList.contains('open') && !card.contains(e.target) && !dd.contains(e.target)) {
+    dd.classList.remove('open');
+    card.classList.remove('open');
+  }
+});
 function logout() {
   currentUser = null;
   HEADERS['Authorization'] = 'Bearer ' + SUPABASE_KEY;
