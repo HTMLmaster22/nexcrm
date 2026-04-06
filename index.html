@@ -1231,6 +1231,13 @@
     </div>
   </div>
 
+  <div class="nav-section">
+    <div class="nav-label">Account</div>
+    <div class="nav-item" onclick="nav('settings',this)" id="settings-nav-item">
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></span><span>Settings</span>
+    </div>
+  </div>
+
   <div class="sidebar-bottom">
     <div class="user-card">
       <div class="avatar">A</div>
@@ -2264,6 +2271,112 @@
 
 
   </div><!-- end content -->
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div style="max-width:700px;margin:0 auto">
+
+        <!-- Profile Card -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">👤 Profile Information</div>
+              <div class="card-subtitle">Update your name and display info</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:20px;margin-bottom:24px">
+            <div id="settings-avatar" style="width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;flex-shrink:0">A</div>
+            <div>
+              <div style="font-size:16px;font-weight:700;color:var(--text)" id="settings-display-name">—</div>
+              <div style="font-size:13px;color:var(--text2)" id="settings-display-email">—</div>
+              <div style="font-size:11px;color:var(--accent);margin-top:4px" id="settings-display-org">—</div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input class="form-input" id="settings-name" placeholder="Your full name" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input class="form-input" id="settings-phone" placeholder="+966 5X XXX XXXX" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input class="form-input" id="settings-email" type="email" placeholder="your@email.com" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Job Title</label>
+            <input class="form-input" id="settings-title" placeholder="e.g. Sales Manager" />
+          </div>
+          <button onclick="saveProfile()" class="btn btn-primary" style="padding:10px 28px">💾 Save Profile</button>
+        </div>
+
+        <!-- Password Card -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">🔐 Change Password</div>
+              <div class="card-subtitle">Keep your account secure</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input class="form-input" id="settings-new-password" type="password" placeholder="Min 8 characters" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm New Password</label>
+            <input class="form-input" id="settings-confirm-password" type="password" placeholder="Repeat new password" />
+          </div>
+          <button onclick="changePassword()" class="btn btn-primary" style="padding:10px 28px">🔐 Update Password</button>
+        </div>
+
+        <!-- Preferences Card -->
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">⚙️ Preferences</div>
+              <div class="card-subtitle">Customize your experience</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg3);border-radius:10px">
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text)">Dark Mode</div>
+                <div style="font-size:12px;color:var(--text2)">Toggle light/dark theme</div>
+              </div>
+              <button onclick="toggleTheme()" style="background:var(--accent);border:none;color:#fff;padding:7px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit">Toggle</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg3);border-radius:10px">
+              <div>
+                <div style="font-size:14px;font-weight:600;color:var(--text)">Language</div>
+                <div style="font-size:12px;color:var(--text2)">Switch between Arabic and English</div>
+              </div>
+              <button onclick="toggleLang()" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:7px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit">العربية / English</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="card" style="border-color:rgba(239,68,68,0.3)">
+          <div class="card-header">
+            <div>
+              <div class="card-title" style="color:var(--danger)">⚠️ Danger Zone</div>
+              <div class="card-subtitle">Irreversible actions</div>
+            </div>
+          </div>
+          <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:16px;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--text)">Sign Out</div>
+              <div style="font-size:12px;color:var(--text2)">Sign out from this device</div>
+            </div>
+            <button onclick="logout()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--danger);padding:8px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit">Sign Out</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
 </main>
 
 <!-- ADD LEAD MODAL -->
@@ -2605,7 +2718,7 @@ function updateLeadStats() {
 const titles = {
   dashboard:'Dashboard', leads:'Leads', pipeline:'Pipeline',
   contacts:'Contacts', campaigns:'Campaigns', analytics:'Analytics', admin:'Admin Panel',
-  calendar:'Content Calendar', deliverables:'Deliverables', invoices:'Invoices'
+  calendar:'Content Calendar', deliverables:'Deliverables', invoices:'Invoices', settings:'Settings'
 };
 function nav(page, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -2623,6 +2736,7 @@ function nav(page, el) {
   if(page === 'calendar') { loadCalendar(); }
   if(page === 'deliverables') { loadDeliverables(); }
   if(page === 'invoices') { loadInvoices(); }
+  if(page === 'settings') { loadSettings(); }
 }
 
 // ─── MODAL ─────────────────────────────────────────────────────
@@ -3557,6 +3671,95 @@ function loginSuccess(data) {
   applyMobileLayout();
   setTimeout(loadReminders, 500);
   nav('dashboard', document.querySelector('.nav-item'));
+}
+
+
+// ─── SETTINGS PAGE ────────────────────────────────────────────
+async function loadSettings() {
+  if (!currentUser) return;
+  // Load saved profile from localStorage
+  const profile = JSON.parse(localStorage.getItem('nexcrm_profile_' + currentUser.id) || '{}');
+  const name = profile.name || currentUser.email.split('@')[0];
+  const email = currentUser.email || '';
+  const phone = profile.phone || '';
+  const title = profile.title || '';
+  const orgName = currentOrg ? currentOrg.name : '';
+  const initial = name.charAt(0).toUpperCase();
+
+  // Update display
+  const av = document.getElementById('settings-avatar');
+  if (av) av.textContent = initial;
+  const dn = document.getElementById('settings-display-name');
+  if (dn) dn.textContent = name;
+  const de = document.getElementById('settings-display-email');
+  if (de) de.textContent = email;
+  const dorg = document.getElementById('settings-display-org');
+  if (dorg) dorg.textContent = orgName ? '📂 ' + orgName : '';
+
+  // Fill inputs
+  document.getElementById('settings-name').value = name;
+  document.getElementById('settings-email').value = email;
+  document.getElementById('settings-phone').value = phone;
+  document.getElementById('settings-title').value = title;
+}
+
+async function saveProfile() {
+  const name = document.getElementById('settings-name').value.trim();
+  const phone = document.getElementById('settings-phone').value.trim();
+  const title = document.getElementById('settings-title').value.trim();
+  const email = document.getElementById('settings-email').value.trim();
+
+  if (!name) { showToast('❌ Name cannot be empty'); return; }
+
+  // Save to localStorage
+  const profile = { name, phone, title };
+  localStorage.setItem('nexcrm_profile_' + currentUser.id, JSON.stringify(profile));
+
+  // Update email in Supabase Auth if changed
+  if (email && email !== currentUser.email) {
+    try {
+      const r = await fetch(SUPABASE_URL + '/auth/v1/user', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': HEADERS['Authorization'] },
+        body: JSON.stringify({ email })
+      });
+      if (!r.ok) { showToast('❌ Failed to update email — check if it is already in use'); return; }
+    } catch(e) { showToast('❌ Error updating email'); return; }
+  }
+
+  // Update sidebar display
+  const userName = document.querySelector('.user-name');
+  const userRole = document.querySelector('.user-role');
+  if (userName) userName.textContent = name;
+  if (userRole && title) userRole.textContent = title;
+
+  // Update avatar
+  const av = document.getElementById('settings-avatar');
+  if (av) av.textContent = name.charAt(0).toUpperCase();
+  document.getElementById('settings-display-name').textContent = name;
+
+  showToast('✅ Profile saved!');
+}
+
+async function changePassword() {
+  const newPass = document.getElementById('settings-new-password').value;
+  const confirmPass = document.getElementById('settings-confirm-password').value;
+
+  if (!newPass) { showToast('❌ Enter a new password'); return; }
+  if (newPass.length < 8) { showToast('❌ Password must be at least 8 characters'); return; }
+  if (newPass !== confirmPass) { showToast('❌ Passwords do not match'); return; }
+
+  try {
+    const r = await fetch(SUPABASE_URL + '/auth/v1/user', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': HEADERS['Authorization'] },
+      body: JSON.stringify({ password: newPass })
+    });
+    if (!r.ok) { showToast('❌ Failed to update password'); return; }
+    document.getElementById('settings-new-password').value = '';
+    document.getElementById('settings-confirm-password').value = '';
+    showToast('✅ Password updated successfully!');
+  } catch(e) { showToast('❌ Error updating password'); }
 }
 
 function logout() {
