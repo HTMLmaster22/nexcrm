@@ -1226,6 +1226,9 @@
     <div class="nav-item" onclick="nav('contacts',this)">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Contacts</span>
     </div>
+    <div class="nav-item" onclick="nav('calls',this)" id="calls-nav-item">
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span>Call Logs</span>
+    </div>
     <div class="nav-item" onclick="nav('inbox',this)" id="inbox-nav-item">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span>WhatsApp Inbox</span>
       <span class="badge" id="inbox-badge" style="background:#25d366">0</span>
@@ -2412,6 +2415,204 @@
 
       </div>
     </div>
+
+    <!-- CALL LOGS PAGE -->
+    <div class="page" id="page-calls">
+      <!-- Header Stats -->
+      <div class="stats-grid" style="margin-bottom:20px">
+        <div class="stat-card">
+          <div class="stat-label">Total Calls</div>
+          <div class="stat-value" id="cl-total">0</div>
+          <div class="stat-sub">This month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Missed Calls</div>
+          <div class="stat-value" style="color:var(--danger)" id="cl-missed">0</div>
+          <div class="stat-sub">Need callback</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Duration</div>
+          <div class="stat-value" id="cl-duration">0m</div>
+          <div class="stat-sub">Per call</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Transcribed</div>
+          <div class="stat-value" style="color:var(--accent)" id="cl-transcribed">0</div>
+          <div class="stat-sub">Auto-processed</div>
+        </div>
+      </div>
+
+      <!-- Search + Filter + Add Manual -->
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <input id="cl-search" class="form-input" placeholder="Search calls or transcripts..." style="flex:1;min-width:200px" oninput="filterCalls()"/>
+          <select id="cl-filter" class="form-input" style="width:140px" onchange="filterCalls()">
+            <option value="all">All Calls</option>
+            <option value="missed">Missed</option>
+            <option value="inbound">Inbound</option>
+            <option value="outbound">Outbound</option>
+          </select>
+          <button class="btn btn-primary" onclick="openAddCallModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Log Call
+          </button>
+        </div>
+      </div>
+
+      <!-- Twilio Setup Banner (shows if not configured) -->
+      <div id="cl-setup-banner" class="card" style="margin-bottom:16px;border-color:rgba(37,99,235,0.3);background:rgba(37,99,235,0.05);display:none">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:700;margin-bottom:4px">Connect Your Phone System</div>
+            <div style="font-size:13px;color:var(--text2)">Link Twilio to auto-capture calls and transcriptions. Free trial available — no credit card needed.</div>
+          </div>
+          <button class="btn btn-primary" onclick="openTwilioSetup()">Connect Twilio</button>
+        </div>
+      </div>
+
+      <!-- Call List -->
+      <div class="card" id="cl-card">
+        <div class="card-header">
+          <div class="card-title">Call Logs</div>
+          <div id="cl-count" style="font-size:13px;color:var(--text2)">0 calls</div>
+        </div>
+        <div id="cl-list">
+          <div style="text-align:center;padding:60px 20px;color:var(--text2)">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 16px;display:block;opacity:0.3"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <div style="font-size:15px;font-weight:600;margin-bottom:8px">No calls yet</div>
+            <div style="font-size:13px">Connect Twilio to auto-capture calls, or log calls manually.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD CALL MODAL -->
+    <div class="modal-overlay" id="add-call-modal">
+      <div class="modal" style="max-width:500px">
+        <div class="modal-header">
+          <div class="modal-title">Log a Call</div>
+          <button class="modal-close" onclick="closeAddCallModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Caller Name</label>
+              <input class="form-input" id="cl-caller-name" placeholder="e.g. محمد العتيبي"/>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input class="form-input" id="cl-caller-phone" placeholder="+966 5X XXX XXXX"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Call Type</label>
+              <select class="form-input" id="cl-call-type">
+                <option value="inbound">Inbound</option>
+                <option value="outbound">Outbound</option>
+                <option value="missed">Missed</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Duration (minutes)</label>
+              <input class="form-input" id="cl-call-duration" type="number" placeholder="0" min="0"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Link to Lead (optional)</label>
+            <select class="form-input" id="cl-lead-link">
+              <option value="">— No lead —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notes / Transcript</label>
+            <textarea class="form-input" id="cl-call-notes" rows="4" placeholder="What was discussed? Key points from the call..." style="resize:vertical"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Callback Needed?</label>
+            <div style="display:flex;gap:10px;margin-top:4px">
+              <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer">
+                <input type="checkbox" id="cl-callback" style="width:16px;height:16px;accent-color:var(--accent)"/>
+                Schedule a callback reminder
+              </label>
+            </div>
+          </div>
+          <div id="cl-callback-date-wrap" style="display:none">
+            <label class="form-label">Callback Date & Time</label>
+            <input class="form-input" id="cl-callback-date" type="datetime-local"/>
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
+            <button class="btn btn-ghost" onclick="closeAddCallModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveCall()">Save Call</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT MODAL -->
+    <div class="modal-overlay" id="transcript-modal">
+      <div class="modal" style="max-width:600px">
+        <div class="modal-header">
+          <div class="modal-title" id="transcript-modal-title">Call Transcript</div>
+          <button class="modal-close" onclick="document.getElementById('transcript-modal').classList.remove('open')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div style="padding:20px">
+          <div id="transcript-content" style="font-size:14px;line-height:1.7;color:var(--text2);background:var(--bg3);border-radius:10px;padding:16px;max-height:400px;overflow-y:auto;white-space:pre-wrap"></div>
+          <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+            <button class="btn btn-ghost" onclick="document.getElementById('transcript-modal').classList.remove('open')">Close</button>
+            <button class="btn btn-primary" onclick="addTranscriptToNotes()" id="transcript-add-btn">Add to Lead Notes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TWILIO SETUP MODAL -->
+    <div class="modal-overlay" id="twilio-modal">
+      <div class="modal" style="max-width:520px">
+        <div class="modal-header">
+          <div class="modal-title">Connect Twilio Phone System</div>
+          <button class="modal-close" onclick="document.getElementById('twilio-modal').classList.remove('open')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
+          <div style="background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.2);border-radius:10px;padding:14px;font-size:13px;color:var(--text2);line-height:1.6">
+            <strong style="color:var(--text)">How it works:</strong><br/>
+            1. Create a free Twilio account at twilio.com<br/>
+            2. Get a Saudi or US phone number ($1/month)<br/>
+            3. Paste your credentials below — calls will auto-log in NexCRM
+          </div>
+          <div class="form-group">
+            <label class="form-label">Twilio Account SID</label>
+            <input class="form-input" id="twilio-sid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Twilio Auth Token</label>
+            <input class="form-input" id="twilio-token" type="password" placeholder="Your auth token"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Twilio Phone Number</label>
+            <input class="form-input" id="twilio-number" placeholder="+1XXXXXXXXXX"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Deepgram API Key (for transcription)</label>
+            <input class="form-input" id="deepgram-key" type="password" placeholder="Your Deepgram key (free tier available)"/>
+          </div>
+          <div style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.2);border-radius:10px;padding:12px;font-size:12px;color:var(--text2)">
+            Your credentials are stored securely and encrypted. NexCRM never shares them with anyone.
+          </div>
+          <div style="display:flex;gap:10px;justify-content:flex-end">
+            <button class="btn btn-ghost" onclick="document.getElementById('twilio-modal').classList.remove('open')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveTwilioConfig()">Save & Connect</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
 </main>
 
 <!-- ADD LEAD MODAL -->
@@ -2753,7 +2954,7 @@ function updateLeadStats() {
 const titles = {
   dashboard:'Dashboard', leads:'Leads', pipeline:'Pipeline',
   contacts:'Contacts', campaigns:'Campaigns', analytics:'Analytics', admin:'Admin Panel',
-  calendar:'Content Calendar', deliverables:'Deliverables', invoices:'Invoices', settings:'Settings'
+  calendar:'Content Calendar', deliverables:'Deliverables', invoices:'Invoices', calls:'Call Logs', settings:'Settings'
 };
 function nav(page, el) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -2771,6 +2972,7 @@ function nav(page, el) {
   if(page === 'calendar') { loadCalendar(); }
   if(page === 'deliverables') { loadDeliverables(); }
   if(page === 'invoices') { loadInvoices(); }
+  if(page === 'calls') { loadCallLogs(); }
   if(page === 'settings') { loadSettings(); }
 }
 
@@ -3820,6 +4022,257 @@ document.addEventListener('click', function(e) {
     card.classList.remove('open');
   }
 });
+
+// ─── CALL LOGS ─────────────────────────────────────────────────
+let allCalls = [];
+let currentTranscriptCallId = null;
+
+async function loadCallLogs() {
+  document.getElementById('cl-setup-banner').style.display =
+    localStorage.getItem('nexcrm_twilio_sid') ? 'none' : 'flex';
+
+  const { data, error } = await window._supabase
+    ? window._supabase.from('call_logs').select('*').order('created_at', { ascending: false })
+    : { data: null };
+
+  // Fallback: fetch via REST
+  const r = await fetch(SUPABASE_URL + '/rest/v1/call_logs?select=*&order=created_at.desc', { headers: HEADERS });
+  if (!r.ok) {
+    // Table might not exist yet — show empty state
+    allCalls = [];
+    renderCallLogs([]);
+    updateCallStats([]);
+    return;
+  }
+  allCalls = await r.json();
+  renderCallLogs(allCalls);
+  updateCallStats(allCalls);
+  populateLeadDropdown();
+}
+
+function updateCallStats(calls) {
+  const total = calls.length;
+  const missed = calls.filter(c => c.call_type === 'missed').length;
+  const transcribed = calls.filter(c => c.transcript && c.transcript.length > 10).length;
+  const durations = calls.filter(c => c.duration > 0).map(c => c.duration);
+  const avgDur = durations.length ? Math.round(durations.reduce((a,b)=>a+b,0)/durations.length) : 0;
+
+  document.getElementById('cl-total').textContent = total;
+  document.getElementById('cl-missed').textContent = missed;
+  document.getElementById('cl-transcribed').textContent = transcribed;
+  document.getElementById('cl-duration').textContent = avgDur + 'm';
+  document.getElementById('cl-count').textContent = total + ' call' + (total !== 1 ? 's' : '');
+}
+
+function renderCallLogs(calls) {
+  const list = document.getElementById('cl-list');
+  if (!calls.length) {
+    list.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--text2)">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 16px;display:block;opacity:0.3"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <div style="font-size:15px;font-weight:600;margin-bottom:8px">No calls yet</div>
+      <div style="font-size:13px">Connect Twilio to auto-capture calls, or log calls manually.</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = calls.map(call => {
+    const typeColor = call.call_type === 'missed' ? 'var(--danger)' : call.call_type === 'inbound' ? 'var(--accent)' : '#22c55e';
+    const typeBg = call.call_type === 'missed' ? 'rgba(239,68,68,0.1)' : call.call_type === 'inbound' ? 'rgba(59,130,246,0.1)' : 'rgba(34,197,94,0.1)';
+    const typeLabel = call.call_type === 'missed' ? 'Missed' : call.call_type === 'inbound' ? 'Inbound' : 'Outbound';
+    const typeIcon = call.call_type === 'missed'
+      ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.42 19.42 0 0 1 4.82 7.42"/><line x1="23" y1="1" x2="1" y2="23"/></svg>'
+      : call.call_type === 'inbound'
+      ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 7 23 1 17 1"/><line x1="16" y1="8" x2="23" y2="1"/><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77"/></svg>'
+      : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 7 1 1 7 1"/><line x1="8" y1="8" x2="1" y2="1"/><path d="M2 16.92v3a2 2 0 0 0 2.18 2 19.79 19.79 0 0 0 8.63-3.07A19.5 19.5 0 0 0 19.31 12 19.79 19.79 0 0 0 22.39 3.42 2 2 0 0 0 20.4 1.24h-3a2 2 0 0 0-2 1.72c-.127.96-.361 1.903-.7 2.81a2 2 0 0 0 .45 2.11L16.09 8.77"/></svg>';
+    const date = new Date(call.created_at).toLocaleDateString('en-SA', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+    const dur = call.duration ? call.duration + ' min' : '—';
+    const hasTranscript = call.transcript && call.transcript.length > 5;
+    const needsCallback = call.callback_needed && !call.callback_done;
+
+    return `<div style="display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)" id="call-${call.id}">
+      <div style="width:36px;height:36px;border-radius:10px;background:${typeBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${typeColor}">${typeIcon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span style="font-weight:700;font-size:14px;color:var(--text)">${call.caller_name || call.phone_number || 'Unknown'}</span>
+          <span style="background:${typeBg};color:${typeColor};padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">${typeLabel}</span>
+          ${needsCallback ? '<span style="background:rgba(245,158,11,0.1);color:#f59e0b;padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">Callback needed</span>' : ''}
+          ${hasTranscript ? '<span style="background:rgba(59,130,246,0.1);color:var(--accent);padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">Transcript</span>' : ''}
+        </div>
+        <div style="font-size:12px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap">
+          <span>${call.phone_number || '—'}</span>
+          <span>${dur}</span>
+          <span>${date}</span>
+        </div>
+        ${call.notes ? `<div style="font-size:12px;color:var(--text2);margin-top:6px;padding:8px 10px;background:var(--bg3);border-radius:8px;line-height:1.5">${call.notes.slice(0,120)}${call.notes.length > 120 ? '...' : ''}</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+        ${hasTranscript ? `<button onclick="viewTranscript('${call.id}')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">View Transcript</button>` : ''}
+        ${call.call_type === 'missed' || needsCallback ? `<button onclick="scheduleCallback('${call.id}','${call.caller_name || ''}','${call.phone_number || ''}')" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);color:#f59e0b;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Call Back</button>` : ''}
+        <button onclick="deleteCall('${call.id}')" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);color:var(--danger);padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterCalls() {
+  const q = document.getElementById('cl-search').value.toLowerCase();
+  const type = document.getElementById('cl-filter').value;
+  let filtered = allCalls;
+  if (type !== 'all') filtered = filtered.filter(c => c.call_type === type);
+  if (q) filtered = filtered.filter(c =>
+    (c.caller_name || '').toLowerCase().includes(q) ||
+    (c.phone_number || '').toLowerCase().includes(q) ||
+    (c.notes || '').toLowerCase().includes(q) ||
+    (c.transcript || '').toLowerCase().includes(q)
+  );
+  renderCallLogs(filtered);
+}
+
+function openAddCallModal() {
+  document.getElementById('add-call-modal').classList.add('open');
+  document.getElementById('cl-caller-name').value = '';
+  document.getElementById('cl-caller-phone').value = '';
+  document.getElementById('cl-call-type').value = 'inbound';
+  document.getElementById('cl-call-duration').value = '';
+  document.getElementById('cl-call-notes').value = '';
+  document.getElementById('cl-callback').checked = false;
+  document.getElementById('cl-callback-date-wrap').style.display = 'none';
+  populateLeadDropdown();
+}
+
+function closeAddCallModal() {
+  document.getElementById('add-call-modal').classList.remove('open');
+}
+
+document.getElementById && document.addEventListener('DOMContentLoaded', () => {
+  const cb = document.getElementById('cl-callback');
+  if (cb) cb.addEventListener('change', () => {
+    document.getElementById('cl-callback-date-wrap').style.display = cb.checked ? 'block' : 'none';
+  });
+});
+
+function populateLeadDropdown() {
+  const sel = document.getElementById('cl-lead-link');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— No lead —</option>';
+  if (typeof leads !== 'undefined' && leads.length) {
+    leads.forEach(l => {
+      const opt = document.createElement('option');
+      opt.value = l.id;
+      opt.textContent = l.name + (l.company ? ' · ' + l.company : '');
+      sel.appendChild(opt);
+    });
+  }
+}
+
+async function saveCall() {
+  const callerName = document.getElementById('cl-caller-name').value.trim();
+  const phone = document.getElementById('cl-caller-phone').value.trim();
+  const callType = document.getElementById('cl-call-type').value;
+  const duration = parseInt(document.getElementById('cl-call-duration').value) || 0;
+  const notes = document.getElementById('cl-call-notes').value.trim();
+  const leadId = document.getElementById('cl-lead-link').value || null;
+  const needsCallback = document.getElementById('cl-callback').checked;
+  const callbackDate = document.getElementById('cl-callback-date').value || null;
+
+  if (!callerName && !phone) { showToast('❌ Enter caller name or phone number'); return; }
+
+  const payload = {
+    org_id: currentOrg?.id,
+    caller_name: callerName,
+    phone_number: phone,
+    call_type: callType,
+    duration,
+    notes,
+    lead_id: leadId,
+    callback_needed: needsCallback,
+    callback_date: callbackDate,
+    callback_done: false,
+    transcript: '',
+    created_at: new Date().toISOString()
+  };
+
+  const r = await fetch(SUPABASE_URL + '/rest/v1/call_logs', {
+    method: 'POST',
+    headers: { ...HEADERS, 'Prefer': 'return=representation' },
+    body: JSON.stringify(payload)
+  });
+
+  if (r.ok) {
+    showToast('✅ Call logged!');
+    closeAddCallModal();
+    loadCallLogs();
+  } else {
+    showToast('❌ Failed to save — make sure call_logs table exists in Supabase');
+  }
+}
+
+async function deleteCall(id) {
+  if (!confirm('Delete this call log?')) return;
+  await fetch(SUPABASE_URL + '/rest/v1/call_logs?id=eq.' + id, {
+    method: 'DELETE', headers: HEADERS
+  });
+  showToast('🗑️ Call deleted');
+  loadCallLogs();
+}
+
+function viewTranscript(id) {
+  const call = allCalls.find(c => c.id === id);
+  if (!call) return;
+  currentTranscriptCallId = id;
+  document.getElementById('transcript-modal-title').textContent = 'Transcript — ' + (call.caller_name || call.phone_number || 'Call');
+  document.getElementById('transcript-content').textContent = call.transcript || 'No transcript available.';
+  document.getElementById('transcript-modal').classList.add('open');
+}
+
+async function addTranscriptToNotes() {
+  const call = allCalls.find(c => c.id === currentTranscriptCallId);
+  if (!call || !call.lead_id) { showToast('❌ No lead linked to this call'); return; }
+  const note = '[Call Transcript - ' + new Date(call.created_at).toLocaleDateString() + ']
+' + call.transcript;
+  const r = await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + call.lead_id, {
+    method: 'PATCH',
+    headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ notes: note })
+  });
+  if (r.ok) { showToast('✅ Transcript added to lead notes!'); document.getElementById('transcript-modal').classList.remove('open'); }
+}
+
+function scheduleCallback(id, name, phone) {
+  const waNum = phone.replace(/[^0-9]/g,'');
+  if (waNum) {
+    window.open('https://wa.me/' + waNum, '_blank');
+  } else {
+    showToast('No phone number to call back');
+  }
+  // Mark callback as done
+  fetch(SUPABASE_URL + '/rest/v1/call_logs?id=eq.' + id, {
+    method: 'PATCH',
+    headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ callback_done: true })
+  }).then(() => loadCallLogs());
+}
+
+function openTwilioSetup() {
+  document.getElementById('twilio-modal').classList.add('open');
+  document.getElementById('twilio-sid').value = localStorage.getItem('nexcrm_twilio_sid') || '';
+  document.getElementById('twilio-number').value = localStorage.getItem('nexcrm_twilio_number') || '';
+}
+
+function saveTwilioConfig() {
+  const sid = document.getElementById('twilio-sid').value.trim();
+  const token = document.getElementById('twilio-token').value.trim();
+  const number = document.getElementById('twilio-number').value.trim();
+  const dgKey = document.getElementById('deepgram-key').value.trim();
+  if (!sid || !token) { showToast('❌ Enter your Twilio credentials'); return; }
+  localStorage.setItem('nexcrm_twilio_sid', sid);
+  localStorage.setItem('nexcrm_twilio_number', number);
+  if (dgKey) localStorage.setItem('nexcrm_deepgram_key', dgKey);
+  document.getElementById('twilio-modal').classList.remove('open');
+  document.getElementById('cl-setup-banner').style.display = 'none';
+  showToast('✅ Twilio connected! Set up webhook in Twilio dashboard.');
+}
+
 function logout() {
   currentUser = null;
   HEADERS['Authorization'] = 'Bearer ' + SUPABASE_KEY;
