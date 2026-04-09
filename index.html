@@ -4228,8 +4228,7 @@ function viewTranscript(id) {
 async function addTranscriptToNotes() {
   const call = allCalls.find(c => c.id === currentTranscriptCallId);
   if (!call || !call.lead_id) { showToast('❌ No lead linked to this call'); return; }
-  const note = '[Call Transcript - ' + new Date(call.created_at).toLocaleDateString() + ']
-' + call.transcript;
+  const note = '[Call Transcript - ' + new Date(call.created_at).toLocaleDateString() + ']\n' + call.transcript;
   const r = await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + call.lead_id, {
     method: 'PATCH',
     headers: { ...HEADERS, 'Prefer': 'return=minimal' },
