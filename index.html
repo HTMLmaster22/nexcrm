@@ -2463,7 +2463,7 @@
               Export
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
-            <div id="cl-export-menu" style="display:none;position:absolute;right:0;top:calc(100% + 8px);background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:180px;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+            <div id="cl-export-menu" style="display:none;position:fixed;right:auto;top:auto;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:180px;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
               <button onclick="exportCallsCSV()" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;font-family:inherit;text-align:left;transition:background 0.15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
                 <span style="width:28px;height:28px;background:rgba(16,185,129,0.12);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#10b981;font-size:12px;font-weight:800">CSV</span>
                 Export as CSV
@@ -4290,7 +4290,15 @@ function filterCalls() {
 // ─── CALL LOGS EXPORT ─────────────────────────────────────────
 function toggleCallExportMenu() {
   const menu = document.getElementById('cl-export-menu');
-  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+  const btn = document.getElementById('cl-export-wrap');
+  if (menu.style.display === 'none') {
+    const rect = btn.getBoundingClientRect();
+    menu.style.top = (rect.bottom + 8) + 'px';
+    menu.style.right = (window.innerWidth - rect.right) + 'px';
+    menu.style.display = 'block';
+  } else {
+    menu.style.display = 'none';
+  }
 }
 document.addEventListener('click', function(e) {
   if (!document.getElementById('cl-export-wrap')?.contains(e.target)) {
