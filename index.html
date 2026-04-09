@@ -2595,7 +2595,7 @@
 
     <!-- TWILIO SETUP MODAL -->
     <div class="modal-overlay" id="twilio-modal">
-      <div class="modal" style="max-width:640px;padding:0;overflow:hidden">
+      <div class="modal" style="max-width:640px;padding:0;overflow:hidden;max-height:90vh;display:flex;flex-direction:column">
 
         <!-- Gradient Header -->
         <div style="background:linear-gradient(135deg,#1e3a5f,#0f172a);padding:24px 28px;position:relative">
@@ -2622,7 +2622,7 @@
         </div>
 
         <!-- TAB: GUIDE -->
-        <div id="twilio-pane-guide" style="padding:24px 28px;overflow-y:auto;max-height:65vh">
+        <div id="twilio-pane-guide" style="padding:24px 28px;overflow-y:auto;max-height:calc(90vh - 180px)">
 
           <!-- Animated Steps -->
           <div style="position:relative">
@@ -2695,7 +2695,7 @@
             </div>
 
             <!-- Step 4 -->
-            <div class="twilio-step" id="tstep-4" style="display:flex;gap:16px;margin-bottom:0;cursor:pointer;padding-bottom:24px" onclick="expandTwilioStep(4)">
+            <div class="twilio-step" id="tstep-4" style="display:flex;gap:16px;margin-bottom:0;cursor:pointer" onclick="expandTwilioStep(4)">
               <div style="display:flex;flex-direction:column;align-items:center">
                 <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#10b981,#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#fff;flex-shrink:0;box-shadow:0 4px 14px rgba(16,185,129,0.4)">✓</div>
               </div>
@@ -2718,7 +2718,7 @@
         </div>
 
         <!-- TAB: CONNECT -->
-        <div id="twilio-pane-connect" style="padding:24px 28px;display:none;overflow-y:auto;max-height:65vh">
+        <div id="twilio-pane-connect" style="padding:24px 28px;display:none">
           <div style="display:flex;flex-direction:column;gap:14px">
             <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px;font-size:12px;color:var(--text2);line-height:1.6">
               Find your credentials at <strong style="color:var(--accent)">console.twilio.com</strong> on the main dashboard.
@@ -4293,8 +4293,16 @@ function toggleCallExportMenu() {
   const btn = document.getElementById('cl-export-wrap');
   if (menu.style.display === 'none' || menu.style.display === '') {
     const rect = btn.getBoundingClientRect();
-    menu.style.top = (rect.bottom + 8) + 'px';
+    // Position below the button, aligned to its right edge
+    menu.style.top = (rect.bottom + 6) + 'px';
+    menu.style.left = 'auto';
     menu.style.right = (window.innerWidth - rect.right) + 'px';
+    menu.style.bottom = 'auto';
+    // If dropdown would go off screen bottom, show above instead
+    const menuHeight = 140;
+    if (rect.bottom + menuHeight > window.innerHeight) {
+      menu.style.top = (rect.top - menuHeight - 6) + 'px';
+    }
     menu.style.display = 'block';
   } else {
     menu.style.display = 'none';
