@@ -2443,7 +2443,7 @@
       </div>
 
       <!-- Search + Filter + Add Manual -->
-      <div class="card" style="margin-bottom:16px">
+      <div class="card" style="margin-bottom:16px;overflow:visible">
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
           <input id="cl-search" class="form-input" placeholder="Search calls or transcripts..." style="flex:1;min-width:200px" oninput="filterCalls()"/>
           <select id="cl-filter" class="form-input" style="width:140px" onchange="filterCalls()">
@@ -2622,7 +2622,7 @@
         </div>
 
         <!-- TAB: GUIDE -->
-        <div id="twilio-pane-guide" style="padding:24px 28px">
+        <div id="twilio-pane-guide" style="padding:24px 28px 36px 28px;max-height:70vh;overflow-y:auto">
 
           <!-- Animated Steps -->
           <div style="position:relative">
