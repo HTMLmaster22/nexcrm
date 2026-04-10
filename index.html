@@ -2443,7 +2443,7 @@
       </div>
 
       <!-- Search + Filter + Add Manual -->
-      <div class="card" style="margin-bottom:16px">
+      <div class="card" style="margin-bottom:16px;overflow:visible">
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
           <input id="cl-search" class="form-input" placeholder="Search calls or transcripts..." style="flex:1;min-width:200px" oninput="filterCalls()"/>
           <select id="cl-filter" class="form-input" style="width:140px" onchange="filterCalls()">
@@ -2458,26 +2458,27 @@
           </button>
           <!-- Export Dropdown -->
           <div style="position:relative" id="cl-export-wrap">
-            <button onclick="toggleCallExportMenu()" style="display:flex;align-items:center;gap:7px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.background='rgba(59,130,246,0.18)'" onmouseout="this.style.background='rgba(59,130,246,0.08)'">
+            <button onclick="toggleCallExportMenu(event)" style="display:flex;align-items:center;gap:7px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.background='rgba(59,130,246,0.18)'" onmouseout="this.style.background='rgba(59,130,246,0.08)'">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Export
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
-            <div id="cl-export-menu" style="display:none;position:fixed;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:180px;z-index:99999;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
-              <button onclick="exportCallsCSV()" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;font-family:inherit;text-align:left;transition:background 0.15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
-                <span style="width:28px;height:28px;background:rgba(16,185,129,0.12);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#10b981;font-size:12px;font-weight:800">CSV</span>
-                Export as CSV
-              </button>
-              <button onclick="exportCallsExcel()" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;font-family:inherit;text-align:left;transition:background 0.15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
-                <span style="width:28px;height:28px;background:rgba(34,197,94,0.12);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#22c55e;font-size:11px;font-weight:800">XLS</span>
-                Export as Excel
-              </button>
-              <div style="height:1px;background:var(--border);margin:4px 0"></div>
-              <button onclick="exportCallsPDF()" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;font-family:inherit;text-align:left;transition:background 0.15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
-                <span style="width:28px;height:28px;background:rgba(239,68,68,0.12);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#ef4444;font-size:11px;font-weight:800">PDF</span>
-                Export as PDF
-              </button>
-            </div>
+          </div>
+          <!-- Export Menu rendered in body via JS to escape overflow:hidden -->
+          <div id="cl-export-menu" style="display:none;position:fixed;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:190px;z-index:999999;box-shadow:0 8px 32px rgba(0,0,0,0.5)">
+            <button onclick="exportCallsCSV()" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;font-family:inherit;text-align:left" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
+              <span style="width:28px;height:28px;background:rgba(16,185,129,0.12);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#10b981;font-size:12px;font-weight:800">CSV</span>
+              Export as CSV
+            </button>
+            <button onclick="exportCallsExcel()" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;font-family:inherit;text-align:left" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
+              <span style="width:28px;height:28px;background:rgba(34,197,94,0.12);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#22c55e;font-size:11px;font-weight:800">XLS</span>
+              Export as Excel
+            </button>
+            <div style="height:1px;background:var(--border);margin:4px 0"></div>
+            <button onclick="exportCallsPDF()" style="display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:none;color:var(--text);font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;font-family:inherit;text-align:left" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background='none'">
+              <span style="width:28px;height:28px;background:rgba(239,68,68,0.12);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#ef4444;font-size:11px;font-weight:800">PDF</span>
+              Export as PDF
+            </button>
           </div>
         </div>
       </div>
@@ -2595,7 +2596,7 @@
 
     <!-- TWILIO SETUP MODAL -->
     <div class="modal-overlay" id="twilio-modal">
-      <div class="modal" style="max-width:640px;padding:0;overflow:hidden;max-height:90vh;display:flex;flex-direction:column">
+      <div class="modal" style="max-width:640px;padding:0;overflow:hidden;max-height:88vh;display:flex;flex-direction:column">
 
         <!-- Gradient Header -->
         <div style="background:linear-gradient(135deg,#1e3a5f,#0f172a);padding:24px 28px;position:relative">
@@ -2622,7 +2623,7 @@
         </div>
 
         <!-- TAB: GUIDE -->
-        <div id="twilio-pane-guide" style="padding:24px 28px;overflow-y:auto;max-height:calc(90vh - 180px)">
+        <div id="twilio-pane-guide" style="padding:24px 28px;overflow-y:auto;flex:1">
 
           <!-- Animated Steps -->
           <div style="position:relative">
@@ -4288,21 +4289,16 @@ function filterCalls() {
 }
 
 // ─── CALL LOGS EXPORT ─────────────────────────────────────────
-function toggleCallExportMenu() {
+function toggleCallExportMenu(e) {
+  if (e) e.stopPropagation();
   const menu = document.getElementById('cl-export-menu');
   const btn = document.getElementById('cl-export-wrap');
   if (menu.style.display === 'none' || menu.style.display === '') {
     const rect = btn.getBoundingClientRect();
-    // Position below the button, aligned to its right edge
+    // Position menu directly below the Export button
     menu.style.top = (rect.bottom + 6) + 'px';
-    menu.style.left = 'auto';
     menu.style.right = (window.innerWidth - rect.right) + 'px';
-    menu.style.bottom = 'auto';
-    // If dropdown would go off screen bottom, show above instead
-    const menuHeight = 140;
-    if (rect.bottom + menuHeight > window.innerHeight) {
-      menu.style.top = (rect.top - menuHeight - 6) + 'px';
-    }
+    menu.style.left = 'auto';
     menu.style.display = 'block';
   } else {
     menu.style.display = 'none';
