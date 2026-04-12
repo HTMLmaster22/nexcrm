@@ -3781,6 +3781,19 @@ const t = {
     dealValue: 'DEAL VALUE ($)', assignLabel: 'ASSIGNED TO',
     cancel: 'Cancel', saveLead: '💾 Save Lead',
     langBtn: '🇸🇦 عربي',
+    callLogs: 'Call Logs', whatsappInbox: 'WhatsApp Inbox',
+    calendar: 'Content Calendar', deliverables: 'Deliverables',
+    invoices: 'Invoices', settings: 'Settings',
+    aiScore: 'AI SCORE', phone: 'PHONE', aiScoreLabel: 'AI Score',
+    newLeads: 'NEW', converted: 'CONVERTED / WON', lost: 'LOST', totalLeads2: 'TOTAL LEADS',
+    awaitingContact: 'Awaiting contact', conversionRate: 'conversion rate',
+    closedLost: 'Closed lost', majnoonLaila: 'Majnoon Laila',
+    callLogsTitle: 'Call Logs', totalCalls: 'TOTAL CALLS', missedCalls: 'MISSED CALLS',
+    avgDuration: 'AVG DURATION', transcribed: 'TRANSCRIBED',
+    thisMonth: 'This month', needCallback: 'Need callback', perCall: 'Per call', autoProcessed: 'Auto-processed',
+    allCalls: 'All Calls', missed: 'Missed', inbound: 'Inbound', outbound: 'Outbound',
+    logCall: 'Log Call', noCallsYet: 'No calls yet',
+    connectTwilio: 'Connect Your Phone System',
   },
   ar: {
     dashboard: 'لوحة التحكم', leads: 'العملاء', pipeline: 'خط المبيعات',
@@ -3807,6 +3820,19 @@ const t = {
     dealValue: 'قيمة الصفقة ($)', assignLabel: 'مسؤول المبيعات',
     cancel: 'إلغاء', saveLead: '💾 حفظ العميل',
     langBtn: '🇬🇧 English',
+    callLogs: 'سجلات المكالمات', whatsappInbox: 'صندوق واتساب',
+    calendar: 'التقويم', deliverables: 'التسليمات',
+    invoices: 'الفواتير', settings: 'الإعدادات',
+    aiScore: 'تقييم الذكاء', phone: 'الهاتف', aiScoreLabel: 'تقييم الذكاء',
+    newLeads: 'جديد', converted: 'تحويل / فوز', lost: 'خسارة', totalLeads2: 'إجمالي العملاء',
+    awaitingContact: 'في انتظار التواصل', conversionRate: 'معدل التحويل',
+    closedLost: 'خسارة مغلقة', majnoonLaila: 'مجنون ليلى',
+    callLogsTitle: 'سجلات المكالمات', totalCalls: 'إجمالي المكالمات', missedCalls: 'مكالمات فائتة',
+    avgDuration: 'متوسط المدة', transcribed: 'مُحوَّل نصاً',
+    thisMonth: 'هذا الشهر', needCallback: 'يحتاج رد', perCall: 'لكل مكالمة', autoProcessed: 'تلقائي',
+    allCalls: 'الكل', missed: 'فائتة', inbound: 'واردة', outbound: 'صادرة',
+    logCall: 'تسجيل مكالمة', noCallsYet: 'لا توجد مكالمات',
+    connectTwilio: 'ربط نظام الهاتف',
   }
 };
 
@@ -3948,6 +3974,104 @@ function applyTranslations() {
 
   // Save preference
   localStorage.setItem('nexcrm_lang', currentLang);
+
+  // ── SIDEBAR NAV items not covered by onclick pattern ──
+  document.querySelectorAll('.nav-item').forEach(item => {
+    const onclick = item.getAttribute('onclick') || '';
+    const span = item.querySelector('span:not(.icon):not(.badge)');
+    if(!span) return;
+    if(onclick.includes("'calls'")) span.textContent = lang.callLogs;
+    else if(onclick.includes("'whatsapp'")) span.textContent = lang.whatsappInbox;
+    else if(onclick.includes("'calendar'")) span.textContent = lang.calendar;
+    else if(onclick.includes("'deliverables'")) span.textContent = lang.deliverables;
+    else if(onclick.includes("'invoices'")) span.textContent = lang.invoices;
+    else if(onclick.includes("'settings'")) span.textContent = lang.settings;
+    else if(onclick.includes("'admin'")) span.textContent = lang.admin;
+  });
+
+  // ── MOBILE BOTTOM NAV ──
+  document.querySelectorAll('.mobile-nav-item').forEach(item => {
+    const onclick = item.getAttribute('onclick') || '';
+    const label = item.querySelector('.mobile-nav-label');
+    if(!label) return;
+    if(onclick.includes("'dashboard'")) label.textContent = lang.dashboard;
+    else if(onclick.includes("'leads'")) label.textContent = lang.leads;
+    else if(onclick.includes("'pipeline'")) label.textContent = lang.pipeline;
+    else if(onclick.includes("'contacts'")) label.textContent = lang.contacts;
+    else if(onclick.includes("'analytics'")) label.textContent = lang.analytics;
+    else if(onclick.includes("'campaigns'")) label.textContent = lang.campaigns;
+    else if(onclick.includes("'invoices'")) label.textContent = lang.invoices;
+    else if(onclick.includes("'calendar'")) label.textContent = lang.calendar;
+    else if(onclick.includes("'admin'")) label.textContent = lang.admin;
+    else if(onclick.includes("'settings'")) label.textContent = lang.settings;
+  });
+
+  // ── TABLE HEADERS (AI Score, Phone) ──
+  document.querySelectorAll('thead th').forEach(th => {
+    const txt = th.textContent.trim();
+    if(txt === 'AI Score' || txt === 'تقييم الذكاء') th.textContent = lang.aiScoreLabel;
+    else if(txt === 'Phone' || txt === 'الهاتف') th.textContent = lang.phone;
+  });
+
+  // ── LEADS PAGE STAT CARDS ──
+  document.querySelectorAll('.stat-sub').forEach(el => {
+    const txt = el.textContent.trim();
+    if(txt === 'Awaiting contact' || txt === 'في انتظار التواصل') el.textContent = lang.awaitingContact;
+    else if(txt === 'Need callback' || txt === 'يحتاج رد') el.textContent = lang.needCallback;
+    else if(txt === 'Per call' || txt === 'لكل مكالمة') el.textContent = lang.perCall;
+    else if(txt === 'Auto-processed' || txt === 'تلقائي') el.textContent = lang.autoProcessed;
+    else if(txt === 'This month' || txt === 'هذا الشهر') el.textContent = lang.thisMonth;
+    else if(txt === 'Closed lost' || txt === 'خسارة مغلقة') el.textContent = lang.closedLost;
+    else if(txt === 'conversion rate' || txt === 'معدل التحويل') el.textContent = lang.conversionRate;
+  });
+
+  // ── LEADS STAT LABELS (the 4 cards at top of leads) ──
+  document.querySelectorAll('.stat-label').forEach(el => {
+    const txt = el.textContent.trim();
+    if(txt === 'TOTAL CALLS' || txt === 'إجمالي المكالمات') el.textContent = lang.totalCalls;
+    else if(txt === 'MISSED CALLS' || txt === 'مكالمات فائتة') el.textContent = lang.missedCalls;
+    else if(txt === 'AVG DURATION' || txt === 'متوسط المدة') el.textContent = lang.avgDuration;
+    else if(txt === 'TRANSCRIBED' || txt === 'مُحوَّل نصاً') el.textContent = lang.transcribed;
+    else if(txt === 'NEW' || txt === 'جديد') el.textContent = lang.newLeads;
+    else if(txt === 'CONVERTED / WON' || txt === 'تحويل / فوز') el.textContent = lang.converted;
+    else if(txt === 'LOST' || txt === 'خسارة') el.textContent = lang.lost;
+    else if(txt === 'TOTAL LEADS' || txt === 'إجمالي العملاء') el.textContent = isAr ? lang.totalLeads2 : 'TOTAL LEADS';
+  });
+
+  // ── CARD TITLES (Call Logs page, etc) ──
+  document.querySelectorAll('.card-title').forEach(el => {
+    const txt = el.textContent.trim();
+    if(txt === 'Call Logs' || txt === 'سجلات المكالمات') el.textContent = lang.callLogsTitle;
+    else if(txt === 'Content Calendar' || txt === 'التقويم') el.textContent = lang.calendar;
+    else if(txt === 'Deliverables Tracker' || txt === 'التسليمات') el.textContent = lang.deliverables;
+  });
+
+  // ── CALL LOGS FILTER BUTTONS ──
+  document.querySelectorAll('#cl-filter option').forEach(opt => {
+    const val = opt.value;
+    if(val === 'all') opt.textContent = lang.allCalls;
+    else if(val === 'missed') opt.textContent = lang.missed;
+    else if(val === 'inbound') opt.textContent = lang.inbound;
+    else if(val === 'outbound') opt.textContent = lang.outbound;
+  });
+
+  // ── PAGE TITLE in topbar for all pages ──
+  const titleMap = {
+    dashboard: lang.dashboard, leads: lang.leads, pipeline: lang.pipeline,
+    contacts: lang.contacts, campaigns: lang.campaigns, analytics: lang.analytics,
+    admin: lang.admin, calls: lang.callLogs, whatsapp: lang.whatsappInbox,
+    calendar: lang.calendar, deliverables: lang.deliverables,
+    invoices: lang.invoices, settings: lang.settings
+  };
+  const activeNav2 = document.querySelector('.nav-item.active');
+  if(activeNav2) {
+    const oc = activeNav2.getAttribute('onclick') || '';
+    const key = Object.keys(titleMap).find(k => oc.includes("'"+k+"'"));
+    if(key) {
+      const pt = document.getElementById('page-title');
+      if(pt) pt.textContent = titleMap[key];
+    }
+  }
 }
 
 // ─── NORMALIZE SOURCE NAMES (Arabic → Brand name) ─────────────
