@@ -3834,7 +3834,7 @@ const _ar = {
   'conversion rate': 'معدل التحويل',
   'Closed lost': 'خسارة مغلقة',
   // Analytics
-  '' + __t('leads awaiting contact') + '': 'عملاء في انتظار التواصل',
+  'leads awaiting contact': 'عملاء في انتظار التواصل',
   'leads responded to': 'عملاء استجابوا',
   'awaiting first contact': 'ينتظرون أول تواصل',
   'of total leads': 'من إجمالي العملاء',
@@ -8227,7 +8227,7 @@ function renderInboxList(leads) {
   var listEl = document.getElementById('inbox-list');
   if (!listEl) return;
   if (!leads || leads.length === 0) {
-    listEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text2);font-size:13px">'+__t(__t('No leads yet'))+'</div>';
+    listEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text2);font-size:13px">'+__t('No leads yet')+'</div>';
     return;
   }
   listEl.innerHTML = leads.map(function(lead) {
