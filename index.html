@@ -1640,71 +1640,289 @@
     </div>
 
     <div class="page" id="page-campaigns">
-      <div class="grid-2" style="margin-bottom:20px">
-        <!-- COMPOSE EMAIL -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">✉️ New Email Campaign</div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Campaign Name</label>
-            <input class="form-input" id="camp-name" placeholder="e.g. Ramadan Offer 2025" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Send To</label>
-            <select class="form-input" id="camp-filter">
-              <option value="all">All Leads</option>
-              <option value="New">New Leads Only</option>
-              <option value="Warm">Warm Leads Only</option>
-              <option value="Active">Active Leads Only</option>
-              <option value="Cold">Cold Leads Only</option>
-              <option value="Won">Won Clients Only</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email Subject</label>
-            <input class="form-input" id="camp-subject" placeholder="e.g. Special Offer Just For You 🎁" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email Message</label>
-            <textarea class="form-input" id="camp-body" rows="6" placeholder="Write your email message here...&#10;&#10;You can use {name} to personalize with the lead's name." style="resize:vertical;min-height:140px"></textarea>
-          </div>
-          <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
-            💡 Use <b style="color:var(--accent)">{name}</b> in your message to personalize with each lead's name
-          </div>
-          <div style="display:flex;gap:10px">
-            <button class="btn btn-ghost" style="flex:1" onclick="previewCampaign()">👁 Preview</button>
-            <button class="btn btn-primary" style="flex:2" onclick="sendCampaign()">🚀 Send Campaign</button>
-          </div>
-        </div>
 
-        <!-- CAMPAIGN HISTORY -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">📋 Campaign History</div>
-            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadCampaignHistory()">🔄</button>
+      <!-- CAMPAIGN TYPE SELECTOR -->
+      <div class="card" style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:4px">Campaigns</div>
+            <div style="font-size:13px;color:var(--text2)">Select a channel to send your campaign</div>
           </div>
-          <div id="campaign-history">
-            <div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>
+          <div style="display:flex;gap:8px;background:var(--bg3);border-radius:12px;padding:5px">
+            <button id="camp-tab-email" onclick="switchCampTab('email')" style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all 0.2s;background:var(--accent);color:#fff">
+              ✉️ Email
+            </button>
+            <button id="camp-tab-sms" onclick="switchCampTab('sms')" style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all 0.2s;background:transparent;color:var(--text2)">
+              📱 SMS
+            </button>
+            <button id="camp-tab-whatsapp" onclick="switchCampTab('whatsapp')" style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all 0.2s;background:transparent;color:var(--text2)">
+              💬 WhatsApp
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- PREVIEW MODAL -->
+      <!-- ═══ EMAIL TAB ═══ -->
+      <div id="camp-pane-email">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">✉️ <span data-en="New Email Campaign" data-ar="حملة بريد جديدة">New Email Campaign</span></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Campaign Name</label>
+              <input class="form-input" id="camp-name" placeholder="e.g. Ramadan Offer 2025" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Send To</label>
+              <select class="form-input" id="camp-filter">
+                <option value="all">All Leads</option>
+                <option value="New">New Leads Only</option>
+                <option value="Warm">Warm Leads Only</option>
+                <option value="Active">Active Leads Only</option>
+                <option value="Cold">Cold Leads Only</option>
+                <option value="Won">Won Clients Only</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Subject</label>
+              <input class="form-input" id="camp-subject" placeholder="e.g. Special Offer Just For You 🎁" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Message</label>
+              <textarea class="form-input" id="camp-body" rows="6" placeholder="Write your email message here...&#10;&#10;You can use {name} to personalize with the lead's name." style="resize:vertical;min-height:140px"></textarea>
+            </div>
+            <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
+              💡 Use <b style="color:var(--accent)">{name}</b> in your message to personalize with each lead's name
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1" onclick="previewCampaign()">👁 Preview</button>
+              <button class="btn btn-primary" style="flex:2" onclick="sendCampaign()">🚀 Send Campaign</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📋 <span data-en="Campaign History" data-ar="سجل الحملات">Campaign History</span></div>
+              <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadCampaignHistory()">🔄</button>
+            </div>
+            <div id="campaign-history">
+              <div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SMS TAB ═══ -->
+      <div id="camp-pane-sms" style="display:none">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📱 New SMS Campaign</div>
+            </div>
+
+            <!-- Twilio connection status -->
+            <div id="sms-connection-banner" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:2px">⚡ Connect Twilio for SMS</div>
+                <div style="font-size:12px;color:var(--text2)">Paste your Twilio credentials to send SMS to your leads</div>
+              </div>
+              <button onclick="openSMSSetup()" style="background:var(--gold);color:#000;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit">Connect</button>
+            </div>
+            <div id="sms-connected-banner" style="display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--success);display:none;align-items:center;gap:8px">
+              ✅ Twilio connected · <span id="sms-phone-display"></span>
+              <button onclick="openSMSSetup()" style="background:none;border:none;color:var(--text2);font-size:11px;cursor:pointer;margin-left:auto;font-family:inherit">Change</button>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Campaign Name</label>
+              <input class="form-input" id="sms-name" placeholder="e.g. Eid Special Offer" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Send To</label>
+              <select class="form-input" id="sms-filter">
+                <option value="all">All Leads</option>
+                <option value="New">New Leads Only</option>
+                <option value="Warm">Warm Leads Only</option>
+                <option value="Active">Active Leads Only</option>
+                <option value="Cold">Cold Leads Only</option>
+                <option value="Won">Won Clients Only</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">SMS Message</label>
+              <textarea class="form-input" id="sms-body" rows="4" placeholder="Write your SMS message here...&#10;&#10;Use {name} to personalize. Keep it under 160 characters for best delivery." style="resize:vertical;min-height:100px" oninput="updateSMSCount(this)"></textarea>
+              <div style="text-align:right;font-size:11px;color:var(--text2);margin-top:4px"><span id="sms-char-count">0</span>/160 characters</div>
+            </div>
+            <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
+              💡 SMS has <b style="color:var(--success)">98% open rate</b> vs 20% for email. Keep it short and clear.
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1" onclick="previewSMS()">👁 Preview</button>
+              <button class="btn btn-primary" style="flex:2" onclick="sendSMSCampaign()">📱 Send SMS</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📋 SMS History</div>
+              <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadSMSHistory()">🔄</button>
+            </div>
+            <div id="sms-history">
+              <div style="text-align:center;padding:40px;color:var(--text2)">No SMS campaigns sent yet</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ WHATSAPP TAB ═══ -->
+      <div id="camp-pane-whatsapp" style="display:none">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">💬 New WhatsApp Campaign</div>
+            </div>
+
+            <!-- WhatsApp connection status -->
+            <div id="wa-connection-banner" style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px">
+              <div style="font-size:13px;font-weight:700;color:#25d366;margin-bottom:6px">💬 Connect WhatsApp Business</div>
+              <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Connect your WhatsApp Business number via Twilio to send bulk messages to your leads.</div>
+              <div style="display:flex;gap:8px">
+                <button onclick="openWASetup()" style="background:#25d366;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Connect Number</button>
+                <a href="https://www.twilio.com/whatsapp" target="_blank" style="background:rgba(37,211,102,0.1);color:#25d366;border:1px solid rgba(37,211,102,0.3);padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center">Learn more ↗</a>
+              </div>
+            </div>
+            <div id="wa-connected-banner" style="display:none;background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#25d366">
+              ✅ WhatsApp connected · <span id="wa-phone-display"></span>
+              <button onclick="openWASetup()" style="background:none;border:none;color:var(--text2);font-size:11px;cursor:pointer;margin-left:8px;font-family:inherit">Change</button>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Campaign Name</label>
+              <input class="form-input" id="wa-camp-name" placeholder="e.g. Ramadan Greetings" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Send To</label>
+              <select class="form-input" id="wa-filter">
+                <option value="all">All Leads</option>
+                <option value="New">New Leads Only</option>
+                <option value="Warm">Warm Leads Only</option>
+                <option value="Active">Active Leads Only</option>
+                <option value="Cold">Cold Leads Only</option>
+                <option value="Won">Won Clients Only</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">WhatsApp Message</label>
+              <textarea class="form-input" id="wa-body" rows="5" placeholder="Write your WhatsApp message here...&#10;&#10;Use {name} to personalize. Supports emojis 🎉" style="resize:vertical;min-height:120px"></textarea>
+            </div>
+            <div style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
+              💡 WhatsApp messages require leads to have a phone number. Use <b style="color:#25d366">{name}</b> to personalize.
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1" onclick="previewWA()">👁 Preview</button>
+              <button class="btn btn-primary" style="flex:2" style="background:#25d366" onclick="sendWACampaign()">💬 Send WhatsApp</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📋 WhatsApp History</div>
+              <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadWAHistory()">🔄</button>
+            </div>
+            <div id="wa-history">
+              <div style="text-align:center;padding:40px;color:var(--text2)">No WhatsApp campaigns sent yet</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PREVIEW MODAL (shared) -->
       <div class="modal-overlay" id="preview-modal">
         <div class="modal" style="max-width:560px">
           <div class="modal-header">
-            <div class="modal-title">📧 Email Preview</div>
+            <div class="modal-title" id="preview-modal-title">📧 Preview</div>
             <div class="modal-close" onclick="closePreview()">✕</div>
           </div>
-          <div id="preview-content" style="background:var(--bg3);border-radius:12px;padding:20px;margin-bottom:16px">
-          </div>
+          <div id="preview-content" style="background:var(--bg3);border-radius:12px;padding:20px;margin-bottom:16px"></div>
           <div style="display:flex;gap:10px">
             <button class="btn btn-ghost" style="flex:1" onclick="closePreview()">Edit</button>
-            <button class="btn btn-primary" style="flex:2" onclick="closePreview();sendCampaign(true)">🚀 Looks Good — Send!</button>
+            <button class="btn btn-primary" id="preview-send-btn" style="flex:2" onclick="closePreview();sendCampaign(true)">🚀 Looks Good — Send!</button>
           </div>
         </div>
       </div>
+
+      <!-- SMS SETUP MODAL -->
+      <div class="modal-overlay" id="sms-setup-modal">
+        <div class="modal" style="max-width:500px">
+          <div class="modal-header">
+            <div class="modal-title">📱 Connect Twilio for SMS</div>
+            <button class="modal-close" onclick="document.getElementById('sms-setup-modal').classList.remove('open')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px;font-size:13px;line-height:1.6">
+              <b>How it works:</b><br>
+              1. Sign up at <a href="https://twilio.com" target="_blank" style="color:var(--accent)">twilio.com</a><br>
+              2. Get a phone number ($1/month)<br>
+              3. Paste your credentials below
+            </div>
+            <div class="form-group">
+              <label class="form-label">Twilio Account SID</label>
+              <input class="form-input" id="sms-account-sid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Twilio Auth Token</label>
+              <input class="form-input" type="password" id="sms-auth-token" placeholder="Your auth token" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your Twilio Phone Number</label>
+              <input class="form-input" id="sms-from-number" placeholder="+1xxxxxxxxxx or +966xxxxxxxxx" />
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('sms-setup-modal').classList.remove('open')">Cancel</button>
+              <button class="btn btn-primary" style="flex:2" onclick="saveSMSCredentials()">💾 Save & Connect</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHATSAPP SETUP MODAL -->
+      <div class="modal-overlay" id="wa-setup-modal">
+        <div class="modal" style="max-width:500px">
+          <div class="modal-header">
+            <div class="modal-title">💬 Connect WhatsApp Business</div>
+            <button class="modal-close" onclick="document.getElementById('wa-setup-modal').classList.remove('open')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);border-radius:10px;padding:12px;font-size:13px;line-height:1.6;color:var(--text2)">
+              <b style="color:#25d366">How it works:</b><br>
+              1. Enable WhatsApp on your Twilio number at <a href="https://console.twilio.com/us1/develop/sms/senders/whatsapp-senders" target="_blank" style="color:#25d366">Twilio Console</a><br>
+              2. Your number must be WhatsApp Business API approved<br>
+              3. Paste credentials below — same as Twilio
+            </div>
+            <div class="form-group">
+              <label class="form-label">Twilio Account SID</label>
+              <input class="form-input" id="wa-account-sid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Twilio Auth Token</label>
+              <input class="form-input" type="password" id="wa-auth-token" placeholder="Your auth token" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">WhatsApp Number (with whatsapp: prefix)</label>
+              <input class="form-input" id="wa-from-number" placeholder="whatsapp:+1xxxxxxxxxx" />
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('wa-setup-modal').classList.remove('open')">Cancel</button>
+              <button class="btn btn-primary" style="flex:2" onclick="saveWACredentials()" style="background:#25d366">💾 Save & Connect</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ANALYTICS -->
@@ -5499,6 +5717,281 @@ async function getFilteredLeads(filter) {
     const data = await r.json();
     return r.ok ? (data || []) : [];
   } catch(e) { return []; }
+}
+
+// ─── CAMPAIGN TAB SWITCHER ─────────────────────────────────────
+let currentCampTab = 'email';
+
+function switchCampTab(tab) {
+  currentCampTab = tab;
+  ['email','sms','whatsapp'].forEach(t => {
+    const pane = document.getElementById('camp-pane-' + t);
+    const btn = document.getElementById('camp-tab-' + t);
+    if(pane) pane.style.display = t === tab ? 'block' : 'none';
+    if(btn) {
+      btn.style.background = t === tab ? 'var(--accent)' : 'transparent';
+      btn.style.color = t === tab ? '#fff' : 'var(--text2)';
+    }
+  });
+  if(tab === 'sms') { loadSMSHistory(); checkSMSConnection(); }
+  if(tab === 'whatsapp') { loadWAHistory(); checkWAConnection(); }
+  if(tab === 'email') loadCampaignHistory();
+}
+
+// ─── SMS CREDENTIALS ──────────────────────────────────────────
+let smsCredentials = null;
+
+function checkSMSConnection() {
+  const stored = localStorage.getItem('nexcrm_sms_creds');
+  if(stored) {
+    smsCredentials = JSON.parse(stored);
+    document.getElementById('sms-connection-banner').style.display = 'none';
+    const connBanner = document.getElementById('sms-connected-banner');
+    connBanner.style.display = 'flex';
+    document.getElementById('sms-phone-display').textContent = smsCredentials.fromNumber;
+  }
+}
+
+function openSMSSetup() {
+  if(smsCredentials) {
+    document.getElementById('sms-account-sid').value = smsCredentials.accountSid || '';
+    document.getElementById('sms-from-number').value = smsCredentials.fromNumber || '';
+  }
+  document.getElementById('sms-setup-modal').classList.add('open');
+}
+
+function saveSMSCredentials() {
+  const sid = document.getElementById('sms-account-sid').value.trim();
+  const token = document.getElementById('sms-auth-token').value.trim();
+  const from = document.getElementById('sms-from-number').value.trim();
+  if(!sid || !token || !from) { showToast('❌ Fill in all fields'); return; }
+  smsCredentials = { accountSid: sid, authToken: token, fromNumber: from };
+  localStorage.setItem('nexcrm_sms_creds', JSON.stringify(smsCredentials));
+  document.getElementById('sms-setup-modal').classList.remove('open');
+  checkSMSConnection();
+  showToast('✅ SMS connected!');
+}
+
+function updateSMSCount(el) {
+  const count = el.value.length;
+  document.getElementById('sms-char-count').textContent = count;
+  document.getElementById('sms-char-count').style.color = count > 160 ? 'var(--danger)' : 'var(--text2)';
+}
+
+function previewSMS() {
+  const body = document.getElementById('sms-body').value.trim();
+  const name = document.getElementById('sms-name').value.trim();
+  if(!body) { showToast('❌ Write your SMS message'); return; }
+  const preview = body.replace(/{name}/g, 'Mohammed Al-Otaibi');
+  document.getElementById('preview-modal-title').textContent = '📱 SMS Preview';
+  document.getElementById('preview-content').innerHTML = `
+    <div style="background:#25d366;border-radius:14px;padding:14px 16px;max-width:280px;color:#fff;font-size:14px;line-height:1.6;white-space:pre-wrap;margin:0 auto">${preview}</div>
+    <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--text2)">This is how your SMS will look on the recipient's phone</div>
+  `;
+  document.getElementById('preview-send-btn').onclick = function() { closePreview(); sendSMSCampaign(true); };
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+async function sendSMSCampaign(confirmed = false) {
+  if(!smsCredentials) { showToast('❌ Connect Twilio first'); openSMSSetup(); return; }
+  const name = document.getElementById('sms-name').value.trim();
+  const body = document.getElementById('sms-body').value.trim();
+  const filter = document.getElementById('sms-filter').value;
+  if(!name) { showToast('❌ Enter campaign name'); return; }
+  if(!body) { showToast('❌ Write your SMS message'); return; }
+
+  const targetLeads = await getFilteredLeads(filter);
+  const leadsWithPhone = targetLeads.filter(l => l.phone);
+  if(!leadsWithPhone.length) { showToast('❌ No leads with phone numbers found'); return; }
+
+  if(!confirmed) {
+    const filterLabel = document.getElementById('sms-filter').options[document.getElementById('sms-filter').selectedIndex].text;
+    if(!confirm(`Send SMS "${name}" to ${leadsWithPhone.length} leads with phone numbers (${filterLabel})?`)) return;
+  }
+
+  const btn = document.querySelector('#camp-pane-sms .btn-primary');
+  if(btn) { btn.textContent = '⏳ Sending...'; btn.disabled = true; }
+
+  let sent = 0, failed = 0;
+  const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${smsCredentials.accountSid}/Messages.json`;
+  const authHeader = 'Basic ' + btoa(smsCredentials.accountSid + ':' + smsCredentials.authToken);
+
+  for(const lead of leadsWithPhone) {
+    const msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    let phone = lead.phone.replace(/\s/g,'');
+    if(!phone.startsWith('+')) phone = '+966' + phone.replace(/^0/, '');
+    try {
+      const r = await fetch(twilioUrl, {
+        method: 'POST',
+        headers: { 'Authorization': authHeader, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ From: smsCredentials.fromNumber, To: phone, Body: msg })
+      });
+      if(r.ok) sent++; else failed++;
+    } catch(e) { failed++; }
+  }
+
+  // Save to Supabase
+  await fetch(SUPABASE_URL + '/rest/v1/campaigns', {
+    method: 'POST',
+    headers: HEADERS,
+    body: JSON.stringify({
+      name, body, filter, campaign_type: 'sms',
+      sent_count: sent, total_count: leadsWithPhone.length,
+      user_id: currentUser ? currentUser.id : null,
+      sent_at: new Date().toISOString()
+    })
+  }).catch(()=>{});
+
+  if(btn) { btn.textContent = '📱 Send SMS'; btn.disabled = false; }
+  showToast(`✅ SMS sent! ${sent} delivered, ${failed} failed.`);
+  loadSMSHistory();
+}
+
+async function loadSMSHistory() {
+  const el = document.getElementById('sms-history');
+  if(!el) return;
+  try {
+    const r = await fetch(SUPABASE_URL + `/rest/v1/campaigns?campaign_type=eq.sms&user_id=eq.${currentUser?.id}&order=sent_at.desc&limit=20`, { headers: HEADERS });
+    if(!r.ok) return;
+    const data = await r.json();
+    if(!data.length) { el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No SMS campaigns sent yet</div>'; return; }
+    el.innerHTML = data.map(c => `
+      <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div style="font-weight:600;font-size:13px">📱 ${c.name}</div>
+          <div style="font-size:11px;color:var(--text2)">${new Date(c.sent_at).toLocaleDateString()}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${(c.body||'').slice(0,80)}${(c.body||'').length>80?'...':''}</div>
+        <div style="display:flex;gap:10px;font-size:11px">
+          <span style="background:rgba(16,185,129,0.1);color:var(--success);padding:2px 8px;border-radius:100px">✓ ${c.sent_count} sent</span>
+          <span style="color:var(--text2)">${c.total_count} targeted</span>
+        </div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+// ─── WHATSAPP CREDENTIALS ─────────────────────────────────────
+let waCredentials = null;
+
+function checkWAConnection() {
+  const stored = localStorage.getItem('nexcrm_wa_camp_creds');
+  if(stored) {
+    waCredentials = JSON.parse(stored);
+    document.getElementById('wa-connection-banner').style.display = 'none';
+    const connBanner = document.getElementById('wa-connected-banner');
+    connBanner.style.display = 'flex';
+    document.getElementById('wa-phone-display').textContent = waCredentials.fromNumber;
+  }
+}
+
+function openWASetup() {
+  if(waCredentials) {
+    document.getElementById('wa-account-sid').value = waCredentials.accountSid || '';
+    document.getElementById('wa-from-number').value = waCredentials.fromNumber || '';
+  }
+  document.getElementById('wa-setup-modal').classList.add('open');
+}
+
+function saveWACredentials() {
+  const sid = document.getElementById('wa-account-sid').value.trim();
+  const token = document.getElementById('wa-auth-token').value.trim();
+  const from = document.getElementById('wa-from-number').value.trim();
+  if(!sid || !token || !from) { showToast('❌ Fill in all fields'); return; }
+  waCredentials = { accountSid: sid, authToken: token, fromNumber: from.startsWith('whatsapp:') ? from : 'whatsapp:' + from };
+  localStorage.setItem('nexcrm_wa_camp_creds', JSON.stringify(waCredentials));
+  document.getElementById('wa-setup-modal').classList.remove('open');
+  checkWAConnection();
+  showToast('✅ WhatsApp connected!');
+}
+
+function previewWA() {
+  const body = document.getElementById('wa-body').value.trim();
+  if(!body) { showToast('❌ Write your WhatsApp message'); return; }
+  const preview = body.replace(/{name}/g, 'Mohammed Al-Otaibi');
+  document.getElementById('preview-modal-title').textContent = '💬 WhatsApp Preview';
+  document.getElementById('preview-content').innerHTML = `
+    <div style="background:#dcf8c6;border-radius:14px 14px 4px 14px;padding:12px 16px;max-width:300px;color:#111;font-size:14px;line-height:1.6;white-space:pre-wrap;margin:0 auto;box-shadow:0 1px 2px rgba(0,0,0,0.15)">${preview}</div>
+    <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--text2)">This is how your WhatsApp message will appear</div>
+  `;
+  document.getElementById('preview-send-btn').onclick = function() { closePreview(); sendWACampaign(true); };
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+async function sendWACampaign(confirmed = false) {
+  if(!waCredentials) { showToast('❌ Connect WhatsApp first'); openWASetup(); return; }
+  const name = document.getElementById('wa-camp-name').value.trim();
+  const body = document.getElementById('wa-body').value.trim();
+  const filter = document.getElementById('wa-filter').value;
+  if(!name) { showToast('❌ Enter campaign name'); return; }
+  if(!body) { showToast('❌ Write your WhatsApp message'); return; }
+
+  const targetLeads = await getFilteredLeads(filter);
+  const leadsWithPhone = targetLeads.filter(l => l.phone);
+  if(!leadsWithPhone.length) { showToast('❌ No leads with phone numbers found'); return; }
+
+  if(!confirmed) {
+    if(!confirm(`Send WhatsApp message "${name}" to ${leadsWithPhone.length} leads?`)) return;
+  }
+
+  const btn = document.querySelector('#camp-pane-whatsapp .btn-primary');
+  if(btn) { btn.textContent = '⏳ Sending...'; btn.disabled = true; }
+
+  let sent = 0, failed = 0;
+  const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${waCredentials.accountSid}/Messages.json`;
+  const authHeader = 'Basic ' + btoa(waCredentials.accountSid + ':' + waCredentials.authToken);
+
+  for(const lead of leadsWithPhone) {
+    const msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    let phone = lead.phone.replace(/\s/g,'');
+    if(!phone.startsWith('+')) phone = '+966' + phone.replace(/^0/, '');
+    try {
+      const r = await fetch(twilioUrl, {
+        method: 'POST',
+        headers: { 'Authorization': authHeader, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ From: waCredentials.fromNumber, To: 'whatsapp:' + phone, Body: msg })
+      });
+      if(r.ok) sent++; else failed++;
+    } catch(e) { failed++; }
+  }
+
+  // Save to Supabase
+  await fetch(SUPABASE_URL + '/rest/v1/campaigns', {
+    method: 'POST',
+    headers: HEADERS,
+    body: JSON.stringify({
+      name, body, filter, campaign_type: 'whatsapp',
+      sent_count: sent, total_count: leadsWithPhone.length,
+      user_id: currentUser ? currentUser.id : null,
+      sent_at: new Date().toISOString()
+    })
+  }).catch(()=>{});
+
+  if(btn) { btn.textContent = '💬 Send WhatsApp'; btn.disabled = false; }
+  showToast(`✅ WhatsApp sent! ${sent} delivered, ${failed} failed.`);
+  loadWAHistory();
+}
+
+async function loadWAHistory() {
+  const el = document.getElementById('wa-history');
+  if(!el) return;
+  try {
+    const r = await fetch(SUPABASE_URL + `/rest/v1/campaigns?campaign_type=eq.whatsapp&user_id=eq.${currentUser?.id}&order=sent_at.desc&limit=20`, { headers: HEADERS });
+    if(!r.ok) return;
+    const data = await r.json();
+    if(!data.length) { el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No WhatsApp campaigns sent yet</div>'; return; }
+    el.innerHTML = data.map(c => `
+      <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div style="font-weight:600;font-size:13px">💬 ${c.name}</div>
+          <div style="font-size:11px;color:var(--text2)">${new Date(c.sent_at).toLocaleDateString()}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${(c.body||'').slice(0,80)}${(c.body||'').length>80?'...':''}</div>
+        <div style="display:flex;gap:10px;font-size:11px">
+          <span style="background:rgba(37,211,102,0.1);color:#25d366;padding:2px 8px;border-radius:100px">✓ ${c.sent_count} sent</span>
+          <span style="color:var(--text2)">${c.total_count} targeted</span>
+        </div>
+      </div>`).join('');
+  } catch(e) {}
 }
 
 function previewCampaign() {
