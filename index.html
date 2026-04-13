@@ -1670,7 +1670,7 @@
         <div class="grid-2" style="margin-bottom:20px">
           <div class="card">
             <div class="card-header">
-              <div class="card-title">✉️ <span data-en="New Email Campaign" data-ar="حملة بريد جديدة">New Email Campaign</span></div>
+              <div class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> <span data-en="New Email Campaign" data-ar="حملة بريد جديدة">New Email Campaign</span></div>
             </div>
             <div class="form-group">
               <label class="form-label">Campaign Name</label>
@@ -1699,14 +1699,14 @@
               💡 Use <b style="color:var(--accent)">{name}</b> in your message to personalize with each lead's name
             </div>
             <div style="display:flex;gap:10px">
-              <button class="btn btn-ghost" style="flex:1" onclick="previewCampaign()">👁 Preview</button>
-              <button class="btn btn-primary" style="flex:2" onclick="sendCampaign()">🚀 Send Campaign</button>
+              <button class="btn btn-ghost" style="flex:1" onclick="previewCampaign()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Preview</button>
+              <button class="btn btn-primary" style="flex:2" onclick="sendCampaign()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send Campaign</button>
             </div>
           </div>
           <div class="card">
             <div class="card-header">
-              <div class="card-title">📋 <span data-en="Campaign History" data-ar="سجل الحملات">Campaign History</span></div>
-              <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadCampaignHistory()">🔄</button>
+              <div class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.77 9.77 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg> <span data-en="Campaign History" data-ar="سجل الحملات">Campaign History</span></div>
+              <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadCampaignHistory()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></button>
             </div>
             <div id="campaign-history">
               <div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>
@@ -1720,13 +1720,13 @@
         <div class="grid-2" style="margin-bottom:20px">
           <div class="card">
             <div class="card-header">
-              <div class="card-title">📱 New SMS Campaign</div>
+              <div class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> New SMS Campaign</div>
             </div>
 
             <!-- Twilio connection status -->
             <div id="sms-connection-banner" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px">
               <div>
-                <div style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:2px">⚡ Connect Twilio for SMS</div>
+                <div style="font-size:13px;font-weight:600;color:var(--gold);margin-bottom:2px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Connect Twilio for SMS</div>
                 <div style="font-size:12px;color:var(--text2)">Paste your Twilio credentials to send SMS to your leads</div>
               </div>
               <button onclick="openSMSSetup()" style="background:var(--gold);color:#000;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit">Connect</button>
@@ -1757,17 +1757,17 @@
               <div style="text-align:right;font-size:11px;color:var(--text2);margin-top:4px"><span id="sms-char-count">0</span>/160 characters</div>
             </div>
             <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
-              💡 SMS has <b style="color:var(--success)">98% open rate</b> vs 20% for email. Keep it short and clear.
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> SMS has <b style="color:var(--success)">98% open rate</b> vs 20% for email. Keep it short and clear.
             </div>
             <div style="display:flex;gap:10px">
-              <button class="btn btn-ghost" style="flex:1" onclick="previewSMS()">👁 Preview</button>
-              <button class="btn btn-primary" style="flex:2" onclick="sendSMSCampaign()">📱 Send SMS</button>
+              <button class="btn btn-ghost" style="flex:1" onclick="previewSMS()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Preview</button>
+              <button class="btn btn-primary" style="flex:2" onclick="sendSMSCampaign()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Send SMS</button>
             </div>
           </div>
 
           <div class="card">
             <div class="card-header">
-              <div class="card-title">📋 SMS History</div>
+              <div class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.77 9.77 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg> SMS History</div>
               <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadSMSHistory()">🔄</button>
             </div>
             <div id="sms-history">
@@ -1782,12 +1782,12 @@
         <div class="grid-2" style="margin-bottom:20px">
           <div class="card">
             <div class="card-header">
-              <div class="card-title">💬 New WhatsApp Campaign</div>
+              <div class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> New WhatsApp Campaign</div>
             </div>
 
             <!-- WhatsApp connection status -->
             <div id="wa-connection-banner" style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px">
-              <div style="font-size:13px;font-weight:700;color:#25d366;margin-bottom:6px">💬 Connect WhatsApp Business</div>
+              <div style="font-size:13px;font-weight:700;color:#25d366;margin-bottom:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Connect WhatsApp Business</div>
               <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Connect your WhatsApp Business number via Twilio to send bulk messages to your leads.</div>
               <div style="display:flex;gap:8px">
                 <button onclick="openWASetup()" style="background:#25d366;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Connect Number</button>
@@ -1819,17 +1819,17 @@
               <textarea class="form-input" id="wa-body" rows="5" placeholder="Write your WhatsApp message here...&#10;&#10;Use {name} to personalize. Supports emojis 🎉" style="resize:vertical;min-height:120px"></textarea>
             </div>
             <div style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
-              💡 WhatsApp messages require leads to have a phone number. Use <b style="color:#25d366">{name}</b> to personalize.
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> WhatsApp messages require leads to have a phone number. Use <b style="color:#25d366">{name}</b> to personalize.
             </div>
             <div style="display:flex;gap:10px">
               <button class="btn btn-ghost" style="flex:1" onclick="previewWA()">👁 Preview</button>
-              <button class="btn btn-primary" style="flex:2" style="background:#25d366" onclick="sendWACampaign()">💬 Send WhatsApp</button>
+              <button class="btn btn-primary" style="flex:2" style="background:#25d366" onclick="sendWACampaign()"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Send WhatsApp</button>
             </div>
           </div>
 
           <div class="card">
             <div class="card-header">
-              <div class="card-title">📋 WhatsApp History</div>
+              <div class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.77 9.77 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg> WhatsApp History</div>
               <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadWAHistory()">🔄</button>
             </div>
             <div id="wa-history">
@@ -1849,7 +1849,7 @@
           <div id="preview-content" style="background:var(--bg3);border-radius:12px;padding:20px;margin-bottom:16px"></div>
           <div style="display:flex;gap:10px">
             <button class="btn btn-ghost" style="flex:1" onclick="closePreview()">Edit</button>
-            <button class="btn btn-primary" id="preview-send-btn" style="flex:2" onclick="closePreview();sendCampaign(true)">🚀 Looks Good — Send!</button>
+            <button class="btn btn-primary" id="preview-send-btn" style="flex:2" onclick="closePreview();sendCampaign(true)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Looks Good — Send!</button>
           </div>
         </div>
       </div>
@@ -1858,7 +1858,7 @@
       <div class="modal-overlay" id="sms-setup-modal">
         <div class="modal" style="max-width:500px">
           <div class="modal-header">
-            <div class="modal-title">📱 Connect Twilio for SMS</div>
+            <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Connect Twilio for SMS</div>
             <button class="modal-close" onclick="document.getElementById('sms-setup-modal').classList.remove('open')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
@@ -1884,7 +1884,7 @@
             </div>
             <div style="display:flex;gap:10px">
               <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('sms-setup-modal').classList.remove('open')">Cancel</button>
-              <button class="btn btn-primary" style="flex:2" onclick="saveSMSCredentials()">💾 Save & Connect</button>
+              <button class="btn btn-primary" style="flex:2" onclick="saveSMSCredentials()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save & Connect</button>
             </div>
           </div>
         </div>
@@ -1894,7 +1894,7 @@
       <div class="modal-overlay" id="wa-setup-modal">
         <div class="modal" style="max-width:500px">
           <div class="modal-header">
-            <div class="modal-title">💬 Connect WhatsApp Business</div>
+            <div class="modal-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Connect WhatsApp Business</div>
             <button class="modal-close" onclick="document.getElementById('wa-setup-modal').classList.remove('open')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
