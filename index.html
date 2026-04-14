@@ -1681,7 +1681,7 @@
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
                 <div>
                   <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">From Name</label>
-                  <input class="form-input" id="camp-from-name" placeholder="e.g. Hussein Motors" style="font-size:13px"/>
+                  <input class="form-input" id="camp-from-name" placeholder="e.g. Hussein Motors" style="font-size:13px" oninput="updateEmailPreviewSender(this.value)"/>
                 </div>
                 <div>
                   <label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">From Email</label>
@@ -1690,7 +1690,7 @@
               </div>
               <div style="font-size:11px;color:var(--text2);margin-top:8px;display:flex;align-items:center;gap:5px">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                Leads will see your name & email when they receive this campaign
+                Leads will see: <strong style="color:var(--text)">Your Name &lt;campaigns@nexcrm.sa&gt;</strong> — your name, our sending domain
               </div>
             </div>
 
@@ -3093,7 +3093,7 @@
 <script>
 // ─── RESEND EMAIL CONFIG ───────────────────────────────────────
 const RESEND_API_KEY = 're_ejpfMweg_3yjBD6cCVuBkpfLCgLhytMd2';
-const FROM_EMAIL = 'onboarding@resend.dev';
+const FROM_EMAIL = 'campaigns@nexcrm.sa'; // Verified Resend domain
 const FROM_NAME = 'NexCRM';
 
 // ─── SUPABASE CONFIG (direct fetch, no library) ────────────────
@@ -6057,7 +6057,7 @@ function previewCampaign() {
 
   document.getElementById('preview-content').innerHTML = `
     <div style="margin-bottom:12px;font-size:12px;color:var(--text2)">
-      <b>To:</b> ${filterLabel} &nbsp;|&nbsp; <b>From:</b> ${FROM_NAME} &lt;${FROM_EMAIL}&gt;
+      <b>To:</b> ${filterLabel} &nbsp;|&nbsp; <b>From:</b> ${senderName} &lt;${FROM_EMAIL}&gt;
     </div>
     <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
       ${subject}
@@ -6080,6 +6080,8 @@ async function sendCampaign(confirmed = false) {
   const subject = document.getElementById('camp-subject').value.trim();
   const body = document.getElementById('camp-body').value.trim();
   const filter = document.getElementById('camp-filter').value;
+  const fromNameInput = document.getElementById('camp-from-name')?.value.trim();
+  const senderName = fromNameInput || FROM_NAME; // Use typed name or fallback to NexCRM
 
   if(!name) { showToast('❌ Enter campaign name'); return; }
   if(!subject) { showToast('❌ Enter email subject'); return; }
@@ -6122,16 +6124,16 @@ Note: Only leads with email addresses will receive the email.`)) return;
           'Authorization': 'Bearer ' + RESEND_API_KEY
         },
         body: JSON.stringify({
-          from: FROM_NAME + ' <' + FROM_EMAIL + '>',
+          from: senderName + ' <' + FROM_EMAIL + '>',
           to: [lead.email],
           subject: subject,
           html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
-            <div style="background:linear-gradient(135deg,#0B1C3F,#132852);padding:20px;border-radius:12px;margin-bottom:20px;text-align:center">
-              <h1 style="color:#C9963A;margin:0;font-size:24px">NexCRM</h1>
+            <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);padding:24px;border-radius:12px;margin-bottom:24px;text-align:center">
+              <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">${senderName}</h1>
             </div>
-            <div style="font-size:15px;line-height:1.8;color:#333;white-space:pre-wrap">${personalizedBody}</div>
-            <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;font-size:12px;color:#999;text-align:center">
-              Sent via NexCRM · ${new Date().getFullYear()}
+            <div style="font-size:15px;line-height:1.9;color:#333;white-space:pre-wrap">${personalizedBody}</div>
+            <div style="margin-top:32px;padding-top:20px;border-top:1px solid #eee;font-size:12px;color:#aaa;text-align:center">
+              Sent by ${senderName} · ${new Date().getFullYear()}
             </div>
           </div>`
         })
