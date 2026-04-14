@@ -1640,6 +1640,7 @@
     </div>
 
     <div class="page" id="page-campaigns">
+
       <!-- AI CAMPAIGN IDEAS -->
       <div class="card" style="margin-bottom:20px;background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(59,130,246,0.05));border:1px solid rgba(139,92,246,0.25)">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
@@ -1713,74 +1714,364 @@
         </div>
       </div>
 
-      <div class="grid-2" style="margin-bottom:20px">
-        <!-- COMPOSE EMAIL -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">✉️ New Email Campaign</div>
+      <!-- CHANNEL TABS -->
+      <div class="card" style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:4px">Campaigns</div>
+            <div style="font-size:13px;color:var(--text2)">Select a channel to send your campaign</div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Campaign Name</label>
-            <input class="form-input" id="camp-name" placeholder="e.g. Ramadan Offer 2025" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Send To</label>
-            <select class="form-input" id="camp-filter">
-              <option value="all">All Leads</option>
-              <option value="New">New Leads Only</option>
-              <option value="Warm">Warm Leads Only</option>
-              <option value="Active">Active Leads Only</option>
-              <option value="Cold">Cold Leads Only</option>
-              <option value="Won">Won Clients Only</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email Subject</label>
-            <input class="form-input" id="camp-subject" placeholder="e.g. Special Offer Just For You 🎁" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email Message</label>
-            <textarea class="form-input" id="camp-body" rows="6" placeholder="Write your email message here...&#10;&#10;You can use {name} to personalize with the lead's name." style="resize:vertical;min-height:140px"></textarea>
-          </div>
-          <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
-            💡 Use <b style="color:var(--accent)">{name}</b> in your message to personalize with each lead's name
-          </div>
-          <div style="display:flex;gap:10px">
-            <button class="btn btn-ghost" style="flex:1" onclick="previewCampaign()">👁 Preview</button>
-            <button class="btn btn-primary" style="flex:2" onclick="sendCampaign()">🚀 Send Campaign</button>
-          </div>
-        </div>
-
-        <!-- CAMPAIGN HISTORY -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title">📋 Campaign History</div>
-            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadCampaignHistory()">🔄</button>
-          </div>
-          <div id="campaign-history">
-            <div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>
+          <div style="display:flex;gap:8px;background:var(--bg3);border-radius:12px;padding:5px">
+            <button id="camp-tab-email" onclick="switchCampTab('email')" style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all 0.2s;background:var(--accent);color:#fff">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              Email
+            </button>
+            <button id="camp-tab-sms" onclick="switchCampTab('sms')" style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all 0.2s;background:transparent;color:var(--text2)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              SMS
+            </button>
+            <button id="camp-tab-whatsapp" onclick="switchCampTab('whatsapp')" style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:all 0.2s;background:transparent;color:var(--text2)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              WhatsApp
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- PREVIEW MODAL -->
+      <!-- ═══ EMAIL TAB ═══ -->
+      <div id="camp-pane-email">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> New Email Campaign</div>
+            </div>
+            <!-- Sender Identity -->
+            <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:14px;margin-bottom:16px">
+              <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:0.5px">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Sender Identity
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div>
+                  <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">From Name</label>
+                  <input class="form-input" id="camp-from-name" placeholder="e.g. Hussein Motors" style="font-size:13px"/>
+                </div>
+                <div>
+                  <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">From Email</label>
+                  <input class="form-input" id="camp-from-email" type="email" placeholder="sales@yourcompany.com" style="font-size:13px"/>
+                </div>
+              </div>
+              <div style="font-size:11px;color:var(--text2);margin-top:8px">
+                Leads will see: <strong style="color:var(--text)">Your Name &lt;campaigns@nexcrm.sa&gt;</strong> — your name, our sending domain
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Campaign Name</label>
+              <input class="form-input" id="camp-name" placeholder="e.g. Ramadan Offer 2025" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Send To</label>
+              <select class="form-input" id="camp-filter">
+                <option value="all">All Leads</option>
+                <option value="New">New Leads Only</option>
+                <option value="Warm">Warm Leads Only</option>
+                <option value="Active">Active Leads Only</option>
+                <option value="Cold">Cold Leads Only</option>
+                <option value="Won">Won Clients Only</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Subject</label>
+              <input class="form-input" id="camp-subject" placeholder="e.g. Special Offer Just For You" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Message</label>
+              <textarea class="form-input" id="camp-body" rows="6" placeholder="Write your email message here...&#10;&#10;You can use {name} to personalize." style="resize:vertical;min-height:140px"></textarea>
+            </div>
+            <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              Use <b style="color:var(--accent)">{name}</b> to personalize with each lead's name
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1" onclick="previewCampaign()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Preview
+              </button>
+              <button class="btn btn-primary" style="flex:2" onclick="sendCampaign()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send Campaign
+              </button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.77 9.77 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                Campaign History
+              </div>
+              <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadCampaignHistory()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+              </button>
+            </div>
+            <div id="campaign-history">
+              <div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SMS TAB ═══ -->
+      <div id="camp-pane-sms" style="display:none">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                New SMS Campaign
+              </div>
+            </div>
+            <div id="sms-connection-banner" style="background:rgba(59,130,246,0.15);border:1.5px solid rgba(59,130,246,0.6);border-radius:10px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:2px">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                  Connect Twilio for SMS
+                </div>
+                <div style="font-size:12px;color:var(--text2)">Paste your Twilio credentials to send SMS to your leads</div>
+              </div>
+              <button onclick="openSMSSetup()" style="background:var(--accent);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit">Connect</button>
+            </div>
+            <div id="sms-connected-banner" style="display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--success)">
+              Connected: <span id="sms-phone-display"></span>
+              <button onclick="openSMSSetup()" style="background:none;border:none;color:var(--text2);font-size:11px;cursor:pointer;margin-left:8px;font-family:inherit">Change</button>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Campaign Name</label>
+              <input class="form-input" id="sms-name" placeholder="e.g. Eid Special Offer" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Send To</label>
+              <select class="form-input" id="sms-filter">
+                <option value="all">All Leads</option>
+                <option value="New">New Leads Only</option>
+                <option value="Warm">Warm Leads Only</option>
+                <option value="Active">Active Leads Only</option>
+                <option value="Won">Won Clients Only</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">SMS Message</label>
+              <textarea class="form-input" id="sms-body" rows="5" placeholder="Write your SMS message here...&#10;&#10;Use {name} to personalize. Keep it under 160 characters." style="resize:vertical;min-height:120px" oninput="updateSMSCount(this)"></textarea>
+              <div style="text-align:right;font-size:11px;color:var(--text2);margin-top:4px" id="sms-char-count">0/160 characters</div>
+            </div>
+            <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              SMS has <b style="color:var(--success)">98% open rate</b> vs 20% for email. Keep it short and clear.
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1" onclick="previewSMS()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Preview
+              </button>
+              <button class="btn btn-primary" style="flex:2" onclick="sendSMSCampaign()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send SMS
+              </button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.77 9.77 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                SMS History
+              </div>
+              <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadSMSHistory()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+              </button>
+            </div>
+            <div id="sms-history">
+              <div style="text-align:center;padding:40px;color:var(--text2)">No SMS campaigns sent yet</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ WHATSAPP TAB ═══ -->
+      <div id="camp-pane-whatsapp" style="display:none">
+        <div class="grid-2" style="margin-bottom:20px">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                New WhatsApp Campaign
+              </div>
+            </div>
+            <div id="wa-connection-banner" style="background:rgba(37,211,102,0.15);border:1.5px solid rgba(37,211,102,0.5);border-radius:10px;padding:12px 14px;margin-bottom:16px">
+              <div style="font-size:13px;font-weight:700;color:#25d366;margin-bottom:6px">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                Connect WhatsApp Business API
+              </div>
+              <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Connect via Meta WhatsApp Business API to send bulk messages.</div>
+              <div style="display:flex;gap:8px">
+                <button onclick="openWASetup()" style="background:#25d366;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Connect Number</button>
+                <a href="https://developers.facebook.com" target="_blank" style="background:rgba(37,211,102,0.1);color:#25d366;border:1px solid rgba(37,211,102,0.3);padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center">Learn more ↗</a>
+              </div>
+            </div>
+            <div id="wa-connected-banner" style="display:none;background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#25d366">
+              Connected: <span id="wa-phone-display"></span>
+              <button onclick="openWASetup()" style="background:none;border:none;color:var(--text2);font-size:11px;cursor:pointer;margin-left:8px;font-family:inherit">Change</button>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Campaign Name</label>
+              <input class="form-input" id="wa-camp-name" placeholder="e.g. Ramadan Greetings" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Send To</label>
+              <select class="form-input" id="wa-filter">
+                <option value="all">All Leads</option>
+                <option value="New">New Leads Only</option>
+                <option value="Warm">Warm Leads Only</option>
+                <option value="Active">Active Leads Only</option>
+                <option value="Won">Won Clients Only</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">WhatsApp Message</label>
+              <textarea class="form-input" id="wa-body" rows="5" placeholder="Write your WhatsApp message here...&#10;&#10;Use {name} to personalize. Supports emojis." style="resize:vertical;min-height:120px"></textarea>
+            </div>
+            <div style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              Leads must have a phone number. Use <b style="color:#25d366">{name}</b> to personalize.
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1" onclick="previewWA()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Preview
+              </button>
+              <button class="btn btn-primary" style="flex:2;background:#25d366" onclick="sendWACampaign()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send WhatsApp
+              </button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.77 9.77 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                WhatsApp History
+              </div>
+              <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadWAHistory()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+              </button>
+            </div>
+            <div id="wa-history">
+              <div style="text-align:center;padding:40px;color:var(--text2)">No WhatsApp campaigns sent yet</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SHARED PREVIEW MODAL -->
       <div class="modal-overlay" id="preview-modal">
         <div class="modal" style="max-width:560px">
           <div class="modal-header">
-            <div class="modal-title">📧 Email Preview</div>
-            <div class="modal-close" onclick="closePreview()">✕</div>
+            <div class="modal-title" id="preview-modal-title">Preview</div>
+            <div class="modal-close" onclick="closePreview()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
           </div>
-          <div id="preview-content" style="background:var(--bg3);border-radius:12px;padding:20px;margin-bottom:16px">
-          </div>
+          <div id="preview-content" style="background:var(--bg3);border-radius:12px;padding:20px;margin-bottom:16px"></div>
           <div style="display:flex;gap:10px">
-            <button class="btn btn-ghost" style="flex:1" onclick="closePreview()">Edit</button>
-            <button class="btn btn-primary" style="flex:2" onclick="closePreview();sendCampaign(true)">🚀 Looks Good — Send!</button>
+            <button class="btn btn-ghost" style="flex:1" onclick="closePreview()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Edit
+            </button>
+            <button class="btn btn-primary" id="preview-send-btn" style="flex:2" onclick="closePreview();sendCampaign(true)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+              Looks Good — Send!
+            </button>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ANALYTICS -->
+      <!-- SMS SETUP MODAL -->
+      <div class="modal-overlay" id="sms-setup-modal">
+        <div class="modal" style="max-width:500px">
+          <div class="modal-header">
+            <div class="modal-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Connect Twilio for SMS
+            </div>
+            <button class="modal-close" onclick="document.getElementById('sms-setup-modal').classList.remove('open')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6">
+              Get your credentials from <a href="https://twilio.com" target="_blank" style="color:var(--accent)">twilio.com</a> — Account SID, Auth Token, and phone number.
+            </div>
+            <div class="form-group">
+              <label class="form-label">Account SID</label>
+              <input class="form-input" id="sms-account-sid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Auth Token</label>
+              <input class="form-input" type="password" id="sms-auth-token" placeholder="Your auth token" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Twilio Phone Number</label>
+              <input class="form-input" id="sms-from-number" placeholder="+1xxxxxxxxxx" />
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('sms-setup-modal').classList.remove('open')">Cancel</button>
+              <button class="btn btn-primary" style="flex:2" onclick="saveSMSCredentials()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save & Connect
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WHATSAPP SETUP MODAL -->
+      <div class="modal-overlay" id="wa-setup-modal">
+        <div class="modal" style="max-width:500px">
+          <div class="modal-header">
+            <div class="modal-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Connect WhatsApp Business API
+            </div>
+            <button class="modal-close" onclick="document.getElementById('wa-setup-modal').classList.remove('open')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+            <div style="background:rgba(37,211,102,0.08);border:1px solid rgba(37,211,102,0.2);border-radius:12px;padding:14px">
+              <div style="font-size:12px;font-weight:700;color:#25d366;margin-bottom:10px">HOW TO GET CREDENTIALS</div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.7">
+                1. Go to <a href="https://developers.facebook.com" target="_blank" style="color:#25d366">developers.facebook.com</a> → Create App → WhatsApp<br>
+                2. Add and verify your business number<br>
+                3. Copy your Phone Number ID and Access Token
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number ID</label>
+              <input class="form-input" id="wa-account-sid" placeholder="e.g. 123456789012345" />
+              <div style="font-size:11px;color:var(--text2);margin-top:4px">From Meta Developer Console → WhatsApp → Getting Started</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Permanent Access Token</label>
+              <input class="form-input" type="password" id="wa-auth-token" placeholder="EAAxxxxxxxxxxxxxx..." />
+              <div style="font-size:11px;color:var(--text2);margin-top:4px">From Meta Business Suite → System Users</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your WhatsApp Business Number</label>
+              <input class="form-input" id="wa-from-number" placeholder="+966 5X XXX XXXX" />
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('wa-setup-modal').classList.remove('open')">Cancel</button>
+              <button class="btn btn-primary" style="flex:2;background:#25d366" onclick="saveWACredentials()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Save & Connect
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     <div class="page" id="page-analytics">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
         <div>
@@ -8786,6 +9077,382 @@ function exitViewAsClient() {
   loadLeads();
   showToast('✅ Back to your admin view');
 }
+
+// ═══════════════════════════════════════════════════════
+// AI CAMPAIGN IDEAS GENERATOR
+// ═══════════════════════════════════════════════════════
+async function generateCampaignIdeas() {
+  const brand = document.getElementById('ai-brand').value.trim();
+  const industry = document.getElementById('ai-industry').value;
+  const goal = document.getElementById('ai-goal').value;
+  const lang = document.getElementById('ai-lang').value;
+  const platform = document.getElementById('ai-platform').value;
+
+  if(!brand) { showToast('Enter your brand name first'); document.getElementById('ai-brand').focus(); return; }
+
+  const btn = document.getElementById('ai-ideas-btn');
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  document.getElementById('ai-ideas-result').style.display = 'none';
+  document.getElementById('ai-ideas-loading').style.display = 'block';
+
+  try {
+    const isAr = lang === 'Arabic';
+    const ideas = generateFallbackIdeas(brand, industry, goal, lang, platform);
+    renderCampaignIdeas(ideas, brand, lang);
+  } catch(e) {
+    showToast('Error generating ideas');
+  } finally {
+    document.getElementById('ai-ideas-loading').style.display = 'none';
+    btn.disabled = false;
+    btn.textContent = 'Generate Ideas';
+  }
+}
+
+function generateFallbackIdeas(brand, industry, goal, lang, platform) {
+  const ar = lang === 'Arabic';
+  return [
+    {
+      name: ar ? 'حملة لحظة القرار' : 'The Decision Moment',
+      hook: ar ? '"كم مرة قلت بكره؟ اليوم قرارك يختلف..."' : '"How many times did you say tomorrow? Today is different..."',
+      script: ar
+        ? 'المشهد 1: شخص يتردد (3 ثوان)\nالمشهد 2: "مع ' + brand + ' ما في تردد" (5 ثوان)\nالمشهد 3: عرض المنتج (10 ثوان)\nالمشهد 4: نتائج حقيقية (7 ثوان)\nالمشهد 5: CTA واضح (5 ثوان)'
+        : 'Scene 1: Person hesitating (3s)\nScene 2: "' + brand + ' — no more hesitation" (5s)\nScene 3: Quick product showcase (10s)\nScene 4: Real customer results (7s)\nScene 5: Clear CTA (5s)',
+      caption: ar
+        ? brand + ' — لما تكون جاهز للقرار الصح، نحن هنا\n\n#' + brand.replace(/\s/g,'') + ' #السعودية #الرياض'
+        : brand + ' — When you\'re ready to make the right choice, we\'re here\n\n#' + brand.replace(/\s/g,'') + ' #Saudi #Riyadh',
+      cta: ar ? 'تواصل الآن عبر الواتساب' : 'Contact us on WhatsApp now'
+    },
+    {
+      name: ar ? 'قبل وبعد' : 'Before & After',
+      hook: ar ? '"شوف الفرق بنفسك..."' : '"See the difference yourself..."',
+      script: ar
+        ? 'المشهد 1: الوضع "قبل" — المشكلة (5 ثوان)\nالمشهد 2: لحظة التحول مع ' + brand + ' (5 ثوان)\nالمشهد 3: "بعد" — النتيجة (10 ثوان)\nالمشهد 4: شهادة عميل (7 ثوان)\nالمشهد 5: عرض خاص (3 ثوان)'
+        : 'Scene 1: "Before" — the problem (5s)\nScene 2: Transformation with ' + brand + ' (5s)\nScene 3: "After" — result (10s)\nScene 4: Customer testimonial (7s)\nScene 5: Special offer (3s)',
+      caption: ar
+        ? 'الفرق واضح مع ' + brand + '\n\nانضم لمئات العملاء الراضين\n\n#' + brand.replace(/\s/g,'') + ' #نتائج_حقيقية'
+        : 'The difference is clear with ' + brand + '\n\nJoin hundreds of happy customers\n\n#' + brand.replace(/\s/g,'') + ' #RealResults',
+      cta: ar ? 'اضغط الرابط في البايو' : 'Click the link in bio'
+    },
+    {
+      name: ar ? 'عرض محدود' : 'Limited Offer',
+      hook: ar ? '"24 ساعة بس... بعدها ما في فرصة ثانية"' : '"Only 24 hours... after that no second chance"',
+      script: ar
+        ? 'المشهد 1: كاونت داون (3 ثوان)\nالمشهد 2: العرض بالتفصيل (8 ثوان)\nالمشهد 3: ما يحصل عليه العميل (7 ثوان)\nالمشهد 4: سعر قبل وبعد الخصم (5 ثوان)\nالمشهد 5: رابط التواصل (7 ثوان)'
+        : 'Scene 1: Countdown (3s)\nScene 2: Offer details (8s)\nScene 3: What customer gets (7s)\nScene 4: Price before/after (5s)\nScene 5: Contact link (7s)',
+      caption: ar
+        ? 'العرض ينتهي الليلة!\n\n' + brand + ' يقدم عرض حصري للمتابعين فقط\n\n#عرض_محدود #' + brand.replace(/\s/g,'') + ' #السعودية'
+        : 'Offer ends tonight!\n\n' + brand + ' exclusive deal for followers only\n\n#LimitedOffer #' + brand.replace(/\s/g,'') + ' #Saudi',
+      cta: ar ? 'تواصل قبل انتهاء العرض' : 'Contact before offer ends'
+    },
+    {
+      name: ar ? 'خلف الكواليس' : 'Behind the Scenes',
+      hook: ar ? '"شو اللي ما تشوفه عادةً عن ' + brand + '؟"' : '"What you don\'t normally see about ' + brand + '"',
+      script: ar
+        ? 'المشهد 1: يوم عمل في ' + brand + ' (8 ثوان)\nالمشهد 2: الفريق والجهد (8 ثوان)\nالمشهد 3: لحظة سعادة عميل (7 ثوان)\nالمشهد 4: رسالة من المؤسس (7 ثوان)\nالمشهد 5: دعوة للتواصل (5 ثوان)'
+        : 'Scene 1: A real workday at ' + brand + ' (8s)\nScene 2: The team and effort (8s)\nScene 3: Happy customer moment (7s)\nScene 4: Message from founder (7s)\nScene 5: Call to connect (5s)',
+      caption: ar
+        ? 'هذا اللي يصير كل يوم في ' + brand + ' عشانك\n\nفريقنا ما يتوقف من أجلك\n\n#' + brand.replace(/\s/g,'') + ' #خلف_الكواليس'
+        : 'This is what happens every day at ' + brand + ' for you\n\nOur team never stops for you\n\n#' + brand.replace(/\s/g,'') + ' #BehindTheScenes',
+      cta: ar ? 'انضم لعيلتنا' : 'Join our family'
+    }
+  ];
+}
+
+function renderCampaignIdeas(ideas, brand, lang) {
+  const container = document.getElementById('ai-ideas-content');
+  container.innerHTML = '';
+  const colors = ['#8b5cf6','#3b82f6','#06b6d4','#10b981'];
+
+  ideas.forEach(function(idea, i) {
+    const color = colors[i % colors.length];
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px';
+
+    const scriptSafe = idea.script.replace(/"/g,'&quot;');
+    const captionSafe = idea.caption.replace(/"/g,'&quot;');
+
+    div.innerHTML =
+      '<div style="background:' + color + '18;border-bottom:1px solid ' + color + '22;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<div style="width:28px;height:28px;background:' + color + ';border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">' + (i+1) + '</div>' +
+          '<div style="font-weight:700;font-size:14px;color:var(--text)">' + idea.name + '</div>' +
+        '</div>' +
+        '<button onclick="this.closest(\'div\').nextElementSibling.style.display=this.closest(\'div\').nextElementSibling.style.display===\'none\'?\'flex\':\'none\'" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;font-family:inherit">▾</button>' +
+      '</div>' +
+      '<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">' +
+        '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">HOOK — First 3 Seconds</div>' +
+          '<div style="font-size:14px;font-weight:600;color:var(--text)">' + idea.hook + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>REEL SCRIPT</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.script + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>READY-TO-POST CAPTION</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--success);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.caption + '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+          '<div style="font-size:12px;color:var(--text2)"><strong style="color:var(--text)">CTA:</strong> ' + idea.cta + '</div>' +
+          '<div style="display:flex;gap:8px">' +
+            '<button onclick="useCampaignIdea(\'email\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.caption.replace(/'/g,"\\'").replace(/\n/g,' ') + '\')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for Email</button>' +
+            '<button onclick="useCampaignIdea(\'sms\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.cta.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for SMS</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    container.appendChild(div);
+  });
+
+  document.getElementById('ai-ideas-result').style.display = 'block';
+}
+
+function useCampaignIdea(channel, name, body) {
+  switchCampTab(channel);
+  if(channel === 'email') {
+    var n = document.getElementById('camp-name'); if(n) n.value = name;
+    var b = document.getElementById('camp-body'); if(b) b.value = body;
+  } else if(channel === 'sms') {
+    var n2 = document.getElementById('sms-name'); if(n2) n2.value = name;
+    var b2 = document.getElementById('sms-body'); if(b2) b2.value = body;
+  }
+  showToast('Campaign idea loaded — ready to send!');
+}
+
+
+// ═══════════════════════════════════════════════════════
+// CAMPAIGN TAB SWITCHER
+// ═══════════════════════════════════════════════════════
+function switchCampTab(tab) {
+  ['email','sms','whatsapp'].forEach(function(t) {
+    var pane = document.getElementById('camp-pane-' + t);
+    var btn = document.getElementById('camp-tab-' + t);
+    if(pane) pane.style.display = t === tab ? 'block' : 'none';
+    if(btn) {
+      btn.style.background = t === tab ? 'var(--accent)' : 'transparent';
+      btn.style.color = t === tab ? '#fff' : 'var(--text2)';
+    }
+  });
+}
+
+function updateSMSCount(el) {
+  var count = document.getElementById('sms-char-count');
+  if(count) count.textContent = el.value.length + '/160 characters';
+}
+
+// ═══════════════════════════════════════════════════════
+// SMS CREDENTIALS
+// ═══════════════════════════════════════════════════════
+var smsCredentials = null;
+try { smsCredentials = JSON.parse(localStorage.getItem('nexcrm_sms_creds')); } catch(e) {}
+
+function openSMSSetup() {
+  document.getElementById('sms-setup-modal').classList.add('open');
+}
+
+function saveSMSCredentials() {
+  var sid = document.getElementById('sms-account-sid').value.trim();
+  var token = document.getElementById('sms-auth-token').value.trim();
+  var from = document.getElementById('sms-from-number').value.trim();
+  if(!sid || !token || !from) { showToast('Fill in all fields'); return; }
+  smsCredentials = { sid: sid, token: token, from: from };
+  localStorage.setItem('nexcrm_sms_creds', JSON.stringify(smsCredentials));
+  document.getElementById('sms-setup-modal').classList.remove('open');
+  var banner = document.getElementById('sms-connection-banner');
+  var connected = document.getElementById('sms-connected-banner');
+  var display = document.getElementById('sms-phone-display');
+  if(banner) banner.style.display = 'none';
+  if(connected) { connected.style.display = 'flex'; }
+  if(display) display.textContent = from;
+  showToast('SMS connected!');
+}
+
+function previewSMS() {
+  var body = document.getElementById('sms-body').value.trim();
+  if(!body) { showToast('Write your SMS message first'); return; }
+  var preview = body.replace(/{name}/g, 'عبدالرحمن');
+  document.getElementById('preview-modal-title').textContent = 'SMS Preview';
+  document.getElementById('preview-content').innerHTML = '<div style="font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text)">' + preview + '</div>';
+  var sendBtn = document.getElementById('preview-send-btn');
+  if(sendBtn) {
+    sendBtn.onclick = function() { closePreview(); sendSMSCampaign(true); };
+  }
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+async function sendSMSCampaign(confirmed) {
+  if(!smsCredentials) { showToast('Connect Twilio first'); openSMSSetup(); return; }
+  var name = document.getElementById('sms-name').value.trim();
+  var body = document.getElementById('sms-body').value.trim();
+  var filter = document.getElementById('sms-filter').value;
+  if(!name) { showToast('Enter campaign name'); return; }
+  if(!body) { showToast('Write your SMS message'); return; }
+
+  var targetLeads = await getFilteredLeads(filter);
+  var leadsWithPhone = targetLeads.filter(function(l) { return l.phone; });
+  if(!leadsWithPhone.length) { showToast('No leads with phone numbers found'); return; }
+  if(!confirmed && !confirm('Send SMS to ' + leadsWithPhone.length + ' leads with phone numbers?')) return;
+
+  var btn = document.querySelector('#camp-pane-sms .btn-primary');
+  if(btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+
+  var sent = 0, failed = 0;
+  for(var i = 0; i < leadsWithPhone.length; i++) {
+    var lead = leadsWithPhone[i];
+    var msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    try {
+      var r = await fetch('https://api.twilio.com/2010-04-01/Accounts/' + smsCredentials.sid + '/Messages.json', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Basic ' + btoa(smsCredentials.sid + ':' + smsCredentials.token),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'To=' + encodeURIComponent(lead.phone) + '&From=' + encodeURIComponent(smsCredentials.from) + '&Body=' + encodeURIComponent(msg)
+      });
+      if(r.ok) sent++; else failed++;
+    } catch(e) { failed++; }
+  }
+  if(btn) { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send SMS'; btn.disabled = false; }
+  showToast('SMS sent! ' + sent + ' delivered, ' + failed + ' failed.');
+  loadSMSHistory();
+}
+
+function loadSMSHistory() {
+  var el = document.getElementById('sms-history');
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No SMS campaigns sent yet</div>';
+}
+
+// ═══════════════════════════════════════════════════════
+// WHATSAPP CREDENTIALS
+// ═══════════════════════════════════════════════════════
+var waCredentials = null;
+try { waCredentials = JSON.parse(localStorage.getItem('nexcrm_wa_creds')); } catch(e) {}
+
+function openWASetup() {
+  document.getElementById('wa-setup-modal').classList.add('open');
+}
+
+function saveWACredentials() {
+  var phoneId = document.getElementById('wa-account-sid').value.trim();
+  var token = document.getElementById('wa-auth-token').value.trim();
+  var from = document.getElementById('wa-from-number').value.trim();
+  if(!phoneId || !token || !from) { showToast('Fill in all fields'); return; }
+  waCredentials = { phoneId: phoneId, token: token, from: from };
+  localStorage.setItem('nexcrm_wa_creds', JSON.stringify(waCredentials));
+  document.getElementById('wa-setup-modal').classList.remove('open');
+  var banner = document.getElementById('wa-connection-banner');
+  var connected = document.getElementById('wa-connected-banner');
+  var display = document.getElementById('wa-phone-display');
+  if(banner) banner.style.display = 'none';
+  if(connected) connected.style.display = 'flex';
+  if(display) display.textContent = from;
+  showToast('WhatsApp connected!');
+}
+
+function previewWA() {
+  var body = document.getElementById('wa-body').value.trim();
+  if(!body) { showToast('Write your WhatsApp message first'); return; }
+  var preview = body.replace(/{name}/g, 'عبدالرحمن');
+  document.getElementById('preview-modal-title').textContent = 'WhatsApp Preview';
+  document.getElementById('preview-content').innerHTML = '<div style="background:#dcf8c6;color:#111;border-radius:10px;padding:12px;font-size:14px;line-height:1.8;white-space:pre-wrap;max-width:80%;margin-left:auto">' + preview + '</div>';
+  var sendBtn = document.getElementById('preview-send-btn');
+  if(sendBtn) sendBtn.onclick = function() { closePreview(); sendWACampaign(true); };
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+async function sendWACampaign(confirmed) {
+  if(!waCredentials) { showToast('Connect WhatsApp first'); openWASetup(); return; }
+  var name = document.getElementById('wa-camp-name').value.trim();
+  var body = document.getElementById('wa-body').value.trim();
+  var filter = document.getElementById('wa-filter').value;
+  if(!name) { showToast('Enter campaign name'); return; }
+  if(!body) { showToast('Write your WhatsApp message'); return; }
+
+  var targetLeads = await getFilteredLeads(filter);
+  var leadsWithPhone = targetLeads.filter(function(l) { return l.phone; });
+  if(!leadsWithPhone.length) { showToast('No leads with phone numbers found'); return; }
+  if(!confirmed && !confirm('Send WhatsApp to ' + leadsWithPhone.length + ' leads?')) return;
+
+  var btn = document.querySelector('#camp-pane-whatsapp .btn-primary');
+  if(btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+
+  var sent = 0, failed = 0;
+  for(var i = 0; i < leadsWithPhone.length; i++) {
+    var lead = leadsWithPhone[i];
+    var msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    try {
+      var r = await fetch('https://graph.facebook.com/v18.0/' + waCredentials.phoneId + '/messages', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + waCredentials.token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messaging_product: 'whatsapp', to: lead.phone.replace(/\s/g,''), type: 'text', text: { body: msg } })
+      });
+      if(r.ok) sent++; else failed++;
+    } catch(e) { failed++; }
+  }
+  if(btn) { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send WhatsApp'; btn.disabled = false; }
+  showToast('WhatsApp sent! ' + sent + ' delivered, ' + failed + ' failed.');
+  loadWAHistory();
+}
+
+function loadWAHistory() {
+  var el = document.getElementById('wa-history');
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No WhatsApp campaigns sent yet</div>';
+}
+
+function closePreview() {
+  document.getElementById('preview-modal').classList.remove('open');
+}
+
+function previewCampaign() {
+  var subject = document.getElementById('camp-subject').value.trim();
+  var body = document.getElementById('camp-body').value.trim();
+  if(!body) { showToast('Write your email message first'); return; }
+  var senderName = document.getElementById('camp-from-name').value.trim() || 'NexCRM';
+  var preview = body.replace(/{name}/g, 'عبدالرحمن');
+  var filterLabel = document.getElementById('camp-filter').options[document.getElementById('camp-filter').selectedIndex].text;
+  document.getElementById('preview-modal-title').textContent = 'Email Preview';
+  document.getElementById('preview-content').innerHTML =
+    '<div style="font-size:12px;color:var(--text2);margin-bottom:12px">' +
+    '<b>From:</b> ' + senderName + ' &lt;campaigns@nexcrm.sa&gt;<br>' +
+    '<b>Subject:</b> ' + (subject || '(no subject)') + '<br>' +
+    '<b>To:</b> ' + filterLabel +
+    '</div>' +
+    '<div style="font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text)">' + preview + '</div>';
+  var sendBtn = document.getElementById('preview-send-btn');
+  if(sendBtn) sendBtn.onclick = function() { closePreview(); sendCampaign(true); };
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+function loadCampaignHistory() {
+  var el = document.getElementById('campaign-history');
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>';
+}
+
+// Init SMS/WA connection state on load
+document.addEventListener('DOMContentLoaded', function() {
+  if(smsCredentials) {
+    var b = document.getElementById('sms-connection-banner');
+    var c = document.getElementById('sms-connected-banner');
+    var d = document.getElementById('sms-phone-display');
+    if(b) b.style.display = 'none';
+    if(c) c.style.display = 'flex';
+    if(d) d.textContent = smsCredentials.from;
+  }
+  if(waCredentials) {
+    var b2 = document.getElementById('wa-connection-banner');
+    var c2 = document.getElementById('wa-connected-banner');
+    var d2 = document.getElementById('wa-phone-display');
+    if(b2) b2.style.display = 'none';
+    if(c2) c2.style.display = 'flex';
+    if(d2) d2.textContent = waCredentials.from;
+  }
+});
 
 // ═══════════════════════════════════════════════════════
 // AI CAMPAIGN IDEAS GENERATOR
