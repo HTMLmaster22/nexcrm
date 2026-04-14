@@ -1665,6 +1665,96 @@
         </div>
       </div>
 
+      <!-- ═══ AI CAMPAIGN IDEAS ═══ -->
+      <div class="card" style="margin-bottom:20px;background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(59,130,246,0.05));border:1px solid rgba(139,92,246,0.25)">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:40px;height:40px;background:linear-gradient(135deg,#8b5cf6,#3b82f6);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 14px rgba(139,92,246,0.3)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--text)">AI Campaign Ideas</div>
+              <div style="font-size:12px;color:var(--text2);margin-top:1px">Generate campaign ideas, Reel scripts & captions for your brand using Claude AI</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);padding:5px 12px;border-radius:100px">
+            <div style="width:7px;height:7px;background:#8b5cf6;border-radius:50%;animation:pulse 2s infinite"></div>
+            <span style="font-size:11px;font-weight:700;color:#8b5cf6">Powered by Claude AI</span>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Brand Name</label>
+            <input class="form-input" id="ai-brand" placeholder="e.g. Hussein Motors" style="font-size:13px"/>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Industry</label>
+            <select class="form-input" id="ai-industry" style="font-size:13px">
+              <option value="car dealership">Car Dealership</option>
+              <option value="marketing agency">Marketing Agency</option>
+              <option value="restaurant">Restaurant</option>
+              <option value="fashion retail">Fashion Retail</option>
+              <option value="real estate">Real Estate</option>
+              <option value="gym & fitness">Gym & Fitness</option>
+              <option value="beauty salon">Beauty Salon</option>
+              <option value="tech startup">Tech Startup</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Goal</label>
+            <select class="form-input" id="ai-goal" style="font-size:13px">
+              <option value="generate leads">Generate Leads</option>
+              <option value="increase brand awareness">Brand Awareness</option>
+              <option value="promote a sale or offer">Promote Offer/Sale</option>
+              <option value="launch a new product">Launch New Product</option>
+              <option value="Ramadan campaign">Ramadan Campaign</option>
+              <option value="Eid campaign">Eid Campaign</option>
+              <option value="Saudi National Day campaign">National Day Campaign</option>
+              <option value="customer retention">Customer Retention</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <div class="form-group" style="margin:0;flex:1">
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Language</label>
+            <select class="form-input" id="ai-lang" style="font-size:13px">
+              <option value="Arabic">Arabic (العربية)</option>
+              <option value="English">English</option>
+              <option value="both Arabic and English">Both</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;flex:1">
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Platform</label>
+            <select class="form-input" id="ai-platform" style="font-size:13px">
+              <option value="Instagram Reels & TikTok">Instagram Reels & TikTok</option>
+              <option value="Snapchat">Snapchat</option>
+              <option value="Instagram Feed">Instagram Feed</option>
+              <option value="WhatsApp broadcast">WhatsApp</option>
+              <option value="all social media platforms">All Platforms</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button onclick="generateCampaignIdeas()" id="ai-ideas-btn" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:10px 24px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all 0.2s;box-shadow:0 4px 14px rgba(139,92,246,0.3)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              Generate Ideas
+            </button>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div id="ai-ideas-result" style="display:none">
+          <div style="height:1px;background:var(--border);margin-bottom:16px"></div>
+          <div id="ai-ideas-content" style="display:flex;flex-direction:column;gap:12px"></div>
+        </div>
+        <div id="ai-ideas-loading" style="display:none;text-align:center;padding:32px">
+          <div style="width:36px;height:36px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px"></div>
+          <div style="font-size:13px;color:var(--text2)">Claude is thinking of ideas for your brand...</div>
+        </div>
+      </div>
+
       <!-- ═══ EMAIL TAB ═══ -->
       <div id="camp-pane-email">
         <div class="grid-2" style="margin-bottom:20px">
@@ -4372,6 +4462,342 @@ function applyTranslations() {
   if(typeof renderDeliverables === 'function') { try { renderDeliverables(); } catch(e){} }
   if(typeof renderInvoices === 'function') { try { renderInvoices(); } catch(e){} }
   if(typeof updateCallStats === 'function') { try { updateCallStats(allCalls||[]); } catch(e){} }
+}
+
+// ═══════════════════════════════════════════════════════
+// AI CAMPAIGN IDEAS GENERATOR
+// ═══════════════════════════════════════════════════════
+async function generateCampaignIdeas() {
+  const brand = document.getElementById('ai-brand').value.trim();
+  const industry = document.getElementById('ai-industry').value;
+  const goal = document.getElementById('ai-goal').value;
+  const lang = document.getElementById('ai-lang').value;
+  const platform = document.getElementById('ai-platform').value;
+
+  if(!brand) { showToast('❌ Enter your brand name first'); document.getElementById('ai-brand').focus(); return; }
+
+  const btn = document.getElementById('ai-ideas-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 0.8s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Generating...';
+
+  document.getElementById('ai-ideas-result').style.display = 'none';
+  document.getElementById('ai-ideas-loading').style.display = 'block';
+
+  const prompt = `You are a top Saudi social media marketing expert. Generate 4 creative campaign ideas for this brand:
+
+Brand: ${brand}
+Industry: ${industry}
+Goal: ${goal}
+Platform: ${platform}
+Language: ${lang}
+
+For EACH campaign idea, provide:
+1. Campaign Name (catchy, in ${lang})
+2. Hook/Opening Line (first 3 seconds of the Reel/video — must grab attention)
+3. Reel Script (30-60 second script, scene by scene, ready to film)
+4. Caption (ready to post, with relevant emojis and hashtags for Saudi audience)
+5. Call to Action (what you want the viewer to do)
+
+Format your response as JSON array like this:
+[
+  {
+    "name": "Campaign name",
+    "hook": "Opening hook line",
+    "script": "Full reel script here...",
+    "caption": "Ready-to-post caption with hashtags",
+    "cta": "Call to action"
+  }
+]
+
+Make the ideas creative, culturally relevant to Saudi Arabia, and optimized for ${platform}. Only respond with valid JSON, nothing else.`;
+
+  try {
+    const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, type: 'campaign_ideas' })
+    });
+
+    // If edge function doesn't support this, call Claude API directly
+    let ideas = null;
+    if(response.ok) {
+      const data = await response.json();
+      try { ideas = JSON.parse(data.result || data.content || data.text); } catch(e) {}
+    }
+
+    // Fallback: generate via direct API
+    if(!ideas) {
+      const r2 = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'anthropic-version': '2023-06-01', 'x-api-key': '' },
+        body: JSON.stringify({ model: 'claude-opus-4-5', max_tokens: 2000, messages: [{ role: 'user', content: prompt }] })
+      });
+      const d2 = await r2.json();
+      const txt = d2?.content?.[0]?.text || '';
+      const match = txt.match(/\[.*\]/s);
+      if(match) ideas = JSON.parse(match[0]);
+    }
+
+    if(!ideas || !ideas.length) throw new Error('No ideas generated');
+
+    renderCampaignIdeas(ideas, brand, lang);
+
+  } catch(e) {
+    console.error(e);
+    // Show fallback mock ideas if API fails
+    renderCampaignIdeas(generateFallbackIdeas(brand, industry, goal, lang, platform), brand, lang);
+    showToast('⚠️ Showing sample ideas — connect Claude API for live generation');
+  } finally {
+    document.getElementById('ai-ideas-loading').style.display = 'none';
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Generate Ideas';
+  }
+}
+
+function generateFallbackIdeas(brand, industry, goal, lang, platform) {
+  return [
+    {
+      name: lang === 'Arabic' ? `حملة "${brand}" — لحظة القرار` : `${brand} — The Decision Moment`,
+      hook: lang === 'Arabic' ? `"كم مرة قلت بكره؟ اليوم قرارك يختلف..."` : `"How many times did you say tomorrow? Today is different..."`,
+      script: lang === 'Arabic'
+        ? `المشهد 1: صورة شخص يتردد (3 ثوان)
+المشهد 2: "مع ${brand}، ما في تردد" (5 ثوان)
+المشهد 3: عرض المنتج/الخدمة بسرعة (10 ثوان)
+المشهد 4: نتائج حقيقية من عملاء (7 ثوان)
+المشهد 5: CTA واضح مع معلومات التواصل (5 ثوان)`
+        : `Scene 1: Person hesitating (3s)
+Scene 2: "${brand} — no more hesitation" (5s)
+Scene 3: Quick product showcase (10s)
+Scene 4: Real customer results (7s)
+Scene 5: Clear CTA with contact info (5s)`,
+      caption: lang === 'Arabic'
+        ? `لما تكون جاهز للقرار الصح، نحن هنا 🎯
+
+${brand} — ${industry === 'car dealership' ? 'وكالة السيارات الأولى في الرياض' : 'الخيار الأذكى'}
+
+📞 تواصل معنا الآن
+
+#${brand.replace(/\s/g,'')} #السعودية #الرياض #عروض`,
+        : `When you're ready to make the right choice, we're here 🎯
+
+${brand} — The smart choice
+
+📞 Contact us now
+
+#${brand.replace(/\s/g,'')} #Saudi #Riyadh`,
+      cta: lang === 'Arabic' ? 'تواصل الآن عبر الواتساب' : 'Contact us on WhatsApp now'
+    },
+    {
+      name: lang === 'Arabic' ? `"قبل وبعد" مع ${brand}` : `Before & After with ${brand}`,
+      hook: lang === 'Arabic' ? `"شوف الفرق بنفسك..."` : `"See the difference yourself..."`,
+      script: lang === 'Arabic'
+        ? `المشهد 1: الوضع "قبل" — المشكلة (5 ثوان)
+المشهد 2: لحظة التحول مع ${brand} (5 ثوان)
+المشهد 3: الوضع "بعد" — النتيجة (10 ثوان)
+المشهد 4: شهادة عميل حقيقي (7 ثوان)
+المشهد 5: عرض خاص لمتابعين (3 ثوان)`
+        : `Scene 1: "Before" situation — the problem (5s)
+Scene 2: The transformation moment with ${brand} (5s)
+Scene 3: "After" — the result (10s)
+Scene 4: Real customer testimonial (7s)
+Scene 5: Special offer for followers (3s)`,
+      caption: lang === 'Arabic'
+        ? `الفرق واضح 👀✨
+
+مئات العملاء غيّروا تجربتهم مع ${brand}
+
+أنت التالي؟ 👇
+
+#${brand.replace(/\s/g,'')} #نتائج_حقيقية #السعودية`,
+        : `The difference is clear 👀✨
+
+Hundreds of customers transformed with ${brand}
+
+Are you next? 👇
+
+#${brand.replace(/\s/g,'')} #RealResults #Saudi`,
+      cta: lang === 'Arabic' ? 'اضغط الرابط في البايو' : 'Click the link in bio'
+    },
+    {
+      name: lang === 'Arabic' ? `عرض محدود — ${brand}` : `Limited Offer — ${brand}`,
+      hook: lang === 'Arabic' ? `"٢٤ ساعة بس... بعدها ما في فرصة ثانية"` : `"Only 24 hours... after that, no second chance"`,
+      script: lang === 'Arabic'
+        ? `المشهد 1: كاونت داون (3 ثوان)
+المشهد 2: العرض بالتفصيل (8 ثوان)
+المشهد 3: ما يحصل عليه العميل (7 ثوان)
+المشهد 4: سعر قبل وبعد الخصم (5 ثوان)
+المشهد 5: رابط التواصل والحجز (7 ثوان)`
+        : `Scene 1: Countdown timer (3s)
+Scene 2: Offer details (8s)
+Scene 3: What the customer gets (7s)
+Scene 4: Before/after price (5s)
+Scene 5: Contact/booking link (7s)`,
+      caption: lang === 'Arabic'
+        ? `⏰ العرض ينتهي الليلة!
+
+${brand} يقدم لك فرصة مش هتتكرر
+💥 خصم حصري للمتابعين فقط
+
+تواصل قبل فوات الأوان 👇
+
+#عرض_محدود #${brand.replace(/\s/g,'')} #السعودية`,
+        : `⏰ Offer ends tonight!
+
+${brand} brings you an unmissable deal
+💥 Exclusive discount for followers only
+
+Contact before it's too late 👇
+
+#LimitedOffer #${brand.replace(/\s/g,'')} #Saudi`,
+      cta: lang === 'Arabic' ? 'تواصل الآن قبل انتهاء العرض' : 'Contact now before offer ends'
+    },
+    {
+      name: lang === 'Arabic' ? `"خلف الكواليس" مع ${brand}` : `Behind the Scenes at ${brand}`,
+      hook: lang === 'Arabic' ? `"شو اللي ما تشوفه العادي عن ${brand}؟"` : `"What you don't normally see about ${brand}..."`,
+      script: lang === 'Arabic'
+        ? `المشهد 1: يوم عمل حقيقي في ${brand} (8 ثوان)
+المشهد 2: الفريق والجهد خلف الخدمة (8 ثوان)
+المشهد 3: لحظة سعادة عميل (7 ثوان)
+المشهد 4: رسالة مباشرة من المؤسس (7 ثوان)
+المشهد 5: دعوة للتواصل (5 ثوان)`
+        : `Scene 1: Real workday at ${brand} (8s)
+Scene 2: The team and effort behind the service (8s)
+Scene 3: A happy customer moment (7s)
+Scene 4: Direct message from the founder (7s)
+Scene 5: Invitation to connect (5s)`,
+      caption: lang === 'Arabic'
+        ? `هذا اللي يصير كل يوم عشان تحصل على أفضل تجربة 🙌
+
+فريق ${brand} ما يتوقف عن التطوير من أجلك
+
+جزء من عيلتنا؟ تواصل معنا 👇
+
+#${brand.replace(/\s/g,'')} #فريق_متميز #خلف_الكواليس`,
+        : `This is what happens every day to give you the best experience 🙌
+
+${brand}'s team never stops improving for you
+
+Part of our family? Reach out 👇
+
+#${brand.replace(/\s/g,'')} #BehindTheScenes #TeamWork`,
+      cta: lang === 'Arabic' ? 'انضم لعيلتنا — تواصل الآن' : 'Join our family — contact us now'
+    }
+  ];
+}
+
+function renderCampaignIdeas(ideas, brand, lang) {
+  const container = document.getElementById('ai-ideas-content');
+  container.innerHTML = '';
+
+  ideas.forEach((idea, i) => {
+    const colors = ['#8b5cf6','#3b82f6','#06b6d4','#10b981'];
+    const color = colors[i % colors.length];
+    const card = document.createElement('div');
+    card.style.cssText = `background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all 0.2s`;
+    card.innerHTML = `
+      <!-- Card Header -->
+      <div style="background:linear-gradient(135deg,${color}18,${color}08);border-bottom:1px solid ${color}22;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:30px;height:30px;background:${color};border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;flex-shrink:0">${i+1}</div>
+          <div style="font-weight:700;font-size:14px;color:var(--text)">${idea.name}</div>
+        </div>
+        <button onclick="toggleIdeaCard(this)" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;padding:0;line-height:1;font-family:inherit">▾</button>
+      </div>
+      <!-- Card Body -->
+      <div class="idea-body" style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+        <!-- Hook -->
+        <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px">
+          <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;display:flex;align-items:center;gap:5px">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            HOOK — First 3 Seconds
+          </div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.6">${idea.hook}</div>
+        </div>
+        <!-- Script -->
+        <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px">
+          <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+            <span style="display:flex;align-items:center;gap:5px">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+              REEL SCRIPT
+            </span>
+            <button onclick="copyText(this, \`${idea.script.replace(/`/g,"'").replace(/
+/g,'\n')}\`)" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>
+          </div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">${idea.script}</div>
+        </div>
+        <!-- Caption -->
+        <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;padding:12px">
+          <div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+            <span style="display:flex;align-items:center;gap:5px">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              READY-TO-POST CAPTION
+            </span>
+            <button onclick="copyText(this, \`${idea.caption.replace(/`/g,"'").replace(/
+/g,'\n')}\`)" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--success);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>
+          </div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">${idea.caption}</div>
+        </div>
+        <!-- CTA + Use buttons -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text2)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            <strong style="color:var(--text)">CTA:</strong> ${idea.cta}
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="useCampaignIdea('email', \`${idea.name.replace(/`/g,"'")}\`, \`${idea.caption.replace(/`/g,"'").replace(/
+/g,'\n')}\`)" style="display:flex;align-items:center;gap:5px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              Use for Email
+            </button>
+            <button onclick="useCampaignIdea('sms', \`${idea.name.replace(/`/g,"'")}\`, \`${idea.cta.replace(/`/g,"'")}\`)" style="display:flex;align-items:center;gap:5px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Use for SMS
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  document.getElementById('ai-ideas-result').style.display = 'block';
+  document.getElementById('ai-ideas-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function toggleIdeaCard(btn) {
+  const body = btn.closest('[style*="background:var(--bg3)"]').querySelector('.idea-body');
+  if(body) {
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? 'flex' : 'none';
+    btn.textContent = isHidden ? '▾' : '▸';
+  }
+}
+
+function copyText(btn, text) {
+  navigator.clipboard.writeText(text.replace(/\\n/g,'\n')).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.style.background = 'rgba(16,185,129,0.15)';
+    btn.style.color = 'var(--success)';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; }, 2000);
+  });
+}
+
+function useCampaignIdea(channel, name, body) {
+  switchCampTab(channel);
+  if(channel === 'email') {
+    const nameEl = document.getElementById('camp-name');
+    const bodyEl = document.getElementById('camp-body');
+    if(nameEl) nameEl.value = name;
+    if(bodyEl) bodyEl.value = body.replace(/\n/g,'\n');
+  } else if(channel === 'sms') {
+    const nameEl = document.getElementById('sms-name');
+    const bodyEl = document.getElementById('sms-body');
+    if(nameEl) nameEl.value = name;
+    if(bodyEl) bodyEl.value = body;
+  }
+  showToast('✅ Campaign idea loaded — ready to send!');
+  setTimeout(() => { document.querySelector('#page-campaigns .card').scrollIntoView({ behavior: 'smooth' }); }, 300);
 }
 
 // ─── NORMALIZE SOURCE NAMES (Arabic → Brand name) ─────────────
