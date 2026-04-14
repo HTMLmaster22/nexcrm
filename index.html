@@ -1762,7 +1762,7 @@
                 </div>
               </div>
               <div style="font-size:11px;color:var(--text2);margin-top:8px">
-                Leads will see: <strong style="color:var(--text)">Your Name &lt;campaigns@nexcrm.sa&gt;</strong> — your name, our sending domain
+                Leads will see: <strong style="color:var(--text)">Your Name &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e380828e93828a848d90a38d869b80918ecd9082">[email&#160;protected]</a>&gt;</strong> — your name, our sending domain
               </div>
             </div>
             <div class="form-group">
@@ -3101,7 +3101,7 @@
       </div>
     </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     function showTwilioTab(tab) {
       document.getElementById('twilio-pane-guide').style.display = tab === 'guide' ? 'block' : 'none';
       document.getElementById('twilio-pane-connect').style.display = tab === 'connect' ? 'block' : 'none';
@@ -7261,20 +7261,33 @@ async function generateCampaignIdeas() {
 
   const btn = document.getElementById('ai-ideas-btn');
   btn.disabled = true;
-  btn.textContent = 'Generating...';
+  btn.innerHTML = 'Generating...';
   document.getElementById('ai-ideas-result').style.display = 'none';
   document.getElementById('ai-ideas-loading').style.display = 'block';
 
   try {
-    const isAr = lang === 'Arabic';
+    // Call real Claude API via Edge Function
+    const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-campaign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ brand, industry, goal, lang, platform })
+    });
+    const data = await response.json();
+    if(data.success && data.ideas && data.ideas.length) {
+      renderCampaignIdeas(data.ideas, brand, lang);
+      showToast('Ideas generated for ' + brand + '!');
+    } else {
+      throw new Error(data.error || 'No ideas returned');
+    }
+  } catch(e) {
+    console.error('AI Campaign error:', e);
     const ideas = generateFallbackIdeas(brand, industry, goal, lang, platform);
     renderCampaignIdeas(ideas, brand, lang);
-  } catch(e) {
-    showToast('Error generating ideas');
+    showToast('Showing sample ideas — API error: ' + e.message);
   } finally {
     document.getElementById('ai-ideas-loading').style.display = 'none';
     btn.disabled = false;
-    btn.textContent = 'Generate Ideas';
+    btn.innerHTML = 'Generate Ideas';
   }
 }
 
@@ -9081,33 +9094,7 @@ function exitViewAsClient() {
 // ═══════════════════════════════════════════════════════
 // AI CAMPAIGN IDEAS GENERATOR
 // ═══════════════════════════════════════════════════════
-async function generateCampaignIdeas() {
-  const brand = document.getElementById('ai-brand').value.trim();
-  const industry = document.getElementById('ai-industry').value;
-  const goal = document.getElementById('ai-goal').value;
-  const lang = document.getElementById('ai-lang').value;
-  const platform = document.getElementById('ai-platform').value;
 
-  if(!brand) { showToast('Enter your brand name first'); document.getElementById('ai-brand').focus(); return; }
-
-  const btn = document.getElementById('ai-ideas-btn');
-  btn.disabled = true;
-  btn.textContent = 'Generating...';
-  document.getElementById('ai-ideas-result').style.display = 'none';
-  document.getElementById('ai-ideas-loading').style.display = 'block';
-
-  try {
-    const isAr = lang === 'Arabic';
-    const ideas = generateFallbackIdeas(brand, industry, goal, lang, platform);
-    renderCampaignIdeas(ideas, brand, lang);
-  } catch(e) {
-    showToast('Error generating ideas');
-  } finally {
-    document.getElementById('ai-ideas-loading').style.display = 'none';
-    btn.disabled = false;
-    btn.textContent = 'Generate Ideas';
-  }
-}
 
 function generateFallbackIdeas(brand, industry, goal, lang, platform) {
   const ar = lang === 'Arabic';
@@ -9457,33 +9444,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // ═══════════════════════════════════════════════════════
 // AI CAMPAIGN IDEAS GENERATOR
 // ═══════════════════════════════════════════════════════
-async function generateCampaignIdeas() {
-  const brand = document.getElementById('ai-brand').value.trim();
-  const industry = document.getElementById('ai-industry').value;
-  const goal = document.getElementById('ai-goal').value;
-  const lang = document.getElementById('ai-lang').value;
-  const platform = document.getElementById('ai-platform').value;
 
-  if(!brand) { showToast('Enter your brand name first'); document.getElementById('ai-brand').focus(); return; }
-
-  const btn = document.getElementById('ai-ideas-btn');
-  btn.disabled = true;
-  btn.textContent = 'Generating...';
-  document.getElementById('ai-ideas-result').style.display = 'none';
-  document.getElementById('ai-ideas-loading').style.display = 'block';
-
-  try {
-    const isAr = lang === 'Arabic';
-    const ideas = generateFallbackIdeas(brand, industry, goal, lang, platform);
-    renderCampaignIdeas(ideas, brand, lang);
-  } catch(e) {
-    showToast('Error generating ideas');
-  } finally {
-    document.getElementById('ai-ideas-loading').style.display = 'none';
-    btn.disabled = false;
-    btn.textContent = 'Generate Ideas';
-  }
-}
 
 function generateFallbackIdeas(brand, industry, goal, lang, platform) {
   const ar = lang === 'Arabic';
@@ -9594,11 +9555,4 @@ function useCampaignIdea(channel, name, body) {
   if(channel === 'email') {
     var n = document.getElementById('camp-name'); if(n) n.value = name;
     var b = document.getElementById('camp-body'); if(b) b.value = body;
-  } else if(channel === 'sms') {
-    var n2 = document.getElementById('sms-name'); if(n2) n2.value = name;
-    var b2 = document.getElementById('sms-body'); if(b2) b2.value = body;
-  }
-  showToast('Campaign idea loaded — ready to send!');
-}
-
-</script>
+  } else if(channel ===
