@@ -9661,11 +9661,12 @@ async function generateVideoFromIdea(index) {
         body: JSON.stringify({ action: 'check', requestId: reqId })
       });
       var statusText = await statusRes.text();
-      var checkData = await statusRes.json();
+      var checkData;
+      try { checkData = JSON.parse(statusText); } catch(e) { throw new Error('Check parse error: ' + statusText.substring(0,200)); }
+      console.log('Check response:', checkData);
       
       if(checkData.status === 'COMPLETED') {
-        var checkData2 = await statusRes.json();
-        videoUrl = checkData2.videoUrl || null;
+        videoUrl = checkData.videoUrl || null;
         break;
       } else if(checkData.status === 'FAILED') {
         throw new Error('Video generation failed');
