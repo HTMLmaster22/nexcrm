@@ -9626,23 +9626,14 @@ async function generateVideoFromIdea(index) {
     '<div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>' +
     'Generating your video... this takes 30-60 seconds</div>';
 
-  var FAL_KEY = '1b4d91d3-bf9e-426a-b0c0-ef0b646e7c83:5d9c9116e8f3413fdee92ab03949328b';
-  var MODEL = 'fal-ai/kling-video/v1.6/standard/text-to-video';
+  var EDGE_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-video';
 
   try {
-    // Step 1: Submit directly to fal.ai
-    var submitRes = await fetch('https://queue.fal.run/' + MODEL, {
+    // Step 1: Submit via edge function
+    var submitRes = await fetch(EDGE_URL, {
       method: 'POST',
-      headers: { 
-        'Authorization': 'Key ' + FAL_KEY,
-        'Content-Type': 'application/json' 
-      },
-      body: JSON.stringify({
-        prompt: videoPrompt,
-        duration: '5',
-        aspect_ratio: '9:16',
-        negative_prompt: 'blurry, low quality, distorted, watermark'
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: videoPrompt, action: 'submit' })
     });
 
     var submitText = await submitRes.text();
@@ -9663,28 +9654,20 @@ async function generateVideoFromIdea(index) {
     for(var attempt = 0; attempt < 24; attempt++) {
       await new Promise(function(r) { setTimeout(r, 5000); });
       
-      // Build correct status URL manually (fal.ai's status_url is sometimes incomplete)
-      var correctStatusUrl = 'https://queue.fal.run/fal-ai/kling-video/v1.6/standard/text-to-video/requests/' + reqId + '/status';
-      var statusRes = await fetch(correctStatusUrl, {
-        method: 'GET',
-        headers: { 'Authorization': 'Key ' + FAL_KEY }
+      // Check status via edge function
+      var statusRes = await fetch(EDGE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'check', requestId: reqId })
       });
-      console.log('Status check:', statusRes.status, correctStatusUrl);
       var statusText = await statusRes.text();
-      var statusData;
-      try { statusData = JSON.parse(statusText); } catch(e) { statusData = { status: 'IN_QUEUE' }; }
+      var checkData = await statusRes.json();
       
-      if(statusData.status === 'COMPLETED') {
-        var correctResponseUrl = 'https://queue.fal.run/fal-ai/kling-video/v1.6/standard/text-to-video/requests/' + reqId;
-        var resultRes = await fetch(correctResponseUrl, {
-          method: 'GET',
-          headers: { 'Authorization': 'Key ' + FAL_KEY }
-        });
-        console.log('Fetching result from:', correctResponseUrl);
-        var resultData = await resultRes.json();
-        videoUrl = resultData?.video?.url || resultData?.output?.video?.url || resultData?.videos?.[0]?.url || null;
+      if(checkData.status === 'COMPLETED') {
+        var checkData2 = await statusRes.json();
+        videoUrl = checkData2.videoUrl || null;
         break;
-      } else if(statusData.status === 'FAILED') {
+      } else if(checkData.status === 'FAILED') {
         throw new Error('Video generation failed');
       }
       
