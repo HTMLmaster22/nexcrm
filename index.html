@@ -9646,10 +9646,11 @@ async function generateVideoFromIdea(index) {
     });
 
     var submitText = await submitRes.text();
+    console.log('FAL submit response:', submitRes.status, submitText.substring(0,300));
     var submitData;
     try { submitData = JSON.parse(submitText); } catch(e) { throw new Error('Submit parse error: ' + submitText.substring(0,200)); }
-    if(!submitRes.ok) throw new Error('Submit failed: ' + submitText.substring(0,200));
-    if(!submitData.request_id) throw new Error('No request_id: ' + submitText.substring(0,200));
+    if(!submitRes.ok) throw new Error('Submit failed ' + submitRes.status + ': ' + submitText.substring(0,300));
+    if(!submitData.request_id) throw new Error('No request_id in: ' + submitText.substring(0,200));
     
     var reqId = submitData.request_id;
     resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... please wait 30-60 seconds</div>';
