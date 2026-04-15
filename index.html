@@ -9660,9 +9660,12 @@ async function generateVideoFromIdea(index) {
       await new Promise(function(r) { setTimeout(r, 5000); });
       
       var statusRes = await fetch('https://queue.fal.run/' + MODEL + '/requests/' + reqId + '/status', {
-        headers: { 'Authorization': 'Key ' + FAL_KEY }
+        method: 'GET',
+        headers: { 'Authorization': 'Key ' + FAL_KEY, 'Content-Type': 'application/json' }
       });
-      var statusData = await statusRes.json();
+      var statusText = await statusRes.text();
+      var statusData;
+      try { statusData = JSON.parse(statusText); } catch(e) { statusData = { status: 'IN_QUEUE' }; }
       
       if(statusData.status === 'COMPLETED') {
         var resultRes = await fetch('https://queue.fal.run/' + MODEL + '/requests/' + reqId, {
