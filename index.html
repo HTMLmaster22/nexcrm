@@ -9663,21 +9663,24 @@ async function generateVideoFromIdea(index) {
     for(var attempt = 0; attempt < 24; attempt++) {
       await new Promise(function(r) { setTimeout(r, 5000); });
       
-      var statusRes = await fetch(statusUrl, {
+      // Build correct status URL manually (fal.ai's status_url is sometimes incomplete)
+      var correctStatusUrl = 'https://queue.fal.run/fal-ai/kling-video/v1.6/standard/text-to-video/requests/' + reqId + '/status';
+      var statusRes = await fetch(correctStatusUrl, {
         method: 'GET',
         headers: { 'Authorization': 'Key ' + FAL_KEY }
       });
-      console.log('Status:', statusRes.status);
+      console.log('Status check:', statusRes.status, correctStatusUrl);
       var statusText = await statusRes.text();
       var statusData;
       try { statusData = JSON.parse(statusText); } catch(e) { statusData = { status: 'IN_QUEUE' }; }
       
       if(statusData.status === 'COMPLETED') {
-        var resultRes = await fetch(responseUrl, {
+        var correctResponseUrl = 'https://queue.fal.run/fal-ai/kling-video/v1.6/standard/text-to-video/requests/' + reqId;
+        var resultRes = await fetch(correctResponseUrl, {
           method: 'GET',
           headers: { 'Authorization': 'Key ' + FAL_KEY }
         });
-        console.log('Result URL:', responseUrl);
+        console.log('Fetching result from:', correctResponseUrl);
         var resultData = await resultRes.json();
         videoUrl = resultData?.video?.url || resultData?.output?.video?.url || resultData?.videos?.[0]?.url || null;
         break;
