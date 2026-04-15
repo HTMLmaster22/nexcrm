@@ -9641,9 +9641,9 @@ async function generateVideoFromIdea(index) {
     var submitData;
     try { submitData = JSON.parse(submitText); } catch(e) { throw new Error('Submit parse error: ' + submitText.substring(0,200)); }
     if(!submitRes.ok) throw new Error('Submit failed ' + submitRes.status + ': ' + submitText.substring(0,300));
-    if(!submitData.request_id) throw new Error('No request_id in: ' + submitText.substring(0,200));
+    if(!submitData.requestId) throw new Error('No request_id in: ' + submitText.substring(0,200));
     
-    var reqId = submitData.request_id;
+    var reqId = submitData.requestId;
     var statusUrl = submitData.status_url;
     var responseUrl = submitData.response_url;
     console.log('Got reqId:', reqId, 'statusUrl:', statusUrl);
