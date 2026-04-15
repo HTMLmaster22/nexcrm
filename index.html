@@ -9626,50 +9626,66 @@ async function generateVideoFromIdea(index) {
     '<div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>' +
     'Generating your video... this takes 30-60 seconds</div>';
 
+  var FAL_KEY = '1b4d91d3-bf9e-426a-b0c0-ef0b646e7c83:5d9c9116e8f3413fdee92ab03949328b';
+  var MODEL = 'fal-ai/kling-video/v1.6/standard/text-to-video';
+
   try {
-    // Step 1: Submit the job
-    var submitRes = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-video', {
+    // Step 1: Submit directly to fal.ai
+    var submitRes = await fetch('https://queue.fal.run/' + MODEL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: videoPrompt, action: 'submit' })
+      headers: { 
+        'Authorization': 'Key ' + FAL_KEY,
+        'Content-Type': 'application/json' 
+      },
+      body: JSON.stringify({
+        prompt: videoPrompt,
+        duration: '5',
+        aspect_ratio: '9:16',
+        negative_prompt: 'blurry, low quality, distorted, watermark'
+      })
     });
-    var submitData = await submitRes.json();
-    if(!submitData.success || !submitData.requestId) throw new Error(submitData.error || 'Submit failed');
+
+    var submitText = await submitRes.text();
+    var submitData;
+    try { submitData = JSON.parse(submitText); } catch(e) { throw new Error('Submit parse error: ' + submitText.substring(0,200)); }
+    if(!submitRes.ok) throw new Error('Submit failed: ' + submitText.substring(0,200));
+    if(!submitData.request_id) throw new Error('No request_id: ' + submitText.substring(0,200));
     
-    var reqId = submitData.requestId;
+    var reqId = submitData.request_id;
     resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... please wait 30-60 seconds</div>';
 
-    // Step 2: Poll for result from browser
+    // Step 2: Poll directly from browser
     var videoUrl = null;
     for(var attempt = 0; attempt < 24; attempt++) {
       await new Promise(function(r) { setTimeout(r, 5000); });
       
-      var checkRes = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-video', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'check', requestId: reqId })
+      var statusRes = await fetch('https://queue.fal.run/' + MODEL + '/requests/' + reqId + '/status', {
+        headers: { 'Authorization': 'Key ' + FAL_KEY }
       });
-      var checkData = await checkRes.json();
+      var statusData = await statusRes.json();
       
-      if(checkData.status === 'COMPLETED' && checkData.videoUrl) {
-        videoUrl = checkData.videoUrl;
+      if(statusData.status === 'COMPLETED') {
+        var resultRes = await fetch('https://queue.fal.run/' + MODEL + '/requests/' + reqId, {
+          headers: { 'Authorization': 'Key ' + FAL_KEY }
+        });
+        var resultData = await resultRes.json();
+        videoUrl = resultData?.video?.url || resultData?.output?.video?.url || resultData?.videos?.[0]?.url || null;
         break;
-      } else if(checkData.status === 'FAILED') {
-        throw new Error('Video generation failed: ' + (checkData.error || 'Unknown'));
+      } else if(statusData.status === 'FAILED') {
+        throw new Error('Video generation failed');
       }
       
-      // Update progress
       var secs = (attempt + 1) * 5;
       resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... ' + secs + 's elapsed</div>';
     }
     
-    if(!videoUrl) throw new Error('Video generation timed out — please try again');
+    if(!videoUrl) throw new Error('Timed out — please try again');
 
     resultDiv.innerHTML = 
       '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:10px">VIDEO READY</div>' +
       '<video src="' + videoUrl + '" controls style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"></video>' +
-      '<div style="text-align:center">' +
-        '<a href="' + videoUrl + '" download="nexcrm-video.mp4" target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">Download Video</a>' +
+      '<div style="text-align:center;margin-top:8px">' +
+        '<a href="' + videoUrl + '" target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">Download Video</a>' +
       '</div>';
     showToast('Video generated!');
 
