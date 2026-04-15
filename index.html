@@ -9653,6 +9653,9 @@ async function generateVideoFromIdea(index) {
     if(!submitData.request_id) throw new Error('No request_id in: ' + submitText.substring(0,200));
     
     var reqId = submitData.request_id;
+    var statusUrl = submitData.status_url;
+    var responseUrl = submitData.response_url;
+    console.log('Got reqId:', reqId, 'statusUrl:', statusUrl);
     resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... please wait 30-60 seconds</div>';
 
     // Step 2: Poll directly from browser
@@ -9660,18 +9663,21 @@ async function generateVideoFromIdea(index) {
     for(var attempt = 0; attempt < 24; attempt++) {
       await new Promise(function(r) { setTimeout(r, 5000); });
       
-      var statusRes = await fetch('https://queue.fal.run/' + MODEL + '/requests/' + reqId + '/status', {
+      var statusRes = await fetch(statusUrl, {
         method: 'GET',
-        headers: { 'Authorization': 'Key ' + FAL_KEY, 'Content-Type': 'application/json' }
+        headers: { 'Authorization': 'Key ' + FAL_KEY }
       });
+      console.log('Status:', statusRes.status);
       var statusText = await statusRes.text();
       var statusData;
       try { statusData = JSON.parse(statusText); } catch(e) { statusData = { status: 'IN_QUEUE' }; }
       
       if(statusData.status === 'COMPLETED') {
-        var resultRes = await fetch('https://queue.fal.run/' + MODEL + '/requests/' + reqId, {
+        var resultRes = await fetch(responseUrl, {
+          method: 'GET',
           headers: { 'Authorization': 'Key ' + FAL_KEY }
         });
+        console.log('Result URL:', responseUrl);
         var resultData = await resultRes.json();
         videoUrl = resultData?.video?.url || resultData?.output?.video?.url || resultData?.videos?.[0]?.url || null;
         break;
