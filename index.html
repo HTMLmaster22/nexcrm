@@ -9588,7 +9588,15 @@ function useCampaignIdea(channel, name, body) {
   if(channel === 'email') {
     var n = document.getElementById('camp-name'); if(n) n.value = name;
     var b = document.getElementById('camp-body'); if(b) b.value = body;
-  } else if(channel ===<script>
+    } else if(channel === 'sms') {
+    var n2 = document.getElementById('sms-name'); if(n2) n2.value = name;
+    var b2 = document.getElementById('sms-body'); if(b2) b2.value = body;
+  }
+  showToast('Campaign idea loaded — ready to send!');
+}
+
+<script>
+
 // Store generated ideas globally so generateVideoFromIdea can access them
 var _lastGeneratedIdeas = [];
 
@@ -9670,6 +9678,7 @@ if(typeof renderCampaignIdeas === 'function') {
     _patchedRender(ideas, brand, lang);
   };
 }
+
 </script>
 <script>
 // Brand context toggle
