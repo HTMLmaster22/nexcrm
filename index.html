@@ -1683,6 +1683,32 @@
             </select>
           </div>
         </div>
+        <!-- Brand Context — Manual or URL -->
+        <div style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Brand Context <span style="color:var(--text2);font-weight:400;text-transform:none;font-size:10px">(helps Claude generate better ideas)</span></label>
+            <div style="display:flex;gap:0;background:var(--bg3);border-radius:8px;padding:3px">
+              <button id="ctx-tab-manual" onclick="switchBrandCtx('manual')" style="padding:4px 12px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;background:var(--accent);color:#fff;transition:all 0.2s">Manual</button>
+              <button id="ctx-tab-url" onclick="switchBrandCtx('url')" style="padding:4px 12px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;background:transparent;color:var(--text2);transition:all 0.2s">Website URL</button>
+            </div>
+          </div>
+          <!-- Manual description -->
+          <div id="ctx-manual">
+            <textarea class="form-input" id="ai-brand-desc" rows="2" placeholder="e.g. Silah is a premium shooting range in Riyadh offering firearms training, tactical courses for individuals and corporates..." style="resize:none;font-size:13px;line-height:1.6"></textarea>
+          </div>
+          <!-- URL input -->
+          <div id="ctx-url" style="display:none">
+            <div style="display:flex;gap:8px">
+              <input class="form-input" id="ai-brand-url" placeholder="https://www.silah.com.sa" style="font-size:13px;flex:1" />
+              <button onclick="fetchBrandFromURL()" id="fetch-url-btn" style="background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                Read Website
+              </button>
+            </div>
+            <div id="url-fetch-result" style="margin-top:8px;font-size:12px;color:var(--text2)"></div>
+          </div>
+        </div>
+
         <div style="display:flex;gap:10px;margin-bottom:14px">
           <div style="flex:1">
             <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Language</label>
@@ -7256,6 +7282,7 @@ async function generateCampaignIdeas() {
   const goal = document.getElementById('ai-goal').value;
   const lang = document.getElementById('ai-lang').value;
   const platform = document.getElementById('ai-platform').value;
+  const brandDesc = document.getElementById('ai-brand-desc') ? document.getElementById('ai-brand-desc').value.trim() : '';
 
   if(!brand) { showToast('Enter your brand name first'); document.getElementById('ai-brand').focus(); return; }
 
@@ -7270,7 +7297,7 @@ async function generateCampaignIdeas() {
     const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-campaign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ brand, industry, goal, lang, platform })
+      body: JSON.stringify({ brand, industry, goal, lang, platform, brandDesc })
     });
     const data = await response.json();
     if(data.success && data.ideas && data.ideas.length) {
@@ -9642,5 +9669,52 @@ if(typeof renderCampaignIdeas === 'function') {
     _lastGeneratedIdeas = ideas;
     _patchedRender(ideas, brand, lang);
   };
+}
+</script>
+<script>
+// Brand context toggle
+function switchBrandCtx(tab) {
+  document.getElementById('ctx-manual').style.display = tab === 'manual' ? 'block' : 'none';
+  document.getElementById('ctx-url').style.display = tab === 'url' ? 'block' : 'none';
+  document.getElementById('ctx-tab-manual').style.background = tab === 'manual' ? 'var(--accent)' : 'transparent';
+  document.getElementById('ctx-tab-manual').style.color = tab === 'manual' ? '#fff' : 'var(--text2)';
+  document.getElementById('ctx-tab-url').style.background = tab === 'url' ? 'var(--accent)' : 'transparent';
+  document.getElementById('ctx-tab-url').style.color = tab === 'url' ? '#fff' : 'var(--text2)';
+}
+
+async function fetchBrandFromURL() {
+  var url = document.getElementById('ai-brand-url').value.trim();
+  if(!url) { showToast('Enter a website URL first'); return; }
+  if(!url.startsWith('http')) url = 'https://' + url;
+
+  var btn = document.getElementById('fetch-url-btn');
+  var result = document.getElementById('url-fetch-result');
+  btn.textContent = 'Reading...';
+  btn.disabled = true;
+  result.textContent = 'Fetching website content...';
+
+  try {
+    var response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-campaign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fetchUrl: url, mode: 'fetch_only' })
+    });
+    var data = await response.json();
+
+    if(data.brandDesc) {
+      // Switch to manual tab and fill in the description
+      switchBrandCtx('manual');
+      document.getElementById('ai-brand-desc').value = data.brandDesc;
+      result.innerHTML = '<span style="color:var(--success)">✓ Website read successfully — description filled in!</span>';
+      showToast('Website content loaded!');
+    } else {
+      throw new Error(data.error || 'Could not read website');
+    }
+  } catch(e) {
+    result.innerHTML = '<span style="color:var(--danger)">Could not read website. Please fill in manually.</span>';
+  } finally {
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Read Website';
+    btn.disabled = false;
+  }
 }
 </script>
