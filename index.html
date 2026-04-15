@@ -7386,8 +7386,10 @@ function renderCampaignIdeas(ideas, brand, lang) {
           '<div style="display:flex;gap:8px">' +
             '<button onclick="useCampaignIdea(\'email\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.caption.replace(/'/g,"\\'").replace(/\n/g,' ') + '\')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for Email</button>' +
             '<button onclick="useCampaignIdea(\'sms\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.cta.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for SMS</button>' +
+            '<button onclick="generateVideoFromIdea(' + i + ')" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video</button>' +
           '</div>' +
         '</div>' +
+        '<div id="video-result-' + i + '" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px"></div>' +
       '</div>';
     container.appendChild(div);
   });
@@ -9191,8 +9193,10 @@ function renderCampaignIdeas(ideas, brand, lang) {
           '<div style="display:flex;gap:8px">' +
             '<button onclick="useCampaignIdea(\'email\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.caption.replace(/'/g,"\\'").replace(/\n/g,' ') + '\')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for Email</button>' +
             '<button onclick="useCampaignIdea(\'sms\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.cta.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for SMS</button>' +
+            '<button onclick="generateVideoFromIdea(' + i + ')" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video</button>' +
           '</div>' +
         '</div>' +
+        '<div id="video-result-' + i + '" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px"></div>' +
       '</div>';
     container.appendChild(div);
   });
@@ -9541,8 +9545,10 @@ function renderCampaignIdeas(ideas, brand, lang) {
           '<div style="display:flex;gap:8px">' +
             '<button onclick="useCampaignIdea(\'email\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.caption.replace(/'/g,"\\'").replace(/\n/g,' ') + '\')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for Email</button>' +
             '<button onclick="useCampaignIdea(\'sms\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.cta.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for SMS</button>' +
+            '<button onclick="generateVideoFromIdea(' + i + ')" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video</button>' +
           '</div>' +
         '</div>' +
+        '<div id="video-result-' + i + '" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px"></div>' +
       '</div>';
     container.appendChild(div);
   });
@@ -9555,4 +9561,86 @@ function useCampaignIdea(channel, name, body) {
   if(channel === 'email') {
     var n = document.getElementById('camp-name'); if(n) n.value = name;
     var b = document.getElementById('camp-body'); if(b) b.value = body;
-  } else if(channel ===
+  } else if(channel ===<script>
+// Store generated ideas globally so generateVideoFromIdea can access them
+var _lastGeneratedIdeas = [];
+
+// Override renderCampaignIdeas to store ideas
+var _origRender = window.renderCampaignIdeas;
+
+async function generateVideoFromIdea(index) {
+  var ideas = _lastGeneratedIdeas;
+  if(!ideas || !ideas[index]) { showToast('Generate ideas first'); return; }
+  
+  var idea = ideas[index];
+  var resultDiv = document.getElementById('video-result-' + index);
+  var btn = document.querySelector('[onclick="generateVideoFromIdea(' + index + ')"]');
+  
+  if(!resultDiv) return;
+
+  // Convert reel script to visual video prompt
+  var videoPrompt = 'Create a vertical social media video (9:16) for ' + 
+    (document.getElementById('ai-brand').value || 'a brand') + 
+    '. Style: modern, cinematic, social media quality. ' +
+    'Hook: ' + idea.hook + '. ' +
+    'Scene description: ' + idea.script.substring(0, 200) + 
+    '. High energy, engaging, suitable for TikTok/Instagram Reels/Snapchat.';
+
+  // Show loading
+  if(btn) { btn.textContent = 'Generating...'; btn.disabled = true; }
+  resultDiv.style.display = 'block';
+  resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">' +
+    '<div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>' +
+    'Generating your video... this takes 30-60 seconds</div>';
+
+  try {
+    var response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-video', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        prompt: videoPrompt,
+        brand: document.getElementById('ai-brand').value || '',
+        duration: '5'
+      })
+    });
+
+    var data = await response.json();
+
+    if(data.success && data.videoUrl) {
+      resultDiv.innerHTML = 
+        '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:10px;display:flex;align-items:center;gap:6px">' +
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>' +
+          'VIDEO GENERATED' +
+        '</div>' +
+        '<video src="' + data.videoUrl + '" controls style="width:100%;max-width:300px;border-radius:12px;display:block;margin:0 auto 12px"></video>' +
+        '<div style="display:flex;gap:8px;justify-content:center">' +
+          '<a href="' + data.videoUrl + '" download="nexcrm-video.mp4" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px">' +
+            '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' +
+            'Download Video' +
+          '</a>' +
+        '</div>';
+      showToast('Video generated successfully!');
+    } else {
+      throw new Error(data.error || 'Video generation failed');
+    }
+  } catch(e) {
+    resultDiv.innerHTML = '<div style="color:var(--danger);font-size:12px;padding:10px">Error: ' + e.message + '</div>';
+    showToast('Video generation failed: ' + e.message);
+  } finally {
+    if(btn) { 
+      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video';
+      btn.disabled = false; 
+    }
+  }
+}
+
+// Patch renderCampaignIdeas to store ideas
+var _origRenderCI = window.renderCampaignIdeas;
+if(typeof renderCampaignIdeas === 'function') {
+  var _patchedRender = renderCampaignIdeas;
+  window.renderCampaignIdeas = function(ideas, brand, lang) {
+    _lastGeneratedIdeas = ideas;
+    _patchedRender(ideas, brand, lang);
+  };
+}
+</script>
