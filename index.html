@@ -9595,8 +9595,6 @@ function useCampaignIdea(channel, name, body) {
   showToast('Campaign idea loaded — ready to send!');
 }
 
-<script>
-
 // Store generated ideas globally so generateVideoFromIdea can access them
 var _lastGeneratedIdeas = [];
 
@@ -9679,8 +9677,8 @@ if(typeof renderCampaignIdeas === 'function') {
   };
 }
 
-</script>
-<script>
+
+
 // Brand context toggle
 function switchBrandCtx(tab) {
   document.getElementById('ctx-manual').style.display = tab === 'manual' ? 'block' : 'none';
@@ -9726,4 +9724,7 @@ async function fetchBrandFromURL() {
     btn.disabled = false;
   }
 }
+
 </script>
+</body>
+</html>
