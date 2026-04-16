@@ -9832,7 +9832,7 @@ async function startVideoGeneration() {
       try { checkData = JSON.parse(checkText); } catch(e) { continue; }
       console.log('Check:', checkData.status);
 
-      if(checkData.status === 'COMPLETED') { videoUrl = checkData.videoUrl; break; }
+      if(checkData.status === 'COMPLETED') { videoUrl = checkData.videoUrl || checkData.video_url || null; console.log('COMPLETED full response:', JSON.stringify(checkData)); break; }
       if(checkData.status === 'FAILED') throw new Error('Video generation failed on FAL side');
 
       var secs = (attempt + 1) * 5;
