@@ -9769,7 +9769,7 @@ function generatePromptOptions(idea, duration) {
 
   var html = '';
   prompts.forEach(function(p, i) {
-    html += '<div class="vm-prompt-card" onclick="selectPrompt(this, '' + i + '')" data-prompt="' + p.text.replace(/"/g, '&quot;') + '">' +
+    html += '<div class="vm-prompt-card" onclick="selectPrompt(this,' + i + ')" data-prompt="' + p.text.replace(/"/g, '&quot;') + '">' +
       '<div class="vm-prompt-label">' + p.label + '</div>' +
       p.text +
       '</div>';
