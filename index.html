@@ -9595,107 +9595,272 @@ function useCampaignIdea(channel, name, body) {
   showToast('Campaign idea loaded — ready to send!');
 }
 
-// Store generated ideas globally so generateVideoFromIdea can access them
+// ── VIDEO MODAL STYLES ───────────────────────────────────────────────────────
+(function() {
+  var s = document.createElement('style');
+  s.textContent = `
+    #video-modal-overlay {
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;
+      align-items:center;justify-content:center;padding:20px;
+    }
+    #video-modal-overlay.open { display:flex; }
+    #video-modal {
+      background:var(--bg2,#0f1629);border:1px solid rgba(139,92,246,0.3);
+      border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;
+      padding:24px;position:relative;
+    }
+    .vm-title { font-size:16px;font-weight:800;color:#8b5cf6;margin-bottom:4px; }
+    .vm-sub { font-size:12px;color:var(--text2);margin-bottom:20px; }
+    .vm-section-label { font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px; }
+    .vm-duration-row { display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap; }
+    .vm-dur-btn {
+      flex:1;min-width:70px;padding:10px 6px;border-radius:10px;border:2px solid rgba(139,92,246,0.2);
+      background:rgba(139,92,246,0.05);color:var(--text);font-size:13px;font-weight:700;
+      cursor:pointer;text-align:center;transition:all 0.2s;
+    }
+    .vm-dur-btn:hover,.vm-dur-btn.active {
+      border-color:#8b5cf6;background:rgba(139,92,246,0.15);color:#8b5cf6;
+    }
+    .vm-prompts { display:flex;flex-direction:column;gap:10px;margin-bottom:20px; }
+    .vm-prompt-card {
+      padding:12px 14px;border-radius:10px;border:2px solid rgba(139,92,246,0.15);
+      background:rgba(139,92,246,0.04);cursor:pointer;font-size:12px;
+      line-height:1.6;color:var(--text);transition:all 0.2s;position:relative;
+    }
+    .vm-prompt-card:hover,.vm-prompt-card.selected {
+      border-color:#8b5cf6;background:rgba(139,92,246,0.12);
+    }
+    .vm-prompt-card.selected::after {
+      content:'✓ Selected';position:absolute;top:8px;right:10px;
+      font-size:10px;font-weight:800;color:#8b5cf6;
+    }
+    .vm-prompt-label { font-size:10px;font-weight:800;color:#8b5cf6;margin-bottom:4px;text-transform:uppercase; }
+    .vm-actions { display:flex;gap:10px;justify-content:flex-end; }
+    .vm-cancel-btn {
+      padding:10px 20px;border-radius:10px;border:1px solid rgba(139,92,246,0.3);
+      background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;
+    }
+    .vm-generate-btn {
+      padding:10px 24px;border-radius:10px;border:none;
+      background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;
+      font-size:13px;font-weight:700;cursor:pointer;opacity:0.4;pointer-events:none;transition:opacity 0.2s;
+    }
+    .vm-generate-btn.ready { opacity:1;pointer-events:auto; }
+    .vm-loading { text-align:center;padding:20px;color:var(--text2);font-size:12px; }
+    .vm-spinner { width:28px;height:28px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px; }
+  `;
+  document.head.appendChild(s);
+
+  // Inject modal HTML
+  var modal = document.createElement('div');
+  modal.id = 'video-modal-overlay';
+  modal.innerHTML = `
+    <div id="video-modal">
+      <div class="vm-title">🎬 Generate AI Video</div>
+      <div class="vm-sub">Choose duration, pick your best prompt, then generate.</div>
+      <div class="vm-section-label">Select Duration</div>
+      <div class="vm-duration-row">
+        <div class="vm-dur-btn" data-dur="5">5s</div>
+        <div class="vm-dur-btn" data-dur="10">10s</div>
+        <div class="vm-dur-btn active" data-dur="16">16s</div>
+      </div>
+      <div class="vm-section-label">Choose a Prompt Angle</div>
+      <div class="vm-prompts" id="vm-prompt-list">
+        <div class="vm-loading"><div class="vm-spinner"></div>Generating prompt options...</div>
+      </div>
+      <div class="vm-actions">
+        <button class="vm-cancel-btn" onclick="closeVideoModal()">Cancel</button>
+        <button class="vm-generate-btn" id="vm-generate-btn" onclick="startVideoGeneration()">Generate Video</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+})();
+
+// ── MODAL STATE ───────────────────────────────────────────────────────────────
 var _lastGeneratedIdeas = [];
+var _videoModalState = { ideaIndex: null, duration: '16', selectedPrompt: null, resultDiv: null, btn: null };
 
-// Override renderCampaignIdeas to store ideas
-var _origRender = window.renderCampaignIdeas;
+function closeVideoModal() {
+  document.getElementById('video-modal-overlay').classList.remove('open');
+}
 
-async function generateVideoFromIdea(index) {
+function openVideoModal(index) {
   var ideas = _lastGeneratedIdeas;
   if(!ideas || !ideas[index]) { showToast('Generate ideas first'); return; }
-  
+
   var idea = ideas[index];
   var resultDiv = document.getElementById('video-result-' + index);
   var btn = document.querySelector('[onclick="generateVideoFromIdea(' + index + ')"]');
-  
-  if(!resultDiv) return;
 
-  // Convert reel script to visual video prompt
-  var videoPrompt = 'Create a vertical social media video (9:16) for ' + 
-    (document.getElementById('ai-brand').value || 'a brand') + 
-    '. Style: modern, cinematic, social media quality. ' +
-    'Hook: ' + idea.hook + '. ' +
-    'Scene description: ' + idea.script.substring(0, 200) + 
-    '. High energy, engaging, suitable for TikTok/Instagram Reels/Snapchat.';
+  _videoModalState.ideaIndex = index;
+  _videoModalState.duration = '16';
+  _videoModalState.selectedPrompt = null;
+  _videoModalState.resultDiv = resultDiv;
+  _videoModalState.btn = btn;
 
-  // Show loading
+  // Reset UI
+  document.querySelectorAll('.vm-dur-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.dur === '16');
+  });
+  document.getElementById('vm-generate-btn').classList.remove('ready');
+  document.getElementById('vm-modal-overlay');
+
+  // Show modal
+  document.getElementById('video-modal-overlay').classList.add('open');
+
+  // Generate prompts
+  generatePromptOptions(idea, '16');
+
+  // Duration click handlers
+  document.querySelectorAll('.vm-dur-btn').forEach(function(b) {
+    b.onclick = function() {
+      document.querySelectorAll('.vm-dur-btn').forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      _videoModalState.duration = b.dataset.dur;
+      _videoModalState.selectedPrompt = null;
+      document.getElementById('vm-generate-btn').classList.remove('ready');
+      generatePromptOptions(idea, b.dataset.dur);
+    };
+  });
+}
+
+function generatePromptOptions(idea, duration) {
+  var list = document.getElementById('vm-prompt-list');
+  list.innerHTML = '<div class="vm-loading"><div class="vm-spinner"></div>Generating prompt options...</div>';
+
+  var brand = (document.getElementById('ai-brand') ? document.getElementById('ai-brand').value : '') || 'Saudi brand';
+  var hook = idea.hook || '';
+  var script = idea.script || '';
+  var dur = parseInt(duration);
+
+  // Build 3 prompt angles based on duration + idea
+  var sceneCount = dur <= 5 ? 1 : dur <= 10 ? 2 : 3;
+  var pacing = dur <= 5 ? 'fast-paced, single impactful shot' : dur <= 10 ? 'two scenes, smooth transition' : 'three scenes, cinematic flow';
+
+  var prompts = [
+    {
+      label: '🎯 Direct Message',
+      text: 'Cinematic vertical 9:16 video, ' + dur + ' seconds, photorealistic. ' +
+        'Saudi man wearing white thobe and ghutra, modern Riyadh office with city skyline. ' +
+        'Confident, speaking directly to camera. Warm golden lighting. ' +
+        'Theme: "' + hook.substring(0, 70) + '". ' +
+        pacing + '. Professional corporate quality, smooth camera movement. No subtitles.'
+    },
+    {
+      label: '🌟 Lifestyle Story',
+      text: 'Cinematic ' + dur + '-second vertical reel (9:16), photorealistic Saudi Arabia setting. ' +
+        'Young Saudi professional, traditional dress, modern lifestyle. ' +
+        'Scene: busy Riyadh business district, glass buildings, luxury feel. ' +
+        'Story arc: challenge → solution → success. ' +
+        'Brand context: ' + brand + '. ' +
+        pacing + '. Cinematic grade, warm tones, high end commercial quality.'
+    },
+    {
+      label: '⚡ High Energy Hook',
+      text: dur + '-second vertical video (9:16), Saudi Arabia, high energy social media style. ' +
+        'Fast cuts, dynamic camera angles. Saudi characters in professional setting. ' +
+        'Opening hook captures attention in first 2 seconds. ' +
+        'Key message: "' + hook.substring(0, 60) + '". ' +
+        'Modern Riyadh backdrop, authentic Saudi culture, thobe, ghutra. ' +
+        'Instagram Reels quality, vibrant colors, cinematic.'
+    }
+  ];
+
+  var html = '';
+  prompts.forEach(function(p, i) {
+    html += '<div class="vm-prompt-card" onclick="selectPrompt(this, '' + i + '')" data-prompt="' + p.text.replace(/"/g, '&quot;') + '">' +
+      '<div class="vm-prompt-label">' + p.label + '</div>' +
+      p.text +
+      '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function selectPrompt(el, idx) {
+  document.querySelectorAll('.vm-prompt-card').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  _videoModalState.selectedPrompt = el.getAttribute('data-prompt');
+  document.getElementById('vm-generate-btn').classList.add('ready');
+}
+
+async function startVideoGeneration() {
+  var state = _videoModalState;
+  if(!state.selectedPrompt) return;
+
+  closeVideoModal();
+
+  var resultDiv = state.resultDiv;
+  var btn = state.btn;
+
   if(btn) { btn.textContent = 'Generating...'; btn.disabled = true; }
-  resultDiv.style.display = 'block';
-  resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">' +
-    '<div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>' +
-    'Generating your video... this takes 30-60 seconds</div>';
+  if(resultDiv) {
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">' +
+      '<div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>' +
+      'Submitting to Runway Gen-3...</div>';
+  }
 
   var EDGE_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-video';
 
   try {
-    // Step 1: Submit via edge function
     var submitRes = await fetch(EDGE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: videoPrompt, action: 'submit' })
+      body: JSON.stringify({ action: 'submit', prompt: state.selectedPrompt, duration: state.duration })
     });
-
     var submitText = await submitRes.text();
-    console.log('FAL submit response:', submitRes.status, submitText.substring(0,300));
+    console.log('Submit:', submitRes.status, submitText.substring(0,300));
     var submitData;
     try { submitData = JSON.parse(submitText); } catch(e) { throw new Error('Submit parse error: ' + submitText.substring(0,200)); }
     if(!submitRes.ok) throw new Error('Submit failed ' + submitRes.status + ': ' + submitText.substring(0,300));
-    if(!submitData.requestId) throw new Error('No request_id in: ' + submitText.substring(0,200));
-    
-    var reqId = submitData.requestId;
-    var statusUrl = submitData.status_url;
-    var responseUrl = submitData.response_url;
-    console.log('Got reqId:', reqId, 'statusUrl:', statusUrl);
-    resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... please wait 30-60 seconds</div>';
+    if(!submitData.requestId) throw new Error('No requestId returned');
 
-    // Step 2: Poll directly from browser
+    var reqId = submitData.requestId;
+    if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... 0s elapsed (takes 3-5 min)</div>';
+
     var videoUrl = null;
-    for(var attempt = 0; attempt < 60; attempt++) {
+    for(var attempt = 0; attempt < 72; attempt++) {
       await new Promise(function(r) { setTimeout(r, 5000); });
-      
-      // Check status via edge function
-      var statusRes = await fetch(EDGE_URL, {
+      var checkRes = await fetch(EDGE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'check', requestId: reqId, statusUrl: statusUrl, responseUrl: responseUrl })
+        body: JSON.stringify({ action: 'check', requestId: reqId })
       });
-      var statusText = await statusRes.text();
+      var checkText = await checkRes.text();
       var checkData;
-      try { checkData = JSON.parse(statusText); } catch(e) { throw new Error('Check parse error: ' + statusText.substring(0,200)); }
-      console.log('Check response:', checkData);
-      
-      if(checkData.status === 'COMPLETED') {
-        videoUrl = checkData.videoUrl || null;
-        break;
-      } else if(checkData.status === 'FAILED') {
-        throw new Error('Video generation failed');
-      }
-      
-      var secs = (attempt + 1) * 5;
-      resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... ' + secs + 's elapsed</div>';
-    }
-    
-    if(!videoUrl) throw new Error('Timed out — please try again');
+      try { checkData = JSON.parse(checkText); } catch(e) { continue; }
+      console.log('Check:', checkData.status);
 
-    resultDiv.innerHTML = 
-      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:10px">VIDEO READY</div>' +
-      '<video src="' + videoUrl + '" controls style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"></video>' +
+      if(checkData.status === 'COMPLETED') { videoUrl = checkData.videoUrl; break; }
+      if(checkData.status === 'FAILED') throw new Error('Video generation failed on FAL side');
+
+      var secs = (attempt + 1) * 5;
+      if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... ' + secs + 's elapsed</div>';
+    }
+
+    if(!videoUrl) throw new Error('Timed out after 6 minutes — please try again');
+
+    if(resultDiv) resultDiv.innerHTML =
+      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:10px">✅ VIDEO READY</div>' +
+      '<video src="' + videoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"></video>' +
       '<div style="text-align:center;margin-top:8px">' +
-        '<a href="' + videoUrl + '" target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">Download Video</a>' +
+        '<a href="' + videoUrl + '" download target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">⬇ Download Video</a>' +
       '</div>';
-    showToast('Video generated!');
+    showToast('🎬 Video ready!');
 
   } catch(e) {
-    resultDiv.innerHTML = '<div style="color:var(--danger);font-size:12px;padding:10px">Error: ' + e.message + '</div>';
+    if(resultDiv) resultDiv.innerHTML = '<div style="color:var(--danger);font-size:12px;padding:10px">Error: ' + e.message + '</div>';
     showToast('Video failed: ' + e.message);
   } finally {
-    if(btn) { 
+    if(btn) {
       btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video';
-      btn.disabled = false; 
+      btn.disabled = false;
     }
   }
 }
+
+function generateVideoFromIdea(index) { openVideoModal(index); }
 
 // Patch renderCampaignIdeas to store ideas
 var _origRenderCI = window.renderCampaignIdeas;
