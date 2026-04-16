@@ -9738,32 +9738,32 @@ function generatePromptOptions(idea, duration) {
   var sceneCount = dur <= 5 ? 1 : dur <= 10 ? 2 : 3;
   var pacing = dur <= 5 ? 'fast-paced, single impactful shot' : dur <= 10 ? 'two scenes, smooth transition' : 'three scenes, cinematic flow';
 
+
   var prompts = [
     {
-      label: '🎯 Direct Message',
-      text: 'Cinematic vertical 9:16 video, ' + dur + ' seconds, photorealistic. ' +
-        'Saudi man wearing white thobe and ghutra, modern Riyadh office with city skyline. ' +
-        'Confident, speaking directly to camera. Warm golden lighting. ' +
-        'Theme: "' + hook.substring(0, 70) + '". ' +
-        pacing + '. Professional corporate quality, smooth camera movement. No subtitles.'
+      label: '🎯 Direct to Camera',
+      text: 'Cinematic vertical 9:16 video, ' + dur + ' seconds, photorealistic 1080p. ' +
+        'Saudi man in his 30s, crisp white thobe and red-white ghutra, modern glass desk in Riyadh high-rise office. ' +
+        'Speaks directly and confidently to camera. Riyadh skyline behind him, golden hour light. ' +
+        'Topic: "' + hookShort + '". Brand: ' + brand + '. ' +
+        'Audio: clear Arabic male voice, professional tone. Slow push-in camera, shallow depth of field. Warm cinematic color grade.'
     },
     {
-      label: '🌟 Lifestyle Story',
-      text: 'Cinematic ' + dur + '-second vertical reel (9:16), photorealistic Saudi Arabia setting. ' +
-        'Young Saudi professional, traditional dress, modern lifestyle. ' +
-        'Scene: busy Riyadh business district, glass buildings, luxury feel. ' +
-        'Story arc: challenge → solution → success. ' +
-        'Brand context: ' + brand + '. ' +
-        pacing + '. Cinematic grade, warm tones, high end commercial quality.'
+      label: '\uD83C\uDF1F Success Story',
+      text: 'Cinematic ' + dur + '-second vertical social media video 9:16, photorealistic. ' +
+        'Young Saudi man in white thobe: first stressed, then discovers ' + brand + ', then confident and successful. ' +
+        'Saudi setting: Arabic coffee cups, Kingdom Tower visible through window, Saudi flag on wall. ' +
+        'Audio: uplifting Arabic background music, male voiceover describing the transformation. ' +
+        'Instagram Reels style, fast cuts, cinematic. Theme: "' + hookShort + '".'
     },
     {
-      label: '⚡ High Energy Hook',
-      text: dur + '-second vertical video (9:16), Saudi Arabia, high energy social media style. ' +
-        'Fast cuts, dynamic camera angles. Saudi characters in professional setting. ' +
-        'Opening hook captures attention in first 2 seconds. ' +
-        'Key message: "' + hook.substring(0, 60) + '". ' +
-        'Modern Riyadh backdrop, authentic Saudi culture, thobe, ghutra. ' +
-        'Instagram Reels quality, vibrant colors, cinematic.'
+      label: '\u26A1 Problem vs Solution',
+      text: dur + '-second vertical video 9:16, Saudi Arabia, cinematic 1080p. ' +
+        'First half: Saudi professional in thobe, frustrated, old way not working. ' +
+        'Second half: ' + brand + ' solves it instantly, relief and success. ' +
+        'Characters: Saudi man in thobe and Saudi woman in black abaya and hijab, modern Riyadh office. ' +
+        'Audio: dramatic Arabic music with male and female voices showing the transformation. ' +
+        'Key message: "' + hookShort + '". Authentic Saudi cultural setting throughout.'
     }
   ];
 
