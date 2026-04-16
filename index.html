@@ -9658,7 +9658,7 @@ async function generateVideoFromIdea(index) {
       var statusRes = await fetch(EDGE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'check', requestId: reqId })
+        body: JSON.stringify({ action: 'check', requestId: reqId, statusUrl: statusUrl, responseUrl: responseUrl })
       });
       var statusText = await statusRes.text();
       var checkData;
