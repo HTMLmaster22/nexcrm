@@ -9651,7 +9651,7 @@ async function generateVideoFromIdea(index) {
 
     // Step 2: Poll directly from browser
     var videoUrl = null;
-    for(var attempt = 0; attempt < 24; attempt++) {
+    for(var attempt = 0; attempt < 60; attempt++) {
       await new Promise(function(r) { setTimeout(r, 5000); });
       
       // Check status via edge function
