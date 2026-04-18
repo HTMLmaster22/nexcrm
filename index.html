@@ -9661,8 +9661,7 @@ function useCampaignIdea(channel, name, body) {
       <div class="vm-section-label">Select Duration</div>
       <div class="vm-duration-row">
         <div class="vm-dur-btn" data-dur="5">5s</div>
-        <div class="vm-dur-btn" data-dur="10">10s</div>
-        <div class="vm-dur-btn active" data-dur="16">16s</div>
+        <div class="vm-dur-btn active" data-dur="10">10s ★</div>
       </div>
       <div class="vm-section-label">Choose a Prompt Angle</div>
       <div class="vm-prompts" id="vm-prompt-list">
@@ -9694,7 +9693,7 @@ function openVideoModal(index) {
   var btn = document.querySelector('[onclick="generateVideoFromIdea(' + index + ')"]');
 
   _videoModalState.ideaIndex = index;
-  _videoModalState.duration = '16';
+  _videoModalState.duration = '10';
   _videoModalState.selectedPrompt = null;
   _videoModalState.resultDiv = resultDiv;
   _videoModalState.btn = btn;
