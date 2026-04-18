@@ -9818,7 +9818,11 @@ async function startVideoGeneration() {
     if(!submitData.requestId) throw new Error('No requestId returned');
 
     var reqId = submitData.requestId;
-    if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... 0s elapsed (takes 3-5 min)</div>';
+    var audioBase64 = submitData.audioBase64 || null;
+    var voiceName = submitData.voiceName || '';
+    var voiceLang = submitData.language || 'ar';
+    console.log('Audio ready:', audioBase64 ? 'YES (' + voiceName + ')' : 'NO');
+    if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video + AI voice (' + (voiceName || 'Arabic') + ')...</div>';
 
     var videoUrl = null;
     for(var attempt = 0; attempt < 72; attempt++) {
@@ -9842,13 +9846,23 @@ async function startVideoGeneration() {
 
     if(!videoUrl) throw new Error('Timed out after 6 minutes — please try again');
 
+    // Build video player with synced audio if available
+    var audioHtml = '';
+    if(audioBase64) {
+      audioHtml = '<audio id="vid-audio-' + state.ideaIndex + '" src="' + audioBase64 + '" style="display:none"></audio>';
+    }
+    var videoTag = '<video id="vid-player-' + state.ideaIndex + '" src="' + videoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"' +
+      (audioBase64 ? ' onplay="syncAudio(' + state.ideaIndex + ')" onpause="pauseAudio(' + state.ideaIndex + ')" onseeked="seekAudio(' + state.ideaIndex + ')"' : '') +
+      '></video>';
+    
     if(resultDiv) resultDiv.innerHTML =
-      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:10px">✅ VIDEO READY</div>' +
-      '<video src="' + videoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"></video>' +
+      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:8px">✅ VIDEO READY' + (audioBase64 ? ' 🔊 ' + voiceName + ' Voice' : '') + '</div>' +
+      audioHtml + videoTag +
+      (audioBase64 ? '<div style="font-size:10px;color:var(--text2);text-align:center;margin-bottom:8px">🎙️ AI Voiceover: ' + voiceName + ' (' + (voiceLang === "ar" ? "Arabic" : "English") + ')</div>' : '') +
       '<div style="text-align:center;margin-top:8px">' +
         '<a href="' + videoUrl + '" download target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">⬇ Download Video</a>' +
       '</div>';
-    showToast('🎬 Video ready!');
+    showToast('🎬 Video + Voice ready!');
 
   } catch(e) {
     if(resultDiv) resultDiv.innerHTML = '<div style="color:var(--danger);font-size:12px;padding:10px">Error: ' + e.message + '</div>';
@@ -9862,6 +9876,22 @@ async function startVideoGeneration() {
 }
 
 function generateVideoFromIdea(index) { openVideoModal(index); }
+
+// Audio sync helpers
+function syncAudio(idx) {
+  var audio = document.getElementById('vid-audio-' + idx);
+  var video = document.getElementById('vid-player-' + idx);
+  if(audio && video) { audio.currentTime = video.currentTime; audio.play(); }
+}
+function pauseAudio(idx) {
+  var audio = document.getElementById('vid-audio-' + idx);
+  if(audio) audio.pause();
+}
+function seekAudio(idx) {
+  var audio = document.getElementById('vid-audio-' + idx);
+  var video = document.getElementById('vid-player-' + idx);
+  if(audio && video) audio.currentTime = video.currentTime;
+}
 
 // Patch renderCampaignIdeas to store ideas
 var _origRenderCI = window.renderCampaignIdeas;
