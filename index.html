@@ -9693,6 +9693,7 @@ function openVideoModal(index) {
   var btn = document.querySelector('[onclick="generateVideoFromIdea(' + index + ')"]');
 
   _videoModalState.ideaIndex = index;
+  _videoModalState._voiceScript = (idea.script || idea.hook || '').substring(0, 400);
   _videoModalState.duration = '10';
   _videoModalState.selectedPrompt = null;
   _videoModalState.resultDiv = resultDiv;
@@ -9845,23 +9846,23 @@ async function startVideoGeneration() {
 
     if(!videoUrl) throw new Error('Timed out after 6 minutes — please try again');
 
-    // Build video player with synced audio if available
-    var audioHtml = '';
-    if(audioBase64) {
-      audioHtml = '<audio id="vid-audio-' + state.ideaIndex + '" src="' + audioBase64 + '" style="display:none"></audio>';
-    }
-    var videoTag = '<video id="vid-player-' + state.ideaIndex + '" src="' + videoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"' +
-      (audioBase64 ? ' onplay="syncAudio(' + state.ideaIndex + ')" onpause="pauseAudio(' + state.ideaIndex + ')" onseeked="seekAudio(' + state.ideaIndex + ')"' : '') +
-      '></video>';
+    // Store voiceover script for browser TTS
+    var voiceScript = _videoModalState._voiceScript || '';
+    var videoLang = voiceLang || 'ar';
     
     if(resultDiv) resultDiv.innerHTML =
-      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:8px">✅ VIDEO READY' + (audioBase64 ? ' 🔊 ' + voiceName + ' Voice' : '') + '</div>' +
-      audioHtml + videoTag +
-      (audioBase64 ? '<div style="font-size:10px;color:var(--text2);text-align:center;margin-bottom:8px">🎙️ AI Voiceover: ' + voiceName + ' (' + (voiceLang === "ar" ? "Arabic" : "English") + ')</div>' : '') +
+      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:8px">✅ VIDEO READY 🔊</div>' +
+      '<video id="vid-player-' + state.ideaIndex + '" src="' + videoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"' +
+      ' onplay="startBrowserVoice(' + state.ideaIndex + ')" onpause="stopBrowserVoice()" onended="stopBrowserVoice()"' +
+      '></video>' +
+      '<div style="font-size:10px;color:var(--text2);text-align:center;margin:6px 0">🎙️ Press play — AI Arabic voice will speak</div>' +
       '<div style="text-align:center;margin-top:8px">' +
         '<a href="' + videoUrl + '" download target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">⬇ Download Video</a>' +
       '</div>';
-    showToast('🎬 Video + Voice ready!');
+    
+    // Store script for browser TTS
+    window['_voiceScript_' + state.ideaIndex] = { script: voiceScript, lang: videoLang };
+    showToast('🎬 Video ready! Press play for voice');
 
   } catch(e) {
     if(resultDiv) resultDiv.innerHTML = '<div style="color:var(--danger);font-size:12px;padding:10px">Error: ' + e.message + '</div>';
@@ -9876,20 +9877,28 @@ async function startVideoGeneration() {
 
 function generateVideoFromIdea(index) { openVideoModal(index); }
 
-// Audio sync helpers
-function syncAudio(idx) {
-  var audio = document.getElementById('vid-audio-' + idx);
-  var video = document.getElementById('vid-player-' + idx);
-  if(audio && video) { audio.currentTime = video.currentTime; audio.play(); }
+// Browser Web Speech API TTS - completely free, built into Chrome
+function startBrowserVoice(idx) {
+  stopBrowserVoice();
+  var data = window['_voiceScript_' + idx];
+  if(!data || !data.script || !window.speechSynthesis) return;
+  
+  var utter = new SpeechSynthesisUtterance(data.script.substring(0, 400));
+  utter.lang = data.lang === 'ar' ? 'ar-SA' : 'en-US';
+  utter.rate = 0.9;
+  utter.pitch = 0.9;
+  
+  // Try to find Arabic voice
+  var voices = window.speechSynthesis.getVoices();
+  var arabicVoice = voices.find(function(v) { 
+    return data.lang === 'ar' ? (v.lang.startsWith('ar')) : (v.lang.startsWith('en')); 
+  });
+  if(arabicVoice) utter.voice = arabicVoice;
+  
+  window.speechSynthesis.speak(utter);
 }
-function pauseAudio(idx) {
-  var audio = document.getElementById('vid-audio-' + idx);
-  if(audio) audio.pause();
-}
-function seekAudio(idx) {
-  var audio = document.getElementById('vid-audio-' + idx);
-  var video = document.getElementById('vid-player-' + idx);
-  if(audio && video) audio.currentTime = video.currentTime;
+function stopBrowserVoice() {
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
 }
 
 // Patch renderCampaignIdeas to store ideas
