@@ -9746,7 +9746,7 @@ function generatePromptOptions(idea, duration) {
       text: 'Cinematic vertical 9:16 video, ' + dur + ' seconds, photorealistic 1080p. ' +
         'Saudi man in his 30s, crisp white thobe and red-white ghutra, modern glass desk in Riyadh high-rise office. ' +
         'Speaks directly and confidently to camera. Riyadh skyline behind him, golden hour light. ' +
-        'Topic: "' + hookShort + '". Brand: ' + brand + '. ' +
+        'Topic: "' + hookShort + '". Brand: ' + brand + '. Scenes: ' + (idea.script ? idea.script.substring(0, 300) : '') + '. ' +
         'Audio: clear Arabic male voice, professional tone. Slow push-in camera, shallow depth of field. Warm cinematic color grade.'
     },
     {
