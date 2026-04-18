@@ -9846,23 +9846,14 @@ async function startVideoGeneration() {
 
     if(!videoUrl) throw new Error('Timed out after 6 minutes — please try again');
 
-    // Store voiceover script for browser TTS
-    var voiceScript = _videoModalState._voiceScript || '';
-    var videoLang = voiceLang || 'ar';
-    
     if(resultDiv) resultDiv.innerHTML =
-      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:8px">✅ VIDEO READY 🔊</div>' +
-      '<video id="vid-player-' + state.ideaIndex + '" src="' + videoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"' +
-      ' onplay="startBrowserVoice(' + state.ideaIndex + ')" onpause="stopBrowserVoice()" onended="stopBrowserVoice()"' +
-      '></video>' +
-      '<div style="font-size:10px;color:var(--text2);text-align:center;margin:6px 0">🎙️ Press play — AI Arabic voice will speak</div>' +
+      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:8px">✅ VIDEO READY 🔊 Native Audio</div>' +
+      '<video src="' + videoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"></video>' +
+      '<div style="font-size:10px;color:var(--text2);text-align:center;margin:6px 0">🎙️ AI voice synced to video</div>' +
       '<div style="text-align:center;margin-top:8px">' +
         '<a href="' + videoUrl + '" download target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">⬇ Download Video</a>' +
       '</div>';
-    
-    // Store script for browser TTS
-    window['_voiceScript_' + state.ideaIndex] = { script: voiceScript, lang: videoLang };
-    showToast('🎬 Video ready! Press play for voice');
+    showToast('🎬 Video + Native Audio ready!');
 
   } catch(e) {
     if(resultDiv) resultDiv.innerHTML = '<div style="color:var(--danger);font-size:12px;padding:10px">Error: ' + e.message + '</div>';
