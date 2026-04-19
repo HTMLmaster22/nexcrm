@@ -8527,15 +8527,7 @@ function elSeek(idx) {
   if(audio && video) audio.currentTime = video.currentTime;
 }
 
-// Patch renderCampaignIdeas to store ideas
-var _origRenderCI = window.renderCampaignIdeas;
-if(typeof renderCampaignIdeas === 'function') {
-  var _patchedRender = renderCampaignIdeas;
-  window.renderCampaignIdeas = function(ideas, brand, lang) {
-    _lastGeneratedIdeas = ideas;
-    _patchedRender(ideas, brand, lang);
-  };
-}
+// _lastGeneratedIdeas is set directly in generateCampaignIdeas
 
 
 
@@ -8614,6 +8606,7 @@ async function generateCampaignIdeas() {
     });
     const data = await response.json();
     if(data.success && data.ideas && data.ideas.length) {
+      _lastGeneratedIdeas = data.ideas;
       renderCampaignIdeas(data.ideas, brand, lang);
       showToast('Ideas generated for ' + brand + '!');
     } else {
@@ -8622,6 +8615,7 @@ async function generateCampaignIdeas() {
   } catch(e) {
     console.error('AI Campaign error:', e);
     const ideas = generateFallbackIdeas(brand, industry, goal, lang, platform);
+    _lastGeneratedIdeas = ideas;
     renderCampaignIdeas(ideas, brand, lang);
     showToast('Showing sample ideas — API error: ' + e.message);
   } finally {
