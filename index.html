@@ -1327,7 +1327,7 @@
     <button class="btn btn-primary" onclick="openModal()">＋ Add Lead</button>
   </div>
 
-  <div class="content" style="background:#0a0f1e;min-height:100vh">
+  <div class="content">
 
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
@@ -8127,14 +8127,7 @@ function renderResponseTime() {
   container.innerHTML = html;
 }
 
-// Hook into renderAnalytics
-if(typeof renderAnalytics === 'function') {
-  var _origRA = renderAnalytics;
-  renderAnalytics = function() {
-    _origRA.apply(this, arguments);
-    setTimeout(renderResponseTime, 200);
-  };
-}
+// renderResponseTime called after analytics loads
 </script>
 <script>
 // ─── ONBOARDING ───────────────────────────────────────────────
