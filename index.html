@@ -9924,7 +9924,7 @@ async function confirmApprove() {
 }
 
 // ─── ASSIGN EXISTING USER TO ORG ─────────────────────────────
-let _assignData = {};
+_assignData = {};
 
 async function showAssignUserModal(userId, email) {
   _assignData = { userId, email };
@@ -10108,16 +10108,16 @@ function renderHijriWidget() {
 // Hook into existing render functions
 _origRenderLeads = window.renderLeads;
 if(typeof renderLeads === 'function') {
-  const origRL = renderLeads;
+  origRL = renderLeads;
   window.renderLeads = function() {
     origRL.apply(this, arguments);
     setTimeout(patchHijriDates, 100);
   };
 }
 
-const _origRenderInvoices = window.renderInvoices;
+_origRenderInvoices = window.renderInvoices;
 if(typeof renderInvoices === 'function') {
-  const origRI = renderInvoices;
+  origRI = renderInvoices;
   window.renderInvoices = function() {
     origRI.apply(this, arguments);
     setTimeout(patchHijriDates, 100);
@@ -10126,7 +10126,7 @@ if(typeof renderInvoices === 'function') {
 
 // Run on page navigation
 if(typeof nav === 'function') {
-  const _origNavHijri = nav;
+  _origNavHijri = nav;
   window.nav = function(page, el) {
     _origNavHijri.apply(this, arguments);
     if(page === 'dashboard') setTimeout(renderHijriWidget, 200);
@@ -10238,7 +10238,7 @@ function renderResponseTime() {
 <script>
 // ─── ONBOARDING ───────────────────────────────────────────────
 obCurrentSlide = 1;
-const obTotalSlides = 4;
+obTotalSlides = 4;
 
 function showOnboarding() {
   if(!currentUser) return;
@@ -10298,7 +10298,7 @@ function updateOnboardingUI() {
 }
 
 // Hook into loadUserOrgs — show after orgs load for non-admin
-const _origLoadUserOrgs = loadUserOrgs;
+_origLoadUserOrgs = loadUserOrgs;
 loadUserOrgs = async function() {
   await _origLoadUserOrgs.apply(this, arguments);
   setTimeout(showOnboarding, 800);
@@ -10448,8 +10448,8 @@ function updateThemeIcon(isLight) {
 <script>
 // ─── AI REPLY STATE ────────────────────────────────────────────
 aiReplyCurrentLead = null;
-let aiReplyLang = 'ar';
-let aiReplyCached = { ar: null, en: null };
+aiReplyLang = 'ar';
+aiReplyCached = { ar: null, en: null };
 
 // ─── OPEN / CLOSE ──────────────────────────────────────────────
 function showAIReply(id) {
@@ -10689,9 +10689,9 @@ body.light-mode .msg-in { background:#f0f0f0;border-color:#e0e0e0; }
 </style>
 
 <script>
-var inboxLeads = [];
-var inboxMessages = {};
-var activeInboxLead = null;
+inboxLeads = [];
+inboxMessages = {};
+activeInboxLead = null;
 
 async function loadInbox() {
   var listEl = document.getElementById('inbox-list');
@@ -10818,10 +10818,10 @@ function autoResizeInbox(el) {
 document.addEventListener('DOMContentLoaded', function() {
   var origNav = window.nav;
   if (typeof origNav === 'function') {
-    var _navWrapped = false;
+    _navWrapped = false;
     if (!_navWrapped) {
       _navWrapped = true;
-      var _navOrig = window.nav;
+      _navOrig = window.nav;
       window.nav = function(page, el) {
         _navOrig.apply(this, arguments);
         if (page === 'inbox') setTimeout(loadInbox, 150);
@@ -11164,8 +11164,8 @@ body.viewing-as-client nav, body.viewing-as-client .topbar { top: 44px; }
 <script>
 // ─── VIEW AS CLIENT ──────────────────────────────────────────
 _adminOrigOrg = null;
-let _adminOrigUser = null;
-let _isViewingAsClient = false;
+_adminOrigUser = null;
+_isViewingAsClient = false;
 
 async function viewAsClient(orgId, orgName) {
   if (!confirm('Switch to view ' + orgName + ' workspace?\n\nA banner will show at the top. This access is logged for transparency.')) return;
