@@ -6999,6 +6999,22 @@ function renderAnalytics() {
       '<div class="analytics-bar-wrap"><div class="analytics-bar-fill" style="width:' + Math.round(cnt/maxStat*100) + '%;background:' + color + '"></div></div>' +
       '<div class="analytics-value">' + pct + '%</div></div>';
   }).join('');
+  if(typeof renderResponseTime === 'function') { try { renderResponseTime(); } catch(e){} }
+}
+
+// ─── LOAD LEADS THEN RENDER ANALYTICS ─────────────────────────
+async function loadAndRenderAnalytics() {
+  const el = id => document.getElementById(id);
+  ['an-conv','an-value','an-total','an-won'].forEach(id => { if(el(id)) el(id).textContent = '…'; });
+  if(el('an-sources')) el('an-sources').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Loading…</div>';
+  if(el('an-statuses')) el('an-statuses').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Loading…</div>';
+  try {
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + orgFilter, { headers: HEADERS });
+    const data = await r.json();
+    if(r.ok && Array.isArray(data)) leads = data;
+  } catch(e) { console.error('Analytics load error:', e); }
+  renderAnalytics();
 }
 
 // ─── POPULATE ASSIGN DROPDOWN FROM TEAM ───────────────────────
