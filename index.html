@@ -3496,10 +3496,10 @@ function nav(page, el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if(el) el.classList.add('active');
   document.getElementById('page-title').textContent = titles[page];
-  if(page === 'dashboard') loadDashboard();
+  if(page === 'dashboard') { loadDashboard(); setTimeout(renderHijriWidget, 200); }
   if(page === 'leads') loadLeads();
   if(page === 'pipeline') renderPipeline();
-  if(page === 'analytics') renderAnalytics();
+  if(page === 'analytics') loadAndRenderAnalytics();
   if(page === 'contacts') loadContacts();
   if(page === 'admin') { loadTeam(); }
   if(page === 'campaigns') { loadCampaignHistory(); }
@@ -3508,6 +3508,8 @@ function nav(page, el) {
   if(page === 'invoices') { loadInvoices(); }
   if(page === 'calls') { loadCallLogs(); }
   if(page === 'settings') { loadSettings(); }
+  if(page === 'inbox') setTimeout(loadInbox, 150);
+  setTimeout(patchHijriDates, 300);
 }
 
 // ─── MODAL ─────────────────────────────────────────────────────
@@ -6317,9 +6319,6 @@ async function loadCampaignHistory() {
   }
 }
 
-// Load campaign history when campaigns page opens
-const _origNav = nav;
-
 // ─── AI LEAD SCORING ───────────────────────────────────────────
 const scoreLabels = {
   10:'🔥 Hot — Close immediately!', 9:'🔥 Very High Priority',
@@ -8284,16 +8283,6 @@ if(typeof renderInvoices === 'function') {
   };
 }
 
-// Run on page navigation
-if(typeof nav === 'function') {
-  const _origNavHijri = nav;
-  window.nav = function(page, el) {
-    _origNavHijri.apply(this, arguments);
-    if(page === 'dashboard') setTimeout(renderHijriWidget, 200);
-    setTimeout(patchHijriDates, 300);
-  };
-}
-
 // Init on load
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
@@ -8983,18 +8972,7 @@ function autoResizeInbox(el) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  var origNav = window.nav;
-  if (typeof origNav === 'function') {
-    var _navWrapped = false;
-    if (!_navWrapped) {
-      _navWrapped = true;
-      var _navOrig = window.nav;
-      window.nav = function(page, el) {
-        _navOrig.apply(this, arguments);
-        if (page === 'inbox') setTimeout(loadInbox, 150);
-      };
-    }
-  }
+  // inbox nav handled in main nav() function
 });
 </script>
 
