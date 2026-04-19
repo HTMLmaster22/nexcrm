@@ -7905,7 +7905,7 @@ function updateSMSCount(el) {
 // ═══════════════════════════════════════════════════════
 // SMS CREDENTIALS
 // ═══════════════════════════════════════════════════════
-var smsCredentials = null;
+// smsCredentials declared above
 try { smsCredentials = JSON.parse(localStorage.getItem('nexcrm_sms_creds')); } catch(e) {}
 
 function openSMSSetup() {
@@ -7987,7 +7987,7 @@ function loadSMSHistory() {
 // ═══════════════════════════════════════════════════════
 // WHATSAPP CREDENTIALS
 // ═══════════════════════════════════════════════════════
-var waCredentials = null;
+// waCredentials declared above
 try { waCredentials = JSON.parse(localStorage.getItem('nexcrm_wa_creds')); } catch(e) {}
 
 function openWASetup() {
