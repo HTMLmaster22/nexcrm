@@ -213,7 +213,7 @@
   }
 
   /* CONTENT */
-  .content { padding:28px; background:var(--bg); min-height:100vh; }
+  .content { padding:28px; }
 
   /* PAGE */
   .page { display:none; }
@@ -1352,9 +1352,9 @@
         </div>
         <div class="stat-card">
           <div class="stat-icon" style="background:rgba(16,185,129,0.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="stat-label">Won Leads</div>
+          <div class="stat-label"><span data-en="Won Leads" data-ar="صفقات مكتملة">Won Leads</span></div>
           <div class="stat-value" id="dash-won" style="color:var(--success)">—</div>
-          <div class="stat-change up">▲ Closed deals</div>
+          <div class="stat-change up">▲ <span data-en="Closed deals" data-ar="صفقات مغلقة">Closed deals</span></div>
         </div>
       </div>
 
@@ -1437,7 +1437,7 @@
         <div class="stat-card">
           <div class="stat-label">New</div>
           <div class="stat-value" id="stat-new">—</div>
-          <div class="stat-change up">▲ Awaiting contact</div>
+          <div class="stat-change up">▲ <span data-en="Awaiting contact" data-ar="في انتظار التواصل">Awaiting contact</span></div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Converted / Won</div>
@@ -1485,7 +1485,7 @@
                 <th>Source</th>
                 <th>Status</th>
                 <th>Value</th>
-                <th>Assigned To</th>
+                <th><span data-en="Assigned To" data-ar="مسؤول المبيعات">Assigned To</span></th>
                 <th>Date</th>
                 <th>AI Score</th>
                 <th>Actions</th>
@@ -2449,8 +2449,8 @@
           <table>
             <thead>
               <tr>
-                <th>Post Date</th><th>Platform</th><th>Content Type</th>
-                <th>Caption</th><th>Caption Status</th><th>Visual Status</th>
+                <th><span data-en="Post Date" data-ar="تاريخ النشر">Post Date</span></th><th><span data-en="Platform" data-ar="المنصة">Platform</span></th><th><span data-en="Content Type" data-ar="نوع المحتوى">Content Type</span></th>
+                <th><span data-en="Caption" data-ar="التعليق">Caption</span></th><th><span data-en="Caption Status" data-ar="حالة التعليق">Caption Status</span></th><th><span data-en="Visual Status" data-ar="حالة المرئي">Visual Status</span></th>
                 <th>Assigned To</th><th>Actions</th>
               </tr>
             </thead>
@@ -2486,9 +2486,9 @@
     <!-- INVOICE TRACKER -->
     <div class="page" id="page-invoices">
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
-        <div class="stat-card"><div class="stat-label">Total Invoiced</div><div class="stat-value" id="inv-total">SAR 0</div></div>
-        <div class="stat-card"><div class="stat-label">Paid</div><div class="stat-value" style="color:var(--success)" id="inv-paid">$0</div></div>
-        <div class="stat-card"><div class="stat-label">Outstanding</div><div class="stat-value" style="color:var(--warning)" id="inv-outstanding">$0</div></div>
+        <div class="stat-card"><div class="stat-label"><span data-en="Total Invoiced" data-ar="إجمالي الفواتير">Total Invoiced</span></div><div class="stat-value" id="inv-total">SAR 0</div></div>
+        <div class="stat-card"><div class="stat-label"><span data-en="Paid" data-ar="مدفوع">Paid</span></div><div class="stat-value" style="color:var(--success)" id="inv-paid">$0</div></div>
+        <div class="stat-card"><div class="stat-label"><span data-en="Outstanding" data-ar="غير مدفوع">Outstanding</span></div><div class="stat-value" style="color:var(--warning)" id="inv-outstanding">$0</div></div>
       </div>
       <div class="card">
         <div class="card-header">
@@ -2811,22 +2811,22 @@
       <!-- Header Stats -->
       <div class="stats-grid" style="margin-bottom:20px">
         <div class="stat-card">
-          <div class="stat-label">Total Calls</div>
+          <div class="stat-label"><span data-en="Total Calls" data-ar="إجمالي المكالمات">Total Calls</span></div>
           <div class="stat-value" id="cl-total">0</div>
           <div class="stat-sub">This month</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Missed Calls</div>
+          <div class="stat-label"><span data-en="Missed Calls" data-ar="مكالمات فائتة">Missed Calls</span></div>
           <div class="stat-value" style="color:var(--danger)" id="cl-missed">0</div>
           <div class="stat-sub">Need callback</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Avg Duration</div>
+          <div class="stat-label"><span data-en="Avg Duration" data-ar="متوسط المدة">Avg Duration</span></div>
           <div class="stat-value" id="cl-duration">0m</div>
           <div class="stat-sub">Per call</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Transcribed</div>
+          <div class="stat-label"><span data-en="Transcribed" data-ar="مُحوَّل نصاً">Transcribed</span></div>
           <div class="stat-value" style="color:var(--accent)" id="cl-transcribed">0</div>
           <div class="stat-sub">Auto-processed</div>
         </div>
@@ -3127,7 +3127,7 @@
       </div>
     </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
     function showTwilioTab(tab) {
       document.getElementById('twilio-pane-guide').style.display = tab === 'guide' ? 'block' : 'none';
       document.getElementById('twilio-pane-connect').style.display = tab === 'connect' ? 'block' : 'none';
@@ -3393,7 +3393,7 @@ function renderLeads() {
     filtered = leads.filter(l => (l.source||'').toLowerCase() === activeSourceFilter.toLowerCase());
   }
   if(filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text2)">${activeSourceFilter !== 'all' ? 'No leads from ' + activeSourceFilter : 'No leads yet — add your first one!'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text2)">${activeSourceFilter !== 'all' ? __t('No leads yet — add your first one!') : __t('No leads yet — add your first one!')}</td></tr>`;
     return;
   }
   tbody.innerHTML = filtered.map((l,i) => `
@@ -3480,7 +3480,7 @@ function updateLeadStats() {
   if(el('stat-total-sub')) el('stat-total-sub').textContent = currentOrg ? '📂 ' + currentOrg.name : 'All leads';
   if(el('stat-new')) el('stat-new').textContent = newLeads;
   if(el('stat-won')) el('stat-won').textContent = won;
-  if(el('stat-rate')) el('stat-rate').textContent = '▲ ' + rate + '% conversion rate';
+  if(el('stat-rate')) el('stat-rate').textContent = '▲ ' + rate + '% ' + __t('conversion rate');
   if(el('stat-lost')) el('stat-lost').textContent = lost;
 }
 
@@ -4200,6 +4200,148 @@ const t = {
   }
 };
 
+// ── Translation helper — use anywhere in JS ──
+const _ar = {
+  // General
+  'No data yet': 'لا توجد بيانات بعد',
+  'No activity yet': 'لا يوجد نشاط بعد',
+  'No leads yet': 'لا يوجد عملاء بعد',
+  'No leads yet — add your first one!': 'لا يوجد عملاء — أضف أول عميل!',
+  'No leads found': 'لا يوجد عملاء',
+  'No leads': 'لا عملاء',
+  'No posts found': 'لا توجد منشورات',
+  'No campaigns sent yet': 'لم يتم إرسال حملات بعد',
+  'No deliverables yet — add your first service!': 'لا تسليمات بعد — أضف خدمتك الأولى!',
+  'Add deliverables to see summary': 'أضف تسليمات لرؤية الملخص',
+  'No calls yet': 'لا مكالمات بعد',
+  // Dashboard
+  'Closed deals': 'صفقات مغلقة',
+  'Awaiting contact': 'في انتظار التواصل',
+  'Total pipeline value': 'إجمالي قيمة خط المبيعات',
+  'In current workspace': 'في مساحة العمل الحالية',
+  'All deal values': 'كل قيم الصفقات',
+  'won out of': 'فوز من',
+  'conversion rate': 'معدل التحويل',
+  'Closed lost': 'خسارة مغلقة',
+  // Analytics
+  'leads awaiting contact': 'عملاء في انتظار التواصل',
+  'leads responded to': 'عملاء استجابوا',
+  'awaiting first contact': 'ينتظرون أول تواصل',
+  'of total leads': 'من إجمالي العملاء',
+  'All leads have been contacted!': 'تم التواصل مع جميع العملاء!',
+  'Lead Status Breakdown': 'توزيع حالات العملاء',
+  'Lead Sources Breakdown': 'توزيع مصادر العملاء',
+  'Lead Response Time Tracker': 'متتبع وقت الاستجابة',
+  'How fast are leads being contacted after submission?': 'ما مدى سرعة التواصل مع العملاء؟',
+  'Contacted': 'تم التواصل',
+  'Waiting': 'في الانتظار',
+  'Contact Rate': 'معدل التواصل',
+  'CONTACT RATE': 'معدل التواصل',
+  'WAITING': 'في الانتظار',
+  'CONTACTED': 'تم التواصل',
+  'WON LEADS': 'صفقات مكتملة',
+  'TOTAL LEADS': 'إجمالي العملاء',
+  'TOTAL PIPELINE VALUE': 'قيمة خط المبيعات',
+  'CONVERSION RATE': 'معدل التحويل',
+  'AVG RESPONSE TIME': 'متوسط وقت الاستجابة',
+  'Generate PDF Report': 'توليد تقرير PDF',
+  'Analytics': 'التحليلات',
+  'Current workspace': 'مساحة العمل الحالية',
+  // Pipeline
+  'Sales Pipeline': 'خط المبيعات',
+  'Your real leads organized by status': 'عملاؤك الحقيقيون مرتبون حسب الحالة',
+  'Total Pipeline:': 'إجمالي خط المبيعات:',
+  'New': 'جديد',
+  'Warm': 'دافئ',
+  'Active': 'نشط',
+  'Won': 'فوز',
+  'Lost': 'خسارة',
+  // Leads
+  'LOST': 'خسارة',
+  'CONVERTED / WON': 'تحويل / فوز',
+  'NEW': 'جديد',
+  'TOTAL LEADS': 'إجمالي العملاء',
+  'Add Lead +': 'إضافة عميل +',
+  'Export': 'تصدير',
+  'Import': 'استيراد',
+  'All Leads': 'جميع العملاء',
+  'NAME': 'الاسم',
+  'COMPANY': 'الشركة',
+  'SOURCE': 'المصدر',
+  'STATUS': 'الحالة',
+  'VALUE': 'القيمة',
+  'ASSIGNED TO': 'مسؤول المبيعات',
+  'DATE': 'التاريخ',
+  'AI SCORE': 'تقييم الذكاء',
+  'ACTIONS': 'إجراءات',
+  'PHONE': 'الهاتف',
+  // Invoices
+  'Outstanding': 'غير مدفوع',
+  'Paid': 'مدفوع',
+  'Total Invoiced': 'إجمالي الفواتير',
+  'OUTSTANDING': 'غير مدفوع',
+  'PAID': 'مدفوع',
+  'TOTAL INVOICED': 'إجمالي الفواتير',
+  'Invoice Tracker': 'متتبع الفواتير',
+  'New Invoice': 'فاتورة جديدة',
+  'VAT Invoice': 'فاتورة ضريبية',
+  // Calendar
+  'Content Calendar': 'تقويم المحتوى',
+  'Schedule and track your social media posts': 'جدول ومتابعة منشوراتك',
+  'Add Post': 'إضافة منشور',
+  'Total Posts': 'إجمالي المنشورات',
+  'Posted': 'تم النشر',
+  'Scheduled': 'مجدول',
+  'Pending Approval': 'في انتظار الموافقة',
+  '<span data-en="POST DATE" data-ar="تاريخ النشر">POST DATE</span>': 'تاريخ النشر',
+  '<span data-en="PLATFORM" data-ar="المنصة">PLATFORM</span>': 'المنصة',
+  '<span data-en="CONTENT TYPE" data-ar="نوع المحتوى">CONTENT TYPE</span>': 'نوع المحتوى',
+  'CAPTION': 'التعليق',
+  '<span data-en="CAPTION STATUS" data-ar="حالة التعليق">CAPTION STATUS</span>': 'حالة التعليق',
+  '<span data-en="VISUAL STATUS" data-ar="حالة المرئي">VISUAL STATUS</span>': 'حالة المرئي',
+  // Deliverables
+  'Monthly Summary': 'ملخص شهري',
+  'Deliverables Tracker': 'متتبع التسليمات',
+  'Add Service': 'إضافة خدمة',
+  // Call Logs
+  'Call Logs': 'سجلات المكالمات',
+  'Total Calls': 'إجمالي المكالمات',
+  'Missed Calls': 'مكالمات فائتة',
+  'Avg Duration': 'متوسط المدة',
+  'Transcribed': 'مُحوَّل نصاً',
+  'This month': 'هذا الشهر',
+  'Need callback': 'يحتاج رد',
+  'Per call': 'لكل مكالمة',
+  'Auto-processed': 'تلقائي',
+  'Log Call': 'تسجيل مكالمة',
+  'All Calls': 'الكل',
+  'Missed': 'فائتة',
+  'Inbound': 'واردة',
+  'Outbound': 'صادرة',
+  'Connect Your Phone System': 'ربط نظام الهاتف',
+  // Campaigns
+  'Campaign History': 'سجل الحملات',
+  'New Email Campaign': 'حملة بريد جديدة',
+  'Send Campaign': 'إرسال الحملة',
+  'Preview': 'معاينة',
+  'CAMPAIGN NAME': 'اسم الحملة',
+  'EMAIL SUBJECT': 'موضوع البريد',
+  'EMAIL MESSAGE': 'نص البريد',
+  'SEND TO': 'إرسال إلى',
+  // Contacts
+  'All Contacts': 'جميع جهات الاتصال',
+  'Add Contact': 'إضافة جهة اتصال',
+  // Settings
+  'Settings': 'الإعدادات',
+  'Sign Out': 'تسجيل الخروج',
+  'Install App': 'تثبيت التطبيق',
+};
+
+function __t(str) {
+  if (currentLang !== 'ar') return str;
+  return _ar[str] || str;
+}
+
 function toggleLang() {
   currentLang = currentLang === 'en' ? 'ar' : 'en';
   applyTranslations();
@@ -4208,6 +4350,11 @@ function toggleLang() {
 function applyTranslations() {
   const lang = t[currentLang];
   const isAr = currentLang === 'ar';
+
+  // Universal: translate all data-en/data-ar elements
+  document.querySelectorAll('[data-en]').forEach(el => {
+    el.textContent = isAr ? el.getAttribute('data-ar') : el.getAttribute('data-en');
+  });
 
   // Toggle RTL
   document.body.classList.toggle('rtl', isAr);
@@ -4301,7 +4448,7 @@ function applyTranslations() {
   document.querySelectorAll('.auth-tab').forEach((tab, i) => {
     tab.textContent = i === 0 ? lang.signIn : lang.createAccount;
   });
-  document.querySelector('.auth-btn-google').innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> ${lang.googleBtn}`;
+  const _ag = document.querySelector('.auth-btn-google'); if(_ag) _ag.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> ${lang.googleBtn}`;
 
   // Update page title in topbar
   const activeNav = document.querySelector('.nav-item.active');
@@ -4338,6 +4485,14 @@ function applyTranslations() {
 
   // Save preference
   localStorage.setItem('nexcrm_lang', currentLang);
+  // Re-render dynamic content with new language
+  if(typeof renderLeads === 'function') renderLeads();
+  if(typeof renderPipeline === 'function') { try { renderPipeline(); } catch(e){} }
+  if(typeof renderAnalytics === 'function') { try { renderAnalytics(); } catch(e){} }
+  if(typeof renderCalendar === 'function') { try { renderCalendar(); } catch(e){} }
+  if(typeof renderDeliverables === 'function') { try { renderDeliverables(); } catch(e){} }
+  if(typeof renderInvoices === 'function') { try { renderInvoices(); } catch(e){} }
+  if(typeof updateCallStats === 'function') { try { updateCallStats(allCalls||[]); } catch(e){} }
 }
 
 // ─── NORMALIZE SOURCE NAMES (Arabic → Brand name) ─────────────
@@ -5736,6 +5891,281 @@ async function getFilteredLeads(filter) {
   } catch(e) { return []; }
 }
 
+// ─── CAMPAIGN TAB SWITCHER ─────────────────────────────────────
+let currentCampTab = 'email';
+
+function switchCampTab(tab) {
+  currentCampTab = tab;
+  ['email','sms','whatsapp'].forEach(t => {
+    const pane = document.getElementById('camp-pane-' + t);
+    const btn = document.getElementById('camp-tab-' + t);
+    if(pane) pane.style.display = t === tab ? 'block' : 'none';
+    if(btn) {
+      btn.style.background = t === tab ? 'var(--accent)' : 'transparent';
+      btn.style.color = t === tab ? '#fff' : 'var(--text2)';
+    }
+  });
+  if(tab === 'sms') { loadSMSHistory(); checkSMSConnection(); }
+  if(tab === 'whatsapp') { loadWAHistory(); checkWAConnection(); }
+  if(tab === 'email') loadCampaignHistory();
+}
+
+// ─── SMS CREDENTIALS ──────────────────────────────────────────
+let smsCredentials = null;
+
+function checkSMSConnection() {
+  const stored = localStorage.getItem('nexcrm_sms_creds');
+  if(stored) {
+    smsCredentials = JSON.parse(stored);
+    document.getElementById('sms-connection-banner').style.display = 'none';
+    const connBanner = document.getElementById('sms-connected-banner');
+    connBanner.style.display = 'flex';
+    document.getElementById('sms-phone-display').textContent = smsCredentials.fromNumber;
+  }
+}
+
+function openSMSSetup() {
+  if(smsCredentials) {
+    document.getElementById('sms-account-sid').value = smsCredentials.accountSid || '';
+    document.getElementById('sms-from-number').value = smsCredentials.fromNumber || '';
+  }
+  document.getElementById('sms-setup-modal').classList.add('open');
+}
+
+function saveSMSCredentials() {
+  const sid = document.getElementById('sms-account-sid').value.trim();
+  const token = document.getElementById('sms-auth-token').value.trim();
+  const from = document.getElementById('sms-from-number').value.trim();
+  if(!sid || !token || !from) { showToast('❌ Fill in all fields'); return; }
+  smsCredentials = { accountSid: sid, authToken: token, fromNumber: from };
+  localStorage.setItem('nexcrm_sms_creds', JSON.stringify(smsCredentials));
+  document.getElementById('sms-setup-modal').classList.remove('open');
+  checkSMSConnection();
+  showToast('✅ SMS connected!');
+}
+
+function updateSMSCount(el) {
+  const count = el.value.length;
+  document.getElementById('sms-char-count').textContent = count;
+  document.getElementById('sms-char-count').style.color = count > 160 ? 'var(--danger)' : 'var(--text2)';
+}
+
+function previewSMS() {
+  const body = document.getElementById('sms-body').value.trim();
+  const name = document.getElementById('sms-name').value.trim();
+  if(!body) { showToast('❌ Write your SMS message'); return; }
+  const preview = body.replace(/{name}/g, 'Mohammed Al-Otaibi');
+  document.getElementById('preview-modal-title').textContent = '📱 SMS Preview';
+  document.getElementById('preview-content').innerHTML = `
+    <div style="background:#25d366;border-radius:14px;padding:14px 16px;max-width:280px;color:#fff;font-size:14px;line-height:1.6;white-space:pre-wrap;margin:0 auto">${preview}</div>
+    <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--text2)">This is how your SMS will look on the recipient's phone</div>
+  `;
+  document.getElementById('preview-send-btn').onclick = function() { closePreview(); sendSMSCampaign(true); };
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+async function sendSMSCampaign(confirmed = false) {
+  if(!smsCredentials) { showToast('❌ Connect Twilio first'); openSMSSetup(); return; }
+  const name = document.getElementById('sms-name').value.trim();
+  const body = document.getElementById('sms-body').value.trim();
+  const filter = document.getElementById('sms-filter').value;
+  if(!name) { showToast('❌ Enter campaign name'); return; }
+  if(!body) { showToast('❌ Write your SMS message'); return; }
+
+  const targetLeads = await getFilteredLeads(filter);
+  const leadsWithPhone = targetLeads.filter(l => l.phone);
+  if(!leadsWithPhone.length) { showToast('❌ No leads with phone numbers found'); return; }
+
+  if(!confirmed) {
+    const filterLabel = document.getElementById('sms-filter').options[document.getElementById('sms-filter').selectedIndex].text;
+    if(!confirm(`Send SMS "${name}" to ${leadsWithPhone.length} leads with phone numbers (${filterLabel})?`)) return;
+  }
+
+  const btn = document.querySelector('#camp-pane-sms .btn-primary');
+  if(btn) { btn.textContent = '⏳ Sending...'; btn.disabled = true; }
+
+  let sent = 0, failed = 0;
+  const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${smsCredentials.accountSid}/Messages.json`;
+  const authHeader = 'Basic ' + btoa(smsCredentials.accountSid + ':' + smsCredentials.authToken);
+
+  for(const lead of leadsWithPhone) {
+    const msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    let phone = lead.phone.replace(/\s/g,'');
+    if(!phone.startsWith('+')) phone = '+966' + phone.replace(/^0/, '');
+    try {
+      const r = await fetch(twilioUrl, {
+        method: 'POST',
+        headers: { 'Authorization': authHeader, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ From: smsCredentials.fromNumber, To: phone, Body: msg })
+      });
+      if(r.ok) sent++; else failed++;
+    } catch(e) { failed++; }
+  }
+
+  // Save to Supabase
+  await fetch(SUPABASE_URL + '/rest/v1/campaigns', {
+    method: 'POST',
+    headers: HEADERS,
+    body: JSON.stringify({
+      name, body, filter, campaign_type: 'sms',
+      sent_count: sent, total_count: leadsWithPhone.length,
+      user_id: currentUser ? currentUser.id : null,
+      sent_at: new Date().toISOString()
+    })
+  }).catch(()=>{});
+
+  if(btn) { btn.textContent = '📱 Send SMS'; btn.disabled = false; }
+  showToast(`✅ SMS sent! ${sent} delivered, ${failed} failed.`);
+  loadSMSHistory();
+}
+
+async function loadSMSHistory() {
+  const el = document.getElementById('sms-history');
+  if(!el) return;
+  try {
+    const r = await fetch(SUPABASE_URL + `/rest/v1/campaigns?campaign_type=eq.sms&user_id=eq.${currentUser?.id}&order=sent_at.desc&limit=20`, { headers: HEADERS });
+    if(!r.ok) return;
+    const data = await r.json();
+    if(!data.length) { el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No SMS campaigns sent yet</div>'; return; }
+    el.innerHTML = data.map(c => `
+      <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div style="font-weight:600;font-size:13px">📱 ${c.name}</div>
+          <div style="font-size:11px;color:var(--text2)">${new Date(c.sent_at).toLocaleDateString()}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${(c.body||'').slice(0,80)}${(c.body||'').length>80?'...':''}</div>
+        <div style="display:flex;gap:10px;font-size:11px">
+          <span style="background:rgba(16,185,129,0.1);color:var(--success);padding:2px 8px;border-radius:100px">✓ ${c.sent_count} sent</span>
+          <span style="color:var(--text2)">${c.total_count} targeted</span>
+        </div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+// ─── WHATSAPP CREDENTIALS ─────────────────────────────────────
+let waCredentials = null;
+
+function checkWAConnection() {
+  const stored = localStorage.getItem('nexcrm_wa_camp_creds');
+  if(stored) {
+    waCredentials = JSON.parse(stored);
+    document.getElementById('wa-connection-banner').style.display = 'none';
+    const connBanner = document.getElementById('wa-connected-banner');
+    connBanner.style.display = 'flex';
+    document.getElementById('wa-phone-display').textContent = waCredentials.fromNumber;
+  }
+}
+
+function openWASetup() {
+  if(waCredentials) {
+    document.getElementById('wa-account-sid').value = waCredentials.accountSid || '';
+    document.getElementById('wa-from-number').value = waCredentials.fromNumber || '';
+  }
+  document.getElementById('wa-setup-modal').classList.add('open');
+}
+
+function saveWACredentials() {
+  const sid = document.getElementById('wa-account-sid').value.trim();
+  const token = document.getElementById('wa-auth-token').value.trim();
+  const from = document.getElementById('wa-from-number').value.trim();
+  if(!sid || !token || !from) { showToast('❌ Fill in all fields'); return; }
+  waCredentials = { accountSid: sid, authToken: token, fromNumber: from.startsWith('whatsapp:') ? from : 'whatsapp:' + from };
+  localStorage.setItem('nexcrm_wa_camp_creds', JSON.stringify(waCredentials));
+  document.getElementById('wa-setup-modal').classList.remove('open');
+  checkWAConnection();
+  showToast('✅ WhatsApp connected!');
+}
+
+function previewWA() {
+  const body = document.getElementById('wa-body').value.trim();
+  if(!body) { showToast('❌ Write your WhatsApp message'); return; }
+  const preview = body.replace(/{name}/g, 'Mohammed Al-Otaibi');
+  document.getElementById('preview-modal-title').textContent = '💬 WhatsApp Preview';
+  document.getElementById('preview-content').innerHTML = `
+    <div style="background:#dcf8c6;border-radius:14px 14px 4px 14px;padding:12px 16px;max-width:300px;color:#111;font-size:14px;line-height:1.6;white-space:pre-wrap;margin:0 auto;box-shadow:0 1px 2px rgba(0,0,0,0.15)">${preview}</div>
+    <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--text2)">This is how your WhatsApp message will appear</div>
+  `;
+  document.getElementById('preview-send-btn').onclick = function() { closePreview(); sendWACampaign(true); };
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+async function sendWACampaign(confirmed = false) {
+  if(!waCredentials) { showToast('❌ Connect WhatsApp first'); openWASetup(); return; }
+  const name = document.getElementById('wa-camp-name').value.trim();
+  const body = document.getElementById('wa-body').value.trim();
+  const filter = document.getElementById('wa-filter').value;
+  if(!name) { showToast('❌ Enter campaign name'); return; }
+  if(!body) { showToast('❌ Write your WhatsApp message'); return; }
+
+  const targetLeads = await getFilteredLeads(filter);
+  const leadsWithPhone = targetLeads.filter(l => l.phone);
+  if(!leadsWithPhone.length) { showToast('❌ No leads with phone numbers found'); return; }
+
+  if(!confirmed) {
+    if(!confirm(`Send WhatsApp message "${name}" to ${leadsWithPhone.length} leads?`)) return;
+  }
+
+  const btn = document.querySelector('#camp-pane-whatsapp .btn-primary');
+  if(btn) { btn.textContent = '⏳ Sending...'; btn.disabled = true; }
+
+  let sent = 0, failed = 0;
+  const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${waCredentials.accountSid}/Messages.json`;
+  const authHeader = 'Basic ' + btoa(waCredentials.accountSid + ':' + waCredentials.authToken);
+
+  for(const lead of leadsWithPhone) {
+    const msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    let phone = lead.phone.replace(/\s/g,'');
+    if(!phone.startsWith('+')) phone = '+966' + phone.replace(/^0/, '');
+    try {
+      const r = await fetch(twilioUrl, {
+        method: 'POST',
+        headers: { 'Authorization': authHeader, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ From: waCredentials.fromNumber, To: 'whatsapp:' + phone, Body: msg })
+      });
+      if(r.ok) sent++; else failed++;
+    } catch(e) { failed++; }
+  }
+
+  // Save to Supabase
+  await fetch(SUPABASE_URL + '/rest/v1/campaigns', {
+    method: 'POST',
+    headers: HEADERS,
+    body: JSON.stringify({
+      name, body, filter, campaign_type: 'whatsapp',
+      sent_count: sent, total_count: leadsWithPhone.length,
+      user_id: currentUser ? currentUser.id : null,
+      sent_at: new Date().toISOString()
+    })
+  }).catch(()=>{});
+
+  if(btn) { btn.textContent = '💬 Send WhatsApp'; btn.disabled = false; }
+  showToast(`✅ WhatsApp sent! ${sent} delivered, ${failed} failed.`);
+  loadWAHistory();
+}
+
+async function loadWAHistory() {
+  const el = document.getElementById('wa-history');
+  if(!el) return;
+  try {
+    const r = await fetch(SUPABASE_URL + `/rest/v1/campaigns?campaign_type=eq.whatsapp&user_id=eq.${currentUser?.id}&order=sent_at.desc&limit=20`, { headers: HEADERS });
+    if(!r.ok) return;
+    const data = await r.json();
+    if(!data.length) { el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No WhatsApp campaigns sent yet</div>'; return; }
+    el.innerHTML = data.map(c => `
+      <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div style="font-weight:600;font-size:13px">💬 ${c.name}</div>
+          <div style="font-size:11px;color:var(--text2)">${new Date(c.sent_at).toLocaleDateString()}</div>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${(c.body||'').slice(0,80)}${(c.body||'').length>80?'...':''}</div>
+        <div style="display:flex;gap:10px;font-size:11px">
+          <span style="background:rgba(37,211,102,0.1);color:#25d366;padding:2px 8px;border-radius:100px">✓ ${c.sent_count} sent</span>
+          <span style="color:var(--text2)">${c.total_count} targeted</span>
+        </div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
 function previewCampaign() {
   const subject = document.getElementById('camp-subject').value.trim();
   const body = document.getElementById('camp-body').value.trim();
@@ -6240,9 +6670,9 @@ async function loadDashboard() {
     if(el('dash-total')) el('dash-total').textContent = total.toLocaleString();
     if(el('dash-total-sub')) el('dash-total-sub').textContent = '📂 ' + orgName;
     if(el('dash-revenue')) el('dash-revenue').textContent = 'SAR ' + totalValue.toLocaleString();
-    if(el('dash-revenue-sub')) el('dash-revenue-sub').textContent = 'Total pipeline value';
+    if(el('dash-revenue-sub')) el('dash-revenue-sub').textContent = __t('Total pipeline value');
     if(el('dash-conv')) el('dash-conv').textContent = convRate + '%';
-    if(el('dash-conv-sub')) el('dash-conv-sub').textContent = won + ' won out of ' + total;
+    if(el('dash-conv-sub')) el('dash-conv-sub').textContent = won + ' ' + __t('won out of') + ' ' + total;
     if(el('dash-won')) el('dash-won').textContent = won;
 
     // Use same data for activity + team perf + chart + donut
@@ -6481,7 +6911,7 @@ function renderPipeline() {
     if(count) count.textContent = items.length;
     if(!col) return;
     if(items.length === 0) {
-      col.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:12px">No leads</div>';
+      col.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:12px">'+__t('No leads')+'</div>';
       return;
     }
     col.innerHTML = items.map(l => {
@@ -6538,7 +6968,7 @@ function renderAnalytics() {
   const convRate = total > 0 ? Math.round(won/total*100) : 0;
 
   if(el('an-conv')) el('an-conv').textContent = convRate + '%';
-  if(el('an-conv-sub')) el('an-conv-sub').textContent = won + ' won out of ' + total;
+  if(el('an-conv-sub')) el('an-conv-sub').textContent = won + ' ' + __t('won out of') + ' ' + total;
   if(el('an-value')) el('an-value').textContent = 'SAR ' + totalVal.toLocaleString();
   if(el('an-total')) el('an-total').textContent = total;
   if(el('an-won')) el('an-won').textContent = won;
@@ -7272,10 +7702,1693 @@ function autoApplyBranding() {
   const b = getBranding(currentOrg.id);
   if(b && (b.name || b.color)) applyBranding(b);
 }
+</script>
+</body>
 
-// ═══════════════════════════════════════════════════════
-// AI CAMPAIGN IDEAS GENERATOR
-// ═══════════════════════════════════════════════════════
+<!-- ONBOARDING MODAL -->
+<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:24px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.5);animation:onboardIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both">
+    <div style="height:3px;background:var(--bg3)"><div id="ob-progress" style="height:100%;background:linear-gradient(90deg,var(--accent),#8b5cf6);border-radius:3px;transition:width 0.4s ease;width:25%"></div></div>
+    <div id="ob-slides" style="padding:40px 40px 28px">
+      <div id="ob-slide-1">
+        <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(99,102,241,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px" id="ob-welcome-title">Welcome aboard!</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px">Your CRM is ready. Let us show you how it works in 30 seconds so you can start turning leads into customers today.</div>
+        <div style="background:var(--bg3);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;background:linear-gradient(135deg,#10b981,#059669);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✓</div><div><div style="font-size:13px;font-weight:700;color:var(--text)">Your workspace is set up</div><div style="font-size:12px;color:var(--text2);margin-top:1px" id="ob-org-name">Ready to receive leads</div></div></div>
+      </div>
+      <div id="ob-slide-2" style="display:none">
+        <div style="width:60px;height:60px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(245,158,11,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">Leads come in automatically</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Every time someone fills your form, their info instantly appears here. No manual entry needed.</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">New leads appear in <strong>Leads</strong> and <strong>Pipeline</strong></div></div>
+          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">You get a <strong>Telegram notification</strong> instantly</div></div>
+          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">Contact fast — <strong>response time drives conversions</strong></div></div>
+        </div>
+      </div>
+      <div id="ob-slide-3" style="display:none">
+        <div style="width:60px;height:60px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(139,92,246,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">Move leads through your pipeline</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Update lead status as you progress. Your pipeline keeps the whole team focused on what matters.</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">New</div></div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Warm</div></div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#8b5cf6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Active</div></div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Won</div></div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#ef4444;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Lost</div></div>
+        </div>
+      </div>
+      <div id="ob-slide-4" style="display:none">
+        <div style="width:60px;height:60px;background:linear-gradient(135deg,#10b981,#059669);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(16,185,129,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">You are all set!</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Generate reports, create VAT invoices, track response times — everything to run your business like a pro.</div>
+        <div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08));border:1px solid rgba(99,102,241,0.15);border-radius:14px;padding:16px 18px">
+          <div style="font-size:12px;color:var(--text2);line-height:2.1\"><div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(59,130,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div><span><strong style="color:var(--text)">Leads</strong> — all incoming leads</span></div><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(139,92,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div><span><strong style="color:var(--text)">Pipeline</strong> — visual deal tracker</span></div><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div><span><strong style="color:var(--text)">Analytics</strong> — PDF reports</span></div><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(245,158,11,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div><span><strong style="color:var(--text)">Invoices</strong> — Saudi VAT compliant</span></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 40px 30px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;gap:5px" id="ob-dots">
+        <div style="width:18px;height:5px;border-radius:3px;background:var(--accent);transition:all 0.3s"></div>
+        <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
+        <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
+        <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button onclick="closeOnboarding()" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;padding:8px 12px;border-radius:8px">Skip</button>
+        <button id="ob-next-btn" onclick="nextOnboardingSlide()" style="background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;border-radius:11px;padding:11px 26px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,0.4)">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+<style>@keyframes onboardIn{from{opacity:0;transform:scale(0.92) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}</style>
+<script>
+// ─── VAT INVOICE GENERATOR ────────────────────────────────────
+function openVATInvoiceModal() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('vat-inv-date').value = today;
+  const count = (invoicesList.length || 0) + 1;
+  document.getElementById('vat-inv-number').value = 'INV-' + String(count).padStart(3,'0');
+  // Pre-fill seller from org branding
+  const b = currentOrg ? getBranding(currentOrg.id) : {};
+  const orgName = currentOrg ? currentOrg.name : '';
+  if(b.name) {
+    document.getElementById('vat-seller-ar').value = b.name;
+    document.getElementById('vat-seller-en').value = orgName || b.name;
+  } else if(orgName) {
+    document.getElementById('vat-seller-en').value = orgName;
+    document.getElementById('vat-seller-ar').value = orgName;
+  }
+  // Restore saved seller info if previously filled
+  const saved = JSON.parse(localStorage.getItem('nexcrm_vat_seller_' + (currentOrg ? currentOrg.id : '')) || '{}');
+  if(saved.vat) document.getElementById('vat-seller-vat').value = saved.vat;
+  if(saved.cr) document.getElementById('vat-seller-cr').value = saved.cr;
+  if(saved.address) document.getElementById('vat-seller-address').value = saved.address;
+  if(saved.bank) document.getElementById('vat-bank-name').value = saved.bank;
+  if(saved.iban) document.getElementById('vat-bank-iban').value = saved.iban;
+  calcVAT();
+  document.getElementById('vat-invoice-modal').classList.add('open');
+}
+
+function addVATItem() {
+  const row = document.createElement('div');
+  row.className = 'vat-item-row';
+  row.style.cssText = 'display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:8px';
+  row.innerHTML = `<input class="form-input" placeholder="Service description" oninput="calcVAT()"/>
+    <input class="form-input" type="number" placeholder="Qty" value="1" oninput="calcVAT()"/>
+    <input class="form-input" type="number" placeholder="Unit price SAR" oninput="calcVAT()"/>
+    <button onclick="removeVATItem(this)" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:8px 10px;color:#ef4444;cursor:pointer">✕</button>`;
+  document.getElementById('vat-items').appendChild(row);
+}
+
+function removeVATItem(btn) {
+  const rows = document.querySelectorAll('.vat-item-row');
+  if(rows.length > 1) { btn.closest('.vat-item-row').remove(); calcVAT(); }
+}
+
+function calcVAT() {
+  let subtotal = 0;
+  document.querySelectorAll('.vat-item-row').forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const qty = parseFloat(inputs[1]?.value) || 0;
+    const price = parseFloat(inputs[2]?.value) || 0;
+    subtotal += qty * price;
+  });
+  const tax = subtotal * 0.15;
+  const total = subtotal + tax;
+  document.getElementById('vat-subtotal').textContent = 'SAR ' + subtotal.toFixed(2);
+  document.getElementById('vat-tax').textContent = 'SAR ' + tax.toFixed(2);
+  document.getElementById('vat-total').textContent = 'SAR ' + total.toFixed(2);
+}
+
+function generateVATInvoice() {
+  const sellerEN = document.getElementById('vat-seller-en').value || 'Your Company';
+  const sellerAR = document.getElementById('vat-seller-ar').value || '';
+  const sellerVAT = document.getElementById('vat-seller-vat').value || '';
+  const sellerCR = document.getElementById('vat-seller-cr').value || '';
+  const sellerAddr = document.getElementById('vat-seller-address').value || '';
+  const buyerName = document.getElementById('vat-buyer-name').value || 'Client';
+  const buyerVAT = document.getElementById('vat-buyer-vat').value || '';
+  const invNumber = document.getElementById('vat-inv-number').value || 'INV-001';
+  // Save seller info for next time
+  localStorage.setItem('nexcrm_vat_seller_' + (currentOrg ? currentOrg.id : ''), JSON.stringify({
+    vat: sellerVAT, cr: sellerCR, address: sellerAddr,
+    bank: document.getElementById('vat-bank-name').value,
+    iban: document.getElementById('vat-bank-iban').value
+  }));
+  const invDate = document.getElementById('vat-inv-date').value || new Date().toISOString().split('T')[0];
+  const bankName = document.getElementById('vat-bank-name').value || '';
+  const bankIBAN = document.getElementById('vat-bank-iban').value || '';
+
+  // Build items
+  let subtotal = 0;
+  const itemRows = [];
+  document.querySelectorAll('.vat-item-row').forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const desc = inputs[0]?.value || '';
+    const qty = parseFloat(inputs[1]?.value) || 0;
+    const price = parseFloat(inputs[2]?.value) || 0;
+    const lineTotal = qty * price;
+    subtotal += lineTotal;
+    if(desc) itemRows.push({ desc, qty, price, lineTotal });
+  });
+  const tax = subtotal * 0.15;
+  const total = subtotal + tax;
+
+  // QR code — ZATCA TLV Base64 encoding
+  function tlv(tag, value) {
+    const enc = new TextEncoder();
+    const valBytes = enc.encode(value);
+    return String.fromCharCode(tag, valBytes.length) + Array.from(valBytes).map(b => String.fromCharCode(b)).join('');
+  }
+  const tlvStr = tlv(1, sellerEN) + tlv(2, sellerVAT) + tlv(3, invDate + 'T00:00:00Z') + tlv(4, total.toFixed(2)) + tlv(5, tax.toFixed(2));
+  const qrData = btoa(tlvStr);
+  const qrURL = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrData)}`;
+
+  const html = `<!DOCTYPE html>
+<html dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Tajawal:wght@400;700;800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#f8fafc;color:#1e293b}
+  .page{width:794px;margin:20px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 30px rgba(0,0,0,0.1)}
+  @media print{body{background:#fff}.page{margin:0;border-radius:0;box-shadow:none;width:100%}.no-print{display:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+  <!-- HEADER -->
+  <div style="background:linear-gradient(135deg,#1e293b,#0f172a);padding:36px 44px;display:flex;justify-content:space-between;align-items:flex-start">
+    <div>
+      <div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-0.5px">${sellerEN}</div>
+      ${sellerAR ? `<div style="font-family:'Tajawal',sans-serif;font-size:18px;font-weight:700;color:rgba(255,255,255,0.7);margin-top:4px;direction:rtl">${sellerAR}</div>` : ''}
+      <div style="margin-top:12px;font-size:12px;color:rgba(255,255,255,0.5);line-height:1.8">
+        ${sellerVAT ? `VAT: ${sellerVAT}<br/>` : ''}
+        ${sellerCR ? `CR: ${sellerCR}<br/>` : ''}
+        ${sellerAddr}
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:11px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px">Tax Invoice — فاتورة ضريبية</div>
+      <div style="font-size:32px;font-weight:900;color:#fff">${invNumber}</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-top:4px">${new Date(invDate+'T00:00:00').toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'})}</div>
+    </div>
+  </div>
+
+  <!-- BILL TO -->
+  <div style="padding:28px 44px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #f1f5f9">
+    <div>
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Bill To — فاتورة إلى</div>
+      <div style="font-size:18px;font-weight:700;color:#0f172a">${buyerName}</div>
+      ${buyerVAT ? `<div style="font-size:12px;color:#64748b;margin-top:4px">VAT: ${buyerVAT}</div>` : ''}
+    </div>
+    <img src="${qrURL}" style="width:100px;height:100px;border-radius:8px;border:1px solid #e2e8f0" alt="QR Code"/>
+  </div>
+
+  <!-- ITEMS TABLE -->
+  <div style="padding:28px 44px">
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:#f8fafc">
+          <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-radius:8px 0 0 8px">Description</th>
+          <th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px">Qty</th>
+          <th style="padding:12px 16px;text-align:right;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px">Unit Price</th>
+          <th style="padding:12px 16px;text-align:right;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;border-radius:0 8px 8px 0">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${itemRows.map((item,i) => `
+        <tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:14px 16px;font-size:14px;color:#1e293b;font-weight:500">${item.desc}</td>
+          <td style="padding:14px 16px;font-size:14px;color:#475569;text-align:center">${item.qty}</td>
+          <td style="padding:14px 16px;font-size:14px;color:#475569;text-align:right">SAR ${item.price.toFixed(2)}</td>
+          <td style="padding:14px 16px;font-size:14px;font-weight:600;color:#1e293b;text-align:right">SAR ${item.lineTotal.toFixed(2)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TOTALS + BANK -->
+  <div style="padding:0 44px 36px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:end">
+    ${(bankName || bankIBAN) ? `
+    <div style="background:#f8fafc;border-radius:12px;padding:20px">
+      <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Bank Details — البنك</div>
+      ${bankName ? `<div style="font-size:13px;color:#475569;margin-bottom:4px"><span style="font-weight:600">Bank:</span> ${bankName}</div>` : ''}
+      ${bankIBAN ? `<div style="font-size:13px;color:#475569;font-family:monospace"><span style="font-weight:600">IBAN:</span> ${bankIBAN}</div>` : ''}
+    </div>` : '<div></div>'}
+    <div style="background:#0f172a;border-radius:12px;padding:20px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;color:rgba(255,255,255,0.6)">
+        <span>Subtotal</span><span>SAR ${subtotal.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px;color:#fbbf24">
+        <span>VAT 15% — ضريبة القيمة المضافة</span><span>SAR ${tax.toFixed(2)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:800;color:#fff;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;margin-top:4px">
+        <span>Total — الإجمالي</span><span>SAR ${total.toFixed(2)}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div style="background:#f8fafc;padding:16px 44px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #e2e8f0">
+    <div style="font-size:11px;color:#94a3b8">This is a computer-generated VAT invoice compliant with ZATCA regulations</div>
+    <div style="font-size:11px;color:#94a3b8">Powered by NexCRM</div>
+  </div>
+</div>
+
+<div class="no-print" style="position:fixed;bottom:24px;right:24px;display:flex;gap:10px">
+  <button onclick="window.print()" style="background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.3)">🖨️ Print / Save PDF</button>
+  <button onclick="window.close()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:12px;padding:14px 20px;font-size:15px;cursor:pointer">✕</button>
+</div>
+</body></html>`;
+  const vatWin = window.open('', '_blank');
+  vatWin.document.write(html);
+  vatWin.document.close();
+}
+</script>
+
+<!-- APPROVE WITH ORG PICKER MODAL -->
+<div id="approve-modal-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:460px;padding:28px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:17px;color:var(--text)">Approve Request</div>
+      <button onclick="document.getElementById('approve-modal-overlay').style.display='none'" style="background:var(--bg3);border:none;color:var(--text2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div id="approve-modal-info" style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text2)"></div>
+    <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:8px">ASSIGN TO ORGANIZATION</label>
+    <select id="approve-org-select" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;margin-bottom:8px;font-family:inherit">
+      <option value="">Loading organizations...</option>
+    </select>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:16px">Or create a new org based on their company name:</div>
+    <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:8px">NEW ORGANIZATION NAME</label>
+    <input id="approve-new-org" placeholder="Leave blank to use existing org above" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;margin-bottom:16px;font-family:inherit"/>
+    <button onclick="confirmApprove()" style="width:100%;padding:12px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">✓ Approve & Assign</button>
+  </div>
+</div>
+
+<!-- ASSIGN USER TO ORG MODAL -->
+<div id="assign-modal-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:420px;padding:28px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:17px;color:var(--text)">Assign to Organization</div>
+      <button onclick="document.getElementById('assign-modal-overlay').style.display='none'" style="background:var(--bg3);border:none;color:var(--text2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div id="assign-modal-info" style="background:var(--bg3);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--text2)"></div>
+    <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:8px">SELECT ORGANIZATION</label>
+    <select id="assign-org-select" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;margin-bottom:16px;font-family:inherit">
+      <option value="">Loading...</option>
+    </select>
+    <label style="font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:8px">ROLE</label>
+    <select id="assign-role-select" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;margin-bottom:16px;font-family:inherit">
+      <option value="member">Member</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button onclick="confirmAssignUser()" style="width:100%;padding:12px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Assign to Organization</button>
+  </div>
+</div>
+
+<script>
+// ─── APPROVE WITH ORG PICKER ──────────────────────────────────
+let _approveData = {};
+
+async function showApproveModal(id, name, email, company) {
+  _approveData = { id, name, email, company };
+  document.getElementById('approve-modal-info').innerHTML = 
+    '<strong>' + name + '</strong> (' + email + ')<br>Requested company: <strong>' + company + '</strong>';
+  document.getElementById('approve-new-org').value = company;
+  
+  // Load orgs into dropdown
+  const sel = document.getElementById('approve-org-select');
+  sel.innerHTML = '<option value="">— Select existing org —</option>';
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/organizations?select=id,name&order=name.asc', { headers: HEADERS });
+    const orgs = await r.json();
+    (orgs || []).forEach(o => {
+      sel.innerHTML += '<option value="' + o.id + '">' + o.name + '</option>';
+    });
+  } catch(e) {}
+  
+  document.getElementById('approve-modal-overlay').style.display = 'flex';
+}
+
+async function confirmApprove() {
+  const { id, name, email } = _approveData;
+  const existingOrgId = document.getElementById('approve-org-select').value;
+  const newOrgName = document.getElementById('approve-new-org').value.trim();
+  
+  if (!existingOrgId && !newOrgName) {
+    showToast('❌ Please select an org or enter a new org name');
+    return;
+  }
+
+  document.getElementById('approve-modal-overlay').style.display = 'none';
+
+  try {
+    let orgId = existingOrgId;
+
+    // Create new org if needed
+    if (!existingOrgId && newOrgName) {
+      const orgR = await fetch(SUPABASE_URL + '/rest/v1/organizations', {
+        method: 'POST',
+        headers: { ...HEADERS, 'Prefer': 'return=representation' },
+        body: JSON.stringify({ name: newOrgName })
+      });
+      const orgData = await orgR.json();
+      const newOrg = Array.isArray(orgData) ? orgData[0] : orgData;
+      if (!newOrg || !newOrg.id) { showToast('❌ Failed to create org'); return; }
+      orgId = newOrg.id;
+    }
+
+    // Check if user already exists in auth
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk3NTEsImV4cCI6MjA4OTEwNTc1MX0.h4NClLHPJwnSkhMBccB8hpPJrrMU3hkKMCqHu4KNv8g';
+    const inviteR = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/approve-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON, 'Authorization': 'Bearer ' + SUPABASE_ANON },
+      body: JSON.stringify({ email, name, org_id: orgId, company: newOrgName || '' })
+    });
+
+    // Update request status
+    await fetch(SUPABASE_URL + '/rest/v1/access_requests?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status: 'approved' })
+    });
+
+    showToast('🎉 ' + name + ' approved and assigned!');
+    loadAccessRequests();
+  } catch(e) {
+    showToast('❌ Error: ' + e.message);
+  }
+}
+
+// ─── ASSIGN EXISTING USER TO ORG ─────────────────────────────
+let _assignData = {};
+
+async function showAssignUserModal(userId, email) {
+  _assignData = { userId, email };
+  document.getElementById('assign-modal-info').innerHTML = 'Assigning <strong>' + email + '</strong> to an organization';
+  
+  const sel = document.getElementById('assign-org-select');
+  sel.innerHTML = '<option value="">Select organization...</option>';
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/organizations?select=id,name&order=name.asc', { headers: HEADERS });
+    const orgs = await r.json();
+    (orgs || []).forEach(o => {
+      sel.innerHTML += '<option value="' + o.id + '">' + o.name + '</option>';
+    });
+  } catch(e) {}
+  
+  document.getElementById('assign-modal-overlay').style.display = 'flex';
+}
+
+async function confirmAssignUser() {
+  const { userId, email } = _assignData;
+  const orgId = document.getElementById('assign-org-select').value;
+  const role = document.getElementById('assign-role-select').value;
+  
+  if (!orgId) { showToast('❌ Please select an organization'); return; }
+  
+  document.getElementById('assign-modal-overlay').style.display = 'none';
+  
+  try {
+    // Remove from all existing orgs first
+    await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + userId, {
+      method: 'DELETE', headers: HEADERS
+    });
+    
+    // Assign to new org
+    await fetch(SUPABASE_URL + '/rest/v1/org_members', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ user_id: userId, org_id: orgId, role: role })
+    });
+    
+    showToast('✅ ' + email + ' assigned successfully!');
+    loadClients();
+  } catch(e) {
+    showToast('❌ Error: ' + e.message);
+  }
+}
+
+
+</script>
+
+<script>
+// ─── HIJRI CALENDAR ENGINE ────────────────────────────────────
+// Accurate Gregorian → Hijri conversion (Umm al-Qura algorithm)
+function toHijri(date) {
+  if(!date) return '';
+  try {
+    const d = (date instanceof Date) ? date : new Date(date + (date.length === 10 ? 'T00:00:00' : ''));
+    if(isNaN(d)) return '';
+    // Use Intl API for accurate Hijri conversion
+    const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    }).format(d);
+    return hijri;
+  } catch(e) { return ''; }
+}
+
+function toHijriShort(date) {
+  if(!date) return '';
+  try {
+    const d = (date instanceof Date) ? date : new Date(date + (date.length === 10 ? 'T00:00:00' : ''));
+    if(isNaN(d)) return '';
+    const hijri = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
+      day: 'numeric', month: 'short', year: 'numeric'
+    }).format(d);
+    return hijri;
+  } catch(e) { return ''; }
+}
+
+// Format date showing both Gregorian + Hijri
+function dualDate(dateStr) {
+  if(!dateStr) return '—';
+  try {
+    const d = new Date(dateStr + (dateStr.length === 10 ? 'T00:00:00' : ''));
+    if(isNaN(d)) return dateStr;
+    const greg = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const hijri = toHijriShort(d);
+    return `<span style="line-height:1.6">${greg}<br/><span style="font-size:10px;color:var(--text2);font-family:'Tajawal',sans-serif;direction:rtl">${hijri}</span></span>`;
+  } catch(e) { return dateStr; }
+}
+
+function dualDateText(dateStr) {
+  if(!dateStr) return '—';
+  try {
+    const d = new Date(dateStr + (dateStr.length === 10 ? 'T00:00:00' : ''));
+    if(isNaN(d)) return dateStr;
+    const greg = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const hijri = toHijriShort(d);
+    return `${greg} · ${hijri}`;
+  } catch(e) { return dateStr; }
+}
+
+// Patch all date displays after render
+function patchHijriDates() {
+  // Leads table dates
+  document.querySelectorAll('#leads-tbody tr td:nth-child(8)').forEach(td => {
+    const txt = td.textContent.trim();
+    if(txt && txt !== '—' && !td.querySelector('span span')) {
+      const hijri = toHijriShort(txt);
+      if(hijri) td.innerHTML = `<span style="line-height:1.6;font-size:12px;color:var(--text2)">${txt}<br/><span style="font-size:10px;font-family:'Tajawal',sans-serif;direction:rtl;color:var(--accent)">${hijri}</span></span>`;
+    }
+  });
+
+  // Invoice due dates
+  document.querySelectorAll('.invoice-card').forEach(card => {
+    const dueLine = Array.from(card.querySelectorAll('div')).find(d => d.textContent.startsWith('Due:'));
+    if(dueLine && !dueLine.dataset.hijriPatched) {
+      const match = dueLine.textContent.match(/Due: (.+)/);
+      if(match) {
+        const dateStr = match[1];
+        try {
+          const d = new Date(dateStr);
+          if(!isNaN(d)) {
+            const hijri = toHijriShort(d);
+            if(hijri) {
+              dueLine.innerHTML = `Due: ${dateStr} <span style="font-size:10px;font-family:'Tajawal',sans-serif;direction:rtl;color:var(--accent)">· ${hijri}</span>`;
+              dueLine.dataset.hijriPatched = '1';
+            }
+          }
+        } catch(e) {}
+      }
+    }
+  });
+
+  // Reminder dates
+  document.querySelectorAll('.existing-reminder').forEach(el => {
+    if(!el.dataset.hijriPatched) {
+      const match = el.textContent.match(/⏰ ([^—]+)/);
+      if(match) {
+        try {
+          const d = new Date(match[1].trim());
+          if(!isNaN(d)) {
+            const hijri = toHijriShort(d);
+            if(hijri) {
+              el.innerHTML = el.innerHTML + ` <span style="font-size:10px;font-family:'Tajawal',sans-serif;direction:rtl;color:var(--accent)">${hijri}</span>`;
+              el.dataset.hijriPatched = '1';
+            }
+          }
+        } catch(e) {}
+      }
+    }
+  });
+}
+
+// Add Hijri date widget to dashboard
+function renderHijriWidget() {
+  const existing = document.getElementById('hijri-widget');
+  if(existing) return;
+  const now = new Date();
+  const hijriFull = toHijri(now);
+  const gregFull = now.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  // Find dashboard stats grid to prepend widget
+  const dashPage = document.getElementById('page-dashboard');
+  if(!dashPage) return;
+  const widget = document.createElement('div');
+  widget.id = 'hijri-widget';
+  widget.style.cssText = 'background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15));border:1px solid rgba(59,130,246,0.2);border-radius:14px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px';
+  widget.innerHTML = `
+    <div>
+      <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px">Today's Date</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text)">${gregFull}</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;direction:rtl">التاريخ الهجري</div>
+      <div style="font-size:16px;font-weight:800;color:var(--text);font-family:'Tajawal',sans-serif;direction:rtl">${hijriFull}</div>
+    </div>
+  `;
+  dashPage.insertBefore(widget, dashPage.firstChild);
+}
+
+// Hook into existing render functions
+const _origRenderLeads = window.renderLeads;
+if(typeof renderLeads === 'function') {
+  const origRL = renderLeads;
+  window.renderLeads = function() {
+    origRL.apply(this, arguments);
+    setTimeout(patchHijriDates, 100);
+  };
+}
+
+const _origRenderInvoices = window.renderInvoices;
+if(typeof renderInvoices === 'function') {
+  const origRI = renderInvoices;
+  window.renderInvoices = function() {
+    origRI.apply(this, arguments);
+    setTimeout(patchHijriDates, 100);
+  };
+}
+
+// Run on page navigation
+if(typeof nav === 'function') {
+  const _origNavHijri = nav;
+  window.nav = function(page, el) {
+    _origNavHijri.apply(this, arguments);
+    if(page === 'dashboard') setTimeout(renderHijriWidget, 200);
+    setTimeout(patchHijriDates, 300);
+  };
+}
+
+// Init on load
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    renderHijriWidget();
+    patchHijriDates();
+  }, 1500);
+});
+</script>
+<script>
+// ─── LEAD RESPONSE TIME TRACKER ───────────────────────────────
+function formatDuration(ms) {
+  if(ms < 0) return '—';
+  const mins = Math.floor(ms / 60000);
+  const hours = Math.floor(mins / 60);
+  const days = Math.floor(hours / 24);
+  if(days > 0) return days + 'd ' + (hours % 24) + 'h';
+  if(hours > 0) return hours + 'h ' + (mins % 60) + 'm';
+  if(mins > 0) return mins + 'm';
+  return '< 1m';
+}
+
+function getResponseColor(ms) {
+  const hours = ms / 3600000;
+  if(hours <= 1) return 'var(--success)';
+  if(hours <= 4) return 'var(--warning)';
+  return 'var(--danger)';
+}
+
+function getResponseLabel(ms) {
+  const hours = ms / 3600000;
+  if(hours <= 1) return '🟢 Excellent';
+  if(hours <= 4) return '🟡 Good';
+  if(hours <= 24) return '🟠 Slow';
+  return '🔴 Critical';
+}
+
+function renderResponseTime() {
+  const container = document.getElementById('an-response-detail');
+  const statEl = document.getElementById('an-response-time');
+  const subEl = document.getElementById('an-response-sub');
+  if(!container) return;
+
+  const now = new Date();
+  const contactedLeads = leads.filter(l => l.created_at && l.status && l.status !== 'New');
+  const waitingLeads = leads.filter(l => l.created_at && (!l.status || l.status === 'New'));
+
+  const waitingTimes = waitingLeads.map(l => {
+    const created = new Date(l.created_at);
+    const waitMs = now - created;
+    return { lead: l, waitMs };
+  }).sort((a,b) => b.waitMs - a.waitMs);
+
+  const avgWaitMs = waitingTimes.length > 0
+    ? waitingTimes.reduce((s,l) => s + l.waitMs, 0) / waitingTimes.length
+    : null;
+
+  if(statEl) {
+    if(waitingTimes.length > 0) {
+      statEl.textContent = formatDuration(avgWaitMs);
+      statEl.style.color = getResponseColor(avgWaitMs);
+    } else if(leads.length > 0) {
+      statEl.textContent = 'All contacted';
+      statEl.style.color = 'var(--success)';
+    } else {
+      statEl.textContent = '—';
+    }
+  }
+  if(subEl) subEl.textContent = waitingLeads.length + ' ' + __t('leads awaiting contact');
+
+  let html = '';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">';
+  html += '<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">' + __t('Contacted') + '</div><div style="font-size:24px;font-weight:800;color:var(--success)">' + contactedLeads.length + '</div><div style="font-size:11px;color:var(--text2)">' + __t('leads responded to') + '</div></div>';
+  html += '<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">' + __t('Waiting') + '</div><div style="font-size:24px;font-weight:800;color:var(--warning)">' + waitingLeads.length + '</div><div style="font-size:11px;color:var(--text2)">' + __t('awaiting first contact') + '</div></div>';
+  html += '<div style="background:var(--bg3);border-radius:10px;padding:14px;text-align:center"><div style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">' + __t('Contact Rate') + '</div><div style="font-size:24px;font-weight:800;color:var(--accent)">' + (leads.length > 0 ? Math.round(contactedLeads.length/leads.length*100) : 0) + '%</div><div style="font-size:11px;color:var(--text2)">' + __t('of total leads') + '</div></div>';
+  html += '</div>';
+
+  if(waitingTimes.length > 0) {
+    html += '<div style="margin-bottom:16px"><div style="font-size:12px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Leads Awaiting Contact — Oldest First</div>';
+    waitingTimes.slice(0, 10).forEach(function(item) {
+      var lead = item.lead, waitMs = item.waitMs;
+      var color = getResponseColor(waitMs);
+      var label = getResponseLabel(waitMs);
+      var pct = Math.min(100, (waitMs / (7 * 86400000)) * 100);
+      html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border-radius:10px;margin-bottom:8px;border:1px solid ' + (waitMs > 86400000 ? 'rgba(239,68,68,0.2)' : 'var(--border)') + '">';
+      html += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--text)">' + (lead.name||'—') + '</div><div style="font-size:11px;color:var(--text2);margin-top:2px">' + (lead.source||'—') + ' · ' + (lead.phone||'—') + '</div><div style="height:4px;background:var(--bg2);border-radius:4px;margin-top:6px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:' + color + ';border-radius:4px"></div></div></div>';
+      html += '<div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:800;color:' + color + '">' + formatDuration(waitMs) + '</div><div style="font-size:10px;color:var(--text2);margin-top:2px">' + label + '</div></div>';
+      html += '<a href="https://wa.me/' + (lead.phone||'').replace(/[^0-9]/g,'') + '" target="_blank" style="background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);border-radius:8px;padding:6px 10px;color:#25d366;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">WhatsApp</a>';
+      html += '</div>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div style="text-align:center;padding:24px;color:var(--success);font-weight:600">All leads have been contacted!</div>';
+  }
+
+  html += '<div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(99,102,241,0.08));border:1px solid rgba(99,102,241,0.15);border-radius:10px;padding:14px;display:flex;gap:10px;align-items:flex-start"><div style="font-size:18px">💡</div><div style="font-size:12px;color:var(--text2);line-height:1.6"><strong style="color:var(--text)">Pro tip:</strong> Leads contacted within 1 hour are <strong style="color:var(--accent)">7x more likely to convert</strong>. Set a team goal: respond to every new lead within 60 minutes.</div></div>';
+
+  container.innerHTML = html;
+}
+
+// Hook into renderAnalytics
+if(typeof renderAnalytics === 'function') {
+  var _origRA = renderAnalytics;
+  renderAnalytics = function() {
+    _origRA.apply(this, arguments);
+    setTimeout(renderResponseTime, 200);
+  };
+}
+</script>
+<script>
+// ─── ONBOARDING ───────────────────────────────────────────────
+let obCurrentSlide = 1;
+const obTotalSlides = 4;
+
+function showOnboarding() {
+  if(!currentUser) return;
+  const key = 'nexcrm_onboarded_' + currentUser.id;
+  if(localStorage.getItem(key)) return; // already seen
+  // Set org name in welcome slide
+  const orgName = currentOrg ? currentOrg.name : '';
+  if(orgName) {
+    const el = document.getElementById('ob-org-name');
+    if(el) el.textContent = orgName + ' workspace is ready';
+    const title = document.getElementById('ob-welcome-title');
+    if(title) title.textContent = 'Welcome, ' + orgName + '!';
+  }
+  obCurrentSlide = 1;
+  updateOnboardingUI();
+  const overlay = document.getElementById('onboarding-overlay');
+  if(overlay) { overlay.style.display = 'flex'; }
+}
+
+function closeOnboarding() {
+  const overlay = document.getElementById('onboarding-overlay');
+  if(overlay) {
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => { overlay.style.display = 'none'; overlay.style.opacity = '1'; }, 300);
+  }
+  if(currentUser) localStorage.setItem('nexcrm_onboarded_' + currentUser.id, '1');
+}
+
+function nextOnboardingSlide() {
+  if(obCurrentSlide >= obTotalSlides) { closeOnboarding(); return; }
+  obCurrentSlide++;
+  updateOnboardingUI();
+}
+
+function updateOnboardingUI() {
+  // Show correct slide
+  for(let i = 1; i <= obTotalSlides; i++) {
+    const slide = document.getElementById('ob-slide-' + i);
+    if(slide) slide.style.display = i === obCurrentSlide ? 'block' : 'none';
+  }
+  // Progress bar
+  const prog = document.getElementById('ob-progress');
+  if(prog) prog.style.width = (obCurrentSlide / obTotalSlides * 100) + '%';
+  // Dots
+  const dots = document.getElementById('ob-dots');
+  if(dots) {
+    const dotEls = dots.children;
+    for(let i = 0; i < dotEls.length; i++) {
+      dotEls[i].style.width = i === obCurrentSlide - 1 ? '18px' : '5px';
+      dotEls[i].style.background = i === obCurrentSlide - 1 ? 'var(--accent)' : 'var(--bg3)';
+    }
+  }
+  // Next button text
+  const btn = document.getElementById('ob-next-btn');
+  if(btn) btn.textContent = obCurrentSlide === obTotalSlides ? "Let's go! 🚀" : 'Next →';
+}
+
+// Hook into loadUserOrgs — show after orgs load for non-admin
+const _origLoadUserOrgs = loadUserOrgs;
+loadUserOrgs = async function() {
+  await _origLoadUserOrgs.apply(this, arguments);
+  setTimeout(showOnboarding, 800);
+};
+</script>
+<script>
+// ─── LIGHT / DARK MODE TOGGLE ─────────────────────────────────
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  localStorage.setItem('nexcrm_theme', isLight ? 'light' : 'dark');
+  updateThemeIcon(isLight);
+}
+
+function updateThemeIcon(isLight) {
+  // Desktop icons
+  const moon = document.getElementById('theme-icon-moon');
+  const sun = document.getElementById('theme-icon-sun');
+  if(moon) moon.style.display = isLight ? 'none' : 'block';
+  if(sun) sun.style.display = isLight ? 'block' : 'none';
+  // Mobile icons
+  const mMoon = document.getElementById('mobile-theme-moon');
+  const mSun = document.getElementById('mobile-theme-sun');
+  if(mMoon) mMoon.style.display = isLight ? 'none' : 'block';
+  if(mSun) mSun.style.display = isLight ? 'block' : 'none';
+  // Also update mobile header background via CSS vars (handled by light-mode class)
+  // Update mobile brand from branding if set
+  const b = currentOrg ? getBranding(currentOrg.id) : {};
+  if(b && b.name) {
+    const brandName = document.getElementById('mobile-brand-name');
+    if(brandName) brandName.textContent = b.name;
+    const logoIcon = document.getElementById('mobile-logo-icon');
+    if(logoIcon) {
+      logoIcon.textContent = b.initial || b.name.charAt(0).toUpperCase();
+      if(b.color) logoIcon.style.background = 'linear-gradient(135deg,' + b.color + ',' + b.color + '99)';
+    }
+  }
+}
+
+
+</script>
+
+<script>
+// Apply saved theme on load
+(function() {
+  const saved = localStorage.getItem('nexcrm_theme');
+  if(saved === 'light') {
+    document.body.classList.add('light-mode');
+    document.addEventListener('DOMContentLoaded', () => updateThemeIcon(true));
+  }
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- AI REPLY SUGGESTIONS FEATURE                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<!-- AI REPLY MODAL HTML -->
+<div id="ai-reply-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:520px;padding:28px;box-shadow:0 40px 80px rgba(0,0,0,0.4);animation:onboardIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;background:linear-gradient(135deg,#25d366,#128c7e);border-radius:10px;display:flex;align-items:center;justify-content:center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:17px;color:var(--text)">AI Reply Suggestion</div>
+          <div style="font-size:11px;color:var(--text2)" id="ai-reply-lead-name">—</div>
+        </div>
+      </div>
+      <button onclick="closeAIReply()" style="background:var(--bg3);border:none;color:var(--text2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+
+    <!-- Language Toggle -->
+    <div style="display:flex;background:var(--bg3);border-radius:10px;padding:3px;margin-bottom:18px;gap:3px">
+      <button id="ai-reply-btn-ar" onclick="setAIReplyLang('ar')" style="flex:1;padding:8px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;background:var(--accent);color:#fff;transition:all 0.2s">🇸🇦 Arabic</button>
+      <button id="ai-reply-btn-en" onclick="setAIReplyLang('en')" style="flex:1;padding:8px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;background:transparent;color:var(--text2);transition:all 0.2s">🇬🇧 English</button>
+    </div>
+
+    <!-- Content area -->
+    <div id="ai-reply-content" style="min-height:120px"></div>
+
+  </div>
+</div>
+
+<style>
+  #ai-reply-overlay.open { display:flex !important; }
+  .ai-reply-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin-bottom: 14px;
+    direction: auto;
+  }
+  .ai-reply-copy-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #25d366, #128c7e);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+  }
+  .ai-reply-copy-btn:hover { opacity: 0.9; }
+  .ai-reply-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 12px;
+  }
+  .ai-reply-spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: #25d366;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  /* AI Reply button in table */
+  .btn-ai-reply {
+    background: rgba(37,211,102,0.12);
+    color: #25d366;
+    border: 1px solid rgba(37,211,102,0.25);
+  }
+  .btn-ai-reply:hover {
+    background: rgba(37,211,102,0.22) !important;
+  }
+  body.light-mode .ai-reply-box { background:#f8fafc; }
+</style>
+
+<script>
+// ─── AI REPLY STATE ────────────────────────────────────────────
+let aiReplyCurrentLead = null;
+let aiReplyLang = 'ar';
+let aiReplyCached = { ar: null, en: null };
+
+// ─── OPEN / CLOSE ──────────────────────────────────────────────
+function showAIReply(id) {
+  const lead = leads.find(l => l.id === id);
+  if (!lead) return;
+  aiReplyCurrentLead = lead;
+  aiReplyCached = { ar: null, en: null };
+  aiReplyLang = 'ar';
+
+  document.getElementById('ai-reply-lead-name').textContent = lead.name + (lead.company && lead.company !== '—' ? ' — ' + lead.company : '');
+  document.getElementById('ai-reply-overlay').classList.add('open');
+  updateAIReplyToggleUI();
+  generateAIReply();
+}
+
+function closeAIReply() {
+  document.getElementById('ai-reply-overlay').classList.remove('open');
+  aiReplyCurrentLead = null;
+}
+
+// Close on backdrop click
+document.getElementById('ai-reply-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeAIReply();
+});
+
+// ─── LANGUAGE TOGGLE ──────────────────────────────────────────
+function setAIReplyLang(lang) {
+  if (aiReplyLang === lang) return;
+  aiReplyLang = lang;
+  updateAIReplyToggleUI();
+  if (aiReplyCached[lang]) {
+    renderAIReplyResult(aiReplyCached[lang]);
+  } else {
+    generateAIReply();
+  }
+}
+
+function updateAIReplyToggleUI() {
+  const arBtn = document.getElementById('ai-reply-btn-ar');
+  const enBtn = document.getElementById('ai-reply-btn-en');
+  if (aiReplyLang === 'ar') {
+    arBtn.style.background = 'var(--accent)';
+    arBtn.style.color = '#fff';
+    enBtn.style.background = 'transparent';
+    enBtn.style.color = 'var(--text2)';
+  } else {
+    enBtn.style.background = 'var(--accent)';
+    enBtn.style.color = '#fff';
+    arBtn.style.background = 'transparent';
+    arBtn.style.color = 'var(--text2)';
+  }
+}
+
+// ─── GENERATE REPLY ───────────────────────────────────────────
+async function generateAIReply() {
+  const lead = aiReplyCurrentLead;
+  if (!lead) return;
+
+  // Show loading
+  document.getElementById('ai-reply-content').innerHTML = `
+    <div class="ai-reply-loading">
+      <div class="ai-reply-spinner"></div>
+      <div style="color:var(--text2);font-size:13px">${aiReplyLang === 'ar' ? 'جاري كتابة الرد...' : 'Generating reply...'}</div>
+    </div>`;
+
+  const isArabic = aiReplyLang === 'ar';
+
+  const prompt = isArabic
+    ? `أنت خبير مبيعات سعودي. اكتب رسالة واتساب احترافية ودافئة للرد على هذا العميل المحتمل.
+
+بيانات العميل:
+- الاسم: ${lead.name}
+- المصدر: ${lead.source || 'غير محدد'}
+- الاهتمام / القيمة: ${lead.value || 'غير محدد'}
+- الشركة: ${lead.company || 'غير محدد'}
+- الحالة: ${lead.status || 'جديد'}
+
+اكتب رسالة واتساب باللغة العربية فقط. يجب أن تكون:
+- قصيرة (3-5 أسطر)
+- ودية ومحترمة بالأسلوب السعودي
+- تبدأ بالتحية باسم العميل
+- تُظهر الاهتمام باحتياجه
+- تنتهي بسؤال أو دعوة للتواصل
+
+اكتب الرسالة فقط بدون أي شرح أو مقدمة.`
+    : `You are a professional Saudi sales expert. Write a short, warm WhatsApp reply message for this lead.
+
+Lead details:
+- Name: ${lead.name}
+- Source: ${lead.source || 'Unknown'}
+- Interest / Value: ${lead.value || 'Unknown'}
+- Company: ${lead.company || 'Unknown'}
+- Status: ${lead.status || 'New'}
+
+Write a WhatsApp message in English only. It must be:
+- Short (3-5 lines)
+- Friendly and professional
+- Start with a greeting using the lead's name
+- Show genuine interest in their need
+- End with a question or call to action
+
+Write the message only, no explanation or preamble.`;
+
+  try {
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk3NTEsImV4cCI6MjA4OTEwNTc1MX0.h4NClLHPJwnSkhMBccB8hpPJrrMU3hkKMCqHu4KNv8g';
+    const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-reply', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + SUPABASE_ANON
+      },
+      body: JSON.stringify({ prompt })
+    });
+
+    const data = await response.json();
+    console.log('AI Reply response:', JSON.stringify(data));
+    const replyText = (data.content && data.content[0] && data.content[0].text)
+      ? data.content[0].text.trim()
+      : (data.error ? '❌ API Error: ' + (data.error.message || JSON.stringify(data.error)) : JSON.stringify(data));
+
+    // Cache it
+    aiReplyCached[aiReplyLang] = replyText;
+    renderAIReplyResult(replyText);
+
+  } catch(e) {
+    console.error(e);
+    document.getElementById('ai-reply-content').innerHTML = `
+      <div style="text-align:center;padding:30px;color:var(--danger);font-size:13px">
+        ❌ ${aiReplyLang === 'ar' ? 'فشل توليد الرد. حاول مجدداً.' : 'Failed to generate reply. Please try again.'}
+      </div>
+      <button onclick="generateAIReply()" style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:13px">
+        🔄 ${aiReplyLang === 'ar' ? 'إعادة المحاولة' : 'Retry'}
+      </button>`;
+  }
+}
+
+// ─── RENDER RESULT ────────────────────────────────────────────
+function renderAIReplyResult(text) {
+  const isArabic = aiReplyLang === 'ar';
+  const dir = isArabic ? 'rtl' : 'ltr';
+
+  document.getElementById('ai-reply-content').innerHTML = `
+    <div class="ai-reply-box" style="direction:${dir};text-align:${isArabic ? 'right' : 'left'}">${escapeHtml(text)}</div>
+    <div style="display:flex;gap:8px">
+      <button class="ai-reply-copy-btn" onclick="copyAIReply(this, ${JSON.stringify(text).replace(/</g,'&lt;')})">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        ${isArabic ? 'نسخ الرسالة' : 'Copy Message'}
+      </button>
+      <button onclick="generateAIReply()" style="padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text2);cursor:pointer;font-size:13px;white-space:nowrap" title="Regenerate">🔄</button>
+    </div>
+  `;
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copyAIReply(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '✅ ' + (aiReplyLang === 'ar' ? 'تم النسخ!' : 'Copied!');
+    btn.style.background = 'linear-gradient(135deg,#128c7e,#075e54)';
+    setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+  });
+}
+
+// ─── PATCH renderLeads TO ADD 💬 BUTTON ───────────────────────
+(function() {
+  const _orig = window.renderLeads;
+  if (typeof _orig !== 'function') return;
+
+  window.renderLeads = function() {
+    _orig.apply(this, arguments);
+
+    // Add AI Reply button to every action cell
+    const tbody = document.getElementById('leads-tbody');
+    if (!tbody) return;
+
+    const rows = tbody.querySelectorAll('tr:not(.notes-row):not(.reminder-row)');
+    rows.forEach((row, i) => {
+      const actionCell = row.querySelector('td:last-child');
+      if (!actionCell) return;
+
+      // Get lead id from existing button onclick
+      const existingBtn = actionCell.querySelector('[onclick*="deleteLead"]');
+      if (!existingBtn) return;
+      const match = existingBtn.getAttribute('onclick').match(/deleteLead\((\d+)\)/);
+      if (!match) return;
+      const id = match[1];
+
+      // Don't add twice
+      if (actionCell.querySelector('.btn-ai-reply')) return;
+
+      const replyBtn = document.createElement('button');
+      replyBtn.className = 'action-btn btn-ai-reply';
+      replyBtn.title = 'AI Reply Suggestion';
+      replyBtn.setAttribute('onclick', `showAIReply(${id})`);
+      replyBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+
+      // Insert before the delete button
+      const deleteBtn = actionCell.querySelector('[onclick*="deleteLead"]');
+      actionCell.insertBefore(replyBtn, deleteBtn);
+    });
+  };
+})();
+</script>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- WHATSAPP INBOX FEATURE                         -->
+<!-- ═══════════════════════════════════════════════ -->
+<style>
+#inbox-list .inbox-item {
+  display:flex;align-items:center;gap:10px;padding:12px 14px;
+  cursor:pointer;border-bottom:1px solid var(--border);transition:background 0.15s;
+}
+#inbox-list .inbox-item:hover { background:var(--bg3); }
+#inbox-list .inbox-item.active { background:rgba(37,211,102,0.08);border-left:3px solid #25d366; }
+.inbox-avatar {
+  width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;
+  color:#fff;flex-shrink:0;
+}
+.inbox-item-info { flex:1;min-width:0; }
+.inbox-item-name { font-weight:600;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.inbox-item-preview { font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px; }
+.inbox-item-time { font-size:11px;color:var(--text2);flex-shrink:0; }
+.inbox-unread { width:8px;height:8px;background:#25d366;border-radius:50%;flex-shrink:0; }
+.msg-bubble { max-width:65%;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.5;word-break:break-word; }
+.msg-out { background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;align-self:flex-end;border-bottom-right-radius:4px; }
+.msg-in { background:var(--bg2);color:var(--text);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px; }
+.msg-time { font-size:10px;opacity:0.7;margin-top:4px;text-align:right; }
+.msg-note { background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);color:var(--text2);font-size:12px;padding:6px 12px;border-radius:8px;align-self:center;font-style:italic; }
+body.light-mode .msg-in { background:#f0f0f0;border-color:#e0e0e0; }
+#inbox-list::-webkit-scrollbar,#inbox-messages::-webkit-scrollbar { width:4px; }
+#inbox-list::-webkit-scrollbar-thumb,#inbox-messages::-webkit-scrollbar-thumb { background:var(--border);border-radius:4px; }
+</style>
+
+<script>
+var inboxLeads = [];
+var inboxMessages = {};
+var activeInboxLead = null;
+
+async function loadInbox() {
+  var listEl = document.getElementById('inbox-list');
+  if (!listEl) return;
+  listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text2);font-size:13px">Loading...</div>';
+  try {
+    var orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    var r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + orgFilter, { headers: HEADERS });
+    var data = await r.json();
+    inboxLeads = data || [];
+    try {
+      var r2 = await fetch(SUPABASE_URL + '/rest/v1/inbox_messages?select=*&order=created_at.asc' + orgFilter, { headers: HEADERS });
+      if (r2.ok) {
+        var msgs = await r2.json();
+        inboxMessages = {};
+        (msgs || []).forEach(function(m) {
+          if (!inboxMessages[m.lead_id]) inboxMessages[m.lead_id] = [];
+          inboxMessages[m.lead_id].push(m);
+        });
+      }
+    } catch(e) { inboxMessages = {}; }
+    renderInboxList(inboxLeads);
+    var badge = document.getElementById('inbox-badge');
+    if (badge) badge.textContent = inboxLeads.length;
+  } catch(e) {
+    listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger)">Failed to load</div>';
+  }
+}
+
+function renderInboxList(leads) {
+  var listEl = document.getElementById('inbox-list');
+  if (!listEl) return;
+  if (!leads || leads.length === 0) {
+    listEl.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text2);font-size:13px">'+__t('No leads yet')+'</div>';
+    return;
+  }
+  listEl.innerHTML = leads.map(function(lead) {
+    var msgs = inboxMessages[lead.id] || [];
+    var lastMsg = msgs[msgs.length - 1];
+    var initials = (lead.name || '?').split(' ').map(function(n){return n[0];}).join('').substring(0,2).toUpperCase();
+    var preview = lastMsg ? lastMsg.message : (lead.notes || lead.source || 'No messages yet');
+    var time = lastMsg ? new Date(lastMsg.created_at).toLocaleTimeString('en', {hour:'2-digit',minute:'2-digit'}) : (lead.date || '');
+    var isActive = activeInboxLead && activeInboxLead.id === lead.id;
+    return '<div class="inbox-item' + (isActive ? ' active' : '') + '" onclick="openInboxChat(' + lead.id + ')">' +
+      '<div class="inbox-avatar">' + initials + '</div>' +
+      '<div class="inbox-item-info">' +
+        '<div class="inbox-item-name">' + (lead.name||'—') + '</div>' +
+        '<div class="inbox-item-preview">' + preview + '</div>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">' +
+        '<div class="inbox-item-time">' + time + '</div>' +
+        (msgs.length === 0 ? '<div class="inbox-unread"></div>' : '') +
+      '</div></div>';
+  }).join('');
+}
+
+function filterInboxList(q) {
+  var filtered = q ? inboxLeads.filter(function(l){ return (l.name||'').toLowerCase().includes(q.toLowerCase()) || (l.phone||'').includes(q); }) : inboxLeads;
+  renderInboxList(filtered);
+}
+
+function openInboxChat(id) {
+  var lead = inboxLeads.find(function(l){ return l.id === id; });
+  if (!lead) return;
+  activeInboxLead = lead;
+  var initials = (lead.name || '?').split(' ').map(function(n){return n[0];}).join('').substring(0,2).toUpperCase();
+  document.getElementById('inbox-avatar').textContent = initials;
+  document.getElementById('inbox-chat-name').textContent = lead.name || '—';
+  document.getElementById('inbox-chat-status').textContent = lead.phone || lead.source || 'Lead';
+  var waLink = document.getElementById('inbox-wa-link');
+  if (waLink && lead.phone) waLink.href = 'https://wa.me/' + lead.phone.replace(/[^0-9]/g,'');
+  renderInboxList(inboxLeads);
+  renderInboxMessages(lead);
+  setTimeout(function(){ var inp = document.getElementById('inbox-reply-input'); if(inp) inp.focus(); }, 100);
+}
+
+function renderInboxMessages(lead) {
+  var el = document.getElementById('inbox-messages');
+  if (!el) return;
+  var msgs = inboxMessages[lead.id] || [];
+  if (msgs.length === 0) {
+    el.innerHTML = '<div style="text-align:center;margin:10px 0"><span style="background:var(--bg3);color:var(--text2);font-size:11px;padding:4px 12px;border-radius:20px">' + (lead.date||'Recently') + '</span></div>' +
+      '<div class="msg-bubble msg-in"><div>مرحبا، أنا مهتم بـ ' + (lead.value||'منتجاتكم') + '</div><div class="msg-time">' + (lead.date||'') + ' · via ' + normalizeSrcName(lead.source||'') + '</div></div>' +
+      (lead.notes ? '<div class="msg-note">Note: ' + lead.notes + '</div>' : '') +
+      '<div style="text-align:center;margin:20px 0;color:var(--text2);font-size:12px">Type a reply below ↓</div>';
+  } else {
+    el.innerHTML = msgs.map(function(m) {
+      var isOut = m.direction === 'out';
+      var time = new Date(m.created_at).toLocaleTimeString('en', {hour:'2-digit',minute:'2-digit'});
+      return '<div class="msg-bubble ' + (isOut?'msg-out':'msg-in') + '"><div>' + m.message + '</div><div class="msg-time">' + time + (isOut?' ✓✓':'') + '</div></div>';
+    }).join('');
+  }
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendInboxMessage() {
+  var input = document.getElementById('inbox-reply-input');
+  if (!input || !activeInboxLead) return;
+  var msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  input.style.height = 'auto';
+  var now = new Date().toISOString();
+  var newMsg = { lead_id: activeInboxLead.id, message: msg, direction: 'out', created_at: now, org_id: currentOrg ? currentOrg.id : null };
+  if (!inboxMessages[activeInboxLead.id]) inboxMessages[activeInboxLead.id] = [];
+  inboxMessages[activeInboxLead.id].push(newMsg);
+  renderInboxMessages(activeInboxLead);
+  renderInboxList(inboxLeads);
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/inbox_messages', { method:'POST', headers:{...HEADERS,'Prefer':'return=minimal'}, body:JSON.stringify(newMsg) });
+  } catch(e) {}
+  showToast('Message sent!');
+}
+
+function inboxKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendInboxMessage(); }
+}
+
+function autoResizeInbox(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var origNav = window.nav;
+  if (typeof origNav === 'function') {
+    var _navWrapped = false;
+    if (!_navWrapped) {
+      _navWrapped = true;
+      var _navOrig = window.nav;
+      window.nav = function(page, el) {
+        _navOrig.apply(this, arguments);
+        if (page === 'inbox') setTimeout(loadInbox, 150);
+      };
+    }
+  }
+});
+</script>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- ACCESS REQUEST FEATURE                         -->
+<!-- ═══════════════════════════════════════════════ -->
+
+<!-- REQUEST MODAL HTML -->
+<div id="request-modal-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:480px;padding:28px;animation:onboardIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--text)">Request Free Trial</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">We'll review and get back to you within 24 hours</div>
+      </div>
+      <button onclick="closeRequestModal()" style="background:var(--bg3);border:none;color:var(--text2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Full Name *</label>
+        <input id="req-name" type="text" placeholder="Your name" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;font-family:inherit"/>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Email Address *</label>
+        <input id="req-email" type="email" placeholder="your@email.com" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;font-family:inherit"/>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Company / Agency Name *</label>
+        <input id="req-company" type="text" placeholder="Your company or agency" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;font-family:inherit"/>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Message (optional)</label>
+        <textarea id="req-message" placeholder="Tell us about your business..." rows="3" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;font-family:inherit;resize:none"></textarea>
+      </div>
+      <div id="req-error" style="color:var(--danger);font-size:13px;display:none"></div>
+      <button onclick="submitAccessRequest()" id="req-submit-btn" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#6366f1);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.2s">
+        Send Request →
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+#request-modal-overlay.open { display:flex !important; }
+.request-card {
+  background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:18px;
+  display:flex;align-items:flex-start;gap:14px;
+}
+.request-card.pending { border-left:3px solid var(--warning); }
+.request-card.approved { border-left:3px solid var(--success); opacity:0.7; }
+.request-card.rejected { border-left:3px solid var(--danger); opacity:0.7; }
+.req-avatar {
+  width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#6366f1);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:#fff;flex-shrink:0;
+}
+</style>
+
+<script>
+// ─── ACCESS REQUESTS ──────────────────────────────────────────
+
+function openRequestModal() {
+  document.getElementById('request-modal-overlay').classList.add('open');
+}
+
+function closeRequestModal() {
+  document.getElementById('request-modal-overlay').classList.remove('open');
+  document.getElementById('req-name').value = '';
+  document.getElementById('req-email').value = '';
+  document.getElementById('req-company').value = '';
+  document.getElementById('req-message').value = '';
+  document.getElementById('req-error').style.display = 'none';
+}
+
+document.getElementById('request-modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeRequestModal();
+});
+
+async function submitAccessRequest() {
+  const name = document.getElementById('req-name').value.trim();
+  const email = document.getElementById('req-email').value.trim();
+  const company = document.getElementById('req-company').value.trim();
+  const message = document.getElementById('req-message').value.trim();
+  const errEl = document.getElementById('req-error');
+  const btn = document.getElementById('req-submit-btn');
+
+  errEl.style.display = 'none';
+  if (!name || !email || !company) {
+    errEl.textContent = 'Please fill in all required fields.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (!email.includes('@')) {
+    errEl.textContent = 'Please enter a valid email address.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.textContent = 'Checking...';
+  btn.disabled = true;
+
+  // ── Company name duplicate check ──
+  try {
+    const checkR = await fetch(
+      SUPABASE_URL + '/rest/v1/organizations?select=id,name&name=ilike.' + encodeURIComponent(company),
+      { headers: HEADERS }
+    );
+    const existing = await checkR.json();
+    if (existing && existing.length > 0) {
+      errEl.textContent = '⚠️ A company with this name already exists in NexCRM. Please contact the admin directly.';
+      errEl.style.display = 'block';
+      btn.textContent = 'Send Request →';
+      btn.disabled = false;
+      return;
+    }
+  } catch(e) {
+    // If check fails, continue anyway
+  }
+
+  btn.textContent = 'Sending...';
+
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/access_requests', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        name, email, company, message,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      })
+    });
+
+    if (r.ok || r.status === 201) {
+      closeRequestModal();
+      // Show success on login page
+      const successEl = document.getElementById('auth-success');
+      if (successEl) {
+        successEl.textContent = '✅ Request sent! We will contact you within 24 hours.';
+        successEl.style.display = 'block';
+        setTimeout(() => { successEl.style.display = 'none'; }, 6000);
+      }
+    } else {
+      const data = await r.json();
+      errEl.textContent = 'Failed to send request. Please try again.';
+      errEl.style.display = 'block';
+    }
+  } catch(e) {
+    errEl.textContent = 'Network error. Please try again.';
+    errEl.style.display = 'block';
+  }
+
+  btn.textContent = 'Send Request →';
+  btn.disabled = false;
+}
+
+async function loadAccessRequests() {
+  const listEl = document.getElementById('requests-list');
+  if (!listEl) return;
+  listEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Loading...</div>';
+
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/access_requests?select=*&order=created_at.desc', { headers: HEADERS });
+    const data = await r.json();
+
+    if (!r.ok || !data.length) {
+      listEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)"><div style="font-size:32px;margin-bottom:12px">📭</div><div>No access requests yet</div><div style="font-size:12px;margin-top:4px">Requests will appear here when someone clicks "Request Free Trial"</div></div>';
+      return;
+    }
+
+    // Update badge
+    const pending = data.filter(r => r.status === 'pending').length;
+    const badge = document.getElementById('requests-badge');
+    if (badge) {
+      badge.textContent = pending;
+      badge.style.display = pending > 0 ? 'inline' : 'none';
+    }
+
+    listEl.innerHTML = data.map(req => {
+      const initials = (req.name || '?').split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+      const date = new Date(req.created_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+      const isPending = req.status === 'pending';
+
+      return `<div class="request-card ${req.status}">
+        <div class="req-avatar">${initials}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+            <div style="font-weight:700;font-size:14px;color:var(--text)">${req.name}</div>
+            <span style="background:${req.status==='pending'?'rgba(245,158,11,0.15)':req.status==='approved'?'rgba(16,185,129,0.15)':'rgba(239,68,68,0.15)'};color:${req.status==='pending'?'var(--warning)':req.status==='approved'?'var(--success)':'var(--danger)'};padding:2px 8px;border-radius:100px;font-size:11px;font-weight:600">${req.status}</span>
+            <span style="font-size:11px;color:var(--text2)">${date}</span>
+          </div>
+          <div style="font-size:13px;color:var(--accent);margin-bottom:2px">${req.email}</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:${req.message?'6px':'0'}">${req.company}</div>
+          ${req.message ? `<div style="font-size:12px;color:var(--text2);font-style:italic;background:var(--bg2);padding:6px 10px;border-radius:8px">"${req.message}"</div>` : ''}
+        </div>
+        ${isPending ? `
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          <button onclick="showApproveModal('${req.id}','${req.name}','${req.email}','${req.company}')" style="background:rgba(16,185,129,0.15);color:var(--success);border:1px solid rgba(16,185,129,0.25);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;white-space:nowrap">✓ Approve</button>
+          <button onclick="rejectRequest('${req.id}')" style="background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.2);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit">✗ Reject</button>
+        </div>` : ''}
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    listEl.innerHTML = '<div style="text-align:center;padding:30px;color:var(--danger)">Failed to load requests. Make sure the access_requests table exists in Supabase.</div>';
+  }
+}
+
+async function approveRequest(id, name, email, company) {
+  if (!confirm(`Approve ${name} (${email}) from ${company}?\n\nThis will:\n• Create a new workspace for "${company}"\n• Send ${email} an invite to set their password\n• Give them admin access to their workspace`)) return;
+
+  const btn = document.querySelector(`[onclick*="approveRequest('${id}'"]`);
+  if (btn) { btn.textContent = '⏳ Processing...'; btn.disabled = true; }
+
+  try {
+    // Step 1: Check company doesn't already exist
+    const checkR = await fetch(
+      SUPABASE_URL + '/rest/v1/organizations?select=id,name&name=ilike.' + encodeURIComponent(company),
+      { headers: HEADERS }
+    );
+    const existing = await checkR.json();
+    if (existing && existing.length > 0) {
+      showToast('❌ Company "' + company + '" already exists! Cannot approve duplicate.');
+      if (btn) { btn.textContent = '✓ Approve'; btn.disabled = false; }
+      return;
+    }
+
+    // Step 2: Create the organization
+    const orgR = await fetch(SUPABASE_URL + '/rest/v1/organizations', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=representation' },
+      body: JSON.stringify({ name: company, created_at: new Date().toISOString() })
+    });
+    const orgData = await orgR.json();
+    const newOrg = Array.isArray(orgData) ? orgData[0] : orgData;
+
+    if (!newOrg || !newOrg.id) {
+      showToast('❌ Failed to create workspace. Check Supabase permissions.');
+      if (btn) { btn.textContent = '✓ Approve'; btn.disabled = false; }
+      return;
+    }
+
+    // Step 3: Invite user via Supabase Edge Function
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk3NTEsImV4cCI6MjA4OTEwNTc1MX0.h4NClLHPJwnSkhMBccB8hpPJrrMU3hkKMCqHu4KNv8g';
+    const inviteR = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/approve-user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON,
+        'Authorization': 'Bearer ' + SUPABASE_ANON
+      },
+      body: JSON.stringify({ email, name, org_id: newOrg.id, company })
+    });
+
+    const inviteData = await inviteR.json();
+
+    // Step 4: Update request status to approved
+    await fetch(SUPABASE_URL + '/rest/v1/access_requests?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status: 'approved', approved_at: new Date().toISOString() })
+    });
+
+    if (inviteR.ok) {
+      showToast('🎉 ' + name + ' approved! Invite email sent to ' + email);
+    } else {
+      // Org created but invite failed — still mark approved
+      showToast('✅ Workspace created for ' + company + '. Manually invite ' + email + ' via Supabase Auth.');
+    }
+
+    loadAccessRequests();
+
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Approval failed: ' + e.message);
+    if (btn) { btn.textContent = '✓ Approve'; btn.disabled = false; }
+  }
+}
+
+async function rejectRequest(id) {
+  if (!confirm('Reject this request?')) return;
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/access_requests?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status: 'rejected' })
+    });
+    showToast('Request rejected.');
+    loadAccessRequests();
+  } catch(e) { showToast('❌ Failed to reject'); }
+}
+
+// Load requests count on admin panel open
+const _origAdminTab = window.adminTab;
+if (typeof adminTab === 'function') {
+  window.adminTab = function(tab, el) {
+    _origAdminTab.apply(this, arguments);
+    if (tab === 'requests') loadAccessRequests();
+  };
+}
+
+// Load badge count when admin logs in
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(async function() {
+    try {
+      const r = await fetch(SUPABASE_URL + '/rest/v1/access_requests?select=id&status=eq.pending', { headers: HEADERS });
+      if (r.ok) {
+        const data = await r.json();
+        const badge = document.getElementById('requests-badge');
+        if (badge && data && data.length > 0) {
+          badge.textContent = data.length;
+          badge.style.display = 'inline';
+        }
+      }
+    } catch(e) {}
+  }, 3000);
+});
+</script>
+<!-- VIEW AS CLIENT BANNER -->
+<div id="view-as-client-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#f59e0b,#d97706);padding:10px 20px;display:none;align-items:center;justify-content:space-between">
+  <div style="display:flex;align-items:center;gap:10px">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    <span style="color:#fff;font-weight:700;font-size:14px">Admin View Mode</span>
+    <span style="color:rgba(255,255,255,0.85);font-size:13px" id="view-as-banner-name">— Viewing as Client</span>
+  </div>
+  <button onclick="exitViewAsClient()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:6px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit">✕ Exit Client View</button>
+</div>
+
+<style>
+#view-as-client-banner.active { display:flex !important; }
+body.viewing-as-client { padding-top: 44px; }
+body.viewing-as-client .sidebar { top: 44px; }
+body.viewing-as-client nav, body.viewing-as-client .topbar { top: 44px; }
+</style>
+
+<script>
+// ─── VIEW AS CLIENT ──────────────────────────────────────────
+let _adminOrigOrg = null;
+let _adminOrigUser = null;
+let _isViewingAsClient = false;
+
+async function viewAsClient(orgId, orgName) {
+  if (!confirm('Switch to view ' + orgName + ' workspace?\n\nA banner will show at the top. This access is logged for transparency.')) return;
+
+  // Save admin state
+  _adminOrigOrg = currentOrg;
+  _isViewingAsClient = true;
+
+  // Log the admin access to Supabase
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/admin_access_log', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        admin_id: currentUser.id,
+        org_id: orgId,
+        org_name: orgName,
+        accessed_at: new Date().toISOString()
+      })
+    });
+  } catch(e) { /* table may not exist yet, ignore */ }
+
+  // Switch to client org
+  const allOrgsR = await fetch(SUPABASE_URL + '/rest/v1/organizations?id=eq.' + orgId + '&select=*', { headers: HEADERS });
+  const allOrgs = await allOrgsR.json();
+  if (allOrgs && allOrgs[0]) {
+    currentOrg = allOrgs[0];
+    // Show banner
+    document.getElementById('view-as-client-banner').classList.add('active');
+    document.getElementById('view-as-banner-name').textContent = '👁️ Viewing as: ' + orgName;
+    document.body.classList.add('viewing-as-client');
+    // Navigate to dashboard
+    nav('dashboard', document.querySelector('.nav-item'));
+    // Reload data for this org
+    await loadLeads();
+    updateLeadStats();
+    showToast('👁️ Now viewing ' + orgName + ' workspace');
+  }
+}
+
+function exitViewAsClient() {
+  if (!_adminOrigOrg) return;
+  currentOrg = _adminOrigOrg;
+  _isViewingAsClient = false;
+  _adminOrigOrg = null;
+  document.getElementById('view-as-client-banner').classList.remove('active');
+  document.body.classList.remove('viewing-as-client');
+  nav('admin', document.getElementById('admin-nav-item'));
+  adminTab('clients', document.querySelector('.admin-tab'));
+  loadLeads();
+  showToast('✅ Back to your admin view');
+}
+
+
+
+
 async function generateCampaignIdeas() {
   const brand = document.getElementById('ai-brand').value.trim();
   const industry = document.getElementById('ai-industry').value;
@@ -9947,6 +12060,5 @@ async function fetchBrandFromURL() {
   }
 }
 
+
 </script>
-</body>
-</html>
