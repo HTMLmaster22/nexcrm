@@ -1641,6 +1641,106 @@
 
     <div class="page" id="page-campaigns">
 
+      <!-- AI CAMPAIGN IDEAS -->
+      <div class="card" style="margin-bottom:20px;background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(59,130,246,0.05));border:1px solid rgba(139,92,246,0.25)">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:40px;height:40px;background:linear-gradient(135deg,#8b5cf6,#3b82f6);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800">AI Campaign Ideas</div>
+              <div style="font-size:12px;color:var(--text2);margin-top:1px">Generate campaign ideas, Reel scripts &amp; captions — Powered by Claude AI</div>
+            </div>
+          </div>
+          <div style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);padding:5px 12px;border-radius:100px;font-size:11px;font-weight:700;color:#8b5cf6">Claude AI</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Brand Name</label>
+            <input class="form-input" id="ai-brand" placeholder="e.g. Hussein Motors"/>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Industry</label>
+            <select class="form-input" id="ai-industry">
+              <option value="car dealership">Car Dealership</option>
+              <option value="marketing agency">Marketing Agency</option>
+              <option value="restaurant">Restaurant</option>
+              <option value="fashion retail">Fashion Retail</option>
+              <option value="real estate">Real Estate</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Goal</label>
+            <select class="form-input" id="ai-goal">
+              <option value="generate leads">Generate Leads</option>
+              <option value="brand awareness">Brand Awareness</option>
+              <option value="promote a sale">Promote Offer</option>
+              <option value="Ramadan campaign">Ramadan Campaign</option>
+              <option value="Eid campaign">Eid Campaign</option>
+              <option value="National Day">National Day</option>
+            </select>
+          </div>
+        </div>
+        <!-- Brand Context — Manual or URL -->
+        <div style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Brand Context <span style="color:var(--text2);font-weight:400;text-transform:none;font-size:10px">(helps Claude generate better ideas)</span></label>
+            <div style="display:flex;gap:0;background:var(--bg3);border-radius:8px;padding:3px">
+              <button id="ctx-tab-manual" onclick="switchBrandCtx('manual')" style="padding:4px 12px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;background:var(--accent);color:#fff;transition:all 0.2s">Manual</button>
+              <button id="ctx-tab-url" onclick="switchBrandCtx('url')" style="padding:4px 12px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;background:transparent;color:var(--text2);transition:all 0.2s">Website URL</button>
+            </div>
+          </div>
+          <!-- Manual description -->
+          <div id="ctx-manual">
+            <textarea class="form-input" id="ai-brand-desc" rows="2" placeholder="e.g. Silah is a premium shooting range in Riyadh offering firearms training, tactical courses for individuals and corporates..." style="resize:none;font-size:13px;line-height:1.6"></textarea>
+          </div>
+          <!-- URL input -->
+          <div id="ctx-url" style="display:none">
+            <div style="display:flex;gap:8px">
+              <input class="form-input" id="ai-brand-url" placeholder="https://www.silah.com.sa" style="font-size:13px;flex:1" />
+              <button onclick="fetchBrandFromURL()" id="fetch-url-btn" style="background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                Read Website
+              </button>
+            </div>
+            <div id="url-fetch-result" style="margin-top:8px;font-size:12px;color:var(--text2)"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-bottom:14px">
+          <div style="flex:1">
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Language</label>
+            <select class="form-input" id="ai-lang">
+              <option value="Arabic">Arabic</option>
+              <option value="English">English</option>
+            </select>
+          </div>
+          <div style="flex:1">
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Platform</label>
+            <select class="form-input" id="ai-platform">
+              <option value="Reels and TikTok">Reels &amp; TikTok</option>
+              <option value="Snapchat">Snapchat</option>
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="all platforms">All Platforms</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button onclick="generateCampaignIdeas()" id="ai-ideas-btn" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              Generate Ideas
+            </button>
+          </div>
+        </div>
+        <div id="ai-ideas-loading" style="display:none;text-align:center;padding:24px;color:var(--text2);font-size:13px">Generating ideas...</div>
+        <div id="ai-ideas-result" style="display:none">
+          <div style="height:1px;background:var(--border);margin-bottom:14px"></div>
+          <div id="ai-ideas-content"></div>
+        </div>
+      </div>
+
+
       <!-- CAMPAIGN TYPE SELECTOR -->
       <div class="card" style="margin-bottom:20px">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
@@ -3375,10 +3475,10 @@ function nav(page, el) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if(el) el.classList.add('active');
   document.getElementById('page-title').textContent = titles[page];
-  if(page === 'dashboard') loadDashboard();
+  if(page === 'dashboard') { loadDashboard(); setTimeout(renderHijriWidget, 200); }
   if(page === 'leads') loadLeads();
   if(page === 'pipeline') renderPipeline();
-  if(page === 'analytics') renderAnalytics();
+  if(page === 'analytics') loadAndRenderAnalytics();
   if(page === 'contacts') loadContacts();
   if(page === 'admin') { loadTeam(); }
   if(page === 'campaigns') { loadCampaignHistory(); }
@@ -3387,6 +3487,8 @@ function nav(page, el) {
   if(page === 'invoices') { loadInvoices(); }
   if(page === 'calls') { loadCallLogs(); }
   if(page === 'settings') { loadSettings(); }
+  if(page === 'inbox') setTimeout(loadInbox, 150);
+  setTimeout(patchHijriDates, 300);
 }
 
 // ─── MODAL ─────────────────────────────────────────────────────
@@ -4906,7 +5008,9 @@ function exportCallsPDF() {
     <span>Exported by ${currentUser?.email || 'Admin'} · ${new Date().toLocaleDateString()}</span>
   </div>
   <script>window.onload=()=>{window.print()}<\/script>
-  </body></html>`;
+  
+
+</body></html>`;
 
   const win = window.open('', '_blank');
   win.document.write(html);
@@ -5682,9 +5786,9 @@ function renderInvoices() {
   const total = invoicesList.reduce((s,i) => s + (i.amount||0), 0);
   const paid = invoicesList.filter(i => i.status==='Paid').reduce((s,i) => s + (i.amount||0), 0);
   const outstanding = total - paid;
-  document.getElementById('inv-total').textContent = 'SAR ' + total.toLocaleString();
-  document.getElementById('inv-paid').textContent = 'SAR ' + paid.toLocaleString();
-  document.getElementById('inv-outstanding').textContent = 'SAR ' + outstanding.toLocaleString();
+  if(document.getElementById('inv-total')) document.getElementById('inv-total').textContent = 'SAR ' + total.toLocaleString();
+  if(document.getElementById('inv-paid')) document.getElementById('inv-paid').textContent = 'SAR ' + paid.toLocaleString();
+  if(document.getElementById('inv-outstanding')) document.getElementById('inv-outstanding').textContent = 'SAR ' + outstanding.toLocaleString();
 
   if(!invoicesList.length) {
     list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No invoices yet</div>';
@@ -6197,7 +6301,6 @@ async function loadCampaignHistory() {
 }
 
 // Load campaign history when campaigns page opens
-const _origNav = nav;
 
 // ─── AI LEAD SCORING ───────────────────────────────────────────
 const scoreLabels = {
@@ -6831,6 +6934,24 @@ async function quickStatus(id, newStatus) {
 }
 
 // ─── ANALYTICS ─────────────────────────────────────────────────
+
+// ─── LOAD LEADS THEN RENDER ANALYTICS ─────────────────────────
+async function loadAndRenderAnalytics() {
+  const el = id => document.getElementById(id);
+  ['an-conv','an-value','an-total','an-won'].forEach(id => { if(el(id)) el(id).textContent = '…'; });
+  if(el('an-sources')) el('an-sources').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Loading…</div>';
+  if(el('an-statuses')) el('an-statuses').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Loading…</div>';
+  if(el('an-response-detail')) el('an-response-detail').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Loading…</div>';
+  try {
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + orgFilter, { headers: HEADERS });
+    const data = await r.json();
+    if(r.ok && Array.isArray(data)) leads = data;
+  } catch(e) { console.error('Analytics load error:', e); }
+  renderAnalytics();
+  if(typeof renderResponseTime === 'function') try { renderResponseTime(); } catch(e) {}
+}
+
 function renderAnalytics() {
   const el = id => document.getElementById(id);
   if(!leads || leads.length === 0) {
@@ -7412,6 +7533,896 @@ function generatePDFReport() {
   <button onclick="window.close()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:12px;padding:14px 20px;font-size:15px;cursor:pointer">✕ Close</button>
 </div>
 
+
+<script>
+
+// ─── VIEW AS CLIENT ──────────────────────────────────────────
+let _adminOrigOrg = null;
+let _adminOrigUser = null;
+let _isViewingAsClient = false;
+
+async function viewAsClient(orgId, orgName) {
+  if (!confirm('Switch to view ' + orgName + ' workspace?\n\nA banner will show at the top. This access is logged for transparency.')) return;
+
+  // Save admin state
+  _adminOrigOrg = currentOrg;
+  _isViewingAsClient = true;
+
+  // Log the admin access to Supabase
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/admin_access_log', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        admin_id: currentUser.id,
+        org_id: orgId,
+        org_name: orgName,
+        accessed_at: new Date().toISOString()
+      })
+    });
+  } catch(e) { /* table may not exist yet, ignore */ }
+
+  // Switch to client org
+  const allOrgsR = await fetch(SUPABASE_URL + '/rest/v1/organizations?id=eq.' + orgId + '&select=*', { headers: HEADERS });
+  const allOrgs = await allOrgsR.json();
+  if (allOrgs && allOrgs[0]) {
+    currentOrg = allOrgs[0];
+    // Show banner
+    document.getElementById('view-as-client-banner').classList.add('active');
+    document.getElementById('view-as-banner-name').textContent = '👁️ Viewing as: ' + orgName;
+    document.body.classList.add('viewing-as-client');
+    // Navigate to dashboard
+    nav('dashboard', document.querySelector('.nav-item'));
+    // Reload data for this org
+    await loadLeads();
+    updateLeadStats();
+    showToast('👁️ Now viewing ' + orgName + ' workspace');
+  }
+}
+
+function exitViewAsClient() {
+  if (!_adminOrigOrg) return;
+  currentOrg = _adminOrigOrg;
+  _isViewingAsClient = false;
+  _adminOrigOrg = null;
+  document.getElementById('view-as-client-banner').classList.remove('active');
+  document.body.classList.remove('viewing-as-client');
+  nav('admin', document.getElementById('admin-nav-item'));
+  adminTab('clients', document.querySelector('.admin-tab'));
+  loadLeads();
+  showToast('✅ Back to your admin view');
+}
+
+// ═══════════════════════════════════════════════════════
+// AI CAMPAIGN IDEAS GENERATOR
+// ═══════════════════════════════════════════════════════
+
+
+function generateFallbackIdeas(brand, industry, goal, lang, platform) {
+  const ar = lang === 'Arabic';
+  return [
+    {
+      name: ar ? 'حملة لحظة القرار' : 'The Decision Moment',
+      hook: ar ? '"كم مرة قلت بكره؟ اليوم قرارك يختلف..."' : '"How many times did you say tomorrow? Today is different..."',
+      script: ar
+        ? 'المشهد 1: شخص يتردد (3 ثوان)\nالمشهد 2: "مع ' + brand + ' ما في تردد" (5 ثوان)\nالمشهد 3: عرض المنتج (10 ثوان)\nالمشهد 4: نتائج حقيقية (7 ثوان)\nالمشهد 5: CTA واضح (5 ثوان)'
+        : 'Scene 1: Person hesitating (3s)\nScene 2: "' + brand + ' — no more hesitation" (5s)\nScene 3: Quick product showcase (10s)\nScene 4: Real customer results (7s)\nScene 5: Clear CTA (5s)',
+      caption: ar
+        ? brand + ' — لما تكون جاهز للقرار الصح، نحن هنا\n\n#' + brand.replace(/\s/g,'') + ' #السعودية #الرياض'
+        : brand + ' — When you\'re ready to make the right choice, we\'re here\n\n#' + brand.replace(/\s/g,'') + ' #Saudi #Riyadh',
+      cta: ar ? 'تواصل الآن عبر الواتساب' : 'Contact us on WhatsApp now'
+    },
+    {
+      name: ar ? 'قبل وبعد' : 'Before & After',
+      hook: ar ? '"شوف الفرق بنفسك..."' : '"See the difference yourself..."',
+      script: ar
+        ? 'المشهد 1: الوضع "قبل" — المشكلة (5 ثوان)\nالمشهد 2: لحظة التحول مع ' + brand + ' (5 ثوان)\nالمشهد 3: "بعد" — النتيجة (10 ثوان)\nالمشهد 4: شهادة عميل (7 ثوان)\nالمشهد 5: عرض خاص (3 ثوان)'
+        : 'Scene 1: "Before" — the problem (5s)\nScene 2: Transformation with ' + brand + ' (5s)\nScene 3: "After" — result (10s)\nScene 4: Customer testimonial (7s)\nScene 5: Special offer (3s)',
+      caption: ar
+        ? 'الفرق واضح مع ' + brand + '\n\nانضم لمئات العملاء الراضين\n\n#' + brand.replace(/\s/g,'') + ' #نتائج_حقيقية'
+        : 'The difference is clear with ' + brand + '\n\nJoin hundreds of happy customers\n\n#' + brand.replace(/\s/g,'') + ' #RealResults',
+      cta: ar ? 'اضغط الرابط في البايو' : 'Click the link in bio'
+    },
+    {
+      name: ar ? 'عرض محدود' : 'Limited Offer',
+      hook: ar ? '"24 ساعة بس... بعدها ما في فرصة ثانية"' : '"Only 24 hours... after that no second chance"',
+      script: ar
+        ? 'المشهد 1: كاونت داون (3 ثوان)\nالمشهد 2: العرض بالتفصيل (8 ثوان)\nالمشهد 3: ما يحصل عليه العميل (7 ثوان)\nالمشهد 4: سعر قبل وبعد الخصم (5 ثوان)\nالمشهد 5: رابط التواصل (7 ثوان)'
+        : 'Scene 1: Countdown (3s)\nScene 2: Offer details (8s)\nScene 3: What customer gets (7s)\nScene 4: Price before/after (5s)\nScene 5: Contact link (7s)',
+      caption: ar
+        ? 'العرض ينتهي الليلة!\n\n' + brand + ' يقدم عرض حصري للمتابعين فقط\n\n#عرض_محدود #' + brand.replace(/\s/g,'') + ' #السعودية'
+        : 'Offer ends tonight!\n\n' + brand + ' exclusive deal for followers only\n\n#LimitedOffer #' + brand.replace(/\s/g,'') + ' #Saudi',
+      cta: ar ? 'تواصل قبل انتهاء العرض' : 'Contact before offer ends'
+    },
+    {
+      name: ar ? 'خلف الكواليس' : 'Behind the Scenes',
+      hook: ar ? '"شو اللي ما تشوفه عادةً عن ' + brand + '؟"' : '"What you don\'t normally see about ' + brand + '"',
+      script: ar
+        ? 'المشهد 1: يوم عمل في ' + brand + ' (8 ثوان)\nالمشهد 2: الفريق والجهد (8 ثوان)\nالمشهد 3: لحظة سعادة عميل (7 ثوان)\nالمشهد 4: رسالة من المؤسس (7 ثوان)\nالمشهد 5: دعوة للتواصل (5 ثوان)'
+        : 'Scene 1: A real workday at ' + brand + ' (8s)\nScene 2: The team and effort (8s)\nScene 3: Happy customer moment (7s)\nScene 4: Message from founder (7s)\nScene 5: Call to connect (5s)',
+      caption: ar
+        ? 'هذا اللي يصير كل يوم في ' + brand + ' عشانك\n\nفريقنا ما يتوقف من أجلك\n\n#' + brand.replace(/\s/g,'') + ' #خلف_الكواليس'
+        : 'This is what happens every day at ' + brand + ' for you\n\nOur team never stops for you\n\n#' + brand.replace(/\s/g,'') + ' #BehindTheScenes',
+      cta: ar ? 'انضم لعيلتنا' : 'Join our family'
+    }
+  ];
+}
+
+function renderCampaignIdeas(ideas, brand, lang) {
+  const container = document.getElementById('ai-ideas-content');
+  container.innerHTML = '';
+  const colors = ['#8b5cf6','#3b82f6','#06b6d4','#10b981'];
+
+  ideas.forEach(function(idea, i) {
+    const color = colors[i % colors.length];
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px';
+
+    const scriptSafe = idea.script.replace(/"/g,'&quot;');
+    const captionSafe = idea.caption.replace(/"/g,'&quot;');
+
+    div.innerHTML =
+      '<div style="background:' + color + '18;border-bottom:1px solid ' + color + '22;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<div style="width:28px;height:28px;background:' + color + ';border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">' + (i+1) + '</div>' +
+          '<div style="font-weight:700;font-size:14px;color:var(--text)">' + idea.name + '</div>' +
+        '</div>' +
+        '<button onclick="this.closest(\'div\').nextElementSibling.style.display=this.closest(\'div\').nextElementSibling.style.display===\'none\'?\'flex\':\'none\'" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;font-family:inherit">▾</button>' +
+      '</div>' +
+      '<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">' +
+        '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">HOOK — First 3 Seconds</div>' +
+          '<div style="font-size:14px;font-weight:600;color:var(--text)">' + idea.hook + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>REEL SCRIPT</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.script + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>READY-TO-POST CAPTION</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--success);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.caption + '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+          '<div style="font-size:12px;color:var(--text2)"><strong style="color:var(--text)">CTA:</strong> ' + idea.cta + '</div>' +
+          '<div style="display:flex;gap:8px">' +
+            '<button onclick="useCampaignIdea(\'email\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.caption.replace(/'/g,"\\'").replace(/\n/g,' ') + '\')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for Email</button>' +
+            '<button onclick="useCampaignIdea(\'sms\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.cta.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for SMS</button>' +
+            '<button onclick="generateVideoFromIdea(' + i + ')" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="video-result-' + i + '" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px"></div>' +
+      '</div>';
+    container.appendChild(div);
+  });
+
+  document.getElementById('ai-ideas-result').style.display = 'block';
+}
+
+function useCampaignIdea(channel, name, body) {
+  switchCampTab(channel);
+  if(channel === 'email') {
+    var n = document.getElementById('camp-name'); if(n) n.value = name;
+    var b = document.getElementById('camp-body'); if(b) b.value = body;
+  } else if(channel === 'sms') {
+    var n2 = document.getElementById('sms-name'); if(n2) n2.value = name;
+    var b2 = document.getElementById('sms-body'); if(b2) b2.value = body;
+  }
+  showToast('Campaign idea loaded — ready to send!');
+}
+
+
+// ═══════════════════════════════════════════════════════
+// CAMPAIGN TAB SWITCHER
+// ═══════════════════════════════════════════════════════
+function switchCampTab(tab) {
+  ['email','sms','whatsapp'].forEach(function(t) {
+    var pane = document.getElementById('camp-pane-' + t);
+    var btn = document.getElementById('camp-tab-' + t);
+    if(pane) pane.style.display = t === tab ? 'block' : 'none';
+    if(btn) {
+      btn.style.background = t === tab ? 'var(--accent)' : 'transparent';
+      btn.style.color = t === tab ? '#fff' : 'var(--text2)';
+    }
+  });
+}
+
+function updateSMSCount(el) {
+  var count = document.getElementById('sms-char-count');
+  if(count) count.textContent = el.value.length + '/160 characters';
+}
+
+// ═══════════════════════════════════════════════════════
+// SMS CREDENTIALS
+// ═══════════════════════════════════════════════════════
+var smsCredentials = null;
+try { smsCredentials = JSON.parse(localStorage.getItem('nexcrm_sms_creds')); } catch(e) {}
+
+function openSMSSetup() {
+  document.getElementById('sms-setup-modal').classList.add('open');
+}
+
+function saveSMSCredentials() {
+  var sid = document.getElementById('sms-account-sid').value.trim();
+  var token = document.getElementById('sms-auth-token').value.trim();
+  var from = document.getElementById('sms-from-number').value.trim();
+  if(!sid || !token || !from) { showToast('Fill in all fields'); return; }
+  smsCredentials = { sid: sid, token: token, from: from };
+  localStorage.setItem('nexcrm_sms_creds', JSON.stringify(smsCredentials));
+  document.getElementById('sms-setup-modal').classList.remove('open');
+  var banner = document.getElementById('sms-connection-banner');
+  var connected = document.getElementById('sms-connected-banner');
+  var display = document.getElementById('sms-phone-display');
+  if(banner) banner.style.display = 'none';
+  if(connected) { connected.style.display = 'flex'; }
+  if(display) display.textContent = from;
+  showToast('SMS connected!');
+}
+
+function previewSMS() {
+  var body = document.getElementById('sms-body').value.trim();
+  if(!body) { showToast('Write your SMS message first'); return; }
+  var preview = body.replace(/{name}/g, 'عبدالرحمن');
+  document.getElementById('preview-modal-title').textContent = 'SMS Preview';
+  document.getElementById('preview-content').innerHTML = '<div style="font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text)">' + preview + '</div>';
+  var sendBtn = document.getElementById('preview-send-btn');
+  if(sendBtn) {
+    sendBtn.onclick = function() { closePreview(); sendSMSCampaign(true); };
+  }
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+async function sendSMSCampaign(confirmed) {
+  if(!smsCredentials) { showToast('Connect Twilio first'); openSMSSetup(); return; }
+  var name = document.getElementById('sms-name').value.trim();
+  var body = document.getElementById('sms-body').value.trim();
+  var filter = document.getElementById('sms-filter').value;
+  if(!name) { showToast('Enter campaign name'); return; }
+  if(!body) { showToast('Write your SMS message'); return; }
+
+  var targetLeads = await getFilteredLeads(filter);
+  var leadsWithPhone = targetLeads.filter(function(l) { return l.phone; });
+  if(!leadsWithPhone.length) { showToast('No leads with phone numbers found'); return; }
+  if(!confirmed && !confirm('Send SMS to ' + leadsWithPhone.length + ' leads with phone numbers?')) return;
+
+  var btn = document.querySelector('#camp-pane-sms .btn-primary');
+  if(btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+
+  var sent = 0, failed = 0;
+  for(var i = 0; i < leadsWithPhone.length; i++) {
+    var lead = leadsWithPhone[i];
+    var msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    try {
+      var r = await fetch('https://api.twilio.com/2010-04-01/Accounts/' + smsCredentials.sid + '/Messages.json', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Basic ' + btoa(smsCredentials.sid + ':' + smsCredentials.token),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'To=' + encodeURIComponent(lead.phone) + '&From=' + encodeURIComponent(smsCredentials.from) + '&Body=' + encodeURIComponent(msg)
+      });
+      if(r.ok) sent++; else failed++;
+    } catch(e) { failed++; }
+  }
+  if(btn) { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send SMS'; btn.disabled = false; }
+  showToast('SMS sent! ' + sent + ' delivered, ' + failed + ' failed.');
+  loadSMSHistory();
+}
+
+function loadSMSHistory() {
+  var el = document.getElementById('sms-history');
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No SMS campaigns sent yet</div>';
+}
+
+// ═══════════════════════════════════════════════════════
+// WHATSAPP CREDENTIALS
+// ═══════════════════════════════════════════════════════
+var waCredentials = null;
+try { waCredentials = JSON.parse(localStorage.getItem('nexcrm_wa_creds')); } catch(e) {}
+
+function openWASetup() {
+  document.getElementById('wa-setup-modal').classList.add('open');
+}
+
+function saveWACredentials() {
+  var phoneId = document.getElementById('wa-account-sid').value.trim();
+  var token = document.getElementById('wa-auth-token').value.trim();
+  var from = document.getElementById('wa-from-number').value.trim();
+  if(!phoneId || !token || !from) { showToast('Fill in all fields'); return; }
+  waCredentials = { phoneId: phoneId, token: token, from: from };
+  localStorage.setItem('nexcrm_wa_creds', JSON.stringify(waCredentials));
+  document.getElementById('wa-setup-modal').classList.remove('open');
+  var banner = document.getElementById('wa-connection-banner');
+  var connected = document.getElementById('wa-connected-banner');
+  var display = document.getElementById('wa-phone-display');
+  if(banner) banner.style.display = 'none';
+  if(connected) connected.style.display = 'flex';
+  if(display) display.textContent = from;
+  showToast('WhatsApp connected!');
+}
+
+function previewWA() {
+  var body = document.getElementById('wa-body').value.trim();
+  if(!body) { showToast('Write your WhatsApp message first'); return; }
+  var preview = body.replace(/{name}/g, 'عبدالرحمن');
+  document.getElementById('preview-modal-title').textContent = 'WhatsApp Preview';
+  document.getElementById('preview-content').innerHTML = '<div style="background:#dcf8c6;color:#111;border-radius:10px;padding:12px;font-size:14px;line-height:1.8;white-space:pre-wrap;max-width:80%;margin-left:auto">' + preview + '</div>';
+  var sendBtn = document.getElementById('preview-send-btn');
+  if(sendBtn) sendBtn.onclick = function() { closePreview(); sendWACampaign(true); };
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+async function sendWACampaign(confirmed) {
+  if(!waCredentials) { showToast('Connect WhatsApp first'); openWASetup(); return; }
+  var name = document.getElementById('wa-camp-name').value.trim();
+  var body = document.getElementById('wa-body').value.trim();
+  var filter = document.getElementById('wa-filter').value;
+  if(!name) { showToast('Enter campaign name'); return; }
+  if(!body) { showToast('Write your WhatsApp message'); return; }
+
+  var targetLeads = await getFilteredLeads(filter);
+  var leadsWithPhone = targetLeads.filter(function(l) { return l.phone; });
+  if(!leadsWithPhone.length) { showToast('No leads with phone numbers found'); return; }
+  if(!confirmed && !confirm('Send WhatsApp to ' + leadsWithPhone.length + ' leads?')) return;
+
+  var btn = document.querySelector('#camp-pane-whatsapp .btn-primary');
+  if(btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+
+  var sent = 0, failed = 0;
+  for(var i = 0; i < leadsWithPhone.length; i++) {
+    var lead = leadsWithPhone[i];
+    var msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    try {
+      var r = await fetch('https://graph.facebook.com/v18.0/' + waCredentials.phoneId + '/messages', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + waCredentials.token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messaging_product: 'whatsapp', to: lead.phone.replace(/\s/g,''), type: 'text', text: { body: msg } })
+      });
+      if(r.ok) sent++; else failed++;
+    } catch(e) { failed++; }
+  }
+  if(btn) { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send WhatsApp'; btn.disabled = false; }
+  showToast('WhatsApp sent! ' + sent + ' delivered, ' + failed + ' failed.');
+  loadWAHistory();
+}
+
+function loadWAHistory() {
+  var el = document.getElementById('wa-history');
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No WhatsApp campaigns sent yet</div>';
+}
+
+function closePreview() {
+  document.getElementById('preview-modal').classList.remove('open');
+}
+
+function previewCampaign() {
+  var subject = document.getElementById('camp-subject').value.trim();
+  var body = document.getElementById('camp-body').value.trim();
+  if(!body) { showToast('Write your email message first'); return; }
+  var senderName = document.getElementById('camp-from-name').value.trim() || 'NexCRM';
+  var preview = body.replace(/{name}/g, 'عبدالرحمن');
+  var filterLabel = document.getElementById('camp-filter').options[document.getElementById('camp-filter').selectedIndex].text;
+  document.getElementById('preview-modal-title').textContent = 'Email Preview';
+  document.getElementById('preview-content').innerHTML =
+    '<div style="font-size:12px;color:var(--text2);margin-bottom:12px">' +
+    '<b>From:</b> ' + senderName + ' &lt;campaigns@nexcrm.sa&gt;<br>' +
+    '<b>Subject:</b> ' + (subject || '(no subject)') + '<br>' +
+    '<b>To:</b> ' + filterLabel +
+    '</div>' +
+    '<div style="font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text)">' + preview + '</div>';
+  var sendBtn = document.getElementById('preview-send-btn');
+  if(sendBtn) sendBtn.onclick = function() { closePreview(); sendCampaign(true); };
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+function loadCampaignHistory() {
+  var el = document.getElementById('campaign-history');
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>';
+}
+
+// Init SMS/WA connection state on load
+document.addEventListener('DOMContentLoaded', function() {
+  if(smsCredentials) {
+    var b = document.getElementById('sms-connection-banner');
+    var c = document.getElementById('sms-connected-banner');
+    var d = document.getElementById('sms-phone-display');
+    if(b) b.style.display = 'none';
+    if(c) c.style.display = 'flex';
+    if(d) d.textContent = smsCredentials.from;
+  }
+  if(waCredentials) {
+    var b2 = document.getElementById('wa-connection-banner');
+    var c2 = document.getElementById('wa-connected-banner');
+    var d2 = document.getElementById('wa-phone-display');
+    if(b2) b2.style.display = 'none';
+    if(c2) c2.style.display = 'flex';
+    if(d2) d2.textContent = waCredentials.from;
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// AI CAMPAIGN IDEAS GENERATOR
+// ═══════════════════════════════════════════════════════
+
+
+function generateFallbackIdeas(brand, industry, goal, lang, platform) {
+  const ar = lang === 'Arabic';
+  return [
+    {
+      name: ar ? 'حملة لحظة القرار' : 'The Decision Moment',
+      hook: ar ? '"كم مرة قلت بكره؟ اليوم قرارك يختلف..."' : '"How many times did you say tomorrow? Today is different..."',
+      script: ar
+        ? 'المشهد 1: شخص يتردد (3 ثوان)\nالمشهد 2: "مع ' + brand + ' ما في تردد" (5 ثوان)\nالمشهد 3: عرض المنتج (10 ثوان)\nالمشهد 4: نتائج حقيقية (7 ثوان)\nالمشهد 5: CTA واضح (5 ثوان)'
+        : 'Scene 1: Person hesitating (3s)\nScene 2: "' + brand + ' — no more hesitation" (5s)\nScene 3: Quick product showcase (10s)\nScene 4: Real customer results (7s)\nScene 5: Clear CTA (5s)',
+      caption: ar
+        ? brand + ' — لما تكون جاهز للقرار الصح، نحن هنا\n\n#' + brand.replace(/\s/g,'') + ' #السعودية #الرياض'
+        : brand + ' — When you\'re ready to make the right choice, we\'re here\n\n#' + brand.replace(/\s/g,'') + ' #Saudi #Riyadh',
+      cta: ar ? 'تواصل الآن عبر الواتساب' : 'Contact us on WhatsApp now'
+    },
+    {
+      name: ar ? 'قبل وبعد' : 'Before & After',
+      hook: ar ? '"شوف الفرق بنفسك..."' : '"See the difference yourself..."',
+      script: ar
+        ? 'المشهد 1: الوضع "قبل" — المشكلة (5 ثوان)\nالمشهد 2: لحظة التحول مع ' + brand + ' (5 ثوان)\nالمشهد 3: "بعد" — النتيجة (10 ثوان)\nالمشهد 4: شهادة عميل (7 ثوان)\nالمشهد 5: عرض خاص (3 ثوان)'
+        : 'Scene 1: "Before" — the problem (5s)\nScene 2: Transformation with ' + brand + ' (5s)\nScene 3: "After" — result (10s)\nScene 4: Customer testimonial (7s)\nScene 5: Special offer (3s)',
+      caption: ar
+        ? 'الفرق واضح مع ' + brand + '\n\nانضم لمئات العملاء الراضين\n\n#' + brand.replace(/\s/g,'') + ' #نتائج_حقيقية'
+        : 'The difference is clear with ' + brand + '\n\nJoin hundreds of happy customers\n\n#' + brand.replace(/\s/g,'') + ' #RealResults',
+      cta: ar ? 'اضغط الرابط في البايو' : 'Click the link in bio'
+    },
+    {
+      name: ar ? 'عرض محدود' : 'Limited Offer',
+      hook: ar ? '"24 ساعة بس... بعدها ما في فرصة ثانية"' : '"Only 24 hours... after that no second chance"',
+      script: ar
+        ? 'المشهد 1: كاونت داون (3 ثوان)\nالمشهد 2: العرض بالتفصيل (8 ثوان)\nالمشهد 3: ما يحصل عليه العميل (7 ثوان)\nالمشهد 4: سعر قبل وبعد الخصم (5 ثوان)\nالمشهد 5: رابط التواصل (7 ثوان)'
+        : 'Scene 1: Countdown (3s)\nScene 2: Offer details (8s)\nScene 3: What customer gets (7s)\nScene 4: Price before/after (5s)\nScene 5: Contact link (7s)',
+      caption: ar
+        ? 'العرض ينتهي الليلة!\n\n' + brand + ' يقدم عرض حصري للمتابعين فقط\n\n#عرض_محدود #' + brand.replace(/\s/g,'') + ' #السعودية'
+        : 'Offer ends tonight!\n\n' + brand + ' exclusive deal for followers only\n\n#LimitedOffer #' + brand.replace(/\s/g,'') + ' #Saudi',
+      cta: ar ? 'تواصل قبل انتهاء العرض' : 'Contact before offer ends'
+    },
+    {
+      name: ar ? 'خلف الكواليس' : 'Behind the Scenes',
+      hook: ar ? '"شو اللي ما تشوفه عادةً عن ' + brand + '؟"' : '"What you don\'t normally see about ' + brand + '"',
+      script: ar
+        ? 'المشهد 1: يوم عمل في ' + brand + ' (8 ثوان)\nالمشهد 2: الفريق والجهد (8 ثوان)\nالمشهد 3: لحظة سعادة عميل (7 ثوان)\nالمشهد 4: رسالة من المؤسس (7 ثوان)\nالمشهد 5: دعوة للتواصل (5 ثوان)'
+        : 'Scene 1: A real workday at ' + brand + ' (8s)\nScene 2: The team and effort (8s)\nScene 3: Happy customer moment (7s)\nScene 4: Message from founder (7s)\nScene 5: Call to connect (5s)',
+      caption: ar
+        ? 'هذا اللي يصير كل يوم في ' + brand + ' عشانك\n\nفريقنا ما يتوقف من أجلك\n\n#' + brand.replace(/\s/g,'') + ' #خلف_الكواليس'
+        : 'This is what happens every day at ' + brand + ' for you\n\nOur team never stops for you\n\n#' + brand.replace(/\s/g,'') + ' #BehindTheScenes',
+      cta: ar ? 'انضم لعيلتنا' : 'Join our family'
+    }
+  ];
+}
+
+function renderCampaignIdeas(ideas, brand, lang) {
+  const container = document.getElementById('ai-ideas-content');
+  container.innerHTML = '';
+  const colors = ['#8b5cf6','#3b82f6','#06b6d4','#10b981'];
+
+  ideas.forEach(function(idea, i) {
+    const color = colors[i % colors.length];
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px';
+
+    const scriptSafe = idea.script.replace(/"/g,'&quot;');
+    const captionSafe = idea.caption.replace(/"/g,'&quot;');
+
+    div.innerHTML =
+      '<div style="background:' + color + '18;border-bottom:1px solid ' + color + '22;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<div style="width:28px;height:28px;background:' + color + ';border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">' + (i+1) + '</div>' +
+          '<div style="font-weight:700;font-size:14px;color:var(--text)">' + idea.name + '</div>' +
+        '</div>' +
+        '<button onclick="this.closest(\'div\').nextElementSibling.style.display=this.closest(\'div\').nextElementSibling.style.display===\'none\'?\'flex\':\'none\'" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;font-family:inherit">▾</button>' +
+      '</div>' +
+      '<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">' +
+        '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">HOOK — First 3 Seconds</div>' +
+          '<div style="font-size:14px;font-weight:600;color:var(--text)">' + idea.hook + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>REEL SCRIPT</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.script + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>READY-TO-POST CAPTION</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--success);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.caption + '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+          '<div style="font-size:12px;color:var(--text2)"><strong style="color:var(--text)">CTA:</strong> ' + idea.cta + '</div>' +
+          '<div style="display:flex;gap:8px">' +
+            '<button onclick="useCampaignIdea(\'email\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.caption.replace(/'/g,"\\'").replace(/\n/g,' ') + '\')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for Email</button>' +
+            '<button onclick="useCampaignIdea(\'sms\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.cta.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for SMS</button>' +
+            '<button onclick="generateVideoFromIdea(' + i + ')" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="video-result-' + i + '" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px"></div>' +
+      '</div>';
+    container.appendChild(div);
+  });
+
+  document.getElementById('ai-ideas-result').style.display = 'block';
+}
+
+function useCampaignIdea(channel, name, body) {
+  switchCampTab(channel);
+  if(channel === 'email') {
+    var n = document.getElementById('camp-name'); if(n) n.value = name;
+    var b = document.getElementById('camp-body'); if(b) b.value = body;
+    } else if(channel === 'sms') {
+    var n2 = document.getElementById('sms-name'); if(n2) n2.value = name;
+    var b2 = document.getElementById('sms-body'); if(b2) b2.value = body;
+  }
+  showToast('Campaign idea loaded — ready to send!');
+}
+
+// ── VIDEO MODAL STYLES ───────────────────────────────────────────────────────
+(function() {
+  var s = document.createElement('style');
+  s.textContent = `
+    #video-modal-overlay {
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;
+      align-items:center;justify-content:center;padding:20px;
+    }
+    #video-modal-overlay.open { display:flex; }
+    #video-modal {
+      background:var(--bg2,#0f1629);border:1px solid rgba(139,92,246,0.3);
+      border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;
+      padding:24px;position:relative;
+    }
+    .vm-title { font-size:16px;font-weight:800;color:#8b5cf6;margin-bottom:4px; }
+    .vm-sub { font-size:12px;color:var(--text2);margin-bottom:20px; }
+    .vm-section-label { font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px; }
+    .vm-duration-row { display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap; }
+    .vm-dur-btn {
+      flex:1;min-width:70px;padding:10px 6px;border-radius:10px;border:2px solid rgba(139,92,246,0.2);
+      background:rgba(139,92,246,0.05);color:var(--text);font-size:13px;font-weight:700;
+      cursor:pointer;text-align:center;transition:all 0.2s;
+    }
+    .vm-dur-btn:hover,.vm-dur-btn.active {
+      border-color:#8b5cf6;background:rgba(139,92,246,0.15);color:#8b5cf6;
+    }
+    .vm-prompts { display:flex;flex-direction:column;gap:10px;margin-bottom:20px; }
+    .vm-prompt-card {
+      padding:12px 14px;border-radius:10px;border:2px solid rgba(139,92,246,0.15);
+      background:rgba(139,92,246,0.04);cursor:pointer;font-size:12px;
+      line-height:1.6;color:var(--text);transition:all 0.2s;position:relative;
+    }
+    .vm-prompt-card:hover,.vm-prompt-card.selected {
+      border-color:#8b5cf6;background:rgba(139,92,246,0.12);
+    }
+    .vm-prompt-card.selected::after {
+      content:'✓ Selected';position:absolute;top:8px;right:10px;
+      font-size:10px;font-weight:800;color:#8b5cf6;
+    }
+    .vm-prompt-label { font-size:10px;font-weight:800;color:#8b5cf6;margin-bottom:4px;text-transform:uppercase; }
+    .vm-actions { display:flex;gap:10px;justify-content:flex-end; }
+    .vm-cancel-btn {
+      padding:10px 20px;border-radius:10px;border:1px solid rgba(139,92,246,0.3);
+      background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;
+    }
+    .vm-generate-btn {
+      padding:10px 24px;border-radius:10px;border:none;
+      background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;
+      font-size:13px;font-weight:700;cursor:pointer;opacity:0.4;pointer-events:none;transition:opacity 0.2s;
+    }
+    .vm-generate-btn.ready { opacity:1;pointer-events:auto; }
+    .vm-loading { text-align:center;padding:20px;color:var(--text2);font-size:12px; }
+    .vm-spinner { width:28px;height:28px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px; }
+  `;
+  document.head.appendChild(s);
+
+  // Inject modal HTML
+  var modal = document.createElement('div');
+  modal.id = 'video-modal-overlay';
+  modal.innerHTML = `
+    <div id="video-modal">
+      <div class="vm-title">🎬 Generate AI Video</div>
+      <div class="vm-sub">Choose duration, pick your best prompt, then generate.</div>
+      <div class="vm-section-label">Select Duration</div>
+      <div class="vm-duration-row">
+        <div class="vm-dur-btn" data-dur="5">5s</div>
+        <div class="vm-dur-btn active" data-dur="10">10s ★</div>
+      </div>
+      <div class="vm-section-label">Choose a Prompt Angle</div>
+      <div class="vm-prompts" id="vm-prompt-list">
+        <div class="vm-loading"><div class="vm-spinner"></div>Generating prompt options...</div>
+      </div>
+      <div class="vm-actions">
+        <button class="vm-cancel-btn" onclick="closeVideoModal()">Cancel</button>
+        <button class="vm-generate-btn" id="vm-generate-btn" onclick="startVideoGeneration()">Generate Video</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+})();
+
+// ── MODAL STATE ───────────────────────────────────────────────────────────────
+var _lastGeneratedIdeas = [];
+var _videoModalState = { ideaIndex: null, duration: '16', selectedPrompt: null, resultDiv: null, btn: null };
+
+function closeVideoModal() {
+  document.getElementById('video-modal-overlay').classList.remove('open');
+}
+
+function openVideoModal(index) {
+  var ideas = _lastGeneratedIdeas;
+  if(!ideas || !ideas[index]) { showToast('Generate ideas first'); return; }
+
+  var idea = ideas[index];
+  var resultDiv = document.getElementById('video-result-' + index);
+  var btn = document.querySelector('[onclick="generateVideoFromIdea(' + index + ')"]');
+
+  _videoModalState.ideaIndex = index;
+  _videoModalState._voiceScript = (idea.script || idea.hook || '').substring(0, 400);
+  _videoModalState.duration = '10';
+  _videoModalState.selectedPrompt = null;
+  _videoModalState.resultDiv = resultDiv;
+  _videoModalState.btn = btn;
+
+  // Reset UI
+  document.querySelectorAll('.vm-dur-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.dur === '16');
+  });
+  document.getElementById('vm-generate-btn').classList.remove('ready');
+  document.getElementById('vm-modal-overlay');
+
+  // Show modal
+  document.getElementById('video-modal-overlay').classList.add('open');
+
+  // Generate prompts
+  generatePromptOptions(idea, '16');
+
+  // Duration click handlers
+  document.querySelectorAll('.vm-dur-btn').forEach(function(b) {
+    b.onclick = function() {
+      document.querySelectorAll('.vm-dur-btn').forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      _videoModalState.duration = b.dataset.dur;
+      _videoModalState.selectedPrompt = null;
+      document.getElementById('vm-generate-btn').classList.remove('ready');
+      generatePromptOptions(idea, b.dataset.dur);
+    };
+  });
+}
+
+function generatePromptOptions(idea, duration) {
+  var list = document.getElementById('vm-prompt-list');
+  list.innerHTML = '<div class="vm-loading"><div class="vm-spinner"></div>Generating prompt options...</div>';
+
+  var brand = (document.getElementById('ai-brand') ? document.getElementById('ai-brand').value : '') || 'Saudi brand';
+  var hook = idea.hook || '';
+  var script = idea.script || '';
+  var dur = parseInt(duration);
+
+  // Build 3 prompt angles based on duration + idea
+  var sceneCount = dur <= 5 ? 1 : dur <= 10 ? 2 : 3;
+  var pacing = dur <= 5 ? 'fast-paced, single impactful shot' : dur <= 10 ? 'two scenes, smooth transition' : 'three scenes, cinematic flow';
+  var hookShort = hook.substring(0, 80);
+
+
+  var prompts = [
+    {
+      label: '🎯 Direct to Camera',
+      text: 'Cinematic vertical 9:16 video, ' + dur + ' seconds, photorealistic 1080p. ' +
+        'Saudi man in his 30s, crisp white thobe and red-white ghutra, modern glass desk in Riyadh high-rise office. ' +
+        'Speaks directly and confidently to camera. Riyadh skyline behind him, golden hour light. ' +
+        'Topic: "' + hookShort + '". Brand: ' + brand + '. Scenes: ' + (idea.script ? idea.script.substring(0, 300) : '') + '. ' +
+        'Audio: clear Arabic male voice, Saudi Gulf dialect ONLY. No Korean. No Chinese. Slow push-in camera, shallow depth of field. Warm cinematic color grade.'
+    },
+    {
+      label: '\uD83C\uDF1F Success Story',
+      text: 'Cinematic ' + dur + '-second vertical social media video 9:16, photorealistic. ' +
+        'Young Saudi man in white thobe: first stressed, then discovers ' + brand + ', then confident and successful. ' +
+        'Saudi setting: Arabic coffee cups, Kingdom Tower visible through window, Saudi flag on wall. ' +
+        'Audio: uplifting Arabic background music, male voiceover describing the transformation. ' +
+        'Instagram Reels style, fast cuts, cinematic. Audio: Arabic Gulf dialect male voice ONLY. No Korean. Theme: "' + hookShort + '".'
+    },
+    {
+      label: '\u26A1 Problem vs Solution',
+      text: dur + '-second vertical video 9:16, Saudi Arabia, cinematic 1080p. ' +
+        'First half: Saudi professional in thobe, frustrated, old way not working. ' +
+        'Second half: ' + brand + ' solves it instantly, relief and success. ' +
+        'Characters: Saudi man in thobe and Saudi woman in black abaya and hijab, modern Riyadh office. ' +
+        'Audio: dramatic Arabic music with male and female voices showing the transformation. ' +
+        'Key message: "' + hookShort + '". Authentic Saudi cultural setting throughout. Audio: Arabic Gulf dialect, male and female Saudi voices ONLY. No Korean. No Chinese.'
+    }
+  ];
+
+  var html = '';
+  prompts.forEach(function(p, i) {
+    html += '<div class="vm-prompt-card" onclick="selectPrompt(this,' + i + ')" data-prompt="' + p.text.replace(/"/g, '&quot;') + '">' +
+      '<div class="vm-prompt-label">' + p.label + '</div>' +
+      p.text +
+      '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function selectPrompt(el, idx) {
+  document.querySelectorAll('.vm-prompt-card').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  _videoModalState.selectedPrompt = el.getAttribute('data-prompt');
+  document.getElementById('vm-generate-btn').classList.add('ready');
+}
+
+async function startVideoGeneration() {
+  var state = _videoModalState;
+  if(!state.selectedPrompt) return;
+
+  closeVideoModal();
+
+  var resultDiv = state.resultDiv;
+  var btn = state.btn;
+
+  if(btn) { btn.textContent = 'Generating...'; btn.disabled = true; }
+  if(resultDiv) {
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">' +
+      '<div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>' +
+      'Submitting to Runway Gen-3...</div>';
+  }
+
+  var EDGE_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-video';
+
+  try {
+    var submitRes = await fetch(EDGE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'submit', prompt: state.selectedPrompt, duration: state.duration })
+    });
+    var submitText = await submitRes.text();
+    console.log('Submit:', submitRes.status, submitText.substring(0,300));
+    var submitData;
+    try { submitData = JSON.parse(submitText); } catch(e) { throw new Error('Submit parse error: ' + submitText.substring(0,200)); }
+    if(!submitRes.ok) throw new Error('Submit failed ' + submitRes.status + ': ' + submitText.substring(0,300));
+    if(!submitData.requestId) throw new Error('No requestId returned');
+
+    var reqId = submitData.requestId;
+    var audioBase64 = submitData.audioBase64 || null;
+    var voiceName = submitData.voiceName || '';
+    var voiceLang = submitData.language || 'ar';
+    console.log('Audio ready:', audioBase64 ? 'YES (' + voiceName + ')' : 'NO');
+    if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video + AI voice (' + (voiceName || 'Arabic') + ')...</div>';
+
+    var videoUrl = null;
+    for(var attempt = 0; attempt < 72; attempt++) {
+      await new Promise(function(r) { setTimeout(r, 5000); });
+      var checkRes = await fetch(EDGE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'check', requestId: reqId })
+      });
+      var checkText = await checkRes.text();
+      var checkData;
+      try { checkData = JSON.parse(checkText); } catch(e) { continue; }
+      console.log('Check:', checkData.status);
+
+      if(checkData.status === 'COMPLETED') { console.log('COMPLETED full response:', JSON.stringify(checkData)); var raw = checkData.raw || {}; videoUrl = checkData.videoUrl || checkData.video_url || (raw.video && raw.video.url) || raw.video_url || raw.url || null; console.log('Extracted videoUrl:', videoUrl); break; }
+      if(checkData.status === 'FAILED') throw new Error('Video generation failed on FAL side');
+
+      var secs = (attempt + 1) * 5;
+      if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... ' + secs + 's elapsed</div>';
+    }
+
+    if(!videoUrl) throw new Error('Timed out after 6 minutes — please try again');
+
+    var idxKey = state.ideaIndex;
+    var hasAudio = audioBase64 ? true : false;
+    if(resultDiv) resultDiv.innerHTML =
+      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:8px">✅ VIDEO READY ' + (hasAudio ? '🔊 Arabic Voice' : '') + '</div>' +
+      (hasAudio ? '<audio id="el-audio-' + idxKey + '" src="' + audioBase64 + '"></audio>' : '') +
+      '<video id="el-video-' + idxKey + '" src="' + videoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"' +
+      (hasAudio ? ' onplay="elPlay(' + idxKey + ')" onpause="elPause(' + idxKey + ')" onseeked="elSeek(' + idxKey + ')" onended="elPause(' + idxKey + ')"' : '') +
+      '></video>' +
+      (hasAudio ? '<div style="font-size:10px;color:var(--text2);text-align:center;margin:6px 0">🎙️ Saudi Arabic voiceover — press play</div>' : '') +
+      '<div style="text-align:center;margin-top:8px">' +
+        '<a href="' + videoUrl + '" download target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">⬇ Download Video</a>' +
+      '</div>';
+    showToast('🎬 Video ' + (hasAudio ? '+ Arabic Voice' : '') + ' ready!');
+
+  } catch(e) {
+    if(resultDiv) resultDiv.innerHTML = '<div style="color:var(--danger);font-size:12px;padding:10px">Error: ' + e.message + '</div>';
+    showToast('Video failed: ' + e.message);
+  } finally {
+    if(btn) {
+      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video';
+      btn.disabled = false;
+    }
+  }
+}
+
+function generateVideoFromIdea(index) { openVideoModal(index); }
+
+// ElevenLabs audio sync with video
+function elPlay(idx) {
+  var audio = document.getElementById('el-audio-' + idx);
+  var video = document.getElementById('el-video-' + idx);
+  if(audio && video) { audio.currentTime = video.currentTime; audio.play(); }
+}
+function elPause(idx) {
+  var audio = document.getElementById('el-audio-' + idx);
+  if(audio) audio.pause();
+}
+function elSeek(idx) {
+  var audio = document.getElementById('el-audio-' + idx);
+  var video = document.getElementById('el-video-' + idx);
+  if(audio && video) audio.currentTime = video.currentTime;
+}
+
+// Patch renderCampaignIdeas to store ideas
+var _origRenderCI = window.renderCampaignIdeas;
+if(typeof renderCampaignIdeas === 'function') {
+  var _patchedRender = renderCampaignIdeas;
+  window.renderCampaignIdeas = function(ideas, brand, lang) {
+    _lastGeneratedIdeas = ideas;
+    _patchedRender(ideas, brand, lang);
+  };
+}
+
+
+
+// Brand context toggle
+function switchBrandCtx(tab) {
+  document.getElementById('ctx-manual').style.display = tab === 'manual' ? 'block' : 'none';
+  document.getElementById('ctx-url').style.display = tab === 'url' ? 'block' : 'none';
+  document.getElementById('ctx-tab-manual').style.background = tab === 'manual' ? 'var(--accent)' : 'transparent';
+  document.getElementById('ctx-tab-manual').style.color = tab === 'manual' ? '#fff' : 'var(--text2)';
+  document.getElementById('ctx-tab-url').style.background = tab === 'url' ? 'var(--accent)' : 'transparent';
+  document.getElementById('ctx-tab-url').style.color = tab === 'url' ? '#fff' : 'var(--text2)';
+}
+
+async function fetchBrandFromURL() {
+  var url = document.getElementById('ai-brand-url').value.trim();
+  if(!url) { showToast('Enter a website URL first'); return; }
+  if(!url.startsWith('http')) url = 'https://' + url;
+
+  var btn = document.getElementById('fetch-url-btn');
+  var result = document.getElementById('url-fetch-result');
+  btn.textContent = 'Reading...';
+  btn.disabled = true;
+  result.textContent = 'Fetching website content...';
+
+  try {
+    var response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-campaign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fetchUrl: url, mode: 'fetch_only' })
+    });
+    var data = await response.json();
+
+    if(data.brandDesc) {
+      // Switch to manual tab and fill in the description
+      switchBrandCtx('manual');
+      document.getElementById('ai-brand-desc').value = data.brandDesc;
+      result.innerHTML = '<span style="color:var(--success)">✓ Website read successfully — description filled in!</span>';
+      showToast('Website content loaded!');
+    } else {
+      throw new Error(data.error || 'Could not read website');
+    }
+  } catch(e) {
+    result.innerHTML = '<span style="color:var(--danger)">Could not read website. Please fill in manually.</span>';
+  } finally {
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Read Website';
+    btn.disabled = false;
+  }
+}
+
+
+
+</script>
 </body></html>`;
 
   const win = window.open('', '_blank');
@@ -7581,6 +8592,896 @@ function autoApplyBranding() {
   const b = getBranding(currentOrg.id);
   if(b && (b.name || b.color)) applyBranding(b);
 }
+</script>
+
+<script>
+
+// ─── VIEW AS CLIENT ──────────────────────────────────────────
+let _adminOrigOrg = null;
+let _adminOrigUser = null;
+let _isViewingAsClient = false;
+
+async function viewAsClient(orgId, orgName) {
+  if (!confirm('Switch to view ' + orgName + ' workspace?\n\nA banner will show at the top. This access is logged for transparency.')) return;
+
+  // Save admin state
+  _adminOrigOrg = currentOrg;
+  _isViewingAsClient = true;
+
+  // Log the admin access to Supabase
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/admin_access_log', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        admin_id: currentUser.id,
+        org_id: orgId,
+        org_name: orgName,
+        accessed_at: new Date().toISOString()
+      })
+    });
+  } catch(e) { /* table may not exist yet, ignore */ }
+
+  // Switch to client org
+  const allOrgsR = await fetch(SUPABASE_URL + '/rest/v1/organizations?id=eq.' + orgId + '&select=*', { headers: HEADERS });
+  const allOrgs = await allOrgsR.json();
+  if (allOrgs && allOrgs[0]) {
+    currentOrg = allOrgs[0];
+    // Show banner
+    document.getElementById('view-as-client-banner').classList.add('active');
+    document.getElementById('view-as-banner-name').textContent = '👁️ Viewing as: ' + orgName;
+    document.body.classList.add('viewing-as-client');
+    // Navigate to dashboard
+    nav('dashboard', document.querySelector('.nav-item'));
+    // Reload data for this org
+    await loadLeads();
+    updateLeadStats();
+    showToast('👁️ Now viewing ' + orgName + ' workspace');
+  }
+}
+
+function exitViewAsClient() {
+  if (!_adminOrigOrg) return;
+  currentOrg = _adminOrigOrg;
+  _isViewingAsClient = false;
+  _adminOrigOrg = null;
+  document.getElementById('view-as-client-banner').classList.remove('active');
+  document.body.classList.remove('viewing-as-client');
+  nav('admin', document.getElementById('admin-nav-item'));
+  adminTab('clients', document.querySelector('.admin-tab'));
+  loadLeads();
+  showToast('✅ Back to your admin view');
+}
+
+// ═══════════════════════════════════════════════════════
+// AI CAMPAIGN IDEAS GENERATOR
+// ═══════════════════════════════════════════════════════
+
+
+function generateFallbackIdeas(brand, industry, goal, lang, platform) {
+  const ar = lang === 'Arabic';
+  return [
+    {
+      name: ar ? 'حملة لحظة القرار' : 'The Decision Moment',
+      hook: ar ? '"كم مرة قلت بكره؟ اليوم قرارك يختلف..."' : '"How many times did you say tomorrow? Today is different..."',
+      script: ar
+        ? 'المشهد 1: شخص يتردد (3 ثوان)\nالمشهد 2: "مع ' + brand + ' ما في تردد" (5 ثوان)\nالمشهد 3: عرض المنتج (10 ثوان)\nالمشهد 4: نتائج حقيقية (7 ثوان)\nالمشهد 5: CTA واضح (5 ثوان)'
+        : 'Scene 1: Person hesitating (3s)\nScene 2: "' + brand + ' — no more hesitation" (5s)\nScene 3: Quick product showcase (10s)\nScene 4: Real customer results (7s)\nScene 5: Clear CTA (5s)',
+      caption: ar
+        ? brand + ' — لما تكون جاهز للقرار الصح، نحن هنا\n\n#' + brand.replace(/\s/g,'') + ' #السعودية #الرياض'
+        : brand + ' — When you\'re ready to make the right choice, we\'re here\n\n#' + brand.replace(/\s/g,'') + ' #Saudi #Riyadh',
+      cta: ar ? 'تواصل الآن عبر الواتساب' : 'Contact us on WhatsApp now'
+    },
+    {
+      name: ar ? 'قبل وبعد' : 'Before & After',
+      hook: ar ? '"شوف الفرق بنفسك..."' : '"See the difference yourself..."',
+      script: ar
+        ? 'المشهد 1: الوضع "قبل" — المشكلة (5 ثوان)\nالمشهد 2: لحظة التحول مع ' + brand + ' (5 ثوان)\nالمشهد 3: "بعد" — النتيجة (10 ثوان)\nالمشهد 4: شهادة عميل (7 ثوان)\nالمشهد 5: عرض خاص (3 ثوان)'
+        : 'Scene 1: "Before" — the problem (5s)\nScene 2: Transformation with ' + brand + ' (5s)\nScene 3: "After" — result (10s)\nScene 4: Customer testimonial (7s)\nScene 5: Special offer (3s)',
+      caption: ar
+        ? 'الفرق واضح مع ' + brand + '\n\nانضم لمئات العملاء الراضين\n\n#' + brand.replace(/\s/g,'') + ' #نتائج_حقيقية'
+        : 'The difference is clear with ' + brand + '\n\nJoin hundreds of happy customers\n\n#' + brand.replace(/\s/g,'') + ' #RealResults',
+      cta: ar ? 'اضغط الرابط في البايو' : 'Click the link in bio'
+    },
+    {
+      name: ar ? 'عرض محدود' : 'Limited Offer',
+      hook: ar ? '"24 ساعة بس... بعدها ما في فرصة ثانية"' : '"Only 24 hours... after that no second chance"',
+      script: ar
+        ? 'المشهد 1: كاونت داون (3 ثوان)\nالمشهد 2: العرض بالتفصيل (8 ثوان)\nالمشهد 3: ما يحصل عليه العميل (7 ثوان)\nالمشهد 4: سعر قبل وبعد الخصم (5 ثوان)\nالمشهد 5: رابط التواصل (7 ثوان)'
+        : 'Scene 1: Countdown (3s)\nScene 2: Offer details (8s)\nScene 3: What customer gets (7s)\nScene 4: Price before/after (5s)\nScene 5: Contact link (7s)',
+      caption: ar
+        ? 'العرض ينتهي الليلة!\n\n' + brand + ' يقدم عرض حصري للمتابعين فقط\n\n#عرض_محدود #' + brand.replace(/\s/g,'') + ' #السعودية'
+        : 'Offer ends tonight!\n\n' + brand + ' exclusive deal for followers only\n\n#LimitedOffer #' + brand.replace(/\s/g,'') + ' #Saudi',
+      cta: ar ? 'تواصل قبل انتهاء العرض' : 'Contact before offer ends'
+    },
+    {
+      name: ar ? 'خلف الكواليس' : 'Behind the Scenes',
+      hook: ar ? '"شو اللي ما تشوفه عادةً عن ' + brand + '؟"' : '"What you don\'t normally see about ' + brand + '"',
+      script: ar
+        ? 'المشهد 1: يوم عمل في ' + brand + ' (8 ثوان)\nالمشهد 2: الفريق والجهد (8 ثوان)\nالمشهد 3: لحظة سعادة عميل (7 ثوان)\nالمشهد 4: رسالة من المؤسس (7 ثوان)\nالمشهد 5: دعوة للتواصل (5 ثوان)'
+        : 'Scene 1: A real workday at ' + brand + ' (8s)\nScene 2: The team and effort (8s)\nScene 3: Happy customer moment (7s)\nScene 4: Message from founder (7s)\nScene 5: Call to connect (5s)',
+      caption: ar
+        ? 'هذا اللي يصير كل يوم في ' + brand + ' عشانك\n\nفريقنا ما يتوقف من أجلك\n\n#' + brand.replace(/\s/g,'') + ' #خلف_الكواليس'
+        : 'This is what happens every day at ' + brand + ' for you\n\nOur team never stops for you\n\n#' + brand.replace(/\s/g,'') + ' #BehindTheScenes',
+      cta: ar ? 'انضم لعيلتنا' : 'Join our family'
+    }
+  ];
+}
+
+function renderCampaignIdeas(ideas, brand, lang) {
+  const container = document.getElementById('ai-ideas-content');
+  container.innerHTML = '';
+  const colors = ['#8b5cf6','#3b82f6','#06b6d4','#10b981'];
+
+  ideas.forEach(function(idea, i) {
+    const color = colors[i % colors.length];
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px';
+
+    const scriptSafe = idea.script.replace(/"/g,'&quot;');
+    const captionSafe = idea.caption.replace(/"/g,'&quot;');
+
+    div.innerHTML =
+      '<div style="background:' + color + '18;border-bottom:1px solid ' + color + '22;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<div style="width:28px;height:28px;background:' + color + ';border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">' + (i+1) + '</div>' +
+          '<div style="font-weight:700;font-size:14px;color:var(--text)">' + idea.name + '</div>' +
+        '</div>' +
+        '<button onclick="this.closest(\'div\').nextElementSibling.style.display=this.closest(\'div\').nextElementSibling.style.display===\'none\'?\'flex\':\'none\'" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;font-family:inherit">▾</button>' +
+      '</div>' +
+      '<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">' +
+        '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">HOOK — First 3 Seconds</div>' +
+          '<div style="font-size:14px;font-weight:600;color:var(--text)">' + idea.hook + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>REEL SCRIPT</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.script + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>READY-TO-POST CAPTION</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--success);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.caption + '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+          '<div style="font-size:12px;color:var(--text2)"><strong style="color:var(--text)">CTA:</strong> ' + idea.cta + '</div>' +
+          '<div style="display:flex;gap:8px">' +
+            '<button onclick="useCampaignIdea(\'email\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.caption.replace(/'/g,"\\'").replace(/\n/g,' ') + '\')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for Email</button>' +
+            '<button onclick="useCampaignIdea(\'sms\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.cta.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for SMS</button>' +
+            '<button onclick="generateVideoFromIdea(' + i + ')" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="video-result-' + i + '" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px"></div>' +
+      '</div>';
+    container.appendChild(div);
+  });
+
+  document.getElementById('ai-ideas-result').style.display = 'block';
+}
+
+function useCampaignIdea(channel, name, body) {
+  switchCampTab(channel);
+  if(channel === 'email') {
+    var n = document.getElementById('camp-name'); if(n) n.value = name;
+    var b = document.getElementById('camp-body'); if(b) b.value = body;
+  } else if(channel === 'sms') {
+    var n2 = document.getElementById('sms-name'); if(n2) n2.value = name;
+    var b2 = document.getElementById('sms-body'); if(b2) b2.value = body;
+  }
+  showToast('Campaign idea loaded — ready to send!');
+}
+
+
+// ═══════════════════════════════════════════════════════
+// CAMPAIGN TAB SWITCHER
+// ═══════════════════════════════════════════════════════
+function switchCampTab(tab) {
+  ['email','sms','whatsapp'].forEach(function(t) {
+    var pane = document.getElementById('camp-pane-' + t);
+    var btn = document.getElementById('camp-tab-' + t);
+    if(pane) pane.style.display = t === tab ? 'block' : 'none';
+    if(btn) {
+      btn.style.background = t === tab ? 'var(--accent)' : 'transparent';
+      btn.style.color = t === tab ? '#fff' : 'var(--text2)';
+    }
+  });
+}
+
+function updateSMSCount(el) {
+  var count = document.getElementById('sms-char-count');
+  if(count) count.textContent = el.value.length + '/160 characters';
+}
+
+// ═══════════════════════════════════════════════════════
+// SMS CREDENTIALS
+// ═══════════════════════════════════════════════════════
+var smsCredentials = null;
+try { smsCredentials = JSON.parse(localStorage.getItem('nexcrm_sms_creds')); } catch(e) {}
+
+function openSMSSetup() {
+  document.getElementById('sms-setup-modal').classList.add('open');
+}
+
+function saveSMSCredentials() {
+  var sid = document.getElementById('sms-account-sid').value.trim();
+  var token = document.getElementById('sms-auth-token').value.trim();
+  var from = document.getElementById('sms-from-number').value.trim();
+  if(!sid || !token || !from) { showToast('Fill in all fields'); return; }
+  smsCredentials = { sid: sid, token: token, from: from };
+  localStorage.setItem('nexcrm_sms_creds', JSON.stringify(smsCredentials));
+  document.getElementById('sms-setup-modal').classList.remove('open');
+  var banner = document.getElementById('sms-connection-banner');
+  var connected = document.getElementById('sms-connected-banner');
+  var display = document.getElementById('sms-phone-display');
+  if(banner) banner.style.display = 'none';
+  if(connected) { connected.style.display = 'flex'; }
+  if(display) display.textContent = from;
+  showToast('SMS connected!');
+}
+
+function previewSMS() {
+  var body = document.getElementById('sms-body').value.trim();
+  if(!body) { showToast('Write your SMS message first'); return; }
+  var preview = body.replace(/{name}/g, 'عبدالرحمن');
+  document.getElementById('preview-modal-title').textContent = 'SMS Preview';
+  document.getElementById('preview-content').innerHTML = '<div style="font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text)">' + preview + '</div>';
+  var sendBtn = document.getElementById('preview-send-btn');
+  if(sendBtn) {
+    sendBtn.onclick = function() { closePreview(); sendSMSCampaign(true); };
+  }
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+async function sendSMSCampaign(confirmed) {
+  if(!smsCredentials) { showToast('Connect Twilio first'); openSMSSetup(); return; }
+  var name = document.getElementById('sms-name').value.trim();
+  var body = document.getElementById('sms-body').value.trim();
+  var filter = document.getElementById('sms-filter').value;
+  if(!name) { showToast('Enter campaign name'); return; }
+  if(!body) { showToast('Write your SMS message'); return; }
+
+  var targetLeads = await getFilteredLeads(filter);
+  var leadsWithPhone = targetLeads.filter(function(l) { return l.phone; });
+  if(!leadsWithPhone.length) { showToast('No leads with phone numbers found'); return; }
+  if(!confirmed && !confirm('Send SMS to ' + leadsWithPhone.length + ' leads with phone numbers?')) return;
+
+  var btn = document.querySelector('#camp-pane-sms .btn-primary');
+  if(btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+
+  var sent = 0, failed = 0;
+  for(var i = 0; i < leadsWithPhone.length; i++) {
+    var lead = leadsWithPhone[i];
+    var msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    try {
+      var r = await fetch('https://api.twilio.com/2010-04-01/Accounts/' + smsCredentials.sid + '/Messages.json', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Basic ' + btoa(smsCredentials.sid + ':' + smsCredentials.token),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'To=' + encodeURIComponent(lead.phone) + '&From=' + encodeURIComponent(smsCredentials.from) + '&Body=' + encodeURIComponent(msg)
+      });
+      if(r.ok) sent++; else failed++;
+    } catch(e) { failed++; }
+  }
+  if(btn) { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send SMS'; btn.disabled = false; }
+  showToast('SMS sent! ' + sent + ' delivered, ' + failed + ' failed.');
+  loadSMSHistory();
+}
+
+function loadSMSHistory() {
+  var el = document.getElementById('sms-history');
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No SMS campaigns sent yet</div>';
+}
+
+// ═══════════════════════════════════════════════════════
+// WHATSAPP CREDENTIALS
+// ═══════════════════════════════════════════════════════
+var waCredentials = null;
+try { waCredentials = JSON.parse(localStorage.getItem('nexcrm_wa_creds')); } catch(e) {}
+
+function openWASetup() {
+  document.getElementById('wa-setup-modal').classList.add('open');
+}
+
+function saveWACredentials() {
+  var phoneId = document.getElementById('wa-account-sid').value.trim();
+  var token = document.getElementById('wa-auth-token').value.trim();
+  var from = document.getElementById('wa-from-number').value.trim();
+  if(!phoneId || !token || !from) { showToast('Fill in all fields'); return; }
+  waCredentials = { phoneId: phoneId, token: token, from: from };
+  localStorage.setItem('nexcrm_wa_creds', JSON.stringify(waCredentials));
+  document.getElementById('wa-setup-modal').classList.remove('open');
+  var banner = document.getElementById('wa-connection-banner');
+  var connected = document.getElementById('wa-connected-banner');
+  var display = document.getElementById('wa-phone-display');
+  if(banner) banner.style.display = 'none';
+  if(connected) connected.style.display = 'flex';
+  if(display) display.textContent = from;
+  showToast('WhatsApp connected!');
+}
+
+function previewWA() {
+  var body = document.getElementById('wa-body').value.trim();
+  if(!body) { showToast('Write your WhatsApp message first'); return; }
+  var preview = body.replace(/{name}/g, 'عبدالرحمن');
+  document.getElementById('preview-modal-title').textContent = 'WhatsApp Preview';
+  document.getElementById('preview-content').innerHTML = '<div style="background:#dcf8c6;color:#111;border-radius:10px;padding:12px;font-size:14px;line-height:1.8;white-space:pre-wrap;max-width:80%;margin-left:auto">' + preview + '</div>';
+  var sendBtn = document.getElementById('preview-send-btn');
+  if(sendBtn) sendBtn.onclick = function() { closePreview(); sendWACampaign(true); };
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+async function sendWACampaign(confirmed) {
+  if(!waCredentials) { showToast('Connect WhatsApp first'); openWASetup(); return; }
+  var name = document.getElementById('wa-camp-name').value.trim();
+  var body = document.getElementById('wa-body').value.trim();
+  var filter = document.getElementById('wa-filter').value;
+  if(!name) { showToast('Enter campaign name'); return; }
+  if(!body) { showToast('Write your WhatsApp message'); return; }
+
+  var targetLeads = await getFilteredLeads(filter);
+  var leadsWithPhone = targetLeads.filter(function(l) { return l.phone; });
+  if(!leadsWithPhone.length) { showToast('No leads with phone numbers found'); return; }
+  if(!confirmed && !confirm('Send WhatsApp to ' + leadsWithPhone.length + ' leads?')) return;
+
+  var btn = document.querySelector('#camp-pane-whatsapp .btn-primary');
+  if(btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+
+  var sent = 0, failed = 0;
+  for(var i = 0; i < leadsWithPhone.length; i++) {
+    var lead = leadsWithPhone[i];
+    var msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    try {
+      var r = await fetch('https://graph.facebook.com/v18.0/' + waCredentials.phoneId + '/messages', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + waCredentials.token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messaging_product: 'whatsapp', to: lead.phone.replace(/\s/g,''), type: 'text', text: { body: msg } })
+      });
+      if(r.ok) sent++; else failed++;
+    } catch(e) { failed++; }
+  }
+  if(btn) { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send WhatsApp'; btn.disabled = false; }
+  showToast('WhatsApp sent! ' + sent + ' delivered, ' + failed + ' failed.');
+  loadWAHistory();
+}
+
+function loadWAHistory() {
+  var el = document.getElementById('wa-history');
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No WhatsApp campaigns sent yet</div>';
+}
+
+function closePreview() {
+  document.getElementById('preview-modal').classList.remove('open');
+}
+
+function previewCampaign() {
+  var subject = document.getElementById('camp-subject').value.trim();
+  var body = document.getElementById('camp-body').value.trim();
+  if(!body) { showToast('Write your email message first'); return; }
+  var senderName = document.getElementById('camp-from-name').value.trim() || 'NexCRM';
+  var preview = body.replace(/{name}/g, 'عبدالرحمن');
+  var filterLabel = document.getElementById('camp-filter').options[document.getElementById('camp-filter').selectedIndex].text;
+  document.getElementById('preview-modal-title').textContent = 'Email Preview';
+  document.getElementById('preview-content').innerHTML =
+    '<div style="font-size:12px;color:var(--text2);margin-bottom:12px">' +
+    '<b>From:</b> ' + senderName + ' &lt;campaigns@nexcrm.sa&gt;<br>' +
+    '<b>Subject:</b> ' + (subject || '(no subject)') + '<br>' +
+    '<b>To:</b> ' + filterLabel +
+    '</div>' +
+    '<div style="font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text)">' + preview + '</div>';
+  var sendBtn = document.getElementById('preview-send-btn');
+  if(sendBtn) sendBtn.onclick = function() { closePreview(); sendCampaign(true); };
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+function loadCampaignHistory() {
+  var el = document.getElementById('campaign-history');
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>';
+}
+
+// Init SMS/WA connection state on load
+document.addEventListener('DOMContentLoaded', function() {
+  if(smsCredentials) {
+    var b = document.getElementById('sms-connection-banner');
+    var c = document.getElementById('sms-connected-banner');
+    var d = document.getElementById('sms-phone-display');
+    if(b) b.style.display = 'none';
+    if(c) c.style.display = 'flex';
+    if(d) d.textContent = smsCredentials.from;
+  }
+  if(waCredentials) {
+    var b2 = document.getElementById('wa-connection-banner');
+    var c2 = document.getElementById('wa-connected-banner');
+    var d2 = document.getElementById('wa-phone-display');
+    if(b2) b2.style.display = 'none';
+    if(c2) c2.style.display = 'flex';
+    if(d2) d2.textContent = waCredentials.from;
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// AI CAMPAIGN IDEAS GENERATOR
+// ═══════════════════════════════════════════════════════
+
+
+function generateFallbackIdeas(brand, industry, goal, lang, platform) {
+  const ar = lang === 'Arabic';
+  return [
+    {
+      name: ar ? 'حملة لحظة القرار' : 'The Decision Moment',
+      hook: ar ? '"كم مرة قلت بكره؟ اليوم قرارك يختلف..."' : '"How many times did you say tomorrow? Today is different..."',
+      script: ar
+        ? 'المشهد 1: شخص يتردد (3 ثوان)\nالمشهد 2: "مع ' + brand + ' ما في تردد" (5 ثوان)\nالمشهد 3: عرض المنتج (10 ثوان)\nالمشهد 4: نتائج حقيقية (7 ثوان)\nالمشهد 5: CTA واضح (5 ثوان)'
+        : 'Scene 1: Person hesitating (3s)\nScene 2: "' + brand + ' — no more hesitation" (5s)\nScene 3: Quick product showcase (10s)\nScene 4: Real customer results (7s)\nScene 5: Clear CTA (5s)',
+      caption: ar
+        ? brand + ' — لما تكون جاهز للقرار الصح، نحن هنا\n\n#' + brand.replace(/\s/g,'') + ' #السعودية #الرياض'
+        : brand + ' — When you\'re ready to make the right choice, we\'re here\n\n#' + brand.replace(/\s/g,'') + ' #Saudi #Riyadh',
+      cta: ar ? 'تواصل الآن عبر الواتساب' : 'Contact us on WhatsApp now'
+    },
+    {
+      name: ar ? 'قبل وبعد' : 'Before & After',
+      hook: ar ? '"شوف الفرق بنفسك..."' : '"See the difference yourself..."',
+      script: ar
+        ? 'المشهد 1: الوضع "قبل" — المشكلة (5 ثوان)\nالمشهد 2: لحظة التحول مع ' + brand + ' (5 ثوان)\nالمشهد 3: "بعد" — النتيجة (10 ثوان)\nالمشهد 4: شهادة عميل (7 ثوان)\nالمشهد 5: عرض خاص (3 ثوان)'
+        : 'Scene 1: "Before" — the problem (5s)\nScene 2: Transformation with ' + brand + ' (5s)\nScene 3: "After" — result (10s)\nScene 4: Customer testimonial (7s)\nScene 5: Special offer (3s)',
+      caption: ar
+        ? 'الفرق واضح مع ' + brand + '\n\nانضم لمئات العملاء الراضين\n\n#' + brand.replace(/\s/g,'') + ' #نتائج_حقيقية'
+        : 'The difference is clear with ' + brand + '\n\nJoin hundreds of happy customers\n\n#' + brand.replace(/\s/g,'') + ' #RealResults',
+      cta: ar ? 'اضغط الرابط في البايو' : 'Click the link in bio'
+    },
+    {
+      name: ar ? 'عرض محدود' : 'Limited Offer',
+      hook: ar ? '"24 ساعة بس... بعدها ما في فرصة ثانية"' : '"Only 24 hours... after that no second chance"',
+      script: ar
+        ? 'المشهد 1: كاونت داون (3 ثوان)\nالمشهد 2: العرض بالتفصيل (8 ثوان)\nالمشهد 3: ما يحصل عليه العميل (7 ثوان)\nالمشهد 4: سعر قبل وبعد الخصم (5 ثوان)\nالمشهد 5: رابط التواصل (7 ثوان)'
+        : 'Scene 1: Countdown (3s)\nScene 2: Offer details (8s)\nScene 3: What customer gets (7s)\nScene 4: Price before/after (5s)\nScene 5: Contact link (7s)',
+      caption: ar
+        ? 'العرض ينتهي الليلة!\n\n' + brand + ' يقدم عرض حصري للمتابعين فقط\n\n#عرض_محدود #' + brand.replace(/\s/g,'') + ' #السعودية'
+        : 'Offer ends tonight!\n\n' + brand + ' exclusive deal for followers only\n\n#LimitedOffer #' + brand.replace(/\s/g,'') + ' #Saudi',
+      cta: ar ? 'تواصل قبل انتهاء العرض' : 'Contact before offer ends'
+    },
+    {
+      name: ar ? 'خلف الكواليس' : 'Behind the Scenes',
+      hook: ar ? '"شو اللي ما تشوفه عادةً عن ' + brand + '؟"' : '"What you don\'t normally see about ' + brand + '"',
+      script: ar
+        ? 'المشهد 1: يوم عمل في ' + brand + ' (8 ثوان)\nالمشهد 2: الفريق والجهد (8 ثوان)\nالمشهد 3: لحظة سعادة عميل (7 ثوان)\nالمشهد 4: رسالة من المؤسس (7 ثوان)\nالمشهد 5: دعوة للتواصل (5 ثوان)'
+        : 'Scene 1: A real workday at ' + brand + ' (8s)\nScene 2: The team and effort (8s)\nScene 3: Happy customer moment (7s)\nScene 4: Message from founder (7s)\nScene 5: Call to connect (5s)',
+      caption: ar
+        ? 'هذا اللي يصير كل يوم في ' + brand + ' عشانك\n\nفريقنا ما يتوقف من أجلك\n\n#' + brand.replace(/\s/g,'') + ' #خلف_الكواليس'
+        : 'This is what happens every day at ' + brand + ' for you\n\nOur team never stops for you\n\n#' + brand.replace(/\s/g,'') + ' #BehindTheScenes',
+      cta: ar ? 'انضم لعيلتنا' : 'Join our family'
+    }
+  ];
+}
+
+function renderCampaignIdeas(ideas, brand, lang) {
+  const container = document.getElementById('ai-ideas-content');
+  container.innerHTML = '';
+  const colors = ['#8b5cf6','#3b82f6','#06b6d4','#10b981'];
+
+  ideas.forEach(function(idea, i) {
+    const color = colors[i % colors.length];
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px';
+
+    const scriptSafe = idea.script.replace(/"/g,'&quot;');
+    const captionSafe = idea.caption.replace(/"/g,'&quot;');
+
+    div.innerHTML =
+      '<div style="background:' + color + '18;border-bottom:1px solid ' + color + '22;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<div style="width:28px;height:28px;background:' + color + ';border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">' + (i+1) + '</div>' +
+          '<div style="font-weight:700;font-size:14px;color:var(--text)">' + idea.name + '</div>' +
+        '</div>' +
+        '<button onclick="this.closest(\'div\').nextElementSibling.style.display=this.closest(\'div\').nextElementSibling.style.display===\'none\'?\'flex\':\'none\'" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;font-family:inherit">▾</button>' +
+      '</div>' +
+      '<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">' +
+        '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">HOOK — First 3 Seconds</div>' +
+          '<div style="font-size:14px;font-weight:600;color:var(--text)">' + idea.hook + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>REEL SCRIPT</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.script + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>READY-TO-POST CAPTION</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--success);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.caption + '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+          '<div style="font-size:12px;color:var(--text2)"><strong style="color:var(--text)">CTA:</strong> ' + idea.cta + '</div>' +
+          '<div style="display:flex;gap:8px">' +
+            '<button onclick="useCampaignIdea(\'email\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.caption.replace(/'/g,"\\'").replace(/\n/g,' ') + '\')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for Email</button>' +
+            '<button onclick="useCampaignIdea(\'sms\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.cta.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for SMS</button>' +
+            '<button onclick="generateVideoFromIdea(' + i + ')" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="video-result-' + i + '" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px"></div>' +
+      '</div>';
+    container.appendChild(div);
+  });
+
+  document.getElementById('ai-ideas-result').style.display = 'block';
+}
+
+function useCampaignIdea(channel, name, body) {
+  switchCampTab(channel);
+  if(channel === 'email') {
+    var n = document.getElementById('camp-name'); if(n) n.value = name;
+    var b = document.getElementById('camp-body'); if(b) b.value = body;
+    } else if(channel === 'sms') {
+    var n2 = document.getElementById('sms-name'); if(n2) n2.value = name;
+    var b2 = document.getElementById('sms-body'); if(b2) b2.value = body;
+  }
+  showToast('Campaign idea loaded — ready to send!');
+}
+
+// ── VIDEO MODAL STYLES ───────────────────────────────────────────────────────
+(function() {
+  var s = document.createElement('style');
+  s.textContent = `
+    #video-modal-overlay {
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;
+      align-items:center;justify-content:center;padding:20px;
+    }
+    #video-modal-overlay.open { display:flex; }
+    #video-modal {
+      background:var(--bg2,#0f1629);border:1px solid rgba(139,92,246,0.3);
+      border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;
+      padding:24px;position:relative;
+    }
+    .vm-title { font-size:16px;font-weight:800;color:#8b5cf6;margin-bottom:4px; }
+    .vm-sub { font-size:12px;color:var(--text2);margin-bottom:20px; }
+    .vm-section-label { font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px; }
+    .vm-duration-row { display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap; }
+    .vm-dur-btn {
+      flex:1;min-width:70px;padding:10px 6px;border-radius:10px;border:2px solid rgba(139,92,246,0.2);
+      background:rgba(139,92,246,0.05);color:var(--text);font-size:13px;font-weight:700;
+      cursor:pointer;text-align:center;transition:all 0.2s;
+    }
+    .vm-dur-btn:hover,.vm-dur-btn.active {
+      border-color:#8b5cf6;background:rgba(139,92,246,0.15);color:#8b5cf6;
+    }
+    .vm-prompts { display:flex;flex-direction:column;gap:10px;margin-bottom:20px; }
+    .vm-prompt-card {
+      padding:12px 14px;border-radius:10px;border:2px solid rgba(139,92,246,0.15);
+      background:rgba(139,92,246,0.04);cursor:pointer;font-size:12px;
+      line-height:1.6;color:var(--text);transition:all 0.2s;position:relative;
+    }
+    .vm-prompt-card:hover,.vm-prompt-card.selected {
+      border-color:#8b5cf6;background:rgba(139,92,246,0.12);
+    }
+    .vm-prompt-card.selected::after {
+      content:'✓ Selected';position:absolute;top:8px;right:10px;
+      font-size:10px;font-weight:800;color:#8b5cf6;
+    }
+    .vm-prompt-label { font-size:10px;font-weight:800;color:#8b5cf6;margin-bottom:4px;text-transform:uppercase; }
+    .vm-actions { display:flex;gap:10px;justify-content:flex-end; }
+    .vm-cancel-btn {
+      padding:10px 20px;border-radius:10px;border:1px solid rgba(139,92,246,0.3);
+      background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;
+    }
+    .vm-generate-btn {
+      padding:10px 24px;border-radius:10px;border:none;
+      background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;
+      font-size:13px;font-weight:700;cursor:pointer;opacity:0.4;pointer-events:none;transition:opacity 0.2s;
+    }
+    .vm-generate-btn.ready { opacity:1;pointer-events:auto; }
+    .vm-loading { text-align:center;padding:20px;color:var(--text2);font-size:12px; }
+    .vm-spinner { width:28px;height:28px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px; }
+  `;
+  document.head.appendChild(s);
+
+  // Inject modal HTML
+  var modal = document.createElement('div');
+  modal.id = 'video-modal-overlay';
+  modal.innerHTML = `
+    <div id="video-modal">
+      <div class="vm-title">🎬 Generate AI Video</div>
+      <div class="vm-sub">Choose duration, pick your best prompt, then generate.</div>
+      <div class="vm-section-label">Select Duration</div>
+      <div class="vm-duration-row">
+        <div class="vm-dur-btn" data-dur="5">5s</div>
+        <div class="vm-dur-btn active" data-dur="10">10s ★</div>
+      </div>
+      <div class="vm-section-label">Choose a Prompt Angle</div>
+      <div class="vm-prompts" id="vm-prompt-list">
+        <div class="vm-loading"><div class="vm-spinner"></div>Generating prompt options...</div>
+      </div>
+      <div class="vm-actions">
+        <button class="vm-cancel-btn" onclick="closeVideoModal()">Cancel</button>
+        <button class="vm-generate-btn" id="vm-generate-btn" onclick="startVideoGeneration()">Generate Video</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+})();
+
+// ── MODAL STATE ───────────────────────────────────────────────────────────────
+var _lastGeneratedIdeas = [];
+var _videoModalState = { ideaIndex: null, duration: '16', selectedPrompt: null, resultDiv: null, btn: null };
+
+function closeVideoModal() {
+  document.getElementById('video-modal-overlay').classList.remove('open');
+}
+
+function openVideoModal(index) {
+  var ideas = _lastGeneratedIdeas;
+  if(!ideas || !ideas[index]) { showToast('Generate ideas first'); return; }
+
+  var idea = ideas[index];
+  var resultDiv = document.getElementById('video-result-' + index);
+  var btn = document.querySelector('[onclick="generateVideoFromIdea(' + index + ')"]');
+
+  _videoModalState.ideaIndex = index;
+  _videoModalState._voiceScript = (idea.script || idea.hook || '').substring(0, 400);
+  _videoModalState.duration = '10';
+  _videoModalState.selectedPrompt = null;
+  _videoModalState.resultDiv = resultDiv;
+  _videoModalState.btn = btn;
+
+  // Reset UI
+  document.querySelectorAll('.vm-dur-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.dur === '16');
+  });
+  document.getElementById('vm-generate-btn').classList.remove('ready');
+  document.getElementById('vm-modal-overlay');
+
+  // Show modal
+  document.getElementById('video-modal-overlay').classList.add('open');
+
+  // Generate prompts
+  generatePromptOptions(idea, '16');
+
+  // Duration click handlers
+  document.querySelectorAll('.vm-dur-btn').forEach(function(b) {
+    b.onclick = function() {
+      document.querySelectorAll('.vm-dur-btn').forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      _videoModalState.duration = b.dataset.dur;
+      _videoModalState.selectedPrompt = null;
+      document.getElementById('vm-generate-btn').classList.remove('ready');
+      generatePromptOptions(idea, b.dataset.dur);
+    };
+  });
+}
+
+function generatePromptOptions(idea, duration) {
+  var list = document.getElementById('vm-prompt-list');
+  list.innerHTML = '<div class="vm-loading"><div class="vm-spinner"></div>Generating prompt options...</div>';
+
+  var brand = (document.getElementById('ai-brand') ? document.getElementById('ai-brand').value : '') || 'Saudi brand';
+  var hook = idea.hook || '';
+  var script = idea.script || '';
+  var dur = parseInt(duration);
+
+  // Build 3 prompt angles based on duration + idea
+  var sceneCount = dur <= 5 ? 1 : dur <= 10 ? 2 : 3;
+  var pacing = dur <= 5 ? 'fast-paced, single impactful shot' : dur <= 10 ? 'two scenes, smooth transition' : 'three scenes, cinematic flow';
+  var hookShort = hook.substring(0, 80);
+
+
+  var prompts = [
+    {
+      label: '🎯 Direct to Camera',
+      text: 'Cinematic vertical 9:16 video, ' + dur + ' seconds, photorealistic 1080p. ' +
+        'Saudi man in his 30s, crisp white thobe and red-white ghutra, modern glass desk in Riyadh high-rise office. ' +
+        'Speaks directly and confidently to camera. Riyadh skyline behind him, golden hour light. ' +
+        'Topic: "' + hookShort + '". Brand: ' + brand + '. Scenes: ' + (idea.script ? idea.script.substring(0, 300) : '') + '. ' +
+        'Audio: clear Arabic male voice, Saudi Gulf dialect ONLY. No Korean. No Chinese. Slow push-in camera, shallow depth of field. Warm cinematic color grade.'
+    },
+    {
+      label: '\uD83C\uDF1F Success Story',
+      text: 'Cinematic ' + dur + '-second vertical social media video 9:16, photorealistic. ' +
+        'Young Saudi man in white thobe: first stressed, then discovers ' + brand + ', then confident and successful. ' +
+        'Saudi setting: Arabic coffee cups, Kingdom Tower visible through window, Saudi flag on wall. ' +
+        'Audio: uplifting Arabic background music, male voiceover describing the transformation. ' +
+        'Instagram Reels style, fast cuts, cinematic. Audio: Arabic Gulf dialect male voice ONLY. No Korean. Theme: "' + hookShort + '".'
+    },
+    {
+      label: '\u26A1 Problem vs Solution',
+      text: dur + '-second vertical video 9:16, Saudi Arabia, cinematic 1080p. ' +
+        'First half: Saudi professional in thobe, frustrated, old way not working. ' +
+        'Second half: ' + brand + ' solves it instantly, relief and success. ' +
+        'Characters: Saudi man in thobe and Saudi woman in black abaya and hijab, modern Riyadh office. ' +
+        'Audio: dramatic Arabic music with male and female voices showing the transformation. ' +
+        'Key message: "' + hookShort + '". Authentic Saudi cultural setting throughout. Audio: Arabic Gulf dialect, male and female Saudi voices ONLY. No Korean. No Chinese.'
+    }
+  ];
+
+  var html = '';
+  prompts.forEach(function(p, i) {
+    html += '<div class="vm-prompt-card" onclick="selectPrompt(this,' + i + ')" data-prompt="' + p.text.replace(/"/g, '&quot;') + '">' +
+      '<div class="vm-prompt-label">' + p.label + '</div>' +
+      p.text +
+      '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function selectPrompt(el, idx) {
+  document.querySelectorAll('.vm-prompt-card').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  _videoModalState.selectedPrompt = el.getAttribute('data-prompt');
+  document.getElementById('vm-generate-btn').classList.add('ready');
+}
+
+async function startVideoGeneration() {
+  var state = _videoModalState;
+  if(!state.selectedPrompt) return;
+
+  closeVideoModal();
+
+  var resultDiv = state.resultDiv;
+  var btn = state.btn;
+
+  if(btn) { btn.textContent = 'Generating...'; btn.disabled = true; }
+  if(resultDiv) {
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">' +
+      '<div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>' +
+      'Submitting to Runway Gen-3...</div>';
+  }
+
+  var EDGE_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-video';
+
+  try {
+    var submitRes = await fetch(EDGE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'submit', prompt: state.selectedPrompt, duration: state.duration })
+    });
+    var submitText = await submitRes.text();
+    console.log('Submit:', submitRes.status, submitText.substring(0,300));
+    var submitData;
+    try { submitData = JSON.parse(submitText); } catch(e) { throw new Error('Submit parse error: ' + submitText.substring(0,200)); }
+    if(!submitRes.ok) throw new Error('Submit failed ' + submitRes.status + ': ' + submitText.substring(0,300));
+    if(!submitData.requestId) throw new Error('No requestId returned');
+
+    var reqId = submitData.requestId;
+    var audioBase64 = submitData.audioBase64 || null;
+    var voiceName = submitData.voiceName || '';
+    var voiceLang = submitData.language || 'ar';
+    console.log('Audio ready:', audioBase64 ? 'YES (' + voiceName + ')' : 'NO');
+    if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video + AI voice (' + (voiceName || 'Arabic') + ')...</div>';
+
+    var videoUrl = null;
+    for(var attempt = 0; attempt < 72; attempt++) {
+      await new Promise(function(r) { setTimeout(r, 5000); });
+      var checkRes = await fetch(EDGE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'check', requestId: reqId })
+      });
+      var checkText = await checkRes.text();
+      var checkData;
+      try { checkData = JSON.parse(checkText); } catch(e) { continue; }
+      console.log('Check:', checkData.status);
+
+      if(checkData.status === 'COMPLETED') { console.log('COMPLETED full response:', JSON.stringify(checkData)); var raw = checkData.raw || {}; videoUrl = checkData.videoUrl || checkData.video_url || (raw.video && raw.video.url) || raw.video_url || raw.url || null; console.log('Extracted videoUrl:', videoUrl); break; }
+      if(checkData.status === 'FAILED') throw new Error('Video generation failed on FAL side');
+
+      var secs = (attempt + 1) * 5;
+      if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... ' + secs + 's elapsed</div>';
+    }
+
+    if(!videoUrl) throw new Error('Timed out after 6 minutes — please try again');
+
+    var idxKey = state.ideaIndex;
+    var hasAudio = audioBase64 ? true : false;
+    if(resultDiv) resultDiv.innerHTML =
+      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:8px">✅ VIDEO READY ' + (hasAudio ? '🔊 Arabic Voice' : '') + '</div>' +
+      (hasAudio ? '<audio id="el-audio-' + idxKey + '" src="' + audioBase64 + '"></audio>' : '') +
+      '<video id="el-video-' + idxKey + '" src="' + videoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"' +
+      (hasAudio ? ' onplay="elPlay(' + idxKey + ')" onpause="elPause(' + idxKey + ')" onseeked="elSeek(' + idxKey + ')" onended="elPause(' + idxKey + ')"' : '') +
+      '></video>' +
+      (hasAudio ? '<div style="font-size:10px;color:var(--text2);text-align:center;margin:6px 0">🎙️ Saudi Arabic voiceover — press play</div>' : '') +
+      '<div style="text-align:center;margin-top:8px">' +
+        '<a href="' + videoUrl + '" download target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">⬇ Download Video</a>' +
+      '</div>';
+    showToast('🎬 Video ' + (hasAudio ? '+ Arabic Voice' : '') + ' ready!');
+
+  } catch(e) {
+    if(resultDiv) resultDiv.innerHTML = '<div style="color:var(--danger);font-size:12px;padding:10px">Error: ' + e.message + '</div>';
+    showToast('Video failed: ' + e.message);
+  } finally {
+    if(btn) {
+      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video';
+      btn.disabled = false;
+    }
+  }
+}
+
+function generateVideoFromIdea(index) { openVideoModal(index); }
+
+// ElevenLabs audio sync with video
+function elPlay(idx) {
+  var audio = document.getElementById('el-audio-' + idx);
+  var video = document.getElementById('el-video-' + idx);
+  if(audio && video) { audio.currentTime = video.currentTime; audio.play(); }
+}
+function elPause(idx) {
+  var audio = document.getElementById('el-audio-' + idx);
+  if(audio) audio.pause();
+}
+function elSeek(idx) {
+  var audio = document.getElementById('el-audio-' + idx);
+  var video = document.getElementById('el-video-' + idx);
+  if(audio && video) audio.currentTime = video.currentTime;
+}
+
+// Patch renderCampaignIdeas to store ideas
+var _origRenderCI = window.renderCampaignIdeas;
+if(typeof renderCampaignIdeas === 'function') {
+  var _patchedRender = renderCampaignIdeas;
+  window.renderCampaignIdeas = function(ideas, brand, lang) {
+    _lastGeneratedIdeas = ideas;
+    _patchedRender(ideas, brand, lang);
+  };
+}
+
+
+
+// Brand context toggle
+function switchBrandCtx(tab) {
+  document.getElementById('ctx-manual').style.display = tab === 'manual' ? 'block' : 'none';
+  document.getElementById('ctx-url').style.display = tab === 'url' ? 'block' : 'none';
+  document.getElementById('ctx-tab-manual').style.background = tab === 'manual' ? 'var(--accent)' : 'transparent';
+  document.getElementById('ctx-tab-manual').style.color = tab === 'manual' ? '#fff' : 'var(--text2)';
+  document.getElementById('ctx-tab-url').style.background = tab === 'url' ? 'var(--accent)' : 'transparent';
+  document.getElementById('ctx-tab-url').style.color = tab === 'url' ? '#fff' : 'var(--text2)';
+}
+
+async function fetchBrandFromURL() {
+  var url = document.getElementById('ai-brand-url').value.trim();
+  if(!url) { showToast('Enter a website URL first'); return; }
+  if(!url.startsWith('http')) url = 'https://' + url;
+
+  var btn = document.getElementById('fetch-url-btn');
+  var result = document.getElementById('url-fetch-result');
+  btn.textContent = 'Reading...';
+  btn.disabled = true;
+  result.textContent = 'Fetching website content...';
+
+  try {
+    var response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-campaign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fetchUrl: url, mode: 'fetch_only' })
+    });
+    var data = await response.json();
+
+    if(data.brandDesc) {
+      // Switch to manual tab and fill in the description
+      switchBrandCtx('manual');
+      document.getElementById('ai-brand-desc').value = data.brandDesc;
+      result.innerHTML = '<span style="color:var(--success)">✓ Website read successfully — description filled in!</span>';
+      showToast('Website content loaded!');
+    } else {
+      throw new Error(data.error || 'Could not read website');
+    }
+  } catch(e) {
+    result.innerHTML = '<span style="color:var(--danger)">Could not read website. Please fill in manually.</span>';
+  } finally {
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Read Website';
+    btn.disabled = false;
+  }
+}
+
+
+
 </script>
 </body>
 
@@ -7841,6 +9742,896 @@ function generateVATInvoice() {
   <button onclick="window.print()" style="background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.3)">🖨️ Print / Save PDF</button>
   <button onclick="window.close()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:12px;padding:14px 20px;font-size:15px;cursor:pointer">✕</button>
 </div>
+
+<script>
+
+// ─── VIEW AS CLIENT ──────────────────────────────────────────
+let _adminOrigOrg = null;
+let _adminOrigUser = null;
+let _isViewingAsClient = false;
+
+async function viewAsClient(orgId, orgName) {
+  if (!confirm('Switch to view ' + orgName + ' workspace?\n\nA banner will show at the top. This access is logged for transparency.')) return;
+
+  // Save admin state
+  _adminOrigOrg = currentOrg;
+  _isViewingAsClient = true;
+
+  // Log the admin access to Supabase
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/admin_access_log', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        admin_id: currentUser.id,
+        org_id: orgId,
+        org_name: orgName,
+        accessed_at: new Date().toISOString()
+      })
+    });
+  } catch(e) { /* table may not exist yet, ignore */ }
+
+  // Switch to client org
+  const allOrgsR = await fetch(SUPABASE_URL + '/rest/v1/organizations?id=eq.' + orgId + '&select=*', { headers: HEADERS });
+  const allOrgs = await allOrgsR.json();
+  if (allOrgs && allOrgs[0]) {
+    currentOrg = allOrgs[0];
+    // Show banner
+    document.getElementById('view-as-client-banner').classList.add('active');
+    document.getElementById('view-as-banner-name').textContent = '👁️ Viewing as: ' + orgName;
+    document.body.classList.add('viewing-as-client');
+    // Navigate to dashboard
+    nav('dashboard', document.querySelector('.nav-item'));
+    // Reload data for this org
+    await loadLeads();
+    updateLeadStats();
+    showToast('👁️ Now viewing ' + orgName + ' workspace');
+  }
+}
+
+function exitViewAsClient() {
+  if (!_adminOrigOrg) return;
+  currentOrg = _adminOrigOrg;
+  _isViewingAsClient = false;
+  _adminOrigOrg = null;
+  document.getElementById('view-as-client-banner').classList.remove('active');
+  document.body.classList.remove('viewing-as-client');
+  nav('admin', document.getElementById('admin-nav-item'));
+  adminTab('clients', document.querySelector('.admin-tab'));
+  loadLeads();
+  showToast('✅ Back to your admin view');
+}
+
+// ═══════════════════════════════════════════════════════
+// AI CAMPAIGN IDEAS GENERATOR
+// ═══════════════════════════════════════════════════════
+
+
+function generateFallbackIdeas(brand, industry, goal, lang, platform) {
+  const ar = lang === 'Arabic';
+  return [
+    {
+      name: ar ? 'حملة لحظة القرار' : 'The Decision Moment',
+      hook: ar ? '"كم مرة قلت بكره؟ اليوم قرارك يختلف..."' : '"How many times did you say tomorrow? Today is different..."',
+      script: ar
+        ? 'المشهد 1: شخص يتردد (3 ثوان)\nالمشهد 2: "مع ' + brand + ' ما في تردد" (5 ثوان)\nالمشهد 3: عرض المنتج (10 ثوان)\nالمشهد 4: نتائج حقيقية (7 ثوان)\nالمشهد 5: CTA واضح (5 ثوان)'
+        : 'Scene 1: Person hesitating (3s)\nScene 2: "' + brand + ' — no more hesitation" (5s)\nScene 3: Quick product showcase (10s)\nScene 4: Real customer results (7s)\nScene 5: Clear CTA (5s)',
+      caption: ar
+        ? brand + ' — لما تكون جاهز للقرار الصح، نحن هنا\n\n#' + brand.replace(/\s/g,'') + ' #السعودية #الرياض'
+        : brand + ' — When you\'re ready to make the right choice, we\'re here\n\n#' + brand.replace(/\s/g,'') + ' #Saudi #Riyadh',
+      cta: ar ? 'تواصل الآن عبر الواتساب' : 'Contact us on WhatsApp now'
+    },
+    {
+      name: ar ? 'قبل وبعد' : 'Before & After',
+      hook: ar ? '"شوف الفرق بنفسك..."' : '"See the difference yourself..."',
+      script: ar
+        ? 'المشهد 1: الوضع "قبل" — المشكلة (5 ثوان)\nالمشهد 2: لحظة التحول مع ' + brand + ' (5 ثوان)\nالمشهد 3: "بعد" — النتيجة (10 ثوان)\nالمشهد 4: شهادة عميل (7 ثوان)\nالمشهد 5: عرض خاص (3 ثوان)'
+        : 'Scene 1: "Before" — the problem (5s)\nScene 2: Transformation with ' + brand + ' (5s)\nScene 3: "After" — result (10s)\nScene 4: Customer testimonial (7s)\nScene 5: Special offer (3s)',
+      caption: ar
+        ? 'الفرق واضح مع ' + brand + '\n\nانضم لمئات العملاء الراضين\n\n#' + brand.replace(/\s/g,'') + ' #نتائج_حقيقية'
+        : 'The difference is clear with ' + brand + '\n\nJoin hundreds of happy customers\n\n#' + brand.replace(/\s/g,'') + ' #RealResults',
+      cta: ar ? 'اضغط الرابط في البايو' : 'Click the link in bio'
+    },
+    {
+      name: ar ? 'عرض محدود' : 'Limited Offer',
+      hook: ar ? '"24 ساعة بس... بعدها ما في فرصة ثانية"' : '"Only 24 hours... after that no second chance"',
+      script: ar
+        ? 'المشهد 1: كاونت داون (3 ثوان)\nالمشهد 2: العرض بالتفصيل (8 ثوان)\nالمشهد 3: ما يحصل عليه العميل (7 ثوان)\nالمشهد 4: سعر قبل وبعد الخصم (5 ثوان)\nالمشهد 5: رابط التواصل (7 ثوان)'
+        : 'Scene 1: Countdown (3s)\nScene 2: Offer details (8s)\nScene 3: What customer gets (7s)\nScene 4: Price before/after (5s)\nScene 5: Contact link (7s)',
+      caption: ar
+        ? 'العرض ينتهي الليلة!\n\n' + brand + ' يقدم عرض حصري للمتابعين فقط\n\n#عرض_محدود #' + brand.replace(/\s/g,'') + ' #السعودية'
+        : 'Offer ends tonight!\n\n' + brand + ' exclusive deal for followers only\n\n#LimitedOffer #' + brand.replace(/\s/g,'') + ' #Saudi',
+      cta: ar ? 'تواصل قبل انتهاء العرض' : 'Contact before offer ends'
+    },
+    {
+      name: ar ? 'خلف الكواليس' : 'Behind the Scenes',
+      hook: ar ? '"شو اللي ما تشوفه عادةً عن ' + brand + '؟"' : '"What you don\'t normally see about ' + brand + '"',
+      script: ar
+        ? 'المشهد 1: يوم عمل في ' + brand + ' (8 ثوان)\nالمشهد 2: الفريق والجهد (8 ثوان)\nالمشهد 3: لحظة سعادة عميل (7 ثوان)\nالمشهد 4: رسالة من المؤسس (7 ثوان)\nالمشهد 5: دعوة للتواصل (5 ثوان)'
+        : 'Scene 1: A real workday at ' + brand + ' (8s)\nScene 2: The team and effort (8s)\nScene 3: Happy customer moment (7s)\nScene 4: Message from founder (7s)\nScene 5: Call to connect (5s)',
+      caption: ar
+        ? 'هذا اللي يصير كل يوم في ' + brand + ' عشانك\n\nفريقنا ما يتوقف من أجلك\n\n#' + brand.replace(/\s/g,'') + ' #خلف_الكواليس'
+        : 'This is what happens every day at ' + brand + ' for you\n\nOur team never stops for you\n\n#' + brand.replace(/\s/g,'') + ' #BehindTheScenes',
+      cta: ar ? 'انضم لعيلتنا' : 'Join our family'
+    }
+  ];
+}
+
+function renderCampaignIdeas(ideas, brand, lang) {
+  const container = document.getElementById('ai-ideas-content');
+  container.innerHTML = '';
+  const colors = ['#8b5cf6','#3b82f6','#06b6d4','#10b981'];
+
+  ideas.forEach(function(idea, i) {
+    const color = colors[i % colors.length];
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px';
+
+    const scriptSafe = idea.script.replace(/"/g,'&quot;');
+    const captionSafe = idea.caption.replace(/"/g,'&quot;');
+
+    div.innerHTML =
+      '<div style="background:' + color + '18;border-bottom:1px solid ' + color + '22;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<div style="width:28px;height:28px;background:' + color + ';border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">' + (i+1) + '</div>' +
+          '<div style="font-weight:700;font-size:14px;color:var(--text)">' + idea.name + '</div>' +
+        '</div>' +
+        '<button onclick="this.closest(\'div\').nextElementSibling.style.display=this.closest(\'div\').nextElementSibling.style.display===\'none\'?\'flex\':\'none\'" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;font-family:inherit">▾</button>' +
+      '</div>' +
+      '<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">' +
+        '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">HOOK — First 3 Seconds</div>' +
+          '<div style="font-size:14px;font-weight:600;color:var(--text)">' + idea.hook + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>REEL SCRIPT</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.script + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>READY-TO-POST CAPTION</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--success);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.caption + '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+          '<div style="font-size:12px;color:var(--text2)"><strong style="color:var(--text)">CTA:</strong> ' + idea.cta + '</div>' +
+          '<div style="display:flex;gap:8px">' +
+            '<button onclick="useCampaignIdea(\'email\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.caption.replace(/'/g,"\\'").replace(/\n/g,' ') + '\')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for Email</button>' +
+            '<button onclick="useCampaignIdea(\'sms\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.cta.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for SMS</button>' +
+            '<button onclick="generateVideoFromIdea(' + i + ')" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="video-result-' + i + '" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px"></div>' +
+      '</div>';
+    container.appendChild(div);
+  });
+
+  document.getElementById('ai-ideas-result').style.display = 'block';
+}
+
+function useCampaignIdea(channel, name, body) {
+  switchCampTab(channel);
+  if(channel === 'email') {
+    var n = document.getElementById('camp-name'); if(n) n.value = name;
+    var b = document.getElementById('camp-body'); if(b) b.value = body;
+  } else if(channel === 'sms') {
+    var n2 = document.getElementById('sms-name'); if(n2) n2.value = name;
+    var b2 = document.getElementById('sms-body'); if(b2) b2.value = body;
+  }
+  showToast('Campaign idea loaded — ready to send!');
+}
+
+
+// ═══════════════════════════════════════════════════════
+// CAMPAIGN TAB SWITCHER
+// ═══════════════════════════════════════════════════════
+function switchCampTab(tab) {
+  ['email','sms','whatsapp'].forEach(function(t) {
+    var pane = document.getElementById('camp-pane-' + t);
+    var btn = document.getElementById('camp-tab-' + t);
+    if(pane) pane.style.display = t === tab ? 'block' : 'none';
+    if(btn) {
+      btn.style.background = t === tab ? 'var(--accent)' : 'transparent';
+      btn.style.color = t === tab ? '#fff' : 'var(--text2)';
+    }
+  });
+}
+
+function updateSMSCount(el) {
+  var count = document.getElementById('sms-char-count');
+  if(count) count.textContent = el.value.length + '/160 characters';
+}
+
+// ═══════════════════════════════════════════════════════
+// SMS CREDENTIALS
+// ═══════════════════════════════════════════════════════
+var smsCredentials = null;
+try { smsCredentials = JSON.parse(localStorage.getItem('nexcrm_sms_creds')); } catch(e) {}
+
+function openSMSSetup() {
+  document.getElementById('sms-setup-modal').classList.add('open');
+}
+
+function saveSMSCredentials() {
+  var sid = document.getElementById('sms-account-sid').value.trim();
+  var token = document.getElementById('sms-auth-token').value.trim();
+  var from = document.getElementById('sms-from-number').value.trim();
+  if(!sid || !token || !from) { showToast('Fill in all fields'); return; }
+  smsCredentials = { sid: sid, token: token, from: from };
+  localStorage.setItem('nexcrm_sms_creds', JSON.stringify(smsCredentials));
+  document.getElementById('sms-setup-modal').classList.remove('open');
+  var banner = document.getElementById('sms-connection-banner');
+  var connected = document.getElementById('sms-connected-banner');
+  var display = document.getElementById('sms-phone-display');
+  if(banner) banner.style.display = 'none';
+  if(connected) { connected.style.display = 'flex'; }
+  if(display) display.textContent = from;
+  showToast('SMS connected!');
+}
+
+function previewSMS() {
+  var body = document.getElementById('sms-body').value.trim();
+  if(!body) { showToast('Write your SMS message first'); return; }
+  var preview = body.replace(/{name}/g, 'عبدالرحمن');
+  document.getElementById('preview-modal-title').textContent = 'SMS Preview';
+  document.getElementById('preview-content').innerHTML = '<div style="font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text)">' + preview + '</div>';
+  var sendBtn = document.getElementById('preview-send-btn');
+  if(sendBtn) {
+    sendBtn.onclick = function() { closePreview(); sendSMSCampaign(true); };
+  }
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+async function sendSMSCampaign(confirmed) {
+  if(!smsCredentials) { showToast('Connect Twilio first'); openSMSSetup(); return; }
+  var name = document.getElementById('sms-name').value.trim();
+  var body = document.getElementById('sms-body').value.trim();
+  var filter = document.getElementById('sms-filter').value;
+  if(!name) { showToast('Enter campaign name'); return; }
+  if(!body) { showToast('Write your SMS message'); return; }
+
+  var targetLeads = await getFilteredLeads(filter);
+  var leadsWithPhone = targetLeads.filter(function(l) { return l.phone; });
+  if(!leadsWithPhone.length) { showToast('No leads with phone numbers found'); return; }
+  if(!confirmed && !confirm('Send SMS to ' + leadsWithPhone.length + ' leads with phone numbers?')) return;
+
+  var btn = document.querySelector('#camp-pane-sms .btn-primary');
+  if(btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+
+  var sent = 0, failed = 0;
+  for(var i = 0; i < leadsWithPhone.length; i++) {
+    var lead = leadsWithPhone[i];
+    var msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    try {
+      var r = await fetch('https://api.twilio.com/2010-04-01/Accounts/' + smsCredentials.sid + '/Messages.json', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Basic ' + btoa(smsCredentials.sid + ':' + smsCredentials.token),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'To=' + encodeURIComponent(lead.phone) + '&From=' + encodeURIComponent(smsCredentials.from) + '&Body=' + encodeURIComponent(msg)
+      });
+      if(r.ok) sent++; else failed++;
+    } catch(e) { failed++; }
+  }
+  if(btn) { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send SMS'; btn.disabled = false; }
+  showToast('SMS sent! ' + sent + ' delivered, ' + failed + ' failed.');
+  loadSMSHistory();
+}
+
+function loadSMSHistory() {
+  var el = document.getElementById('sms-history');
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No SMS campaigns sent yet</div>';
+}
+
+// ═══════════════════════════════════════════════════════
+// WHATSAPP CREDENTIALS
+// ═══════════════════════════════════════════════════════
+var waCredentials = null;
+try { waCredentials = JSON.parse(localStorage.getItem('nexcrm_wa_creds')); } catch(e) {}
+
+function openWASetup() {
+  document.getElementById('wa-setup-modal').classList.add('open');
+}
+
+function saveWACredentials() {
+  var phoneId = document.getElementById('wa-account-sid').value.trim();
+  var token = document.getElementById('wa-auth-token').value.trim();
+  var from = document.getElementById('wa-from-number').value.trim();
+  if(!phoneId || !token || !from) { showToast('Fill in all fields'); return; }
+  waCredentials = { phoneId: phoneId, token: token, from: from };
+  localStorage.setItem('nexcrm_wa_creds', JSON.stringify(waCredentials));
+  document.getElementById('wa-setup-modal').classList.remove('open');
+  var banner = document.getElementById('wa-connection-banner');
+  var connected = document.getElementById('wa-connected-banner');
+  var display = document.getElementById('wa-phone-display');
+  if(banner) banner.style.display = 'none';
+  if(connected) connected.style.display = 'flex';
+  if(display) display.textContent = from;
+  showToast('WhatsApp connected!');
+}
+
+function previewWA() {
+  var body = document.getElementById('wa-body').value.trim();
+  if(!body) { showToast('Write your WhatsApp message first'); return; }
+  var preview = body.replace(/{name}/g, 'عبدالرحمن');
+  document.getElementById('preview-modal-title').textContent = 'WhatsApp Preview';
+  document.getElementById('preview-content').innerHTML = '<div style="background:#dcf8c6;color:#111;border-radius:10px;padding:12px;font-size:14px;line-height:1.8;white-space:pre-wrap;max-width:80%;margin-left:auto">' + preview + '</div>';
+  var sendBtn = document.getElementById('preview-send-btn');
+  if(sendBtn) sendBtn.onclick = function() { closePreview(); sendWACampaign(true); };
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+async function sendWACampaign(confirmed) {
+  if(!waCredentials) { showToast('Connect WhatsApp first'); openWASetup(); return; }
+  var name = document.getElementById('wa-camp-name').value.trim();
+  var body = document.getElementById('wa-body').value.trim();
+  var filter = document.getElementById('wa-filter').value;
+  if(!name) { showToast('Enter campaign name'); return; }
+  if(!body) { showToast('Write your WhatsApp message'); return; }
+
+  var targetLeads = await getFilteredLeads(filter);
+  var leadsWithPhone = targetLeads.filter(function(l) { return l.phone; });
+  if(!leadsWithPhone.length) { showToast('No leads with phone numbers found'); return; }
+  if(!confirmed && !confirm('Send WhatsApp to ' + leadsWithPhone.length + ' leads?')) return;
+
+  var btn = document.querySelector('#camp-pane-whatsapp .btn-primary');
+  if(btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+
+  var sent = 0, failed = 0;
+  for(var i = 0; i < leadsWithPhone.length; i++) {
+    var lead = leadsWithPhone[i];
+    var msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    try {
+      var r = await fetch('https://graph.facebook.com/v18.0/' + waCredentials.phoneId + '/messages', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + waCredentials.token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messaging_product: 'whatsapp', to: lead.phone.replace(/\s/g,''), type: 'text', text: { body: msg } })
+      });
+      if(r.ok) sent++; else failed++;
+    } catch(e) { failed++; }
+  }
+  if(btn) { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send WhatsApp'; btn.disabled = false; }
+  showToast('WhatsApp sent! ' + sent + ' delivered, ' + failed + ' failed.');
+  loadWAHistory();
+}
+
+function loadWAHistory() {
+  var el = document.getElementById('wa-history');
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No WhatsApp campaigns sent yet</div>';
+}
+
+function closePreview() {
+  document.getElementById('preview-modal').classList.remove('open');
+}
+
+function previewCampaign() {
+  var subject = document.getElementById('camp-subject').value.trim();
+  var body = document.getElementById('camp-body').value.trim();
+  if(!body) { showToast('Write your email message first'); return; }
+  var senderName = document.getElementById('camp-from-name').value.trim() || 'NexCRM';
+  var preview = body.replace(/{name}/g, 'عبدالرحمن');
+  var filterLabel = document.getElementById('camp-filter').options[document.getElementById('camp-filter').selectedIndex].text;
+  document.getElementById('preview-modal-title').textContent = 'Email Preview';
+  document.getElementById('preview-content').innerHTML =
+    '<div style="font-size:12px;color:var(--text2);margin-bottom:12px">' +
+    '<b>From:</b> ' + senderName + ' &lt;campaigns@nexcrm.sa&gt;<br>' +
+    '<b>Subject:</b> ' + (subject || '(no subject)') + '<br>' +
+    '<b>To:</b> ' + filterLabel +
+    '</div>' +
+    '<div style="font-size:14px;line-height:1.8;white-space:pre-wrap;color:var(--text)">' + preview + '</div>';
+  var sendBtn = document.getElementById('preview-send-btn');
+  if(sendBtn) sendBtn.onclick = function() { closePreview(); sendCampaign(true); };
+  document.getElementById('preview-modal').classList.add('open');
+}
+
+function loadCampaignHistory() {
+  var el = document.getElementById('campaign-history');
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>';
+}
+
+// Init SMS/WA connection state on load
+document.addEventListener('DOMContentLoaded', function() {
+  if(smsCredentials) {
+    var b = document.getElementById('sms-connection-banner');
+    var c = document.getElementById('sms-connected-banner');
+    var d = document.getElementById('sms-phone-display');
+    if(b) b.style.display = 'none';
+    if(c) c.style.display = 'flex';
+    if(d) d.textContent = smsCredentials.from;
+  }
+  if(waCredentials) {
+    var b2 = document.getElementById('wa-connection-banner');
+    var c2 = document.getElementById('wa-connected-banner');
+    var d2 = document.getElementById('wa-phone-display');
+    if(b2) b2.style.display = 'none';
+    if(c2) c2.style.display = 'flex';
+    if(d2) d2.textContent = waCredentials.from;
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// AI CAMPAIGN IDEAS GENERATOR
+// ═══════════════════════════════════════════════════════
+
+
+function generateFallbackIdeas(brand, industry, goal, lang, platform) {
+  const ar = lang === 'Arabic';
+  return [
+    {
+      name: ar ? 'حملة لحظة القرار' : 'The Decision Moment',
+      hook: ar ? '"كم مرة قلت بكره؟ اليوم قرارك يختلف..."' : '"How many times did you say tomorrow? Today is different..."',
+      script: ar
+        ? 'المشهد 1: شخص يتردد (3 ثوان)\nالمشهد 2: "مع ' + brand + ' ما في تردد" (5 ثوان)\nالمشهد 3: عرض المنتج (10 ثوان)\nالمشهد 4: نتائج حقيقية (7 ثوان)\nالمشهد 5: CTA واضح (5 ثوان)'
+        : 'Scene 1: Person hesitating (3s)\nScene 2: "' + brand + ' — no more hesitation" (5s)\nScene 3: Quick product showcase (10s)\nScene 4: Real customer results (7s)\nScene 5: Clear CTA (5s)',
+      caption: ar
+        ? brand + ' — لما تكون جاهز للقرار الصح، نحن هنا\n\n#' + brand.replace(/\s/g,'') + ' #السعودية #الرياض'
+        : brand + ' — When you\'re ready to make the right choice, we\'re here\n\n#' + brand.replace(/\s/g,'') + ' #Saudi #Riyadh',
+      cta: ar ? 'تواصل الآن عبر الواتساب' : 'Contact us on WhatsApp now'
+    },
+    {
+      name: ar ? 'قبل وبعد' : 'Before & After',
+      hook: ar ? '"شوف الفرق بنفسك..."' : '"See the difference yourself..."',
+      script: ar
+        ? 'المشهد 1: الوضع "قبل" — المشكلة (5 ثوان)\nالمشهد 2: لحظة التحول مع ' + brand + ' (5 ثوان)\nالمشهد 3: "بعد" — النتيجة (10 ثوان)\nالمشهد 4: شهادة عميل (7 ثوان)\nالمشهد 5: عرض خاص (3 ثوان)'
+        : 'Scene 1: "Before" — the problem (5s)\nScene 2: Transformation with ' + brand + ' (5s)\nScene 3: "After" — result (10s)\nScene 4: Customer testimonial (7s)\nScene 5: Special offer (3s)',
+      caption: ar
+        ? 'الفرق واضح مع ' + brand + '\n\nانضم لمئات العملاء الراضين\n\n#' + brand.replace(/\s/g,'') + ' #نتائج_حقيقية'
+        : 'The difference is clear with ' + brand + '\n\nJoin hundreds of happy customers\n\n#' + brand.replace(/\s/g,'') + ' #RealResults',
+      cta: ar ? 'اضغط الرابط في البايو' : 'Click the link in bio'
+    },
+    {
+      name: ar ? 'عرض محدود' : 'Limited Offer',
+      hook: ar ? '"24 ساعة بس... بعدها ما في فرصة ثانية"' : '"Only 24 hours... after that no second chance"',
+      script: ar
+        ? 'المشهد 1: كاونت داون (3 ثوان)\nالمشهد 2: العرض بالتفصيل (8 ثوان)\nالمشهد 3: ما يحصل عليه العميل (7 ثوان)\nالمشهد 4: سعر قبل وبعد الخصم (5 ثوان)\nالمشهد 5: رابط التواصل (7 ثوان)'
+        : 'Scene 1: Countdown (3s)\nScene 2: Offer details (8s)\nScene 3: What customer gets (7s)\nScene 4: Price before/after (5s)\nScene 5: Contact link (7s)',
+      caption: ar
+        ? 'العرض ينتهي الليلة!\n\n' + brand + ' يقدم عرض حصري للمتابعين فقط\n\n#عرض_محدود #' + brand.replace(/\s/g,'') + ' #السعودية'
+        : 'Offer ends tonight!\n\n' + brand + ' exclusive deal for followers only\n\n#LimitedOffer #' + brand.replace(/\s/g,'') + ' #Saudi',
+      cta: ar ? 'تواصل قبل انتهاء العرض' : 'Contact before offer ends'
+    },
+    {
+      name: ar ? 'خلف الكواليس' : 'Behind the Scenes',
+      hook: ar ? '"شو اللي ما تشوفه عادةً عن ' + brand + '؟"' : '"What you don\'t normally see about ' + brand + '"',
+      script: ar
+        ? 'المشهد 1: يوم عمل في ' + brand + ' (8 ثوان)\nالمشهد 2: الفريق والجهد (8 ثوان)\nالمشهد 3: لحظة سعادة عميل (7 ثوان)\nالمشهد 4: رسالة من المؤسس (7 ثوان)\nالمشهد 5: دعوة للتواصل (5 ثوان)'
+        : 'Scene 1: A real workday at ' + brand + ' (8s)\nScene 2: The team and effort (8s)\nScene 3: Happy customer moment (7s)\nScene 4: Message from founder (7s)\nScene 5: Call to connect (5s)',
+      caption: ar
+        ? 'هذا اللي يصير كل يوم في ' + brand + ' عشانك\n\nفريقنا ما يتوقف من أجلك\n\n#' + brand.replace(/\s/g,'') + ' #خلف_الكواليس'
+        : 'This is what happens every day at ' + brand + ' for you\n\nOur team never stops for you\n\n#' + brand.replace(/\s/g,'') + ' #BehindTheScenes',
+      cta: ar ? 'انضم لعيلتنا' : 'Join our family'
+    }
+  ];
+}
+
+function renderCampaignIdeas(ideas, brand, lang) {
+  const container = document.getElementById('ai-ideas-content');
+  container.innerHTML = '';
+  const colors = ['#8b5cf6','#3b82f6','#06b6d4','#10b981'];
+
+  ideas.forEach(function(idea, i) {
+    const color = colors[i % colors.length];
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px';
+
+    const scriptSafe = idea.script.replace(/"/g,'&quot;');
+    const captionSafe = idea.caption.replace(/"/g,'&quot;');
+
+    div.innerHTML =
+      '<div style="background:' + color + '18;border-bottom:1px solid ' + color + '22;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:10px">' +
+          '<div style="width:28px;height:28px;background:' + color + ';border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">' + (i+1) + '</div>' +
+          '<div style="font-weight:700;font-size:14px;color:var(--text)">' + idea.name + '</div>' +
+        '</div>' +
+        '<button onclick="this.closest(\'div\').nextElementSibling.style.display=this.closest(\'div\').nextElementSibling.style.display===\'none\'?\'flex\':\'none\'" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;font-family:inherit">▾</button>' +
+      '</div>' +
+      '<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">' +
+        '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">HOOK — First 3 Seconds</div>' +
+          '<div style="font-size:14px;font-weight:600;color:var(--text)">' + idea.hook + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>REEL SCRIPT</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.script + '</div>' +
+        '</div>' +
+        '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;padding:12px">' +
+          '<div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>READY-TO-POST CAPTION</span>' +
+            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--success);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
+          '</div>' +
+          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.caption + '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+          '<div style="font-size:12px;color:var(--text2)"><strong style="color:var(--text)">CTA:</strong> ' + idea.cta + '</div>' +
+          '<div style="display:flex;gap:8px">' +
+            '<button onclick="useCampaignIdea(\'email\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.caption.replace(/'/g,"\\'").replace(/\n/g,' ') + '\')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for Email</button>' +
+            '<button onclick="useCampaignIdea(\'sms\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.cta.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for SMS</button>' +
+            '<button onclick="generateVideoFromIdea(' + i + ')" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="video-result-' + i + '" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px"></div>' +
+      '</div>';
+    container.appendChild(div);
+  });
+
+  document.getElementById('ai-ideas-result').style.display = 'block';
+}
+
+function useCampaignIdea(channel, name, body) {
+  switchCampTab(channel);
+  if(channel === 'email') {
+    var n = document.getElementById('camp-name'); if(n) n.value = name;
+    var b = document.getElementById('camp-body'); if(b) b.value = body;
+    } else if(channel === 'sms') {
+    var n2 = document.getElementById('sms-name'); if(n2) n2.value = name;
+    var b2 = document.getElementById('sms-body'); if(b2) b2.value = body;
+  }
+  showToast('Campaign idea loaded — ready to send!');
+}
+
+// ── VIDEO MODAL STYLES ───────────────────────────────────────────────────────
+(function() {
+  var s = document.createElement('style');
+  s.textContent = `
+    #video-modal-overlay {
+      display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;
+      align-items:center;justify-content:center;padding:20px;
+    }
+    #video-modal-overlay.open { display:flex; }
+    #video-modal {
+      background:var(--bg2,#0f1629);border:1px solid rgba(139,92,246,0.3);
+      border-radius:16px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;
+      padding:24px;position:relative;
+    }
+    .vm-title { font-size:16px;font-weight:800;color:#8b5cf6;margin-bottom:4px; }
+    .vm-sub { font-size:12px;color:var(--text2);margin-bottom:20px; }
+    .vm-section-label { font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px; }
+    .vm-duration-row { display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap; }
+    .vm-dur-btn {
+      flex:1;min-width:70px;padding:10px 6px;border-radius:10px;border:2px solid rgba(139,92,246,0.2);
+      background:rgba(139,92,246,0.05);color:var(--text);font-size:13px;font-weight:700;
+      cursor:pointer;text-align:center;transition:all 0.2s;
+    }
+    .vm-dur-btn:hover,.vm-dur-btn.active {
+      border-color:#8b5cf6;background:rgba(139,92,246,0.15);color:#8b5cf6;
+    }
+    .vm-prompts { display:flex;flex-direction:column;gap:10px;margin-bottom:20px; }
+    .vm-prompt-card {
+      padding:12px 14px;border-radius:10px;border:2px solid rgba(139,92,246,0.15);
+      background:rgba(139,92,246,0.04);cursor:pointer;font-size:12px;
+      line-height:1.6;color:var(--text);transition:all 0.2s;position:relative;
+    }
+    .vm-prompt-card:hover,.vm-prompt-card.selected {
+      border-color:#8b5cf6;background:rgba(139,92,246,0.12);
+    }
+    .vm-prompt-card.selected::after {
+      content:'✓ Selected';position:absolute;top:8px;right:10px;
+      font-size:10px;font-weight:800;color:#8b5cf6;
+    }
+    .vm-prompt-label { font-size:10px;font-weight:800;color:#8b5cf6;margin-bottom:4px;text-transform:uppercase; }
+    .vm-actions { display:flex;gap:10px;justify-content:flex-end; }
+    .vm-cancel-btn {
+      padding:10px 20px;border-radius:10px;border:1px solid rgba(139,92,246,0.3);
+      background:transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;
+    }
+    .vm-generate-btn {
+      padding:10px 24px;border-radius:10px;border:none;
+      background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;
+      font-size:13px;font-weight:700;cursor:pointer;opacity:0.4;pointer-events:none;transition:opacity 0.2s;
+    }
+    .vm-generate-btn.ready { opacity:1;pointer-events:auto; }
+    .vm-loading { text-align:center;padding:20px;color:var(--text2);font-size:12px; }
+    .vm-spinner { width:28px;height:28px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px; }
+  `;
+  document.head.appendChild(s);
+
+  // Inject modal HTML
+  var modal = document.createElement('div');
+  modal.id = 'video-modal-overlay';
+  modal.innerHTML = `
+    <div id="video-modal">
+      <div class="vm-title">🎬 Generate AI Video</div>
+      <div class="vm-sub">Choose duration, pick your best prompt, then generate.</div>
+      <div class="vm-section-label">Select Duration</div>
+      <div class="vm-duration-row">
+        <div class="vm-dur-btn" data-dur="5">5s</div>
+        <div class="vm-dur-btn active" data-dur="10">10s ★</div>
+      </div>
+      <div class="vm-section-label">Choose a Prompt Angle</div>
+      <div class="vm-prompts" id="vm-prompt-list">
+        <div class="vm-loading"><div class="vm-spinner"></div>Generating prompt options...</div>
+      </div>
+      <div class="vm-actions">
+        <button class="vm-cancel-btn" onclick="closeVideoModal()">Cancel</button>
+        <button class="vm-generate-btn" id="vm-generate-btn" onclick="startVideoGeneration()">Generate Video</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+})();
+
+// ── MODAL STATE ───────────────────────────────────────────────────────────────
+var _lastGeneratedIdeas = [];
+var _videoModalState = { ideaIndex: null, duration: '16', selectedPrompt: null, resultDiv: null, btn: null };
+
+function closeVideoModal() {
+  document.getElementById('video-modal-overlay').classList.remove('open');
+}
+
+function openVideoModal(index) {
+  var ideas = _lastGeneratedIdeas;
+  if(!ideas || !ideas[index]) { showToast('Generate ideas first'); return; }
+
+  var idea = ideas[index];
+  var resultDiv = document.getElementById('video-result-' + index);
+  var btn = document.querySelector('[onclick="generateVideoFromIdea(' + index + ')"]');
+
+  _videoModalState.ideaIndex = index;
+  _videoModalState._voiceScript = (idea.script || idea.hook || '').substring(0, 400);
+  _videoModalState.duration = '10';
+  _videoModalState.selectedPrompt = null;
+  _videoModalState.resultDiv = resultDiv;
+  _videoModalState.btn = btn;
+
+  // Reset UI
+  document.querySelectorAll('.vm-dur-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.dur === '16');
+  });
+  document.getElementById('vm-generate-btn').classList.remove('ready');
+  document.getElementById('vm-modal-overlay');
+
+  // Show modal
+  document.getElementById('video-modal-overlay').classList.add('open');
+
+  // Generate prompts
+  generatePromptOptions(idea, '16');
+
+  // Duration click handlers
+  document.querySelectorAll('.vm-dur-btn').forEach(function(b) {
+    b.onclick = function() {
+      document.querySelectorAll('.vm-dur-btn').forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      _videoModalState.duration = b.dataset.dur;
+      _videoModalState.selectedPrompt = null;
+      document.getElementById('vm-generate-btn').classList.remove('ready');
+      generatePromptOptions(idea, b.dataset.dur);
+    };
+  });
+}
+
+function generatePromptOptions(idea, duration) {
+  var list = document.getElementById('vm-prompt-list');
+  list.innerHTML = '<div class="vm-loading"><div class="vm-spinner"></div>Generating prompt options...</div>';
+
+  var brand = (document.getElementById('ai-brand') ? document.getElementById('ai-brand').value : '') || 'Saudi brand';
+  var hook = idea.hook || '';
+  var script = idea.script || '';
+  var dur = parseInt(duration);
+
+  // Build 3 prompt angles based on duration + idea
+  var sceneCount = dur <= 5 ? 1 : dur <= 10 ? 2 : 3;
+  var pacing = dur <= 5 ? 'fast-paced, single impactful shot' : dur <= 10 ? 'two scenes, smooth transition' : 'three scenes, cinematic flow';
+  var hookShort = hook.substring(0, 80);
+
+
+  var prompts = [
+    {
+      label: '🎯 Direct to Camera',
+      text: 'Cinematic vertical 9:16 video, ' + dur + ' seconds, photorealistic 1080p. ' +
+        'Saudi man in his 30s, crisp white thobe and red-white ghutra, modern glass desk in Riyadh high-rise office. ' +
+        'Speaks directly and confidently to camera. Riyadh skyline behind him, golden hour light. ' +
+        'Topic: "' + hookShort + '". Brand: ' + brand + '. Scenes: ' + (idea.script ? idea.script.substring(0, 300) : '') + '. ' +
+        'Audio: clear Arabic male voice, Saudi Gulf dialect ONLY. No Korean. No Chinese. Slow push-in camera, shallow depth of field. Warm cinematic color grade.'
+    },
+    {
+      label: '\uD83C\uDF1F Success Story',
+      text: 'Cinematic ' + dur + '-second vertical social media video 9:16, photorealistic. ' +
+        'Young Saudi man in white thobe: first stressed, then discovers ' + brand + ', then confident and successful. ' +
+        'Saudi setting: Arabic coffee cups, Kingdom Tower visible through window, Saudi flag on wall. ' +
+        'Audio: uplifting Arabic background music, male voiceover describing the transformation. ' +
+        'Instagram Reels style, fast cuts, cinematic. Audio: Arabic Gulf dialect male voice ONLY. No Korean. Theme: "' + hookShort + '".'
+    },
+    {
+      label: '\u26A1 Problem vs Solution',
+      text: dur + '-second vertical video 9:16, Saudi Arabia, cinematic 1080p. ' +
+        'First half: Saudi professional in thobe, frustrated, old way not working. ' +
+        'Second half: ' + brand + ' solves it instantly, relief and success. ' +
+        'Characters: Saudi man in thobe and Saudi woman in black abaya and hijab, modern Riyadh office. ' +
+        'Audio: dramatic Arabic music with male and female voices showing the transformation. ' +
+        'Key message: "' + hookShort + '". Authentic Saudi cultural setting throughout. Audio: Arabic Gulf dialect, male and female Saudi voices ONLY. No Korean. No Chinese.'
+    }
+  ];
+
+  var html = '';
+  prompts.forEach(function(p, i) {
+    html += '<div class="vm-prompt-card" onclick="selectPrompt(this,' + i + ')" data-prompt="' + p.text.replace(/"/g, '&quot;') + '">' +
+      '<div class="vm-prompt-label">' + p.label + '</div>' +
+      p.text +
+      '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function selectPrompt(el, idx) {
+  document.querySelectorAll('.vm-prompt-card').forEach(function(c) { c.classList.remove('selected'); });
+  el.classList.add('selected');
+  _videoModalState.selectedPrompt = el.getAttribute('data-prompt');
+  document.getElementById('vm-generate-btn').classList.add('ready');
+}
+
+async function startVideoGeneration() {
+  var state = _videoModalState;
+  if(!state.selectedPrompt) return;
+
+  closeVideoModal();
+
+  var resultDiv = state.resultDiv;
+  var btn = state.btn;
+
+  if(btn) { btn.textContent = 'Generating...'; btn.disabled = true; }
+  if(resultDiv) {
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">' +
+      '<div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>' +
+      'Submitting to Runway Gen-3...</div>';
+  }
+
+  var EDGE_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-video';
+
+  try {
+    var submitRes = await fetch(EDGE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'submit', prompt: state.selectedPrompt, duration: state.duration })
+    });
+    var submitText = await submitRes.text();
+    console.log('Submit:', submitRes.status, submitText.substring(0,300));
+    var submitData;
+    try { submitData = JSON.parse(submitText); } catch(e) { throw new Error('Submit parse error: ' + submitText.substring(0,200)); }
+    if(!submitRes.ok) throw new Error('Submit failed ' + submitRes.status + ': ' + submitText.substring(0,300));
+    if(!submitData.requestId) throw new Error('No requestId returned');
+
+    var reqId = submitData.requestId;
+    var audioBase64 = submitData.audioBase64 || null;
+    var voiceName = submitData.voiceName || '';
+    var voiceLang = submitData.language || 'ar';
+    console.log('Audio ready:', audioBase64 ? 'YES (' + voiceName + ')' : 'NO');
+    if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video + AI voice (' + (voiceName || 'Arabic') + ')...</div>';
+
+    var videoUrl = null;
+    for(var attempt = 0; attempt < 72; attempt++) {
+      await new Promise(function(r) { setTimeout(r, 5000); });
+      var checkRes = await fetch(EDGE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'check', requestId: reqId })
+      });
+      var checkText = await checkRes.text();
+      var checkData;
+      try { checkData = JSON.parse(checkText); } catch(e) { continue; }
+      console.log('Check:', checkData.status);
+
+      if(checkData.status === 'COMPLETED') { console.log('COMPLETED full response:', JSON.stringify(checkData)); var raw = checkData.raw || {}; videoUrl = checkData.videoUrl || checkData.video_url || (raw.video && raw.video.url) || raw.video_url || raw.url || null; console.log('Extracted videoUrl:', videoUrl); break; }
+      if(checkData.status === 'FAILED') throw new Error('Video generation failed on FAL side');
+
+      var secs = (attempt + 1) * 5;
+      if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... ' + secs + 's elapsed</div>';
+    }
+
+    if(!videoUrl) throw new Error('Timed out after 6 minutes — please try again');
+
+    var idxKey = state.ideaIndex;
+    var hasAudio = audioBase64 ? true : false;
+    if(resultDiv) resultDiv.innerHTML =
+      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:8px">✅ VIDEO READY ' + (hasAudio ? '🔊 Arabic Voice' : '') + '</div>' +
+      (hasAudio ? '<audio id="el-audio-' + idxKey + '" src="' + audioBase64 + '"></audio>' : '') +
+      '<video id="el-video-' + idxKey + '" src="' + videoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"' +
+      (hasAudio ? ' onplay="elPlay(' + idxKey + ')" onpause="elPause(' + idxKey + ')" onseeked="elSeek(' + idxKey + ')" onended="elPause(' + idxKey + ')"' : '') +
+      '></video>' +
+      (hasAudio ? '<div style="font-size:10px;color:var(--text2);text-align:center;margin:6px 0">🎙️ Saudi Arabic voiceover — press play</div>' : '') +
+      '<div style="text-align:center;margin-top:8px">' +
+        '<a href="' + videoUrl + '" download target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">⬇ Download Video</a>' +
+      '</div>';
+    showToast('🎬 Video ' + (hasAudio ? '+ Arabic Voice' : '') + ' ready!');
+
+  } catch(e) {
+    if(resultDiv) resultDiv.innerHTML = '<div style="color:var(--danger);font-size:12px;padding:10px">Error: ' + e.message + '</div>';
+    showToast('Video failed: ' + e.message);
+  } finally {
+    if(btn) {
+      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video';
+      btn.disabled = false;
+    }
+  }
+}
+
+function generateVideoFromIdea(index) { openVideoModal(index); }
+
+// ElevenLabs audio sync with video
+function elPlay(idx) {
+  var audio = document.getElementById('el-audio-' + idx);
+  var video = document.getElementById('el-video-' + idx);
+  if(audio && video) { audio.currentTime = video.currentTime; audio.play(); }
+}
+function elPause(idx) {
+  var audio = document.getElementById('el-audio-' + idx);
+  if(audio) audio.pause();
+}
+function elSeek(idx) {
+  var audio = document.getElementById('el-audio-' + idx);
+  var video = document.getElementById('el-video-' + idx);
+  if(audio && video) audio.currentTime = video.currentTime;
+}
+
+// Patch renderCampaignIdeas to store ideas
+var _origRenderCI = window.renderCampaignIdeas;
+if(typeof renderCampaignIdeas === 'function') {
+  var _patchedRender = renderCampaignIdeas;
+  window.renderCampaignIdeas = function(ideas, brand, lang) {
+    _lastGeneratedIdeas = ideas;
+    _patchedRender(ideas, brand, lang);
+  };
+}
+
+
+
+// Brand context toggle
+function switchBrandCtx(tab) {
+  document.getElementById('ctx-manual').style.display = tab === 'manual' ? 'block' : 'none';
+  document.getElementById('ctx-url').style.display = tab === 'url' ? 'block' : 'none';
+  document.getElementById('ctx-tab-manual').style.background = tab === 'manual' ? 'var(--accent)' : 'transparent';
+  document.getElementById('ctx-tab-manual').style.color = tab === 'manual' ? '#fff' : 'var(--text2)';
+  document.getElementById('ctx-tab-url').style.background = tab === 'url' ? 'var(--accent)' : 'transparent';
+  document.getElementById('ctx-tab-url').style.color = tab === 'url' ? '#fff' : 'var(--text2)';
+}
+
+async function fetchBrandFromURL() {
+  var url = document.getElementById('ai-brand-url').value.trim();
+  if(!url) { showToast('Enter a website URL first'); return; }
+  if(!url.startsWith('http')) url = 'https://' + url;
+
+  var btn = document.getElementById('fetch-url-btn');
+  var result = document.getElementById('url-fetch-result');
+  btn.textContent = 'Reading...';
+  btn.disabled = true;
+  result.textContent = 'Fetching website content...';
+
+  try {
+    var response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-campaign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fetchUrl: url, mode: 'fetch_only' })
+    });
+    var data = await response.json();
+
+    if(data.brandDesc) {
+      // Switch to manual tab and fill in the description
+      switchBrandCtx('manual');
+      document.getElementById('ai-brand-desc').value = data.brandDesc;
+      result.innerHTML = '<span style="color:var(--success)">✓ Website read successfully — description filled in!</span>';
+      showToast('Website content loaded!');
+    } else {
+      throw new Error(data.error || 'Could not read website');
+    }
+  } catch(e) {
+    result.innerHTML = '<span style="color:var(--danger)">Could not read website. Please fill in manually.</span>';
+  } finally {
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Read Website';
+    btn.disabled = false;
+  }
+}
+
+
+
+</script>
 </body></html>`;
   const vatWin = window.open('', '_blank');
   vatWin.document.write(html);
@@ -8163,15 +10954,7 @@ if(typeof renderInvoices === 'function') {
   };
 }
 
-// Run on page navigation
-if(typeof nav === 'function') {
-  const _origNavHijri = nav;
-  window.nav = function(page, el) {
-    _origNavHijri.apply(this, arguments);
-    if(page === 'dashboard') setTimeout(renderHijriWidget, 200);
-    setTimeout(patchHijriDates, 300);
-  };
-}
+// Hijri nav handled in main nav()
 
 // Init on load
 document.addEventListener('DOMContentLoaded', () => {
@@ -8861,20 +11644,7 @@ function autoResizeInbox(el) {
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  var origNav = window.nav;
-  if (typeof origNav === 'function') {
-    var _navWrapped = false;
-    if (!_navWrapped) {
-      _navWrapped = true;
-      var _navOrig = window.nav;
-      window.nav = function(page, el) {
-        _navOrig.apply(this, arguments);
-        if (page === 'inbox') setTimeout(loadInbox, 150);
-      };
-    }
-  }
-});
+// inbox nav handled in main nav()
 </script>
 
 <!-- ═══════════════════════════════════════════════ -->
@@ -9207,61 +11977,3 @@ body.viewing-as-client .sidebar { top: 44px; }
 body.viewing-as-client nav, body.viewing-as-client .topbar { top: 44px; }
 </style>
 
-<script>
-// ─── VIEW AS CLIENT ──────────────────────────────────────────
-let _adminOrigOrg = null;
-let _adminOrigUser = null;
-let _isViewingAsClient = false;
-
-async function viewAsClient(orgId, orgName) {
-  if (!confirm('Switch to view ' + orgName + ' workspace?\n\nA banner will show at the top. This access is logged for transparency.')) return;
-
-  // Save admin state
-  _adminOrigOrg = currentOrg;
-  _isViewingAsClient = true;
-
-  // Log the admin access to Supabase
-  try {
-    await fetch(SUPABASE_URL + '/rest/v1/admin_access_log', {
-      method: 'POST',
-      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({
-        admin_id: currentUser.id,
-        org_id: orgId,
-        org_name: orgName,
-        accessed_at: new Date().toISOString()
-      })
-    });
-  } catch(e) { /* table may not exist yet, ignore */ }
-
-  // Switch to client org
-  const allOrgsR = await fetch(SUPABASE_URL + '/rest/v1/organizations?id=eq.' + orgId + '&select=*', { headers: HEADERS });
-  const allOrgs = await allOrgsR.json();
-  if (allOrgs && allOrgs[0]) {
-    currentOrg = allOrgs[0];
-    // Show banner
-    document.getElementById('view-as-client-banner').classList.add('active');
-    document.getElementById('view-as-banner-name').textContent = '👁️ Viewing as: ' + orgName;
-    document.body.classList.add('viewing-as-client');
-    // Navigate to dashboard
-    nav('dashboard', document.querySelector('.nav-item'));
-    // Reload data for this org
-    await loadLeads();
-    updateLeadStats();
-    showToast('👁️ Now viewing ' + orgName + ' workspace');
-  }
-}
-
-function exitViewAsClient() {
-  if (!_adminOrigOrg) return;
-  currentOrg = _adminOrigOrg;
-  _isViewingAsClient = false;
-  _adminOrigOrg = null;
-  document.getElementById('view-as-client-banner').classList.remove('active');
-  document.body.classList.remove('viewing-as-client');
-  nav('admin', document.getElementById('admin-nav-item'));
-  adminTab('clients', document.querySelector('.admin-tab'));
-  loadLeads();
-  showToast('✅ Back to your admin view');
-}
-</script>
