@@ -9851,7 +9851,7 @@ function generateVATInvoice() {
 
 <script>
 // ─── APPROVE WITH ORG PICKER ──────────────────────────────────
-let _approveData = {};
+_approveData = {};
 
 async function showApproveModal(id, name, email, company) {
   _approveData = { id, name, email, company };
@@ -10106,7 +10106,7 @@ function renderHijriWidget() {
 }
 
 // Hook into existing render functions
-const _origRenderLeads = window.renderLeads;
+_origRenderLeads = window.renderLeads;
 if(typeof renderLeads === 'function') {
   const origRL = renderLeads;
   window.renderLeads = function() {
@@ -10237,7 +10237,7 @@ function renderResponseTime() {
 </script>
 <script>
 // ─── ONBOARDING ───────────────────────────────────────────────
-let obCurrentSlide = 1;
+obCurrentSlide = 1;
 const obTotalSlides = 4;
 
 function showOnboarding() {
@@ -10447,7 +10447,7 @@ function updateThemeIcon(isLight) {
 
 <script>
 // ─── AI REPLY STATE ────────────────────────────────────────────
-let aiReplyCurrentLead = null;
+aiReplyCurrentLead = null;
 let aiReplyLang = 'ar';
 let aiReplyCached = { ar: null, en: null };
 
@@ -11119,7 +11119,7 @@ async function rejectRequest(id) {
 }
 
 // Load requests count on admin panel open
-const _origAdminTab = window.adminTab;
+_origAdminTab = window.adminTab;
 if (typeof adminTab === 'function') {
   window.adminTab = function(tab, el) {
     _origAdminTab.apply(this, arguments);
@@ -11163,7 +11163,7 @@ body.viewing-as-client nav, body.viewing-as-client .topbar { top: 44px; }
 
 <script>
 // ─── VIEW AS CLIENT ──────────────────────────────────────────
-let _adminOrigOrg = null;
+_adminOrigOrg = null;
 let _adminOrigUser = null;
 let _isViewingAsClient = false;
 
