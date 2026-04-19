@@ -31,7 +31,7 @@
     --glow: 0 0 30px rgba(59,130,246,0.15);
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'DM Sans',sans-serif; background:#0a0f1e; color:#f0f4ff; min-height:100vh; overflow-x:hidden; transition:background 0.3s,color 0.3s; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; transition:background 0.3s,color 0.3s; }
 
   /* ─── LIGHT MODE ─────────────────────────────────────────── */
   body.light-mode {
@@ -169,7 +169,7 @@
   .user-role { font-size:11px; color:var(--text2); }
 
   /* MAIN */
-  .main { margin-left:240px; min-height:100vh; background:#0a0f1e; }
+  .main { margin-left:240px; min-height:100vh; }
 
   /* TOPBAR */
   .topbar {
@@ -3499,7 +3499,7 @@ function nav(page, el) {
   if(page === 'dashboard') loadDashboard();
   if(page === 'leads') loadLeads();
   if(page === 'pipeline') renderPipeline();
-  if(page === 'analytics') loadAndRenderAnalytics();
+  if(page === 'analytics') renderAnalytics();
   if(page === 'contacts') loadContacts();
   if(page === 'admin') { loadTeam(); }
   if(page === 'campaigns') { loadCampaignHistory(); }
@@ -4118,7 +4118,7 @@ function mobileNav(page, el) {
   if(page === 'dashboard') loadDashboard();
   if(page === 'leads') loadLeads();
   if(page === 'pipeline') renderPipeline();
-  if(page === 'analytics') loadAndRenderAnalytics();
+  if(page === 'analytics') renderAnalytics();
   if(page === 'contacts') loadContacts();
   if(page === 'admin') loadTeam();
 }
@@ -4488,7 +4488,7 @@ function applyTranslations() {
   // Re-render dynamic content with new language
   if(typeof renderLeads === 'function') renderLeads();
   if(typeof renderPipeline === 'function') { try { renderPipeline(); } catch(e){} }
-  if(typeof renderAnalytics === 'function') { try { renderAnalytics(); renderResponseTime(); } catch(e){} }
+  if(typeof renderAnalytics === 'function') { try { renderAnalytics(); } catch(e){} }
   if(typeof renderCalendar === 'function') { try { renderCalendar(); } catch(e){} }
   if(typeof renderDeliverables === 'function') { try { renderDeliverables(); } catch(e){} }
   if(typeof renderInvoices === 'function') { try { renderInvoices(); } catch(e){} }
@@ -5279,7 +5279,7 @@ async function updateLead(id) {
     if(pipelinePage && pipelinePage.classList.contains('active')) renderPipeline();
     // Re-render analytics if on analytics page
     const analyticsPage = document.getElementById('page-analytics');
-    if(analyticsPage && analyticsPage.classList.contains('active')) { renderAnalytics(); renderResponseTime(); }
+    if(analyticsPage && analyticsPage.classList.contains('active')) renderAnalytics();
     showToast('✅ Lead updated!');
   } catch(e) { console.error(e); showToast('❌ Error updating lead'); }
 }
@@ -5690,7 +5690,6 @@ async function loadDeliverables() {
 function renderDeliverables() {
   const list = document.getElementById('deliverables-list');
   const summary = document.getElementById('deliverables-summary');
-  if(!list || !summary) return;
 
   if(!deliverablesList.length) {
     list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No deliverables yet — add your first service!</div>';
@@ -5799,13 +5798,14 @@ async function loadInvoices() {
 
 function renderInvoices() {
   const list = document.getElementById('invoices-list');
-  if(!list) return;
+
+  // Stats
   const total = invoicesList.reduce((s,i) => s + (i.amount||0), 0);
   const paid = invoicesList.filter(i => i.status==='Paid').reduce((s,i) => s + (i.amount||0), 0);
   const outstanding = total - paid;
-  if(document.getElementById('inv-total')) document.getElementById('inv-total').textContent = 'SAR ' + total.toLocaleString();
-  if(document.getElementById('inv-paid')) document.getElementById('inv-paid').textContent = 'SAR ' + paid.toLocaleString();
-  if(document.getElementById('inv-outstanding')) document.getElementById('inv-outstanding').textContent = 'SAR ' + outstanding.toLocaleString();
+  document.getElementById('inv-total').textContent = 'SAR ' + total.toLocaleString();
+  document.getElementById('inv-paid').textContent = 'SAR ' + paid.toLocaleString();
+  document.getElementById('inv-outstanding').textContent = 'SAR ' + outstanding.toLocaleString();
 
   if(!invoicesList.length) {
     list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No invoices yet</div>';
@@ -7000,29 +7000,6 @@ function renderAnalytics() {
       '<div class="analytics-bar-wrap"><div class="analytics-bar-fill" style="width:' + Math.round(cnt/maxStat*100) + '%;background:' + color + '"></div></div>' +
       '<div class="analytics-value">' + pct + '%</div></div>';
   }).join('');
-
-  // Always render response time tracker
-  if(typeof renderResponseTime === 'function') { try { renderResponseTime(); } catch(e){} }
-}
-
-// ─── LOAD LEADS THEN RENDER ANALYTICS ─────────────────────────
-async function loadAndRenderAnalytics() {
-  // Show loading state
-  const el = id => document.getElementById(id);
-  ['an-conv','an-value','an-total','an-won'].forEach(id => { if(el(id)) el(id).textContent = '…'; });
-  if(el('an-sources')) el('an-sources').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Loading…</div>';
-  if(el('an-statuses')) el('an-statuses').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Loading…</div>';
-  if(el('an-response-detail')) el('an-response-detail').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Loading…</div>';
-
-  // Always fetch fresh data for analytics
-  try {
-    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
-    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + orgFilter, { headers: HEADERS });
-    const data = await r.json();
-    if(r.ok && Array.isArray(data)) leads = data;
-  } catch(e) { console.error('Analytics load error:', e); }
-
-  renderAnalytics();
 }
 
 // ─── POPULATE ASSIGN DROPDOWN FROM TEAM ───────────────────────
@@ -8416,7 +8393,14 @@ function renderResponseTime() {
   container.innerHTML = html;
 }
 
-// renderResponseTime runs separately
+// Hook into renderAnalytics
+if(typeof renderAnalytics === 'function') {
+  var _origRA = renderAnalytics;
+  renderAnalytics = function() {
+    _origRA.apply(this, arguments);
+    setTimeout(renderResponseTime, 200);
+  };
+}
 </script>
 <script>
 // ─── ONBOARDING ───────────────────────────────────────────────
@@ -9565,278 +9549,6 @@ function useCampaignIdea(channel, name, body) {
   showToast('Campaign idea loaded — ready to send!');
 }
 
-
-
-var _lastGeneratedIdeas = [];
-var _videoModalState = { ideaIndex: null, duration: '16', selectedPrompt: null, resultDiv: null, btn: null };
-
-function closeVideoModal() {
-  document.getElementById('video-modal-overlay').classList.remove('open');
-}
-
-function openVideoModal(index) {
-  var ideas = _lastGeneratedIdeas;
-  if(!ideas || !ideas[index]) { showToast('Generate ideas first'); return; }
-
-  var idea = ideas[index];
-  var resultDiv = document.getElementById('video-result-' + index);
-  var btn = document.querySelector('[onclick="generateVideoFromIdea(' + index + ')"]');
-
-  _videoModalState.ideaIndex = index;
-  _videoModalState._voiceScript = (idea.script || idea.hook || '').substring(0, 400);
-  _videoModalState.duration = '10';
-  _videoModalState.selectedPrompt = null;
-  _videoModalState.resultDiv = resultDiv;
-  _videoModalState.btn = btn;
-
-  // Reset UI
-  document.querySelectorAll('.vm-dur-btn').forEach(function(b) {
-    b.classList.toggle('active', b.dataset.dur === '16');
-  });
-  document.getElementById('vm-generate-btn').classList.remove('ready');
-  document.getElementById('vm-modal-overlay');
-
-  // Show modal
-  document.getElementById('video-modal-overlay').classList.add('open');
-
-  // Generate prompts
-  generatePromptOptions(idea, '16');
-
-  // Duration click handlers
-  document.querySelectorAll('.vm-dur-btn').forEach(function(b) {
-    b.onclick = function() {
-      document.querySelectorAll('.vm-dur-btn').forEach(function(x) { x.classList.remove('active'); });
-      b.classList.add('active');
-      _videoModalState.duration = b.dataset.dur;
-      _videoModalState.selectedPrompt = null;
-      document.getElementById('vm-generate-btn').classList.remove('ready');
-      generatePromptOptions(idea, b.dataset.dur);
-    };
-  });
-}
-
-function generatePromptOptions(idea, duration) {
-  var list = document.getElementById('vm-prompt-list');
-  list.innerHTML = '<div class="vm-loading"><div class="vm-spinner"></div>Generating prompt options...</div>';
-
-  var brand = (document.getElementById('ai-brand') ? document.getElementById('ai-brand').value : '') || 'Saudi brand';
-  var hook = idea.hook || '';
-  var script = idea.script || '';
-  var dur = parseInt(duration);
-
-  // Build 3 prompt angles based on duration + idea
-  var sceneCount = dur <= 5 ? 1 : dur <= 10 ? 2 : 3;
-  var pacing = dur <= 5 ? 'fast-paced, single impactful shot' : dur <= 10 ? 'two scenes, smooth transition' : 'three scenes, cinematic flow';
-  var hookShort = hook.substring(0, 80);
-
-
-  var prompts = [
-    {
-      label: '🎯 Direct to Camera',
-      text: 'Cinematic vertical 9:16 video, ' + dur + ' seconds, photorealistic 1080p. ' +
-        'Saudi man in his 30s, crisp white thobe and red-white ghutra, modern glass desk in Riyadh high-rise office. ' +
-        'Speaks directly and confidently to camera. Riyadh skyline behind him, golden hour light. ' +
-        'Topic: "' + hookShort + '". Brand: ' + brand + '. Scenes: ' + (idea.script ? idea.script.substring(0, 300) : '') + '. ' +
-        'Audio: clear Arabic male voice, Saudi Gulf dialect ONLY. No Korean. No Chinese. Slow push-in camera, shallow depth of field. Warm cinematic color grade.'
-    },
-    {
-      label: '\uD83C\uDF1F Success Story',
-      text: 'Cinematic ' + dur + '-second vertical social media video 9:16, photorealistic. ' +
-        'Young Saudi man in white thobe: first stressed, then discovers ' + brand + ', then confident and successful. ' +
-        'Saudi setting: Arabic coffee cups, Kingdom Tower visible through window, Saudi flag on wall. ' +
-        'Audio: uplifting Arabic background music, male voiceover describing the transformation. ' +
-        'Instagram Reels style, fast cuts, cinematic. Audio: Arabic Gulf dialect male voice ONLY. No Korean. Theme: "' + hookShort + '".'
-    },
-    {
-      label: '\u26A1 Problem vs Solution',
-      text: dur + '-second vertical video 9:16, Saudi Arabia, cinematic 1080p. ' +
-        'First half: Saudi professional in thobe, frustrated, old way not working. ' +
-        'Second half: ' + brand + ' solves it instantly, relief and success. ' +
-        'Characters: Saudi man in thobe and Saudi woman in black abaya and hijab, modern Riyadh office. ' +
-        'Audio: dramatic Arabic music with male and female voices showing the transformation. ' +
-        'Key message: "' + hookShort + '". Authentic Saudi cultural setting throughout. Audio: Arabic Gulf dialect, male and female Saudi voices ONLY. No Korean. No Chinese.'
-    }
-  ];
-
-  var html = '';
-  prompts.forEach(function(p, i) {
-    html += '<div class="vm-prompt-card" onclick="selectPrompt(this,' + i + ')" data-prompt="' + p.text.replace(/"/g, '&quot;') + '">' +
-      '<div class="vm-prompt-label">' + p.label + '</div>' +
-      p.text +
-      '</div>';
-  });
-  list.innerHTML = html;
-}
-
-function selectPrompt(el, idx) {
-  document.querySelectorAll('.vm-prompt-card').forEach(function(c) { c.classList.remove('selected'); });
-  el.classList.add('selected');
-  _videoModalState.selectedPrompt = el.getAttribute('data-prompt');
-  document.getElementById('vm-generate-btn').classList.add('ready');
-}
-
-async function startVideoGeneration() {
-  var state = _videoModalState;
-  if(!state.selectedPrompt) return;
-
-  closeVideoModal();
-
-  var resultDiv = state.resultDiv;
-  var btn = state.btn;
-
-  if(btn) { btn.textContent = 'Generating...'; btn.disabled = true; }
-  if(resultDiv) {
-    resultDiv.style.display = 'block';
-    resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">' +
-      '<div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>' +
-      'Submitting to Runway Gen-3...</div>';
-  }
-
-  var EDGE_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-video';
-
-  try {
-    var submitRes = await fetch(EDGE_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'submit', prompt: state.selectedPrompt, duration: state.duration })
-    });
-    var submitText = await submitRes.text();
-    console.log('Submit:', submitRes.status, submitText.substring(0,300));
-    var submitData;
-    try { submitData = JSON.parse(submitText); } catch(e) { throw new Error('Submit parse error: ' + submitText.substring(0,200)); }
-    if(!submitRes.ok) throw new Error('Submit failed ' + submitRes.status + ': ' + submitText.substring(0,300));
-    if(!submitData.requestId) throw new Error('No requestId returned');
-
-    var reqId = submitData.requestId;
-    var audioBase64 = submitData.audioBase64 || null;
-    var voiceName = submitData.voiceName || '';
-    var voiceLang = submitData.language || 'ar';
-    console.log('Audio ready:', audioBase64 ? 'YES (' + voiceName + ')' : 'NO');
-    if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video + AI voice (' + (voiceName || 'Arabic') + ')...</div>';
-
-    var videoUrl = null;
-    for(var attempt = 0; attempt < 72; attempt++) {
-      await new Promise(function(r) { setTimeout(r, 5000); });
-      var checkRes = await fetch(EDGE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'check', requestId: reqId })
-      });
-      var checkText = await checkRes.text();
-      var checkData;
-      try { checkData = JSON.parse(checkText); } catch(e) { continue; }
-      console.log('Check:', checkData.status);
-
-      if(checkData.status === 'COMPLETED') { console.log('COMPLETED full response:', JSON.stringify(checkData)); var raw = checkData.raw || {}; videoUrl = checkData.videoUrl || checkData.video_url || (raw.video && raw.video.url) || raw.video_url || raw.url || null; console.log('Extracted videoUrl:', videoUrl); break; }
-      if(checkData.status === 'FAILED') throw new Error('Video generation failed on FAL side');
-
-      var secs = (attempt + 1) * 5;
-      if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... ' + secs + 's elapsed</div>';
-    }
-
-    if(!videoUrl) throw new Error('Timed out after 6 minutes — please try again');
-
-    var idxKey = state.ideaIndex;
-    var hasAudio = audioBase64 ? true : false;
-    if(resultDiv) resultDiv.innerHTML =
-      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:8px">✅ VIDEO READY ' + (hasAudio ? '🔊 Arabic Voice' : '') + '</div>' +
-      (hasAudio ? '<audio id="el-audio-' + idxKey + '" src="' + audioBase64 + '"></audio>' : '') +
-      '<video id="el-video-' + idxKey + '" src="' + videoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"' +
-      (hasAudio ? ' onplay="elPlay(' + idxKey + ')" onpause="elPause(' + idxKey + ')" onseeked="elSeek(' + idxKey + ')" onended="elPause(' + idxKey + ')"' : '') +
-      '></video>' +
-      (hasAudio ? '<div style="font-size:10px;color:var(--text2);text-align:center;margin:6px 0">🎙️ Saudi Arabic voiceover — press play</div>' : '') +
-      '<div style="text-align:center;margin-top:8px">' +
-        '<a href="' + videoUrl + '" download target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">⬇ Download Video</a>' +
-      '</div>';
-    showToast('🎬 Video ' + (hasAudio ? '+ Arabic Voice' : '') + ' ready!');
-
-  } catch(e) {
-    if(resultDiv) resultDiv.innerHTML = '<div style="color:var(--danger);font-size:12px;padding:10px">Error: ' + e.message + '</div>';
-    showToast('Video failed: ' + e.message);
-  } finally {
-    if(btn) {
-      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video';
-      btn.disabled = false;
-    }
-  }
-}
-
-function generateVideoFromIdea(index) { openVideoModal(index); }
-
-// ElevenLabs audio sync with video
-function elPlay(idx) {
-  var audio = document.getElementById('el-audio-' + idx);
-  var video = document.getElementById('el-video-' + idx);
-  if(audio && video) { audio.currentTime = video.currentTime; audio.play(); }
-}
-function elPause(idx) {
-  var audio = document.getElementById('el-audio-' + idx);
-  if(audio) audio.pause();
-}
-function elSeek(idx) {
-  var audio = document.getElementById('el-audio-' + idx);
-  var video = document.getElementById('el-video-' + idx);
-  if(audio && video) audio.currentTime = video.currentTime;
-}
-
-// Patch renderCampaignIdeas to store ideas
-var _origRenderCI = window.renderCampaignIdeas;
-if(typeof renderCampaignIdeas === 'function') {
-  var _patchedRender = renderCampaignIdeas;
-  window.renderCampaignIdeas = function(ideas, brand, lang) {
-    _lastGeneratedIdeas = ideas;
-    _patchedRender(ideas, brand, lang);
-  };
-}
-
-
-
-// Brand context toggle
-function switchBrandCtx(tab) {
-  document.getElementById('ctx-manual').style.display = tab === 'manual' ? 'block' : 'none';
-  document.getElementById('ctx-url').style.display = tab === 'url' ? 'block' : 'none';
-  document.getElementById('ctx-tab-manual').style.background = tab === 'manual' ? 'var(--accent)' : 'transparent';
-  document.getElementById('ctx-tab-manual').style.color = tab === 'manual' ? '#fff' : 'var(--text2)';
-  document.getElementById('ctx-tab-url').style.background = tab === 'url' ? 'var(--accent)' : 'transparent';
-  document.getElementById('ctx-tab-url').style.color = tab === 'url' ? '#fff' : 'var(--text2)';
-}
-
-async function fetchBrandFromURL() {
-  var url = document.getElementById('ai-brand-url').value.trim();
-  if(!url) { showToast('Enter a website URL first'); return; }
-  if(!url.startsWith('http')) url = 'https://' + url;
-
-  var btn = document.getElementById('fetch-url-btn');
-  var result = document.getElementById('url-fetch-result');
-  btn.textContent = 'Reading...';
-  btn.disabled = true;
-  result.textContent = 'Fetching website content...';
-
-  try {
-    var response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-campaign', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fetchUrl: url, mode: 'fetch_only' })
-    });
-    var data = await response.json();
-
-    if(data.brandDesc) {
-      // Switch to manual tab and fill in the description
-      switchBrandCtx('manual');
-      document.getElementById('ai-brand-desc').value = data.brandDesc;
-      result.innerHTML = '<span style="color:var(--success)">✓ Website read successfully — description filled in!</span>';
-      showToast('Website content loaded!');
-    } else {
-      throw new Error(data.error || 'Could not read website');
-    }
-  } catch(e) {
-    result.innerHTML = '<span style="color:var(--danger)">Could not read website. Please fill in manually.</span>';
-  } finally {
-    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Read Website';
-    btn.disabled = false;
-  }
-}
-
-
 </script>
 </body>
+</html>
