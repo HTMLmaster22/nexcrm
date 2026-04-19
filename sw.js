@@ -1,10 +1,9 @@
-const CACHE_NAME = 'nexcrm-v1';
+const CACHE_NAME = 'nexcrm-v2';
 const STATIC_ASSETS = [
   '/nexcrm/',
   '/nexcrm/index.html',
   'https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap'
 ];
-
 // Install - cache static assets
 self.addEventListener('install', (e) => {
   e.waitUntil(
@@ -14,7 +13,6 @@ self.addEventListener('install', (e) => {
   );
   self.skipWaiting();
 });
-
 // Activate - clean old caches
 self.addEventListener('activate', (e) => {
   e.waitUntil(
@@ -24,12 +22,10 @@ self.addEventListener('activate', (e) => {
   );
   self.clients.claim();
 });
-
 // Fetch - network first, fallback to cache
 self.addEventListener('fetch', (e) => {
   // Skip Supabase API calls - always go to network
   if(e.request.url.includes('supabase.co')) return;
-
   e.respondWith(
     fetch(e.request)
       .then(res => {
@@ -43,7 +39,6 @@ self.addEventListener('fetch', (e) => {
       .catch(() => caches.match(e.request))
   );
 });
-
 // Push notifications
 self.addEventListener('push', (e) => {
   const data = e.data ? e.data.json() : { title: 'NexCRM', body: 'New notification' };
@@ -57,7 +52,6 @@ self.addEventListener('push', (e) => {
     })
   );
 });
-
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
   e.waitUntil(clients.openWindow(e.notification.data.url || '/nexcrm/'));
