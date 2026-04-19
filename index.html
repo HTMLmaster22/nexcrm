@@ -213,7 +213,7 @@
   }
 
   /* CONTENT */
-  .content { padding:28px; }
+  .content { padding:28px; background:var(--bg); min-height:100vh; }
 
   /* PAGE */
   .page { display:none; }
@@ -1327,7 +1327,7 @@
     <button class="btn btn-primary" onclick="openModal()">＋ Add Lead</button>
   </div>
 
-  <div class="content" style="background:var(--bg);min-height:100vh;padding:28px">
+  <div class="content" style="background:#0a0f1e;min-height:100vh">
 
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
@@ -9385,8 +9385,6 @@ function exitViewAsClient() {
   loadLeads();
   showToast('✅ Back to your admin view');
 }
-
-
 
 
 async function generateCampaignIdeas() {
