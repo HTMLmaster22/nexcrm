@@ -7702,13 +7702,9 @@ function autoApplyBranding() {
   if(b && (b.name || b.color)) applyBranding(b);
 }
 </script>
-
 <script>
 
 // ─── VIEW AS CLIENT ──────────────────────────────────────────
-let _adminOrigOrg = null;
-let _adminOrigUser = null;
-let _isViewingAsClient = false;
 
 async function viewAsClient(orgId, orgName) {
   if (!confirm('Switch to view ' + orgName + ' workspace?\n\nA banner will show at the top. This access is logged for transparency.')) return;
