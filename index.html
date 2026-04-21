@@ -8842,62 +8842,109 @@ async function runMarketIntelligence() {
   result.style.display = 'none';
   result.innerHTML = '';
 
-  const prompt = `You are a senior market intelligence analyst. Research and analyze the following brand based purely on MARKET DATA — their competitors, social media presence, industry trends, and positioning in the ${market} market. Do NOT make up data. Base your analysis on real market knowledge.
+  // Check if desc looks like a URL
+  const websiteUrl = desc.match(/https?:\/\/[^\s]+/) ? desc.match(/https?:\/\/[^\s]+/)[0] : null;
 
-BRAND TO ANALYZE:
-- Brand Name: ${brand}
-- Industry: ${industry}
-- Target Market: ${market}
-- Business Description: ${desc}
+  const prompt = `You are a senior market research analyst specializing in the ${market} market. Conduct a DEEP, SPECIFIC analysis of the following business. Be highly specific — no generic advice.
 
-Your task: Analyze how ${brand} stands in the ${market} ${industry} market. Identify their REAL top competitors in ${market}, analyze the competitive landscape, and provide a concrete action plan to help them grow and differentiate.
+BUSINESS TO ANALYZE:
+- Brand: ${brand}
+- Industry: ${industry}  
+- Market: ${market}
+- Info provided: ${desc}
+${websiteUrl ? `- Website: ${websiteUrl} (analyze this URL for products, pricing, UX quality)` : ''}
 
-Return ONLY a valid JSON object:
+YOUR TASK: Conduct a thorough market intelligence report. Be VERY SPECIFIC to ${market}. Research:
+1. LOCAL competitors in ${market} (not just global brands — find actual local/regional players)
+2. If a website URL is provided, analyze: product range, pricing competitiveness, website quality, missing features
+3. Find their likely social media presence based on the brand name and industry
+4. Give SPECIFIC, ACTIONABLE recommendations — not generic tips
+
+Return ONLY valid JSON:
 {
   "market_position": {
-    "score": <number 1-10 based on market maturity and competitive landscape>,
+    "score": <1-10>,
     "level": "<Emerging|Growing|Established|Market Leader>",
-    "summary": "<2-3 sentences about where this brand stands in the ${market} ${industry} market and what defines their competitive position>"
+    "summary": "<3-4 specific sentences about this brand's actual position in ${market}>"
   },
-  "top_competitors": [
-    {"name": "<real competitor name in ${market}>", "strength": "<what they do well>", "weakness": "<their gap or weakness>"},
-    {"name": "<real competitor name in ${market}>", "strength": "<what they do well>", "weakness": "<their gap or weakness>"},
-    {"name": "<real competitor name in ${market}>", "strength": "<what they do well>", "weakness": "<their gap or weakness>"}
+  "website_analysis": {
+    "overall_score": <1-10>,
+    "strengths": ["<specific strength>", "<specific strength>"],
+    "weaknesses": ["<specific weakness>", "<specific weakness>", "<specific weakness>"],
+    "pricing_assessment": "<are prices competitive? too high? too low? compared to what?>",
+    "product_range": "<assessment of product variety and quality based on description>",
+    "ux_issues": ["<specific UX/website issue>", "<specific issue>"],
+    "quick_wins": ["<specific fix that would immediately improve sales>", "<specific fix>", "<specific fix>"]
+  },
+  "social_media_analysis": {
+    "platforms_to_check": [
+      {"platform": "Instagram", "handle": "<likely handle based on brand name>", "strategy": "<what to post>", "frequency": "<posts per week>"},
+      {"platform": "Snapchat", "handle": "<likely handle>", "strategy": "<what to post>", "frequency": "<posts per week>"},
+      {"platform": "TikTok", "handle": "<likely handle>", "strategy": "<what to post>", "frequency": "<posts per week>"}
+    ],
+    "content_gaps": ["<what content they are missing>", "<content gap>"],
+    "best_content_type": "<the single best content type for this business in ${market}>",
+    "influencer_strategy": "<specific influencer collaboration strategy for ${market}>"
+  },
+  "local_competitors": [
+    {
+      "name": "<LOCAL competitor name in ${market}>",
+      "type": "<Online|Physical|Both>",
+      "strength": "<specific strength>",
+      "weakness": "<specific weakness>",
+      "how_to_beat_them": "<specific tactic to win against this competitor>"
+    },
+    {
+      "name": "<LOCAL competitor name>",
+      "type": "<Online|Physical|Both>",
+      "strength": "<specific strength>",
+      "weakness": "<specific weakness>",
+      "how_to_beat_them": "<specific tactic>"
+    },
+    {
+      "name": "<LOCAL or REGIONAL competitor>",
+      "type": "<Online|Physical|Both>",
+      "strength": "<specific strength>",
+      "weakness": "<specific weakness>",
+      "how_to_beat_them": "<specific tactic>"
+    }
   ],
-  "social_media_presence": {
-    "current_landscape": "<how brands in this industry are using social media in ${market}>",
-    "primary_platform": "<best platform for this business in ${market}>",
-    "content_that_works": ["<content type 1>", "<content type 2>", "<content type 3>"],
-    "posting_frequency": "<recommended frequency>",
-    "best_times": "<best posting times for ${market} audience>",
-    "winning_strategy": "<the single most important social media move for this brand>"
-  },
-  "market_opportunities": [
-    "<specific real opportunity in ${market} for this industry>",
-    "<specific real opportunity>",
-    "<specific real opportunity>"
-  ],
-  "differentiation_strategy": {
-    "unique_angle": "<what makes or could make ${brand} stand out from competitors>",
-    "positioning": "<recommended market positioning statement>",
-    "key_message": "<the core message they should communicate to customers>"
-  },
   "pricing_strategy": {
-    "market_range": "<what the market typically charges in ${market}>",
-    "recommendation": "<pricing strategy recommendation for ${brand}>",
-    "tip": "<specific pricing tip>"
+    "market_range": "<specific price range in ${market} for this industry>",
+    "current_assessment": "<assessment of their current pricing>",
+    "recommendation": "<specific pricing recommendation>",
+    "bundle_ideas": ["<specific bundle idea>", "<specific bundle idea>", "<specific bundle idea>"],
+    "upsell_opportunities": ["<specific upsell>", "<specific upsell>"]
   },
-  "growth_actions": [
-    {"priority": "High", "action": "<specific immediate action>", "why": "<why this matters now>", "impact": "<expected result>"},
-    {"priority": "High", "action": "<specific immediate action>", "why": "<why this matters now>", "impact": "<expected result>"},
-    {"priority": "Medium", "action": "<specific medium-term action>", "why": "<why this matters>", "impact": "<expected result>"},
-    {"priority": "Medium", "action": "<specific medium-term action>", "why": "<why this matters>", "impact": "<expected result>"},
-    {"priority": "Low", "action": "<longer-term strategic action>", "why": "<why this matters>", "impact": "<expected result>"}
+  "customer_targeting": {
+    "primary_segment": "<specific customer segment in ${market}>",
+    "secondary_segment": "<secondary customer segment>",
+    "where_to_find_them": ["<specific channel>", "<specific channel>", "<specific channel>"],
+    "key_motivations": ["<what drives purchase>", "<motivation>", "<motivation>"],
+    "barriers_to_purchase": ["<what stops them buying>", "<barrier>"]
+  },
+  "growth_plan": {
+    "month_1": {
+      "focus": "<single most important focus>",
+      "actions": ["<specific action>", "<specific action>", "<specific action>"]
+    },
+    "month_3": {
+      "focus": "<focus at 3 months>",
+      "actions": ["<specific action>", "<specific action>", "<specific action>"]
+    },
+    "month_6": {
+      "focus": "<focus at 6 months>",
+      "actions": ["<specific action>", "<specific action>"]
+    }
+  },
+  "key_metrics_to_track": [
+    {"metric": "<metric name>", "target": "<specific target>", "why": "<why this matters>"},
+    {"metric": "<metric name>", "target": "<specific target>", "why": "<why this matters>"},
+    {"metric": "<metric name>", "target": "<specific target>", "why": "<why this matters>"}
   ]
 }`;
 
   try {
-    // Call Anthropic API directly via Edge Function proxy
     const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-market', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
@@ -8907,8 +8954,6 @@ Return ONLY a valid JSON object:
     
     let report;
     try {
-      // Try to extract JSON from response - handle various response formats
-      let raw = '';
       if(data.success && data.report) {
         report = data.report;
       } else if(data.raw) {
@@ -8920,12 +8965,12 @@ Return ONLY a valid JSON object:
     if(report && report.market_position) {
       renderMarketReport(report, brand);
     } else {
-      throw new Error('AI returned campaign format — using market fallback');
+      throw new Error('Could not parse response');
     }
   } catch(e) {
     console.error('Market intelligence error:', e);
     renderMarketReport(generateFallbackReport(brand, industry, market), brand);
-    showToast('Showing sample analysis — connect AI for live data');
+    showToast('Showing sample — check AI connection');
   } finally {
     loading.style.display = 'none';
     btn.style.display = 'flex';
@@ -8934,71 +8979,102 @@ Return ONLY a valid JSON object:
 }
 
 
+
 function generateFallbackReport(brand, industry, market) {
   return {
-    market_position: { score: 6, level: 'Growing', summary: brand + ' is entering the ' + market + ' ' + industry + ' market at a time of strong growth. The competitive landscape is evolving rapidly with both local and regional players. Success will depend on clear differentiation, strong social media execution, and speed to build brand recognition.' },
-    top_competitors: [
-      { name: 'Leading Local ' + industry + ' Brand', strength: 'Established brand recognition and loyal customer base', weakness: 'Slow to adapt to digital-first customer behavior' },
-      { name: 'Regional Digital Player', strength: 'Strong Instagram and Snapchat presence, high engagement', weakness: 'Less premium positioning, competes on price' },
-      { name: 'Premium International Brand', strength: 'Global trust, high-quality product/service standards', weakness: 'Less localized, higher price point limits reach in ' + market }
-    ],
-    social_media_presence: {
-      current_landscape: 'Brands in ' + industry + ' in ' + market + ' are heavily investing in short-form video content on Instagram Reels, TikTok, and Snapchat. Influencer partnerships and user-generated content are driving the most growth.',
-      primary_platform: 'Instagram Reels & Snapchat',
-      content_that_works: ['Behind-the-scenes & process videos', 'Customer testimonials and transformations', 'Educational content that builds authority'],
-      posting_frequency: '1 Reel per day, 3-5 Stories per day',
-      best_times: '7:00 PM – 10:00 PM (Saudi/Gulf time) — peak scrolling hours',
-      winning_strategy: 'Go all-in on short-form video. Brands in ' + market + ' that post 5+ Reels per week see 3-5x more organic reach than those posting static content.'
+    market_position: { score: 5, level: 'Growing', summary: brand + ' is entering the ' + market + ' ' + industry + ' market with room to grow. The key is differentiating through quality, digital presence, and local community engagement before larger players notice the opportunity.' },
+    website_analysis: {
+      overall_score: 6,
+      strengths: ['Online presence established', 'Product catalog available'],
+      weaknesses: ['Limited social proof / reviews', 'Pricing transparency could improve', 'Mobile experience may need optimization'],
+      pricing_assessment: 'Pricing appears competitive but needs clearer value communication',
+      product_range: 'Good starting range — consider adding bundle packages to increase average order value',
+      ux_issues: ['Slow loading images', 'No live chat or WhatsApp button visible', 'Checkout friction'],
+      quick_wins: ['Add WhatsApp button to every product page', 'Show customer reviews prominently', 'Create 3-5 bundle packages at different price points']
     },
-    market_opportunities: [
-      'Growing middle and upper-class consumer base in ' + market + ' seeking premium ' + industry + ' experiences',
-      'Low competition for brands that combine strong digital presence with high-quality in-person service',
-      'Corporate and B2B packages are underserved — companies are actively looking for premium ' + industry + ' solutions for teams and events'
-    ],
-    differentiation_strategy: {
-      unique_angle: brand + ' can stand out by combining a premium, personalized experience with a strong authentic social media presence that feels real — not corporate',
-      positioning: 'The premium, trusted ' + industry + ' brand in ' + market + ' that delivers real results with a personal touch',
-      key_message: 'We do not just offer a service — we deliver an experience worth sharing'
+    social_media_analysis: {
+      platforms_to_check: [
+        { platform: 'Instagram', handle: '@' + brand.toLowerCase().replace(/\s/g, ''), strategy: 'Lifestyle shots in Saudi homes, transformation videos, Arabic content', frequency: '5-7 posts/week' },
+        { platform: 'Snapchat', handle: brand.toLowerCase().replace(/\s/g, ''), strategy: 'Behind-the-scenes, exclusive offers, quick product showcases', frequency: 'Daily stories' },
+        { platform: 'TikTok', handle: '@' + brand.toLowerCase().replace(/\s/g, ''), strategy: 'Room transformation videos, furniture styling tips, trending sounds', frequency: '3-5 videos/week' }
+      ],
+      content_gaps: ['Customer testimonials / before-after content', 'Arabic-language educational content', 'Influencer collaborations with Saudi interior designers'],
+      best_content_type: 'Before/after room transformation videos — highest engagement in ' + market + ' home decor space',
+      influencer_strategy: 'Partner with 3-5 Saudi interior design micro-influencers (50k-200k followers) for product placements in real Saudi homes'
     },
+    local_competitors: [
+      { name: 'Local Furniture District (Al-Olaya / Al-Malaz)', type: 'Physical', strength: 'Established customer trust, wide selection', weakness: 'No digital presence, old-school experience', how_to_beat_them: 'Win online — be the brand they find when searching Instagram and Google' },
+      { name: 'Regional Home Stores (Tamimi / similar)', type: 'Both', strength: 'Loyalty programs, wide reach', weakness: 'Generic product line, no design identity', how_to_beat_them: 'Position as the design-forward, curated alternative' },
+      { name: 'D2C Instagram Furniture Brands', type: 'Online', strength: 'Trendy content, direct customer relationships', weakness: 'Limited product range, no physical trust', how_to_beat_them: 'Match their content game but add quality assurance and faster delivery' }
+    ],
     pricing_strategy: {
-      market_range: 'Mid to high-tier pricing is the sweet spot for premium ' + industry + ' brands in ' + market,
-      recommendation: 'Tiered packages: Starter / Premium / VIP. This lets customers self-select and increases average deal value.',
-      tip: 'Always include a premium tier at 2x your standard price — 15-25% of customers will choose it and it anchors the value of your other packages'
+      market_range: 'Mid-range ' + market + ' furniture: SAR 500-5,000 per piece for quality items',
+      current_assessment: 'Review pricing against 3 local competitors monthly',
+      recommendation: 'Tiered pricing: Entry / Premium / Luxury collections',
+      bundle_ideas: ['Living Room Starter Pack (sofa + rug + side tables)', 'Home Office Bundle (desk + chair + storage)', 'Bedroom Refresh Kit (bed frame + side tables + lighting)'],
+      upsell_opportunities: ['White-glove delivery & assembly service', 'Interior design consultation add-on']
     },
-    growth_actions: [
-      { priority: 'High', action: 'Launch a weekly Reels series showing your service, team, and customer results', why: 'Video content is the fastest way to build brand awareness in ' + market + ' right now', impact: 'Organic reach of 10,000-50,000 views per Reel within 60 days' },
-      { priority: 'High', action: 'Reach out to 5 micro-influencers (10k-100k followers) in ' + market + ' for a collaboration or free experience exchange', why: 'Influencer trust transfers to your brand instantly in the Gulf market', impact: 'Gain 500-2,000 new followers and multiple qualified leads per collaboration' },
-      { priority: 'Medium', action: 'Build 3 clear service packages with transparent pricing on your website and social bio', why: 'Customers in ' + market + ' research online before contacting — make it easy to understand what you offer', impact: 'Reduce decision friction, increase inbound inquiries by 30-40%' },
-      { priority: 'Medium', action: 'Create a Google Business Profile and actively collect 5-star reviews from every happy customer', why: 'Google search is the #1 discovery channel for local businesses in ' + market, impact: 'Appear in local search results, build social proof that converts skeptical leads' },
-      { priority: 'Low', action: 'Develop a referral program offering existing customers a reward for every new customer they bring', why: 'Word of mouth is highly trusted in Gulf culture — make it structured and incentivized', impact: 'A new lead channel that costs nothing in ad spend' }
+    customer_targeting: {
+      primary_segment: 'Saudi newlyweds and new homeowners (25-35) in Riyadh/Jeddah/Dammam',
+      secondary_segment: 'Corporate clients furnishing offices and hospitality spaces',
+      where_to_find_them: ['Instagram & Snapchat ads targeting new homeowners', 'Google search "furniture store Riyadh"', 'Real estate developer partnerships'],
+      key_motivations: ['Quality that lasts', 'Style that fits Saudi home culture', 'Convenient delivery and installation'],
+      barriers_to_purchase: ['Cannot see/touch products before buying', 'Unclear return policy', 'Delivery time uncertainty']
+    },
+    growth_plan: {
+      month_1: { focus: 'Build online presence and first sales', actions: ['Launch Instagram with 20 high-quality posts', 'Set up Google Business Profile with photos', 'Add WhatsApp Business for instant customer chat'] },
+      month_3: { focus: 'Scale what works and build social proof', actions: ['Launch first influencer campaign', 'Collect 50+ reviews from happy customers', 'Run Ramadan/seasonal sale campaign'] },
+      month_6: { focus: 'Expand customer base and increase order value', actions: ['Launch bundle packages', 'Start B2B outreach to offices and hotels'] }
+    },
+    key_metrics_to_track: [
+      { metric: 'Website Visitors', target: '1,000/month by month 3', why: 'Traffic = opportunity for sales' },
+      { metric: 'Instagram Followers', target: '5,000 by month 3', why: 'Social proof builds purchase confidence' },
+      { metric: 'Average Order Value', target: 'SAR 2,500+', why: 'Bundles and upsells improve profitability' }
     ]
   };
+}
+
+function toggleSection(id) {
+  const content = document.getElementById(id);
+  const arrow = document.getElementById(id + '-arrow');
+  if(!content) return;
+  const isOpen = content.style.display !== 'none';
+  content.style.display = isOpen ? 'none' : 'block';
+  if(arrow) arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
 function renderMarketReport(r, brand) {
   const result = document.getElementById('mi-result');
   const scoreColor = r.market_position.score >= 8 ? '#10b981' : r.market_position.score >= 5 ? '#f59e0b' : '#ef4444';
   const priorityColor = { 'High': '#ef4444', 'Medium': '#f59e0b', 'Low': '#10b981' };
-  const sm = r.social_media_presence || r.social_media_strategy || {};
-  const contentTypes = sm.content_that_works || sm.content_types || [];
-  const winningTip = sm.winning_strategy || sm.key_tip || '';
-  const primaryPlatform = sm.primary_platform || '';
-  const frequency = sm.posting_frequency || '';
-  const bestTimes = sm.best_times || '';
-  const landscape = sm.current_landscape || '';
-  const diff = r.differentiation_strategy || {};
-  const pricing = r.pricing_strategy || r.pricing_insights || {};
-  const opportunities = r.market_opportunities || r.opportunities || [];
-  const actions = r.growth_actions || r.action_plan || [];
+  const wa = r.website_analysis || {};
+  const sm = r.social_media_analysis || {};
+  const lc = r.local_competitors || [];
+  const ps = r.pricing_strategy || {};
+  const ct = r.customer_targeting || {};
+  const gp = r.growth_plan || {};
+  const km = r.key_metrics_to_track || [];
+
+  const sectionHeader = (id, icon, title, score) => `
+    <div onclick="toggleSection('${id}')" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:14px 16px;background:var(--bg2);border-radius:12px;margin-bottom:2px;user-select:none">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:16px">${icon}</span>
+        <span style="font-size:13px;font-weight:700;color:var(--text)">${title}</span>
+        ${score !== undefined ? `<span style="background:${score>=7?'rgba(16,185,129,0.15)':score>=4?'rgba(245,158,11,0.15)':'rgba(239,68,68,0.15)'};color:${score>=7?'#10b981':score>=4?'#f59e0b':'#ef4444'};font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px">${score}/10</span>` : ''}
+      </div>
+      <svg id="${id}-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div id="${id}" style="display:none;padding:14px;background:var(--bg3);border-radius:0 0 12px 12px;margin-bottom:12px">
+  `;
 
   result.innerHTML = `
     <div style="height:1px;background:var(--border);margin-bottom:20px"></div>
     
-    <!-- Market Position Score -->
+    <!-- Market Position Header -->
     <div style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;background:var(--bg3);border-radius:16px;padding:20px;margin-bottom:16px">
-      <div style="text-align:center">
-        <div style="font-size:52px;font-weight:900;font-family:'Syne',sans-serif;color:${scoreColor};line-height:1">${r.market_position.score}<span style="font-size:24px;color:var(--text2)">/10</span></div>
-        <div style="font-size:12px;font-weight:700;color:${scoreColor};margin-top:4px;text-transform:uppercase;letter-spacing:1px">${r.market_position.level}</div>
+      <div style="text-align:center;min-width:80px">
+        <div style="font-size:52px;font-weight:900;font-family:'Syne',sans-serif;color:${scoreColor};line-height:1">${r.market_position.score}<span style="font-size:22px;color:var(--text2)">/10</span></div>
+        <div style="font-size:11px;font-weight:700;color:${scoreColor};margin-top:4px;text-transform:uppercase;letter-spacing:1px">${r.market_position.level}</div>
       </div>
       <div>
         <div style="font-size:15px;font-weight:800;font-family:'Syne',sans-serif;color:var(--text);margin-bottom:8px">Market Position — ${brand}</div>
@@ -9006,92 +9082,143 @@ function renderMarketReport(r, brand) {
       </div>
     </div>
 
-    <!-- Competitors + Opportunities -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-      <div style="background:var(--bg3);border-radius:14px;padding:16px">
-        <div style="font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">🏆 Top Competitors</div>
-        ${r.top_competitors.map(c => `
-          <div style="margin-bottom:10px;padding:10px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)">
-            <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">${c.name}</div>
-            <div style="font-size:11px;color:var(--success);margin-bottom:2px">✅ ${c.strength}</div>
-            <div style="font-size:11px;color:var(--danger)">⚠️ ${c.weakness}</div>
+    <!-- EXPANDABLE SECTIONS -->
+
+    <!-- 1. Website Analysis -->
+    ${sectionHeader('sec-website', '🌐', 'Website & Product Analysis', wa.overall_score)}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--success);text-transform:uppercase;margin-bottom:8px">✅ Strengths</div>
+          ${(wa.strengths||[]).map(s=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:rgba(16,185,129,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid var(--success)">${s}</div>`).join('')}
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--danger);text-transform:uppercase;margin-bottom:8px">⚠️ Weaknesses</div>
+          ${(wa.weaknesses||[]).map(s=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:rgba(239,68,68,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid var(--danger)">${s}</div>`).join('')}
+        </div>
+      </div>
+      <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:6px">💰 Pricing Assessment</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7">${wa.pricing_assessment||'—'}</div>
+      </div>
+      <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:6px">📦 Product Range</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7">${wa.product_range||'—'}</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:8px">⚡ Quick Wins</div>
+      ${(wa.quick_wins||[]).map((q,i)=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:rgba(59,130,246,0.06);border-radius:8px;margin-bottom:6px;border-left:3px solid var(--accent)"><span style="font-weight:700;color:var(--accent);font-size:12px">${i+1}.</span><div style="font-size:12px;color:var(--text)">${q}</div></div>`).join('')}
+    </div>
+
+    <!-- 2. Social Media Analysis -->
+    ${sectionHeader('sec-social', '📱', 'Social Media Presence & Strategy')}
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:8px">Platforms to Build</div>
+        ${(sm.platforms_to_check||[]).map(p=>`
+          <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:8px;display:grid;grid-template-columns:80px 1fr 1fr;gap:10px;align-items:start">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--accent)">${p.platform}</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:2px">${p.handle||''}</div>
+            </div>
+            <div style="font-size:11px;color:var(--text);line-height:1.6">${p.strategy||''}</div>
+            <div style="font-size:11px;color:var(--text2);text-align:right">${p.frequency||''}</div>
           </div>
         `).join('')}
       </div>
-      <div style="background:var(--bg3);border-radius:14px;padding:16px">
-        <div style="font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">🚀 Market Opportunities</div>
-        ${opportunities.map(o => `
-          <div style="display:flex;gap:8px;margin-bottom:10px;padding:10px;background:var(--bg2);border-radius:10px;border:1px solid rgba(16,185,129,0.15)">
-            <div style="width:6px;height:6px;border-radius:50%;background:var(--success);flex-shrink:0;margin-top:5px"></div>
-            <div style="font-size:12px;color:var(--text);line-height:1.6">${o}</div>
+      <div style="background:rgba(139,92,246,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;margin-bottom:6px">🌟 Best Content Type</div>
+        <div style="font-size:12px;color:var(--text)">${sm.best_content_type||'—'}</div>
+      </div>
+      <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:6px">🤝 Influencer Strategy</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7">${sm.influencer_strategy||'—'}</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--warning);text-transform:uppercase;margin-bottom:8px">❌ Content Gaps</div>
+      ${(sm.content_gaps||[]).map(g=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:rgba(245,158,11,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid var(--warning)">${g}</div>`).join('')}
+    </div>
+
+    <!-- 3. Local Competitors -->
+    ${sectionHeader('sec-competitors', '🏆', 'Local Competitors & How to Beat Them')}
+      ${lc.map(c=>`
+        <div style="background:var(--bg2);border-radius:12px;padding:14px;margin-bottom:10px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:13px;font-weight:700;color:var(--text)">${c.name}</div>
+            <span style="background:var(--bg3);border:1px solid var(--border);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;color:var(--text2)">${c.type||''}</span>
           </div>
-        `).join('')}
-      </div>
+          <div style="font-size:11px;color:var(--success);margin-bottom:4px">✅ ${c.strength||''}</div>
+          <div style="font-size:11px;color:var(--danger);margin-bottom:8px">⚠️ ${c.weakness||''}</div>
+          <div style="background:rgba(59,130,246,0.08);border-radius:8px;padding:8px;font-size:11px;color:var(--accent)">
+            ⚡ <strong>How to beat them:</strong> ${c.how_to_beat_them||''}
+          </div>
+        </div>
+      `).join('')}
     </div>
 
-    <!-- Differentiation Strategy -->
-    ${diff.unique_angle ? `
-    <div style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(99,102,241,0.05));border:1px solid rgba(139,92,246,0.2);border-radius:14px;padding:16px;margin-bottom:16px">
-      <div style="font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">⚡ Your Differentiation Strategy</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+    <!-- 4. Pricing & Bundles -->
+    ${sectionHeader('sec-pricing', '💰', 'Pricing Strategy & Bundle Ideas')}
+      <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px">Market Price Range</div>
+        <div style="font-size:13px;font-weight:700;color:var(--accent)">${ps.market_range||'—'}</div>
+      </div>
+      <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px">Recommendation</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.7">${ps.recommendation||'—'}</div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:8px">📦 Bundle Ideas</div>
+      ${(ps.bundle_ideas||[]).map((b,i)=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:rgba(16,185,129,0.06);border-radius:8px;margin-bottom:6px;border-left:3px solid var(--success)"><span style="font-weight:700;color:var(--success);font-size:12px">${i+1}.</span><div style="font-size:12px;color:var(--text)">${b}</div></div>`).join('')}
+      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin:10px 0 8px">💎 Upsell Opportunities</div>
+      ${(ps.upsell_opportunities||[]).map(u=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:rgba(139,92,246,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid #8b5cf6">${u}</div>`).join('')}
+    </div>
+
+    <!-- 5. Customer Targeting -->
+    ${sectionHeader('sec-customers', '👥', 'Customer Targeting & Where to Find Them')}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
         <div style="background:var(--bg2);border-radius:10px;padding:12px">
-          <div style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;margin-bottom:6px">Unique Angle</div>
-          <div style="font-size:12px;color:var(--text);line-height:1.6">${diff.unique_angle}</div>
+          <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:6px">Primary Segment</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6">${ct.primary_segment||'—'}</div>
         </div>
         <div style="background:var(--bg2);border-radius:10px;padding:12px">
-          <div style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;margin-bottom:6px">Positioning</div>
-          <div style="font-size:12px;color:var(--text);line-height:1.6">${diff.positioning || ''}</div>
-        </div>
-        <div style="background:var(--bg2);border-radius:10px;padding:12px">
-          <div style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;margin-bottom:6px">Key Message</div>
-          <div style="font-size:12px;color:var(--text);line-height:1.6">${diff.key_message || ''}</div>
+          <div style="font-size:10px;font-weight:700;color:#8b5cf6;text-transform:uppercase;margin-bottom:6px">Secondary Segment</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6">${ct.secondary_segment||'—'}</div>
         </div>
       </div>
-    </div>
-    ` : ''}
-
-    <!-- Social Media -->
-    <div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(99,102,241,0.05));border:1px solid rgba(99,102,241,0.15);border-radius:14px;padding:16px;margin-bottom:16px">
-      <div style="font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">📱 Social Media Strategy</div>
-      ${landscape ? `<div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px;padding:10px;background:var(--bg2);border-radius:10px">${landscape}</div>` : ''}
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">
-        <div style="background:var(--bg2);border-radius:10px;padding:10px;text-align:center">
-          <div style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;margin-bottom:4px">Best Platform</div>
-          <div style="font-size:12px;font-weight:700;color:var(--accent)">${primaryPlatform}</div>
-        </div>
-        <div style="background:var(--bg2);border-radius:10px;padding:10px;text-align:center">
-          <div style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;margin-bottom:4px">Frequency</div>
-          <div style="font-size:12px;font-weight:700;color:var(--text)">${frequency}</div>
-        </div>
-        <div style="background:var(--bg2);border-radius:10px;padding:10px;text-align:center">
-          <div style="font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;margin-bottom:4px">Best Times</div>
-          <div style="font-size:12px;font-weight:700;color:var(--text)">${bestTimes}</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        ${contentTypes.map(t => `<span style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#6366f1">${t}</span>`).join('')}
-      </div>
-      ${winningTip ? `<div style="background:rgba(99,102,241,0.08);border-radius:10px;padding:10px;font-size:12px;color:var(--text);display:flex;gap:8px;align-items:flex-start"><span style="font-size:16px">💡</span><span>${winningTip}</span></div>` : ''}
+      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:8px">📍 Where to Find Them</div>
+      ${(ct.where_to_find_them||[]).map(w=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:var(--bg2);border-radius:8px;margin-bottom:4px;display:flex;align-items:center;gap:6px"><div style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0"></div>${w}</div>`).join('')}
+      <div style="font-size:11px;font-weight:700;color:var(--success);text-transform:uppercase;margin:10px 0 8px">✅ What Drives Purchase</div>
+      ${(ct.key_motivations||[]).map(m=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:rgba(16,185,129,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid var(--success)">${m}</div>`).join('')}
+      <div style="font-size:11px;font-weight:700;color:var(--danger);text-transform:uppercase;margin:10px 0 8px">🚫 Purchase Barriers</div>
+      ${(ct.barriers_to_purchase||[]).map(b=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:rgba(239,68,68,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid var(--danger)">${b}</div>`).join('')}
     </div>
 
-    <!-- Pricing -->
-    <div style="background:var(--bg3);border-radius:14px;padding:16px;margin-bottom:16px">
-      <div style="font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">💰 Pricing Strategy</div>
-      ${pricing.market_range ? `<div style="font-size:11px;color:var(--text2);margin-bottom:8px">Market Range: <strong style="color:var(--text)">${pricing.market_range}</strong></div>` : ''}
-      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">${pricing.recommendation || ''}</div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.7">${pricing.tip || ''}</div>
+    <!-- 6. Growth Plan -->
+    ${sectionHeader('sec-growth', '🚀', '6-Month Growth Plan')}
+      ${['month_1','month_3','month_6'].map((m,i) => {
+        const phase = gp[m] || {};
+        const labels = ['Month 1', 'Month 3', 'Month 6'];
+        const colors = ['var(--danger)','var(--warning)','var(--success)'];
+        return `
+          <div style="margin-bottom:14px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <div style="width:28px;height:28px;border-radius:50%;background:${colors[i]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">${i+1}</div>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--text)">${labels[i]}</div>
+                <div style="font-size:11px;color:var(--text2)">${phase.focus||''}</div>
+              </div>
+            </div>
+            ${(phase.actions||[]).map(a=>`<div style="font-size:12px;color:var(--text);padding:6px 10px 6px 36px;background:var(--bg2);border-radius:8px;margin-bottom:4px">${a}</div>`).join('')}
+          </div>
+        `;
+      }).join('')}
     </div>
 
-    <!-- Action Plan -->
-    <div style="background:var(--bg3);border-radius:14px;padding:16px">
-      <div style="font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">⚡ Priority Action Plan</div>
-      ${actions.map(a => `
-        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--bg2);border-radius:10px;margin-bottom:8px;border-left:3px solid ${priorityColor[a.priority]||'var(--accent)'}">
-          <span style="background:${priorityColor[a.priority]||'var(--accent)'};color:#fff;font-size:9px;font-weight:800;padding:3px 7px;border-radius:20px;white-space:nowrap;margin-top:1px">${a.priority}</span>
-          <div style="flex:1">
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px">${a.action}</div>
-            ${a.why ? `<div style="font-size:11px;color:var(--accent);margin-bottom:2px">Why: ${a.why}</div>` : ''}
-            <div style="font-size:11px;color:var(--text2)">Expected: ${a.impact}</div>
+    <!-- 7. Key Metrics -->
+    ${sectionHeader('sec-metrics', '📊', 'Key Metrics to Track')}
+      ${km.map(k=>`
+        <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:8px;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px">${k.metric||''}</div>
+            <div style="font-size:11px;color:var(--text2)">${k.why||''}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;font-weight:700;color:var(--accent)">${k.target||''}</div>
           </div>
         </div>
       `).join('')}
@@ -9099,70 +9226,6 @@ function renderMarketReport(r, brand) {
   `;
 }
 
-
-
-</script>
-</body>
-
-<!-- ONBOARDING MODAL -->
-<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:24px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.5);animation:onboardIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both">
-    <div style="height:3px;background:var(--bg3)"><div id="ob-progress" style="height:100%;background:linear-gradient(90deg,var(--accent),#8b5cf6);border-radius:3px;transition:width 0.4s ease;width:25%"></div></div>
-    <div id="ob-slides" style="padding:40px 40px 28px">
-      <div id="ob-slide-1">
-        <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(99,102,241,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
-        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px" id="ob-welcome-title">Welcome aboard!</div>
-        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px">Your CRM is ready. Let us show you how it works in 30 seconds so you can start turning leads into customers today.</div>
-        <div style="background:var(--bg3);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;background:linear-gradient(135deg,#10b981,#059669);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✓</div><div><div style="font-size:13px;font-weight:700;color:var(--text)">Your workspace is set up</div><div style="font-size:12px;color:var(--text2);margin-top:1px" id="ob-org-name">Ready to receive leads</div></div></div>
-      </div>
-      <div id="ob-slide-2" style="display:none">
-        <div style="width:60px;height:60px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(245,158,11,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">Leads come in automatically</div>
-        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Every time someone fills your form, their info instantly appears here. No manual entry needed.</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">New leads appear in <strong>Leads</strong> and <strong>Pipeline</strong></div></div>
-          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">You get a <strong>Telegram notification</strong> instantly</div></div>
-          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">Contact fast — <strong>response time drives conversions</strong></div></div>
-        </div>
-      </div>
-      <div id="ob-slide-3" style="display:none">
-        <div style="width:60px;height:60px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(139,92,246,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
-        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">Move leads through your pipeline</div>
-        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Update lead status as you progress. Your pipeline keeps the whole team focused on what matters.</div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
-          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">New</div></div>
-          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Warm</div></div>
-          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#8b5cf6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Active</div></div>
-          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Won</div></div>
-          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#ef4444;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Lost</div></div>
-        </div>
-      </div>
-      <div id="ob-slide-4" style="display:none">
-        <div style="width:60px;height:60px;background:linear-gradient(135deg,#10b981,#059669);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(16,185,129,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
-        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">You are all set!</div>
-        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Generate reports, create VAT invoices, track response times — everything to run your business like a pro.</div>
-        <div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08));border:1px solid rgba(99,102,241,0.15);border-radius:14px;padding:16px 18px">
-          <div style="font-size:12px;color:var(--text2);line-height:2.1\"><div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(59,130,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div><span><strong style="color:var(--text)">Leads</strong> — all incoming leads</span></div><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(139,92,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div><span><strong style="color:var(--text)">Pipeline</strong> — visual deal tracker</span></div><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div><span><strong style="color:var(--text)">Analytics</strong> — PDF reports</span></div><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(245,158,11,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div><span><strong style="color:var(--text)">Invoices</strong> — Saudi VAT compliant</span></div></div></div>
-        </div>
-      </div>
-    </div>
-    <div style="padding:0 40px 30px;display:flex;align-items:center;justify-content:space-between">
-      <div style="display:flex;gap:5px" id="ob-dots">
-        <div style="width:18px;height:5px;border-radius:3px;background:var(--accent);transition:all 0.3s"></div>
-        <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
-        <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
-        <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
-      </div>
-      <div style="display:flex;gap:10px;align-items:center">
-        <button onclick="closeOnboarding()" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;padding:8px 12px;border-radius:8px">Skip</button>
-        <button id="ob-next-btn" onclick="nextOnboardingSlide()" style="background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;border-radius:11px;padding:11px 26px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,0.4)">Next →</button>
-      </div>
-    </div>
-  </div>
-</div>
-<style>@keyframes onboardIn{from{opacity:0;transform:scale(0.92) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}</style>
-<script>
-// ─── VAT INVOICE GENERATOR ────────────────────────────────────
 function openVATInvoiceModal() {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('vat-inv-date').value = today;
