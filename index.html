@@ -5115,35 +5115,7 @@ function exportCallsPDF() {
     <span>Exported by ${currentUser?.email || 'Admin'} · ${new Date().toLocaleDateString()}</span>
   </div>
   <script>window.onload=()=>{window.print()}<\/script>
-  <script>
-
-// Sync AI Market Intelligence fields with language
-function syncMILanguage() {
-  const lang = (typeof currentLang !== 'undefined' ? currentLang : 'en');
-  ['mi-brand','mi-desc'].forEach(id => {
-    const el = document.getElementById(id);
-    if(!el) return;
-    const arPh = el.getAttribute('data-ar-placeholder');
-    if(lang === 'ar' && arPh) el.placeholder = arPh;
-    else if(lang === 'en') {
-      if(id === 'mi-brand') el.placeholder = 'e.g. Silah Shooting Range';
-      if(id === 'mi-desc') el.placeholder = 'e.g. Premium shooting range in Riyadh...';
-    }
-  });
-  const sel = document.getElementById('mi-industry');
-  if(sel) Array.from(sel.options).forEach(o => {
-    const ar = o.getAttribute('data-ar'), en = o.getAttribute('data-en');
-    if(lang === 'ar' && ar) o.text = ar;
-    else if(lang === 'en' && en) o.text = en;
-  });
-}
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('lang-toggle') || document.querySelector('[onclick*="toggleLang"]');
-  if(btn) btn.addEventListener('click', () => setTimeout(syncMILanguage, 50));
-});
-
-</script>
-</body></html>`;
+  </body></html>`;
 
   const win = window.open('', '_blank');
   win.document.write(html);
