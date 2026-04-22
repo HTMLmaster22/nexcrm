@@ -2144,45 +2144,55 @@
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             </div>
             <div>
-              <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text)">AI Market Intelligence</div>
-              <div style="font-size:12px;color:var(--text2);margin-top:2px">Analyze your market position, competitors & growth opportunities — Powered by Claude AI</div>
+              <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text)">
+                <span data-en="AI Market Intelligence" data-ar="ذكاء السوق بالذكاء الاصطناعي">AI Market Intelligence</span>
+              </div>
+              <div style="font-size:12px;color:var(--text2);margin-top:2px">
+                <span data-en="Analyze your market position, competitors & growth opportunities — Powered by Claude AI" data-ar="تحليل موقعك في السوق والمنافسين وفرص النمو — مدعوم بـ Claude AI">Analyze your market position, competitors & growth opportunities — Powered by Claude AI</span>
+              </div>
             </div>
           </div>
           <div style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;color:#6366f1">Claude AI</div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px">
           <div>
-            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Brand / Business Name</label>
-            <input class="form-input" id="mi-brand" placeholder="e.g. Silah Shooting Range" />
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">
+              <span data-en="Brand / Business Name" data-ar="اسم العلامة / النشاط التجاري">Brand / Business Name</span>
+            </label>
+            <input class="form-input" id="mi-brand" placeholder="e.g. Silah Shooting Range" data-ar-placeholder="مثال: مطعم المندي الأصيل" />
           </div>
           <div>
-            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Industry</label>
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">
+              <span data-en="Industry" data-ar="القطاع">Industry</span>
+            </label>
             <select class="form-input" id="mi-industry">
-              <option>Furniture & Home Decor</option>
-              <option>Fashion Retail</option>
-              <option>Car Dealership</option>
-              <option>Real Estate</option>
-              <option>Restaurant & Food</option>
-              <option>Cafe & Coffee Shop</option>
-              <option>Marketing Agency</option>
-              <option>Gym / Fitness</option>
-              <option>Shooting Range / Entertainment</option>
-              <option>Medical / Healthcare</option>
-              <option>Beauty & Skincare</option>
-              <option>Jewelry & Accessories</option>
-              <option>Electronics & Tech</option>
-              <option>Technology / SaaS</option>
-              <option>E-commerce</option>
-              <option>Education & Training</option>
-              <option>Events & Entertainment</option>
-              <option>Travel & Tourism</option>
-              <option>Construction & Contracting</option>
-              <option>Other</option>
+              <option data-en="Furniture & Home Decor" data-ar="أثاث وديكور منزلي">Furniture & Home Decor</option>
+              <option data-en="Fashion Retail" data-ar="أزياء وملابس">Fashion Retail</option>
+              <option data-en="Car Dealership" data-ar="معرض سيارات">Car Dealership</option>
+              <option data-en="Real Estate" data-ar="عقارات">Real Estate</option>
+              <option data-en="Restaurant & Food" data-ar="مطاعم وأغذية">Restaurant & Food</option>
+              <option data-en="Cafe & Coffee Shop" data-ar="كافيه ومقاهي">Cafe & Coffee Shop</option>
+              <option data-en="Marketing Agency" data-ar="وكالة تسويق">Marketing Agency</option>
+              <option data-en="Gym / Fitness" data-ar="جيم ولياقة بدنية">Gym / Fitness</option>
+              <option data-en="Shooting Range / Entertainment" data-ar="ميدان رماية / ترفيه">Shooting Range / Entertainment</option>
+              <option data-en="Medical / Healthcare" data-ar="طبي / رعاية صحية">Medical / Healthcare</option>
+              <option data-en="Beauty & Skincare" data-ar="جمال وعناية بالبشرة">Beauty & Skincare</option>
+              <option data-en="Jewelry & Accessories" data-ar="مجوهرات وإكسسوارات">Jewelry & Accessories</option>
+              <option data-en="Electronics & Tech" data-ar="إلكترونيات وتقنية">Electronics & Tech</option>
+              <option data-en="Technology / SaaS" data-ar="تقنية / برمجيات">Technology / SaaS</option>
+              <option data-en="E-commerce" data-ar="تجارة إلكترونية">E-commerce</option>
+              <option data-en="Education & Training" data-ar="تعليم وتدريب">Education & Training</option>
+              <option data-en="Events & Entertainment" data-ar="فعاليات وترفيه">Events & Entertainment</option>
+              <option data-en="Travel & Tourism" data-ar="سفر وسياحة">Travel & Tourism</option>
+              <option data-en="Construction & Contracting" data-ar="مقاولات وبناء">Construction & Contracting</option>
+              <option data-en="Other" data-ar="أخرى">Other</option>
             </select>
           </div>
           <div>
-            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Target Market</label>
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">
+              <span data-en="Target Market" data-ar="السوق المستهدف">Target Market</span>
+            </label>
             <select class="form-input" id="mi-market">
               <option>Saudi Arabia</option>
               <option>UAE</option>
@@ -2194,19 +2204,28 @@
         </div>
 
         <div style="margin-bottom:14px">
-          <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Business Description <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text2)">(what you offer, who your customers are)</span></label>
-          <textarea class="form-input" id="mi-desc" rows="2" placeholder="e.g. Premium shooting range in Riyadh offering firearms training, tactical courses for individuals and corporates. Target audience: security professionals, sport shooters, corporate teams..." style="resize:none;font-size:13px;line-height:1.6"></textarea>
+          <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">
+            <span data-en="Business Description" data-ar="وصف النشاط التجاري">Business Description</span>
+            <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text2)">
+              (<span data-en="what you offer, who your customers are" data-ar="ماذا تقدم، من هم عملاؤك">what you offer, who your customers are</span>)
+            </span>
+          </label>
+          <textarea class="form-input" id="mi-desc" rows="2" placeholder="e.g. Premium shooting range in Riyadh..." data-ar-placeholder="مثال: مطعم سعودي أصيل في الرياض يقدم المندي والكبسة..." style="resize:none;font-size:13px;line-height:1.6"></textarea>
         </div>
 
         <button onclick="runMarketIntelligence()" id="mi-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:13px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(99,102,241,0.4);transition:all 0.2s">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          Analyze My Market Position
+          <span data-en="Analyze My Market Position" data-ar="تحليل موقعي في السوق">Analyze My Market Position</span>
         </button>
 
         <div id="mi-loading" style="display:none;text-align:center;padding:32px;color:var(--text2)">
           <div style="width:36px;height:36px;border:3px solid rgba(99,102,241,0.2);border-top-color:#6366f1;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px"></div>
-          <div style="font-size:13px;font-weight:600">Analyzing your market...</div>
-          <div style="font-size:11px;margin-top:4px">This takes about 15 seconds</div>
+          <div style="font-size:13px;font-weight:600">
+            <span data-en="Analyzing your market..." data-ar="جاري تحليل السوق...">Analyzing your market...</span>
+          </div>
+          <div style="font-size:11px;margin-top:4px">
+            <span data-en="This takes about 15 seconds" data-ar="هذا يستغرق حوالي 15 ثانية">This takes about 15 seconds</span>
+          </div>
         </div>
 
         <div id="mi-result" style="display:none;margin-top:20px"></div>
@@ -4410,8 +4429,20 @@ function applyTranslations() {
 
   // Universal: translate all data-en/data-ar elements
   document.querySelectorAll('[data-en]').forEach(el => {
-    el.textContent = isAr ? el.getAttribute('data-ar') : el.getAttribute('data-en');
+    const tag = el.tagName;
+    if(tag === 'INPUT' || tag === 'TEXTAREA') {
+      el.placeholder = isAr ? (el.getAttribute('data-ar') || el.placeholder) : (el.getAttribute('data-en') || el.placeholder);
+    } else if(tag === 'OPTION') {
+      el.text = isAr ? (el.getAttribute('data-ar') || el.text) : (el.getAttribute('data-en') || el.text);
+    } else {
+      el.textContent = isAr ? el.getAttribute('data-ar') : el.getAttribute('data-en');
+    }
   });
+  // Sync AI Market input placeholders
+  const miBrand = document.getElementById('mi-brand');
+  if(miBrand) miBrand.placeholder = isAr ? 'مثال: مطعم المندي الأصيل' : 'e.g. Silah Shooting Range';
+  const miDesc = document.getElementById('mi-desc');
+  if(miDesc) miDesc.placeholder = isAr ? 'مثال: متجر أثاث عصري في الرياض يقدم...' : 'e.g. Premium shooting range in Riyadh...';
 
   // Toggle RTL
   document.body.classList.toggle('rtl', isAr);
@@ -5084,7 +5115,35 @@ function exportCallsPDF() {
     <span>Exported by ${currentUser?.email || 'Admin'} · ${new Date().toLocaleDateString()}</span>
   </div>
   <script>window.onload=()=>{window.print()}<\/script>
-  </body></html>`;
+  <script>
+
+// Sync AI Market Intelligence fields with language
+function syncMILanguage() {
+  const lang = (typeof currentLang !== 'undefined' ? currentLang : 'en');
+  ['mi-brand','mi-desc'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    const arPh = el.getAttribute('data-ar-placeholder');
+    if(lang === 'ar' && arPh) el.placeholder = arPh;
+    else if(lang === 'en') {
+      if(id === 'mi-brand') el.placeholder = 'e.g. Silah Shooting Range';
+      if(id === 'mi-desc') el.placeholder = 'e.g. Premium shooting range in Riyadh...';
+    }
+  });
+  const sel = document.getElementById('mi-industry');
+  if(sel) Array.from(sel.options).forEach(o => {
+    const ar = o.getAttribute('data-ar'), en = o.getAttribute('data-en');
+    if(lang === 'ar' && ar) o.text = ar;
+    else if(lang === 'en' && en) o.text = en;
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('lang-toggle') || document.querySelector('[onclick*="toggleLang"]');
+  if(btn) btn.addEventListener('click', () => setTimeout(syncMILanguage, 50));
+});
+
+</script>
+</body></html>`;
 
   const win = window.open('', '_blank');
   win.document.write(html);
@@ -8843,9 +8902,13 @@ async function runMarketIntelligence() {
   result.innerHTML = '';
 
   // Check if desc looks like a URL
+  const isArabic = (typeof currentLang !== 'undefined' && currentLang === 'ar');
   const websiteUrl = desc.match(/https?:\/\/[^\s]+/) ? desc.match(/https?:\/\/[^\s]+/)[0] : null;
+  const responseLang = isArabic ? 'Arabic' : 'English';
 
-  const prompt = `You are a senior market research analyst specializing in the ${market} market. Conduct a DEEP, SPECIFIC analysis of the following business. Be highly specific — no generic advice.
+  const prompt = `You are a senior market research analyst specializing in the ${market} market. IMPORTANT: Respond entirely in ${responseLang}. All text values in the JSON must be in ${responseLang}.
+
+You are a senior market research analyst specializing in the ${market} market. Conduct a DEEP, SPECIFIC analysis of the following business. Be highly specific — no generic advice.
 
 BUSINESS TO ANALYZE:
 - Brand: ${brand}
