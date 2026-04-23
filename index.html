@@ -1,4 +1,139 @@
-<!DOCTYPE html>
+<!DOCTYPE<script>
+
+// ─── SMART FOLLOW-UP SYSTEM ────────────────────────────────────
+function getHoursAgo(dateStr) {
+  if(!dateStr) return 9999;
+  const d = new Date(dateStr);
+  if(isNaN(d)) return 9999;
+  return (Date.now() - d.getTime()) / 3600000;
+}
+
+function renderFollowUpAlert(data) {
+  const card = document.getElementById('followup-alert-card');
+  const subtitle = document.getElementById('followup-subtitle');
+  const preview = document.getElementById('followup-preview');
+  if(!card || !data) return;
+
+  // Find leads not contacted in 24+ hours (New/Warm/Active status, not Won/Lost)
+  const coldLeads = data.filter(l => {
+    const status = (l.status || '').toLowerCase();
+    if(status === 'won' || status === 'lost') return false;
+    const hoursAgo = getHoursAgo(l.created_at);
+    return hoursAgo > 24;
+  }).sort((a,b) => getHoursAgo(b.created_at) - getHoursAgo(a.created_at));
+
+  if(coldLeads.length === 0) { card.style.display = 'none'; return; }
+
+  card.style.display = 'block';
+  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+
+  const hoursStr = h => {
+    if(h > 48) return Math.round(h/24) + (isAr ? ' يوم' : ' days');
+    return Math.round(h) + (isAr ? ' ساعة' : 'h');
+  };
+
+  subtitle.textContent = isAr
+    ? coldLeads.length + ' عميل لم يتم التواصل معهم منذ أكثر من 24 ساعة'
+    : coldLeads.length + ' leads haven\'t been contacted in 24+ hours';
+
+  // Show top 3 preview chips
+  preview.innerHTML = coldLeads.slice(0,3).map(l => {
+    const h = getHoursAgo(l.created_at);
+    const urgency = h > 72 ? 'var(--danger)' : h > 48 ? 'var(--warning)' : 'var(--accent)';
+    return `<div style="background:var(--bg2);border:1px solid ${urgency};border-left:3px solid ${urgency};border-radius:8px;padding:8px 14px;font-size:12px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showFollowupList()">
+      <span style="color:${urgency};font-weight:700">${hoursStr(h)}</span>
+      <span style="color:var(--text);font-weight:600">${l.name||'Unknown'}</span>
+      <span style="color:var(--text2)">${l.source||''}</span>
+    </div>`;
+  }).join('');
+}
+
+function showFollowupList() {
+  const modal = document.getElementById('followup-modal');
+  const list = document.getElementById('followup-list');
+  if(!modal || !list) return;
+
+  modal.style.display = 'flex';
+  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+
+  const coldLeads = leads.filter(l => {
+    const status = (l.status || '').toLowerCase();
+    if(status === 'won' || status === 'lost') return false;
+    return getHoursAgo(l.created_at) > 24;
+  }).sort((a,b) => getHoursAgo(b.created_at) - getHoursAgo(a.created_at));
+
+  if(coldLeads.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--success);font-size:14px;font-weight:600">✅ ' + (isAr ? 'تم التواصل مع جميع العملاء!' : 'All leads have been contacted!') + '</div>';
+    return;
+  }
+
+  const waTemplates = {
+    new: isAr
+      ? 'مرحباً {name}! 👋\nشكراً لاهتمامك. أود التعرف عليك ومناقشة كيف يمكننا مساعدتك. هل أنت متاح للحديث؟'
+      : 'Hi {name}! 👋\nThank you for your interest. I\'d love to connect and discuss how we can help you. Are you available to chat?',
+    warm: isAr
+      ? 'مرحباً {name}! 😊\nكيف حالك؟ أتذكر أنك أبديت اهتماماً بخدماتنا. هل لديك أي أسئلة؟ نحن هنا للمساعدة!'
+      : 'Hey {name}! 😊\nHope you\'re doing well! I remember you showed interest in our services. Do you have any questions? We\'re here to help!',
+    active: isAr
+      ? 'مرحباً {name}! ⚡\nأريد التأكد من أن كل شيء يسير على ما يرام. هل يمكنني مساعدتك في اتخاذ قرار؟'
+      : 'Hi {name}! ⚡\nJust checking in to make sure everything is going smoothly. Can I help you with your decision?'
+  };
+
+  list.innerHTML = coldLeads.map(l => {
+    const h = getHoursAgo(l.created_at);
+    const urgency = h > 72 ? '#ef4444' : h > 48 ? '#f59e0b' : '#3b82f6';
+    const urgencyLabel = h > 72
+      ? (isAr ? 'عاجل جداً' : 'Critical')
+      : h > 48 ? (isAr ? 'عاجل' : 'Urgent')
+      : (isAr ? 'تابع' : 'Follow up');
+    const hoursStr = h > 48 ? Math.round(h/24) + (isAr ? ' يوم' : 'd') : Math.round(h) + (isAr ? ' ساعة' : 'h');
+    const template = waTemplates[(l.status||'new').toLowerCase()] || waTemplates.new;
+    const msg = encodeURIComponent(template.replace('{name}', (l.name||'').split(' ')[0]));
+    const phone = (l.phone||'').replace(/\D/g,'');
+    const waLink = phone ? `https://wa.me/${phone}?text=${msg}` : null;
+
+    return `<div style="background:var(--bg3);border-radius:14px;padding:16px;margin-bottom:10px;border-left:3px solid ${urgency}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-size:13px;font-weight:700;color:var(--text)">${l.name||'Unknown'}</span>
+            <span style="font-size:10px;font-weight:700;color:${urgency};background:${urgency}18;padding:2px 8px;border-radius:20px">${urgencyLabel}</span>
+          </div>
+          <div style="font-size:11px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;align-items:center">
+            <span style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${l.phone||'—'}</span>
+            <span style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.source||'—'}</span>
+            <span style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>${l.status||'New'}</span>
+            <span style="display:flex;align-items:center;gap:4px;color:${urgency};font-weight:600"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${hoursStr} ${isAr ? 'بدون تواصل' : 'without contact'}</span>
+          </div>
+          ${l.value ? `<div style="font-size:11px;color:var(--success);margin-top:6px;font-weight:600;display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>SAR ${parseInt((l.value||'0').replace(/[$,]/g,'')).toLocaleString()}</div>` : ''}
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          ${waLink ? `<a href="${waLink}" target="_blank" style="background:#25d366;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp
+          </a>` : `<button style="background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer">${isAr ? 'لا يوجد رقم' : 'No phone'}</button>`}
+          <button onclick="nav('leads')" style="background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">
+            ${isAr ? 'عرض' : 'View'}
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function closeFollowupModal() {
+  const modal = document.getElementById('followup-modal');
+  if(modal) modal.style.display = 'none';
+}
+
+// Close modal on backdrop click
+document.addEventListener('click', e => {
+  const modal = document.getElementById('followup-modal');
+  if(modal && e.target === modal) closeFollowupModal();
+});
+
+</script>
+ html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -1357,6 +1492,46 @@
           <div class="stat-change up">▲ <span data-en="Closed deals" data-ar="صفقات مغلقة">Closed deals</span></div>
         </div>
       </div>
+
+      <!-- SMART FOLLOW-UP ALERT -->
+      <div id="followup-alert-card" style="display:none;background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(245,158,11,0.05));border:1px solid rgba(239,68,68,0.25);border-radius:16px;padding:18px 20px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:40px;height:40px;background:linear-gradient(135deg,#ef4444,#f59e0b);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:pulse 2s infinite">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div>
+              <div style="font-size:14px;font-weight:800;color:var(--danger)" id="followup-title">
+                <span data-en="Hot Leads Going Cold!" data-ar="عملاء ساخنون يبردون!">Hot Leads Going Cold!</span>
+              </div>
+              <div style="font-size:12px;color:var(--text2);margin-top:2px" id="followup-subtitle"></div>
+            </div>
+          </div>
+          <button onclick="showFollowupList()" style="background:var(--danger);color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">
+            <span data-en="View & Follow Up" data-ar="عرض ومتابعة">View & Follow Up</span>
+          </button>
+        </div>
+        <div id="followup-preview" style="margin-top:14px;display:flex;flex-wrap:wrap;gap:8px"></div>
+      </div>
+
+      <!-- FOLLOW-UP MODAL -->
+      <div id="followup-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:20px">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:600px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 40px 80px rgba(0,0,0,0.4)">
+          <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:16px;font-weight:800;color:var(--text)">
+                <span data-en="Follow-Up List" data-ar="قائمة المتابعة">Follow-Up List</span>
+              </div>
+              <div style="font-size:12px;color:var(--text2);margin-top:2px">
+                <span data-en="Leads waiting for contact — act now before they go cold" data-ar="عملاء ينتظرون التواصل — تصرف الآن قبل أن يبردوا">Leads waiting for contact — act now before they go cold</span>
+              </div>
+            </div>
+            <button onclick="closeFollowupModal()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);cursor:pointer;font-size:13px">✕</button>
+          </div>
+          <div id="followup-list" style="overflow-y:auto;padding:16px;flex:1"></div>
+        </div>
+      </div>
+
 
       <div class="grid-3">
         <div class="card">
@@ -6793,6 +6968,7 @@ async function loadDashboard() {
     renderMonthlyChart(data);
     renderDonut(data);
     leads = saved;
+    renderFollowUpAlert(data);
   } catch(e) { console.error(e); }
 }
 
