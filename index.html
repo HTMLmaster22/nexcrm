@@ -7144,7 +7144,19 @@ function renderActivityFeed() {
     const icon = getSourceIcon(l.source);
     return `<div class="activity-item">
       <div style="width:36px;height:36px;border-radius:10px;background:${icon.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px ${icon.bg}55">${icon.svg}</div>
-      <div><div class="activity-text">New lead: <b>${l.name||'Unknown'}</b>${src}</div><div class="activity-time">${l.date ? new Date(l.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : 'Recently'} · ${l.status||'New'}</div></div>
+      <div><div class="activity-text">New lead: <b>${l.name||'Unknown'}</b>${src}</div><div class="activity-time">${(() => {
+        // Try l.date first, then created_at
+        let d = null;
+        if(l.date && l.date !== 'Invalid Date') {
+          const parsed = new Date(l.date.includes('T') ? l.date : l.date + 'T00:00:00');
+          if(!isNaN(parsed)) d = parsed;
+        }
+        if(!d && l.created_at) {
+          const parsed = new Date(l.created_at);
+          if(!isNaN(parsed)) d = parsed;
+        }
+        return d ? d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : 'Recently';
+      })()} · ${l.status||'New'}</div></div>
     </div>`;
   }).join('');
 }
