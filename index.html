@@ -1,444 +1,4 @@
-<!DOCTYPE<script>
-
-
-// ─── AI LEAD GENERATOR ─────────────────────────────────────────
-let _generatedLeads = [];
-let _lgMode = 'ai'; // 'ai' or 'real'
-let _realLeadsUsed = 0;
-const REAL_LEADS_FREE_LIMIT = 5;
-
-function selectLeadGenMode(mode) {
-  _lgMode = mode;
-  const aiCard = document.getElementById('mode-ai-card');
-  const realCard = document.getElementById('mode-real-card');
-  const upgradePrompt = document.getElementById('lg-upgrade-prompt');
-  const form = document.getElementById('lg-form');
-  const countWrapper = document.getElementById('lg-count-wrapper');
-
-  // Update card borders
-  if(aiCard) aiCard.style.borderColor = mode === 'ai' ? 'var(--accent)' : 'var(--border)';
-  if(realCard) realCard.style.borderColor = mode === 'real' ? '#f59e0b' : 'var(--border)';
-
-  if(mode === 'real') {
-    // Show upgrade prompt + limit count to 5 for free
-    if(upgradePrompt) upgradePrompt.style.display = 'block';
-    if(form) form.style.display = 'block';
-    // Lock count to 5 for free tier
-    const countSel = document.getElementById('lg-count');
-    if(countSel) {
-      countSel.innerHTML = '<option value="5">5 (Free trial)</option>';
-      countSel.disabled = true;
-    }
-    const btn = document.getElementById('lg-btn');
-    if(btn) {
-      btn.style.background = 'linear-gradient(135deg,#f59e0b,#ef4444)';
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> <span data-en="Get My 5 Free Real Leads" data-ar="احصل على 5 عملاء حقيقيين مجاناً">Get My 5 Free Real Leads</span>`;
-    }
-  } else {
-    if(upgradePrompt) upgradePrompt.style.display = 'none';
-    if(form) form.style.display = 'block';
-    const countSel = document.getElementById('lg-count');
-    if(countSel) {
-      countSel.innerHTML = '<option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option>';
-      countSel.disabled = false;
-    }
-    const btn = document.getElementById('lg-btn');
-    if(btn) {
-      btn.style.background = 'linear-gradient(135deg,#3b82f6,#8b5cf6)';
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg> <span data-en="Generate Leads" data-ar="توليد العملاء">Generate Leads</span>`;
-    }
-  }
-}
-
-function claimFreeRealLeads() {
-  // Scroll to form and trigger
-  document.getElementById('lg-form').scrollIntoView({ behavior: 'smooth' });
-  const mybiz = document.getElementById('lg-mybiz').value.trim();
-  if(!mybiz) {
-    showToast('❌ Enter your business description first');
-    document.getElementById('lg-mybiz').focus();
-    return;
-  }
-  runLeadGenerator();
-}
-
-function showUpgradePlans() {
-  const modal = document.getElementById('lg-plans-modal');
-  if(modal) modal.style.display = 'flex';
-}
-
-function contactForUpgrade(plan) {
-  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
-  const msg = isAr
-    ? 'مرحباً! أود الاشتراك في خطة ' + plan + ' لمولد العملاء في NexCRM'
-    : 'Hi! I want to subscribe to the ' + plan + ' plan for the Lead Generator in NexCRM';
-  window.open('https://wa.me/966500000000?text=' + encodeURIComponent(msg), '_blank');
-}
-
-async function runLeadGenerator() {
-  const mybiz = document.getElementById('lg-mybiz').value.trim();
-  const location = document.getElementById('lg-location').value;
-  const count = document.getElementById('lg-count').value;
-  const details = document.getElementById('lg-details').value.trim();
-  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
-
-  if(!mybiz) { showToast(isAr ? '❌ أدخل وصف نشاطك التجاري' : '❌ Describe your business first'); return; }
-
-  const btn = document.getElementById('lg-btn');
-  const loading = document.getElementById('lg-loading');
-  const results = document.getElementById('lg-results');
-
-  btn.style.display = 'none';
-  loading.style.display = 'block';
-  results.style.display = 'none';
-  _generatedLeads = [];
-
-  // Update loading text based on mode
-  const loadingText = document.getElementById('lg-loading-text');
-  if(loadingText) loadingText.innerHTML = _lgMode === 'real'
-    ? (isAr ? '<span>جاري البحث في قاعدة بيانات 265 مليون جهة اتصال...</span>' : '<span>Searching database of 265M+ verified contacts...</span>')
-    : (isAr ? '<span>الذكاء الاصطناعي يحلل نشاطك ويجد أفضل العملاء...</span>' : '<span>AI is analyzing your business and finding best prospects...</span>');
-
-  try {
-    const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/apollo-leads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
-      body: JSON.stringify({ mode: _lgMode, mybiz, location, count, details, org_id: currentOrg?.id, user_email: currentUser?.email })
-    });
-    const data = await response.json();
-
-    if(data.success && data.leads && data.leads.length > 0) {
-      _generatedLeads = data.leads;
-      renderGeneratedLeads(data.leads, location, data.target_profile, data.mode);
-    } else if(data.error && _lgMode === 'real') {
-      // Apollo not configured yet — fall back to AI mode for demo
-      showToast(isAr ? 'جاري استخدام AI مؤقتاً' : 'Using AI mode temporarily');
-      _lgMode = 'ai';
-      await runLeadGenerator();
-      return;
-    } else {
-      throw new Error(data.error || 'No leads returned');
-    }
-  } catch(e) {
-    console.error('Lead gen error:', e);
-    // Fallback to local generation
-    _generatedLeads = generateFallbackLeads(mybiz, location, count);
-    renderGeneratedLeads(_generatedLeads, location, 'AI-generated prospects matching your business profile', 'ai');
-    showToast(isAr ? 'يعرض نتائج AI — جاري ضبط الاتصال' : 'Showing AI leads — connection being configured');
-  } finally {
-    loading.style.display = 'none';
-    btn.style.display = 'flex';
-    results.style.display = 'block';
-  }
-}
-
-function generateFallbackLeads(mybiz, location, count) {
-  const city = location.split(',')[0];
-  const n = parseInt(count) || 10;
-  const names = ['Mohammed Al-Otaibi','Faisal Al-Zahrani','Khalid Al-Dosari','Abdullah Al-Shammari','Saad Al-Qahtani','Nour Al-Shammari','Reem Al-Ahmadi','Ahmed Al-Ghamdi','Sultan Al-Anazi','Manal Al-Harbi','Omar Al-Rashid','Sara Al-Mutairi','Abdulaziz Al-Tamimi','Hind Al-Yami','Turki Al-Malki'];
-  const companies = ['Al-Riyadh Trading Group','Najma Advanced Solutions','Saudi Tech Ventures','Al-Amal Services Co.','Horizon Business Group','Al-Nakheel Development','Gulf Operations LLC','Tamkeen Business Solutions','Al-Faisal Enterprises','Crown Commercial Group','Al-Majd Logistics','Platinum Services KSA','Al-Watan Industries','Future Vision Co.','Reach Business Center'];
-  const industries = ['Logistics & Supply Chain','Manufacturing','Retail & Commerce','Technology','Construction','Healthcare','Education','Food & Beverage','Real Estate','Financial Services'];
-  const sizes = ['50-100','100-250','250-500','500-1000','1000+'];
-  return Array.from({length:Math.min(n,names.length)}, (_,i) => ({
-    name: names[i], company: companies[i],
-    title: ['CEO','HR Director','Operations Manager','General Manager','Owner'][i%5],
-    industry: industries[i%industries.length],
-    location: city,
-    phone: '+966 5' + (Math.floor(Math.random()*9)+1) + ' ' + Math.floor(Math.random()*900+100) + ' ' + Math.floor(Math.random()*9000+1000),
-    email: companies[i].toLowerCase().replace(/[^a-z]/g,'').slice(0,8) + '@' + companies[i].toLowerCase().replace(/[^a-z]/g,'').slice(0,6) + '.com.sa',
-    company_size: sizes[i%sizes.length] + ' employees',
-    why_good_lead: 'This company profile matches your target based on industry and size',
-    approach: 'Lead with a quick ROI example from a similar company in ' + city,
-    urgency: ['High','High','Medium'][i%3],
-    source: 'AI Generated', status: 'New', verified: false
-  }));
-}
-
-function renderGeneratedLeads(leads, location, targetProfile, mode) {
-  const list = document.getElementById('lg-leads-list');
-  const title = document.getElementById('lg-results-title');
-  const profileEl = document.getElementById('lg-target-profile');
-  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
-  const isReal = mode === 'real';
-
-  title.innerHTML = `
-    <span style="display:flex;align-items:center;gap:8px">
-      ${isReal
-        ? `<span style="background:rgba(16,185,129,0.12);color:var(--success);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>${isAr ? 'متحقق' : 'Verified'}</span>`
-        : `<span style="background:rgba(59,130,246,0.12);color:var(--accent);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">AI</span>`
-      }
-      ${leads.length} ${isAr ? 'عميل محتمل تم إيجاده في' : 'prospects found in'} ${location}
-    </span>`;
-
-  if(profileEl && targetProfile) {
-    profileEl.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;margin-left:4px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> ${targetProfile}`;
-  }
-
-  list.innerHTML = leads.map((l, i) => {
-    const phone = (l.phone||'').replace(/[\s\-\(\)]/g,'');
-    const waMsg = encodeURIComponent(isAr
-      ? 'مرحباً ' + (l.name||'').split(' ')[0] + '، تواصلت معك بخصوص خدماتنا التي قد تفيد ' + (l.company||'شركتكم') + '. هل لديك دقيقة؟'
-      : 'Hi ' + (l.name||'').split(' ')[0] + ', reaching out about services that could help ' + (l.company||'your company') + '. Do you have a minute?'
-    );
-    const waLink = phone && phone.length > 7 ? 'https://wa.me/' + phone.replace('+','') + '?text=' + waMsg : null;
-    const urgencyColor = l.urgency === 'High' ? 'var(--danger)' : l.urgency === 'Medium' ? 'var(--warning)' : 'var(--success)';
-
-    return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
-        <div style="flex:1;min-width:200px">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">${(l.name||'?')[0].toUpperCase()}</div>
-            <div style="flex:1">
-              <div style="display:flex;align-items:center;gap:6px">
-                <span style="font-size:13px;font-weight:700;color:var(--text)">${l.name||'—'}</span>
-                ${l.verified ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" title="Verified"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>` : ''}
-                <span style="font-size:10px;font-weight:700;color:${urgencyColor};background:${urgencyColor}18;padding:2px 7px;border-radius:20px">${l.urgency||'Medium'}</span>
-              </div>
-              <div style="font-size:11px;color:var(--text2)">${l.title||'—'} · ${l.company||'—'}</div>
-            </div>
-          </div>
-
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
-            <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              ${l.phone||'—'}
-            </div>
-            <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;overflow:hidden">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.email||'—'}</span>
-            </div>
-            <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              ${l.location||location}
-            </div>
-            <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-              ${l.industry||'—'} ${l.company_size ? '· ' + l.company_size : ''}
-            </div>
-          </div>
-
-          ${l.linkedin ? `<a href="${l.linkedin}" target="_blank" style="font-size:11px;color:var(--accent);display:flex;align-items:center;gap:4px;margin-bottom:8px;text-decoration:none"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn Profile</a>` : ''}
-
-          <div style="background:rgba(59,130,246,0.06);border-radius:8px;padding:8px 10px;margin-bottom:6px">
-            <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:3px">${isAr ? 'لماذا هو عميل جيد' : 'Why good lead'}</div>
-            <div style="font-size:12px;color:var(--text);line-height:1.6">${l.why_good_lead||'—'}</div>
-          </div>
-          <div style="background:rgba(16,185,129,0.06);border-radius:8px;padding:8px 10px">
-            <div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;margin-bottom:3px">${isAr ? 'كيفية التواصل' : 'Opening line'}</div>
-            <div style="font-size:12px;color:var(--text);line-height:1.6">${l.approach||'—'}</div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;min-width:110px">
-          ${waLink ? `<a href="${waLink}" target="_blank" style="background:#25d366;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            WhatsApp
-          </a>` : ''}
-          <button onclick="importSingleLead(${i})" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap" id="lg-import-btn-${i}">
-            ${isAr ? '+ CRM' : '+ CRM'}
-          </button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function importSingleLead(index) {
-  const l = _generatedLeads[index];
-  if(!l) return;
-  const btn = document.getElementById('lg-import-btn-' + index);
-  if(btn) { btn.textContent = '...'; btn.disabled = true; }
-  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
-  try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/leads', {
-      method: 'POST',
-      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({
-        name: l.name, company: l.company, phone: l.phone, email: l.email,
-        source: l.source || 'AI Generated', status: 'New',
-        assigned: currentUser?.email || '', org_id: currentOrg?.id || null,
-        notes: (l.why_good_lead||'') + '\n\nApproach: ' + (l.approach||''),
-        created_at: new Date().toISOString()
-      })
-    });
-    if(r.ok || r.status === 201) {
-      if(btn) { btn.textContent = isAr ? '✓' : '✓ Added'; btn.style.background = 'var(--success)'; }
-      showToast('✅ ' + l.name + (isAr ? ' تمت الإضافة!' : ' added!'));
-    } else throw new Error();
-  } catch(e) {
-    if(btn) { btn.textContent = isAr ? '+ CRM' : '+ CRM'; btn.disabled = false; }
-    showToast('❌ ' + (isAr ? 'فشل في الإضافة' : 'Import failed'));
-  }
-}
-
-async function importAllLeads() {
-  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
-  if(!_generatedLeads.length) return;
-  showToast(isAr ? 'جاري الاستيراد...' : 'Importing...');
-  let ok = 0;
-  for(let i = 0; i < _generatedLeads.length; i++) {
-    const l = _generatedLeads[i];
-    try {
-      const r = await fetch(SUPABASE_URL + '/rest/v1/leads', {
-        method: 'POST', headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ name:l.name, company:l.company, phone:l.phone, email:l.email, source:l.source||'AI Generated', status:'New', assigned:currentUser?.email||'', org_id:currentOrg?.id||null, notes:(l.why_good_lead||'')+'\\n\\nApproach: '+(l.approach||''), created_at:new Date().toISOString() })
-      });
-      if(r.ok || r.status === 201) {
-        ok++;
-        const btn = document.getElementById('lg-import-btn-'+i);
-        if(btn) { btn.textContent = '✓'; btn.style.background='var(--success)'; btn.disabled=true; }
-      }
-    } catch(e) {}
-  }
-  showToast('✅ ' + ok + (isAr ? ' عميل تم استيراده!' : ' leads imported!'));
-}
-
-function exportLeadsCSV() {
-  if(!_generatedLeads.length) return;
-  const h = ['Name','Company','Title','Industry','Location','Phone','Email','LinkedIn','Company Size','Why Good Lead','Approach'];
-  const rows = _generatedLeads.map(l => [l.name,l.company,l.title,l.industry,l.location,l.phone,l.email,l.linkedin||'',l.company_size||'',l.why_good_lead,l.approach].map(v=>'"'+(v||'').replace(/"/g,'""')+'"').join(','));
-  const blob = new Blob(['\ufeff'+[h.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8'});
-  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='leads_'+Date.now()+'.csv'; a.click();
-  showToast('✅ CSV exported!');
-}
-
-</script>
-<script>
-
-// ─── SMART FOLLOW-UP SYSTEM ────────────────────────────────────
-function getHoursAgo(dateStr) {
-  if(!dateStr) return 9999;
-  const d = new Date(dateStr);
-  if(isNaN(d)) return 9999;
-  return (Date.now() - d.getTime()) / 3600000;
-}
-
-function renderFollowUpAlert(data) {
-  const card = document.getElementById('followup-alert-card');
-  const subtitle = document.getElementById('followup-subtitle');
-  const preview = document.getElementById('followup-preview');
-  if(!card || !data) return;
-
-  // Find leads not contacted in 24+ hours (New/Warm/Active status, not Won/Lost)
-  const coldLeads = data.filter(l => {
-    const status = (l.status || '').toLowerCase();
-    if(status === 'won' || status === 'lost') return false;
-    const hoursAgo = getHoursAgo(l.created_at);
-    return hoursAgo > 24;
-  }).sort((a,b) => getHoursAgo(b.created_at) - getHoursAgo(a.created_at));
-
-  if(coldLeads.length === 0) { card.style.display = 'none'; return; }
-
-  card.style.display = 'block';
-  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
-
-  const hoursStr = h => {
-    if(h > 48) return Math.round(h/24) + (isAr ? ' يوم' : ' days');
-    return Math.round(h) + (isAr ? ' ساعة' : 'h');
-  };
-
-  subtitle.textContent = isAr
-    ? coldLeads.length + ' عميل لم يتم التواصل معهم منذ أكثر من 24 ساعة'
-    : coldLeads.length + ' leads haven\'t been contacted in 24+ hours';
-
-  // Show top 3 preview chips
-  preview.innerHTML = coldLeads.slice(0,3).map(l => {
-    const h = getHoursAgo(l.created_at);
-    const urgency = h > 72 ? 'var(--danger)' : h > 48 ? 'var(--warning)' : 'var(--accent)';
-    return `<div style="background:var(--bg2);border:1px solid ${urgency};border-left:3px solid ${urgency};border-radius:8px;padding:8px 14px;font-size:12px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showFollowupList()">
-      <span style="color:${urgency};font-weight:700">${hoursStr(h)}</span>
-      <span style="color:var(--text);font-weight:600">${l.name||'Unknown'}</span>
-      <span style="color:var(--text2)">${l.source||''}</span>
-    </div>`;
-  }).join('');
-}
-
-function showFollowupList() {
-  const modal = document.getElementById('followup-modal');
-  const list = document.getElementById('followup-list');
-  if(!modal || !list) return;
-
-  modal.style.display = 'flex';
-  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
-
-  const coldLeads = leads.filter(l => {
-    const status = (l.status || '').toLowerCase();
-    if(status === 'won' || status === 'lost') return false;
-    return getHoursAgo(l.created_at) > 24;
-  }).sort((a,b) => getHoursAgo(b.created_at) - getHoursAgo(a.created_at));
-
-  if(coldLeads.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--success);font-size:14px;font-weight:600">✅ ' + (isAr ? 'تم التواصل مع جميع العملاء!' : 'All leads have been contacted!') + '</div>';
-    return;
-  }
-
-  const waTemplates = {
-    new: isAr
-      ? 'مرحباً {name}! 👋\nشكراً لاهتمامك. أود التعرف عليك ومناقشة كيف يمكننا مساعدتك. هل أنت متاح للحديث؟'
-      : 'Hi {name}! 👋\nThank you for your interest. I\'d love to connect and discuss how we can help you. Are you available to chat?',
-    warm: isAr
-      ? 'مرحباً {name}! 😊\nكيف حالك؟ أتذكر أنك أبديت اهتماماً بخدماتنا. هل لديك أي أسئلة؟ نحن هنا للمساعدة!'
-      : 'Hey {name}! 😊\nHope you\'re doing well! I remember you showed interest in our services. Do you have any questions? We\'re here to help!',
-    active: isAr
-      ? 'مرحباً {name}! ⚡\nأريد التأكد من أن كل شيء يسير على ما يرام. هل يمكنني مساعدتك في اتخاذ قرار؟'
-      : 'Hi {name}! ⚡\nJust checking in to make sure everything is going smoothly. Can I help you with your decision?'
-  };
-
-  list.innerHTML = coldLeads.map(l => {
-    const h = getHoursAgo(l.created_at);
-    const urgency = h > 72 ? '#ef4444' : h > 48 ? '#f59e0b' : '#3b82f6';
-    const urgencyLabel = h > 72
-      ? (isAr ? 'عاجل جداً' : 'Critical')
-      : h > 48 ? (isAr ? 'عاجل' : 'Urgent')
-      : (isAr ? 'تابع' : 'Follow up');
-    const hoursStr = h > 48 ? Math.round(h/24) + (isAr ? ' يوم' : 'd') : Math.round(h) + (isAr ? ' ساعة' : 'h');
-    const template = waTemplates[(l.status||'new').toLowerCase()] || waTemplates.new;
-    const msg = encodeURIComponent(template.replace('{name}', (l.name||'').split(' ')[0]));
-    const phone = (l.phone||'').replace(/\D/g,'');
-    const waLink = phone ? `https://wa.me/${phone}?text=${msg}` : null;
-
-    return `<div style="background:var(--bg3);border-radius:14px;padding:16px;margin-bottom:10px;border-left:3px solid ${urgency}">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <span style="font-size:13px;font-weight:700;color:var(--text)">${l.name||'Unknown'}</span>
-            <span style="font-size:10px;font-weight:700;color:${urgency};background:${urgency}18;padding:2px 8px;border-radius:20px">${urgencyLabel}</span>
-          </div>
-          <div style="font-size:11px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap;margin-top:4px;align-items:center">
-            <span style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${l.phone||'—'}</span>
-            <span style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.source||'—'}</span>
-            <span style="display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>${l.status||'New'}</span>
-            <span style="display:flex;align-items:center;gap:4px;color:${urgency};font-weight:600"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${hoursStr} ${isAr ? 'بدون تواصل' : 'without contact'}</span>
-          </div>
-          ${l.value ? `<div style="font-size:11px;color:var(--success);margin-top:6px;font-weight:600;display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>SAR ${parseInt((l.value||'0').replace(/[$,]/g,'')).toLocaleString()}</div>` : ''}
-        </div>
-        <div style="display:flex;gap:8px;flex-shrink:0">
-          ${waLink ? `<a href="${waLink}" target="_blank" style="background:#25d366;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            WhatsApp
-          </a>` : `<button style="background:var(--bg2);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer">${isAr ? 'لا يوجد رقم' : 'No phone'}</button>`}
-          <button onclick="nav('leads')" style="background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">
-            ${isAr ? 'عرض' : 'View'}
-          </button>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function closeFollowupModal() {
-  const modal = document.getElementById('followup-modal');
-  if(modal) modal.style.display = 'none';
-}
-
-// Close modal on backdrop click
-document.addEventListener('click', e => {
-  const modal = document.getElementById('followup-modal');
-  if(modal && e.target === modal) closeFollowupModal();
-});
-
-</script>
- html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -1667,7 +1227,7 @@ document.addEventListener('click', e => {
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Contacts</span>
     </div>
     <div class="nav-item" onclick="nav('calls',this)" id="calls-nav-item">
-      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span data-en="Call Logs" data-ar="سجلات المكالمات">Call Logs</span>
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span>Call Logs</span>
     </div>
     <div class="nav-item" onclick="nav('inbox',this)" id="inbox-nav-item">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span>WhatsApp Inbox</span>
@@ -1678,7 +1238,7 @@ document.addEventListener('click', e => {
   <div class="nav-section">
     <div class="nav-label">Admin</div>
     <div class="nav-item" onclick="nav('admin',this)" id="admin-nav-item" style="display:none">
-      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></span><span><span data-en="Admin Panel" data-ar="لوحة الإدارة">Admin Panel</span><span class="admin-badge">ADMIN</span></span>
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></span><span>Admin Panel<span class="admin-badge">ADMIN</span></span>
     </div>
   </div>
 
@@ -1693,13 +1253,13 @@ document.addEventListener('click', e => {
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span><span>Campaigns</span>
     </div>
     <div class="nav-item" onclick="nav('calendar',this)">
-      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span><span data-en="Content Calendar" data-ar="تقويم المحتوى">Content Calendar</span></span>
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>Content Calendar</span>
     </div>
     <div class="nav-item" onclick="nav('deliverables',this)">
-      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span data-en="Deliverables" data-ar="التسليمات">Deliverables</span>
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span>Deliverables</span>
     </div>
     <div class="nav-item" onclick="nav('invoices',this)">
-      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span data-en="Invoices" data-ar="الفواتير">Invoices</span>
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span>Invoices</span>
     </div>
     <div class="nav-item" onclick="nav('analytics',this)">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span>Analytics</span>
@@ -1779,7 +1339,7 @@ document.addEventListener('click', e => {
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon" style="background:rgba(59,130,246,0.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-          <div class="stat-label"><span data-en="Total Leads" data-ar="إجمالي العملاء">Total Leads</span></div>
+          <div class="stat-label">Total Leads</div>
           <div class="stat-value" id="dash-total">—</div>
           <div class="stat-change up" id="dash-total-sub">Loading...</div>
         </div>
@@ -1791,7 +1351,7 @@ document.addEventListener('click', e => {
         </div>
         <div class="stat-card">
           <div class="stat-icon" style="background:rgba(245,158,11,0.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></div>
-          <div class="stat-label"><span data-en="Conversion Rate" data-ar="معدل التحويل">Conversion Rate</span></div>
+          <div class="stat-label">Conversion Rate</div>
           <div class="stat-value" id="dash-conv">—</div>
           <div class="stat-change up" id="dash-conv-sub">Won / Total leads</div>
         </div>
@@ -1807,19 +1367,15 @@ document.addEventListener('click', e => {
       <div id="followup-alert-card" style="display:none;background:linear-gradient(135deg,rgba(239,68,68,0.08),rgba(245,158,11,0.05));border:1px solid rgba(239,68,68,0.25);border-radius:16px;padding:18px 20px;margin-bottom:20px">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div style="display:flex;align-items:center;gap:12px">
-            <div style="width:40px;height:40px;background:linear-gradient(135deg,#ef4444,#f59e0b);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;animation:pulse 2s infinite">
+            <div style="width:40px;height:40px;background:linear-gradient(135deg,#ef4444,#f59e0b);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
             <div>
-              <div style="font-size:14px;font-weight:800;color:var(--danger)" id="followup-title">
-                <span data-en="Hot Leads Going Cold!" data-ar="عملاء ساخنون يبردون!">Hot Leads Going Cold!</span>
-              </div>
+              <div style="font-size:14px;font-weight:800;color:var(--danger)" id="followup-title"><span data-en="Hot Leads Going Cold!" data-ar="عملاء ساخنون يبردون!">Hot Leads Going Cold!</span></div>
               <div style="font-size:12px;color:var(--text2);margin-top:2px" id="followup-subtitle"></div>
             </div>
           </div>
-          <button onclick="showFollowupList()" style="background:var(--danger);color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">
-            <span data-en="View & Follow Up" data-ar="عرض ومتابعة">View & Follow Up</span>
-          </button>
+          <button onclick="showFollowupList()" style="background:var(--danger);color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap"><span data-en="View & Follow Up" data-ar="عرض ومتابعة">View & Follow Up</span></button>
         </div>
         <div id="followup-preview" style="margin-top:14px;display:flex;flex-wrap:wrap;gap:8px"></div>
       </div>
@@ -1829,12 +1385,8 @@ document.addEventListener('click', e => {
         <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:600px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 40px 80px rgba(0,0,0,0.4)">
           <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
             <div>
-              <div style="font-size:16px;font-weight:800;color:var(--text)">
-                <span data-en="Follow-Up List" data-ar="قائمة المتابعة">Follow-Up List</span>
-              </div>
-              <div style="font-size:12px;color:var(--text2);margin-top:2px">
-                <span data-en="Leads waiting for contact — act now before they go cold" data-ar="عملاء ينتظرون التواصل — تصرف الآن قبل أن يبردوا">Leads waiting for contact — act now before they go cold</span>
-              </div>
+              <div style="font-size:16px;font-weight:800;color:var(--text)"><span data-en="Follow-Up List" data-ar="قائمة المتابعة">Follow-Up List</span></div>
+              <div style="font-size:12px;color:var(--text2);margin-top:2px"><span data-en="Leads waiting for contact — act now" data-ar="عملاء ينتظرون التواصل — تصرف الآن">Leads waiting for contact — act now</span></div>
             </div>
             <button onclick="closeFollowupModal()" style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);cursor:pointer;font-size:13px">✕</button>
           </div>
@@ -1848,9 +1400,9 @@ document.addEventListener('click', e => {
           <div class="card-header">
             <div>
               <div class="card-title">Monthly Performance</div>
-              <div class="card-subtitle"><span data-en="Leads vs Conversions" data-ar="العملاء مقابل التحويلات">Leads vs Conversions</span></div>
+              <div class="card-subtitle">Leads vs Conversions</div>
             </div>
-            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px"><span data-en="This Year" data-ar="هذا العام">This Year</span></button>
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px">This Year</button>
           </div>
           <div class="mini-chart" id="monthly-chart">
             <div class="bar" style="height:10%"></div>
@@ -1915,7 +1467,7 @@ document.addEventListener('click', e => {
     <div class="page" id="page-leads">
       <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
         <div class="stat-card">
-          <div class="stat-label"><span data-en="Total Leads" data-ar="إجمالي العملاء">Total Leads</span></div>
+          <div class="stat-label">Total Leads</div>
           <div class="stat-value" id="stat-total">—</div>
           <div class="stat-change up" id="stat-total-sub">Loading...</div>
         </div>
@@ -2075,163 +1627,6 @@ document.addEventListener('click', e => {
       </div>
     </div>
 
-
-    <!-- AI LEAD GENERATOR PAGE -->
-    <div class="page" id="page-leadgen">
-      <div style="max-width:920px;margin:0 auto">
-
-        <!-- Header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
-          <div style="display:flex;align-items:center;gap:16px">
-            <div style="width:48px;height:48px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(99,102,241,0.4)">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-            </div>
-            <div>
-              <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)"><span data-en="Lead Generator" data-ar="مولد العملاء">Lead Generator</span></div>
-              <div style="font-size:12px;color:var(--text2);margin-top:2px"><span data-en="Find your perfect prospects automatically" data-ar="اعثر على عملائك المثاليين تلقائياً">Find your perfect prospects automatically</span></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mode Selector -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
-
-          <!-- AI Mode -->
-          <div id="mode-ai-card" onclick="selectLeadGenMode('ai')" style="background:var(--bg2);border:2px solid var(--accent);border-radius:16px;padding:20px;cursor:pointer;transition:all 0.2s;position:relative">
-            <div style="position:absolute;top:12px;right:12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">FREE</div>
-            <div style="width:40px;height:40px;background:rgba(59,130,246,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            </div>
-            <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px"><span data-en="AI Sample Leads" data-ar="عملاء AI تجريبيون">AI Sample Leads</span></div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.6"><span data-en="AI generates realistic prospect profiles matched to your business. Perfect to see how the feature works." data-ar="الذكاء الاصطناعي يولد ملفات عملاء واقعية متطابقة مع نشاطك. مثالي لرؤية كيف تعمل الميزة.">AI generates realistic prospect profiles matched to your business. Perfect to see how the feature works.</span></div>
-            <div style="margin-top:12px;font-size:11px;color:var(--accent);font-weight:700"><span data-en="Unlimited · Instant · Free forever" data-ar="غير محدود · فوري · مجاني دائماً">Unlimited · Instant · Free forever</span></div>
-          </div>
-
-          <!-- Real Mode -->
-          <div id="mode-real-card" onclick="selectLeadGenMode('real')" style="background:var(--bg2);border:2px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;transition:all 0.2s;position:relative">
-            <div style="position:absolute;top:12px;right:12px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px"><span data-en="5 FREE TRIAL" data-ar="5 مجاناً تجربة">5 FREE TRIAL</span></div>
-            <div style="width:40px;height:40px;background:rgba(245,158,11,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            </div>
-            <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px"><span data-en="Real Verified Leads" data-ar="عملاء حقيقيون ومتحققون">Real Verified Leads</span></div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.6"><span data-en="Real people, real companies, real phone numbers and emails you can contact right now." data-ar="أشخاص حقيقيون، شركات حقيقية، أرقام هواتف وإيميلات يمكنك التواصل معها الآن.">Real people, real companies, real phone numbers and emails you can contact right now.</span></div>
-            <div style="margin-top:12px;font-size:11px;color:#f59e0b;font-weight:700"><span data-en="Try 5 leads free · Upgrade for more" data-ar="جرب 5 عملاء مجاناً · ترقية للمزيد">Try 5 leads free · Upgrade for more</span></div>
-          </div>
-        </div>
-
-        <!-- Hidden: Real mode upgrade prompt -->
-        <div id="lg-upgrade-prompt" style="display:none;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(239,68,68,0.05));border:1px solid rgba(245,158,11,0.3);border-radius:16px;padding:20px;margin-bottom:20px;text-align:center">
-          <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:8px"><span data-en="Unlock Real Verified Leads" data-ar="افتح العملاء الحقيقيين المتحققين">Unlock Real Verified Leads</span></div>
-          <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.7"><span data-en="Get real contacts with verified phone numbers and emails from a database of 265M+ professionals. Your first 5 leads are free." data-ar="احصل على جهات اتصال حقيقية مع أرقام هواتف وإيميلات متحققة من قاعدة بيانات تضم أكثر من 265 مليون محترف. أول 5 عملاء مجاناً.">Get real contacts with verified phone numbers and emails from a database of 265M+ professionals. Your first 5 leads are free.</span></div>
-          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-            <button onclick="claimFreeRealLeads()" style="background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(245,158,11,0.4)">
-              <span data-en="Claim My 5 Free Leads" data-ar="احصل على 5 عملاء مجاناً">Claim My 5 Free Leads</span>
-            </button>
-            <button onclick="showUpgradePlans()" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
-              <span data-en="View Plans" data-ar="عرض الخطط">View Plans</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Upgrade Plans Modal -->
-        <div id="lg-plans-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;padding:20px">
-          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:24px;width:100%;max-width:700px;padding:32px;box-shadow:0 40px 80px rgba(0,0,0,0.4)">
-            <div style="text-align:center;margin-bottom:28px">
-              <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px"><span data-en="Choose Your Plan" data-ar="اختر خطتك">Choose Your Plan</span></div>
-              <div style="font-size:13px;color:var(--text2)"><span data-en="Real verified leads delivered to your CRM" data-ar="عملاء حقيقيون متحققون يصلون مباشرة إلى CRM">Real verified leads delivered to your CRM</span></div>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
-              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center">
-                <div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Starter</div>
-                <div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 99<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div>
-                <div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">50 <span data-en="real leads/month" data-ar="عميل حقيقي/شهر">real leads/month</span></div>
-                <button onclick="contactForUpgrade('Starter - SAR 99')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px"><span data-en="Get Started" data-ar="ابدأ الآن">Get Started</span></button>
-              </div>
-              <div style="background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.08));border:2px solid var(--accent);border-radius:16px;padding:20px;text-align:center;position:relative">
-                <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap"><span data-en="MOST POPULAR" data-ar="الأكثر طلباً">MOST POPULAR</span></div>
-                <div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Growth</div>
-                <div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 299<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div>
-                <div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">200 <span data-en="real leads/month" data-ar="عميل حقيقي/شهر">real leads/month</span></div>
-                <button onclick="contactForUpgrade('Growth - SAR 299')" style="width:100%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px"><span data-en="Get Started" data-ar="ابدأ الآن">Get Started</span></button>
-              </div>
-              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center">
-                <div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Pro</div>
-                <div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 599<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div>
-                <div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0"><span data-en="Unlimited leads/month" data-ar="عملاء غير محدود/شهر">Unlimited leads/month</span></div>
-                <button onclick="contactForUpgrade('Pro - SAR 599')" style="width:100%;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px"><span data-en="Get Started" data-ar="ابدأ الآن">Get Started</span></button>
-              </div>
-            </div>
-            <button onclick="document.getElementById('lg-plans-modal').style.display='none'" style="width:100%;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;cursor:pointer;font-family:inherit"><span data-en="Maybe later" data-ar="ربما لاحقاً">Maybe later</span></button>
-          </div>
-        </div>
-
-        <!-- Search Form -->
-        <div class="card" id="lg-form" style="margin-bottom:20px;background:linear-gradient(135deg,rgba(59,130,246,0.05),rgba(139,92,246,0.03));border:1px solid rgba(99,102,241,0.15)">
-          <div style="margin-bottom:16px">
-            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="What does your business offer?" data-ar="ماذا تقدم شركتك؟">What does your business offer?</span></label>
-            <input class="form-input" id="lg-mybiz" placeholder="e.g. Employee training & upskilling programs for companies with large operations teams" />
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
-            <div>
-              <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Location" data-ar="الموقع">Location</span></label>
-              <select class="form-input" id="lg-location">
-                <option>Riyadh, Saudi Arabia</option>
-                <option>Jeddah, Saudi Arabia</option>
-                <option>Dammam, Saudi Arabia</option>
-                <option>Saudi Arabia (All)</option>
-                <option>Dubai, UAE</option>
-                <option>UAE (All)</option>
-                <option>GCC Region</option>
-                <option>Kuwait</option>
-                <option>Qatar</option>
-              </select>
-            </div>
-            <div id="lg-count-wrapper">
-              <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Number of Leads" data-ar="عدد العملاء">Number of Leads</span></label>
-              <select class="form-input" id="lg-count">
-                <option value="10">10</option>
-                <option value="20" selected>20</option>
-                <option value="30">30</option>
-                <option value="50">50</option>
-              </select>
-            </div>
-          </div>
-          <div style="margin-bottom:16px">
-            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Additional details (optional)" data-ar="تفاصيل إضافية (اختياري)">Additional details (optional)</span></label>
-            <textarea class="form-input" id="lg-details" rows="2" placeholder="e.g. Target logistics, manufacturing, or retail companies with 50+ employees..." style="resize:none;font-size:13px;line-height:1.6"></textarea>
-          </div>
-          <button onclick="runLeadGenerator()" id="lg-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(99,102,241,0.4)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-            <span data-en="Generate Leads" data-ar="توليد العملاء">Generate Leads</span>
-          </button>
-          <div id="lg-loading" style="display:none;text-align:center;padding:32px;color:var(--text2)">
-            <div style="width:36px;height:36px;border:3px solid rgba(99,102,241,0.2);border-top-color:#6366f1;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px"></div>
-            <div style="font-size:13px;font-weight:600" id="lg-loading-text"><span data-en="Finding your prospects..." data-ar="جاري البحث عن العملاء...">Finding your prospects...</span></div>
-            <div style="font-size:11px;margin-top:4px;color:var(--text2)"><span data-en="This takes about 20 seconds" data-ar="يستغرق حوالي 20 ثانية">This takes about 20 seconds</span></div>
-          </div>
-        </div>
-
-        <!-- Results -->
-        <div id="lg-results" style="display:none">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-            <div>
-              <div style="font-size:14px;font-weight:700;color:var(--text)" id="lg-results-title"></div>
-              <div style="font-size:12px;color:var(--text2);margin-top:2px" id="lg-target-profile"></div>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button onclick="importAllLeads()" style="background:var(--success);color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span data-en="Import All to CRM" data-ar="استيراد الكل">Import All to CRM</span>
-              </button>
-              <button onclick="exportLeadsCSV()" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">CSV</button>
-            </div>
-          </div>
-          <div id="lg-leads-list"></div>
-        </div>
-
-      </div>
-    </div>
-
     <!-- CAMPAIGNS -->
     <div class="page" id="page-inbox">
       <div style="display:flex;height:calc(100vh - 70px);gap:0;overflow:hidden;border-radius:16px;border:1px solid var(--border);background:var(--bg2)">
@@ -2277,6 +1672,91 @@ document.addEventListener('click', e => {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- AI LEAD GENERATOR PAGE -->
+    <div class="page" id="page-leadgen">
+      <div style="max-width:920px;margin:0 auto">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+          <div style="width:48px;height:48px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(99,102,241,0.4)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text)"><span data-en="Lead Generator" data-ar="مولد العملاء">Lead Generator</span></div>
+            <div style="font-size:12px;color:var(--text2);margin-top:2px"><span data-en="Find your perfect prospects automatically" data-ar="اعثر على عملائك المثاليين تلقائياً">Find your perfect prospects automatically</span></div>
+          </div>
+        </div>
+
+        <!-- Mode Selector -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+          <div id="mode-ai-card" onclick="selectLeadGenMode('ai')" style="background:var(--bg2);border:2px solid var(--accent);border-radius:16px;padding:20px;cursor:pointer;position:relative">
+            <div style="position:absolute;top:12px;right:12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">FREE</div>
+            <div style="width:40px;height:40px;background:rgba(59,130,246,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+            <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px"><span data-en="AI Sample Leads" data-ar="عملاء AI تجريبيون">AI Sample Leads</span></div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6"><span data-en="AI generates realistic prospect profiles matched to your business." data-ar="الذكاء الاصطناعي يولد ملفات عملاء واقعية متطابقة مع نشاطك.">AI generates realistic prospect profiles matched to your business.</span></div>
+            <div style="margin-top:12px;font-size:11px;color:var(--accent);font-weight:700"><span data-en="Unlimited · Instant · Free" data-ar="غير محدود · فوري · مجاني">Unlimited · Instant · Free</span></div>
+          </div>
+          <div id="mode-real-card" onclick="selectLeadGenMode('real')" style="background:var(--bg2);border:2px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;position:relative">
+            <div style="position:absolute;top:12px;right:12px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px"><span data-en="5 FREE TRIAL" data-ar="5 مجاناً">5 FREE TRIAL</span></div>
+            <div style="width:40px;height:40px;background:rgba(245,158,11,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px"><span data-en="Real Verified Leads" data-ar="عملاء حقيقيون ومتحققون">Real Verified Leads</span></div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6"><span data-en="Real people, real companies, real phone numbers you can contact right now." data-ar="أشخاص حقيقيون، شركات حقيقية، أرقام هواتف يمكنك التواصل معها الآن.">Real people, real companies, real phone numbers you can contact right now.</span></div>
+            <div style="margin-top:12px;font-size:11px;color:#f59e0b;font-weight:700"><span data-en="Try 5 leads free · Upgrade for more" data-ar="جرب 5 عملاء مجاناً · ترقية للمزيد">Try 5 leads free · Upgrade for more</span></div>
+          </div>
+        </div>
+
+        <!-- Upgrade prompt (hidden by default) -->
+        <div id="lg-upgrade-prompt" style="display:none;background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(239,68,68,0.05));border:1px solid rgba(245,158,11,0.3);border-radius:16px;padding:20px;margin-bottom:20px;text-align:center">
+          <div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:8px"><span data-en="Unlock Real Verified Leads" data-ar="افتح العملاء الحقيقيين">Unlock Real Verified Leads</span></div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:16px"><span data-en="Real contacts from a database of 265M+ professionals. First 5 leads free." data-ar="جهات اتصال حقيقية من قاعدة بيانات 265 مليون محترف. أول 5 مجاناً.">Real contacts from a database of 265M+ professionals. First 5 leads free.</span></div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <button onclick="claimFreeRealLeads()" style="background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;border:none;border-radius:12px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit"><span data-en="Claim My 5 Free Leads" data-ar="احصل على 5 عملاء مجاناً">Claim My 5 Free Leads</span></button>
+            <button onclick="showUpgradePlans()" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:12px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit"><span data-en="View Plans" data-ar="عرض الخطط">View Plans</span></button>
+          </div>
+        </div>
+
+        <!-- Plans Modal -->
+        <div id="lg-plans-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;padding:20px">
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:24px;width:100%;max-width:700px;padding:32px;box-shadow:0 40px 80px rgba(0,0,0,0.4)">
+            <div style="text-align:center;margin-bottom:28px"><div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px"><span data-en="Choose Your Plan" data-ar="اختر خطتك">Choose Your Plan</span></div></div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center"><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Starter</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 99<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">50 leads/month</div><button onclick="contactForUpgrade('Starter - SAR 99')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
+              <div style="background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.08));border:2px solid var(--accent);border-radius:16px;padding:20px;text-align:center;position:relative"><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap">MOST POPULAR</div><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Growth</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 299<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">200 leads/month</div><button onclick="contactForUpgrade('Growth - SAR 299')" style="width:100%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
+              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center"><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Pro</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 599<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">Unlimited leads</div><button onclick="contactForUpgrade('Pro - SAR 599')" style="width:100%;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
+            </div>
+            <button onclick="document.getElementById('lg-plans-modal').style.display='none'" style="width:100%;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;cursor:pointer;font-family:inherit">Maybe later</button>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <div class="card" id="lg-form" style="margin-bottom:20px;background:linear-gradient(135deg,rgba(59,130,246,0.05),rgba(139,92,246,0.03));border:1px solid rgba(99,102,241,0.15)">
+          <div style="margin-bottom:16px"><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="What does your business offer?" data-ar="ماذا تقدم شركتك؟">What does your business offer?</span></label><input class="form-input" id="lg-mybiz" placeholder="e.g. Employee training & upskilling programs for companies with large operations teams" /></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px">
+            <div><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Location" data-ar="الموقع">Location</span></label><select class="form-input" id="lg-location"><option>Riyadh, Saudi Arabia</option><option>Jeddah, Saudi Arabia</option><option>Dammam, Saudi Arabia</option><option>Saudi Arabia (All)</option><option>Dubai, UAE</option><option>UAE (All)</option><option>GCC Region</option><option>Kuwait</option><option>Qatar</option></select></div>
+            <div id="lg-count-wrapper"><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Number of Leads" data-ar="عدد العملاء">Number of Leads</span></label><select class="form-input" id="lg-count"><option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option></select></div>
+          </div>
+          <div style="margin-bottom:16px"><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Additional details (optional)" data-ar="تفاصيل إضافية (اختياري)">Additional details (optional)</span></label><textarea class="form-input" id="lg-details" rows="2" placeholder="e.g. Target logistics, manufacturing companies with 50+ employees..." style="resize:none;font-size:13px;line-height:1.6"></textarea></div>
+          <button onclick="runLeadGenerator()" id="lg-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(99,102,241,0.4)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            <span data-en="Generate Leads" data-ar="توليد العملاء">Generate Leads</span>
+          </button>
+          <div id="lg-loading" style="display:none;text-align:center;padding:32px;color:var(--text2)">
+            <div style="width:36px;height:36px;border:3px solid rgba(99,102,241,0.2);border-top-color:#6366f1;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px"></div>
+            <div style="font-size:13px;font-weight:600" id="lg-loading-text"><span data-en="Finding your prospects..." data-ar="جاري البحث عن العملاء...">Finding your prospects...</span></div>
+          </div>
+        </div>
+        <div id="lg-results" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div><div style="font-size:14px;font-weight:700;color:var(--text)" id="lg-results-title"></div><div style="font-size:12px;color:var(--text2);margin-top:2px" id="lg-target-profile"></div></div>
+            <div style="display:flex;gap:8px">
+              <button onclick="importAllLeads()" style="background:var(--success);color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><span data-en="Import All to CRM" data-ar="استيراد الكل">Import All to CRM</span></button>
+              <button onclick="exportLeadsCSV()" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">CSV</button>
+            </div>
+          </div>
+          <div id="lg-leads-list"></div>
         </div>
       </div>
     </div>
@@ -2473,7 +1953,7 @@ document.addEventListener('click', e => {
               <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadCampaignHistory()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg></button>
             </div>
             <div id="campaign-history">
-              <div style="text-align:center;padding:40px;color:var(--text2)"><span data-en="No campaigns sent yet" data-ar="لم يتم إرسال حملات بعد">No campaigns sent yet</span></div>
+              <div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>
             </div>
           </div>
         </div>
@@ -2731,38 +2211,38 @@ document.addEventListener('click', e => {
       </div>
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-label"><span data-en="Conversion Rate" data-ar="معدل التحويل">Conversion Rate</span></div>
+          <div class="stat-label">Conversion Rate</div>
           <div class="stat-value" id="an-conv">—</div>
-          <div class="stat-change up" id="an-conv-sub"><span data-en="Won / Total leads" data-ar="فوز / إجمالي العملاء">Won / Total leads</span></div>
+          <div class="stat-change up" id="an-conv-sub">Won / Total leads</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label"><span data-en="Total Pipeline Value" data-ar="قيمة خط المبيعات">Total Pipeline Value</span></div>
+          <div class="stat-label">Total Pipeline Value</div>
           <div class="stat-value" id="an-value">—</div>
           <div class="stat-change up">▲ <span data-en="All deal values" data-ar="كل قيم الصفقات">All deal values</span></div>
         </div>
         <div class="stat-card">
-          <div class="stat-label"><span data-en="Total Leads" data-ar="إجمالي العملاء">Total Leads</span></div>
+          <div class="stat-label">Total Leads</div>
           <div class="stat-value" id="an-total">—</div>
           <div class="stat-change up" id="an-total-sub"><span data-en="In current workspace" data-ar="في مساحة العمل الحالية">In current workspace</span></div>
         </div>
         <div class="stat-card">
-          <div class="stat-label"><span data-en="Won Leads" data-ar="صفقات مكتملة">Won Leads</span></div>
+          <div class="stat-label">Won Leads</div>
           <div class="stat-value" id="an-won" style="color:var(--success)">—</div>
-          <div class="stat-change up">▲ <span data-en="Closed deals" data-ar="صفقات مغلقة">Closed deals</span></div>
+          <div class="stat-change up">▲ Closed deals</div>
         </div>
         <div class="stat-card">
           <div class="stat-label"><span data-en="⚡ Avg Response Time" data-ar="⚡ متوسط وقت الاستجابة">⚡ Avg Response Time</span></div>
           <div class="stat-value" id="an-response-time" style="color:var(--warning)">—</div>
-          <div class="stat-change" id="an-response-sub"><span data-en="Time to first contact" data-ar="وقت أول تواصل">Time to first contact</span></div>
+          <div class="stat-change" id="an-response-sub">Time to first contact</div>
         </div>
       </div>
       <div class="grid-2">
         <div class="card">
-          <div class="card-header"><div class="card-title"><span data-en="Lead Sources Breakdown" data-ar="توزيع مصادر العملاء"><span data-en="Lead Sources Breakdown" data-ar="توزيع مصادر العملاء">Lead Sources Breakdown</span></span></div></div>
+          <div class="card-header"><div class="card-title"><span data-en="Lead Sources Breakdown" data-ar="توزيع مصادر العملاء">Lead Sources Breakdown</span></div></div>
           <div id="an-sources"><div style="text-align:center;padding:30px;color:var(--text2)">Loading...</div></div>
         </div>
         <div class="card">
-          <div class="card-header"><div class="card-title"><span data-en="Lead Status Breakdown" data-ar="توزيع حالات العملاء"><span data-en="Lead Status Breakdown" data-ar="توزيع حالات العملاء">Lead Status Breakdown</span></span></div></div>
+          <div class="card-header"><div class="card-title"><span data-en="Lead Status Breakdown" data-ar="توزيع حالات العملاء">Lead Status Breakdown</span></div></div>
           <div id="an-statuses"><div style="text-align:center;padding:30px;color:var(--text2)">Loading...</div></div>
         </div>
       </div>
@@ -2771,13 +2251,14 @@ document.addEventListener('click', e => {
         <div class="card-header">
           <div>
             <div class="card-title">⚡ Lead Response Time Tracker</div>
-            <div class="card-subtitle"><span data-en="<span data-en="How fast are leads being contacted after submission?" data-ar="ما مدى سرعة التواصل مع العملاء بعد التسجيل؟">How fast are leads being contacted after submission?</span>" data-ar="ما مدى سرعة التواصل مع العملاء؟"><span data-en="How fast are leads being contacted after submission?" data-ar="ما مدى سرعة التواصل مع العملاء بعد التسجيل؟">How fast are leads being contacted after submission?</span></span></div>
+            <div class="card-subtitle"><span data-en="How fast are leads being contacted after submission?" data-ar="ما مدى سرعة التواصل مع العملاء؟">How fast are leads being contacted after submission?</span></div>
           </div>
         </div>
         <div id="an-response-detail">
           <div style="text-align:center;padding:30px;color:var(--text2)">Loading response data...</div>
         </div>
       </div>
+    </div>
       <!-- AI MARKET INTELLIGENCE -->
       <div class="card" style="margin-top:20px;background:linear-gradient(135deg,rgba(59,130,246,0.06),rgba(139,92,246,0.04));border:1px solid rgba(99,102,241,0.2)">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px">
@@ -2786,94 +2267,29 @@ document.addEventListener('click', e => {
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
             </div>
             <div>
-              <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text)">
-                <span data-en="AI Market Intelligence" data-ar="ذكاء السوق بالذكاء الاصطناعي">AI Market Intelligence</span>
-              </div>
-              <div style="font-size:12px;color:var(--text2);margin-top:2px">
-                <span data-en="Analyze your market position, competitors & growth opportunities — Powered by Claude AI" data-ar="تحليل موقعك في السوق والمنافسين وفرص النمو — مدعوم بـ Claude AI">Analyze your market position, competitors & growth opportunities — Powered by Claude AI</span>
-              </div>
+              <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text)"><span data-en="AI Market Intelligence" data-ar="ذكاء السوق بالذكاء الاصطناعي">AI Market Intelligence</span></div>
+              <div style="font-size:12px;color:var(--text2);margin-top:2px"><span data-en="Analyze your market position, competitors & growth opportunities — Powered by Claude AI" data-ar="تحليل موقعك في السوق والمنافسين وفرص النمو — مدعوم بـ Claude AI">Analyze your market position, competitors & growth opportunities — Powered by Claude AI</span></div>
             </div>
           </div>
           <div style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;color:#6366f1">Claude AI</div>
         </div>
-
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px">
-          <div>
-            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">
-              <span data-en="Brand / Business Name" data-ar="اسم العلامة / النشاط التجاري">Brand / Business Name</span>
-            </label>
-            <input class="form-input" id="mi-brand" placeholder="e.g. Silah Shooting Range" data-ar-placeholder="مثال: مطعم المندي الأصيل" />
-          </div>
-          <div>
-            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">
-              <span data-en="Industry" data-ar="القطاع">Industry</span>
-            </label>
-            <select class="form-input" id="mi-industry">
-              <option data-en="Furniture & Home Decor" data-ar="أثاث وديكور منزلي">Furniture & Home Decor</option>
-              <option data-en="Fashion Retail" data-ar="أزياء وملابس">Fashion Retail</option>
-              <option data-en="Car Dealership" data-ar="معرض سيارات">Car Dealership</option>
-              <option data-en="Real Estate" data-ar="عقارات">Real Estate</option>
-              <option data-en="Restaurant & Food" data-ar="مطاعم وأغذية">Restaurant & Food</option>
-              <option data-en="Cafe & Coffee Shop" data-ar="كافيه ومقاهي">Cafe & Coffee Shop</option>
-              <option data-en="Marketing Agency" data-ar="وكالة تسويق">Marketing Agency</option>
-              <option data-en="Gym / Fitness" data-ar="جيم ولياقة بدنية">Gym / Fitness</option>
-              <option data-en="Shooting Range / Entertainment" data-ar="ميدان رماية / ترفيه">Shooting Range / Entertainment</option>
-              <option data-en="Medical / Healthcare" data-ar="طبي / رعاية صحية">Medical / Healthcare</option>
-              <option data-en="Beauty & Skincare" data-ar="جمال وعناية بالبشرة">Beauty & Skincare</option>
-              <option data-en="Jewelry & Accessories" data-ar="مجوهرات وإكسسوارات">Jewelry & Accessories</option>
-              <option data-en="Electronics & Tech" data-ar="إلكترونيات وتقنية">Electronics & Tech</option>
-              <option data-en="Technology / SaaS" data-ar="تقنية / برمجيات">Technology / SaaS</option>
-              <option data-en="E-commerce" data-ar="تجارة إلكترونية">E-commerce</option>
-              <option data-en="Education & Training" data-ar="تعليم وتدريب">Education & Training</option>
-              <option data-en="Events & Entertainment" data-ar="فعاليات وترفيه">Events & Entertainment</option>
-              <option data-en="Travel & Tourism" data-ar="سفر وسياحة">Travel & Tourism</option>
-              <option data-en="Construction & Contracting" data-ar="مقاولات وبناء">Construction & Contracting</option>
-              <option data-en="Other" data-ar="أخرى">Other</option>
-            </select>
-          </div>
-          <div>
-            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">
-              <span data-en="Target Market" data-ar="السوق المستهدف">Target Market</span>
-            </label>
-            <select class="form-input" id="mi-market">
-              <option>Saudi Arabia</option>
-              <option>UAE</option>
-              <option>GCC Region</option>
-              <option>MENA Region</option>
-              <option>Global</option>
-            </select>
-          </div>
+          <div><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px"><span data-en="Brand / Business Name" data-ar="اسم العلامة / النشاط التجاري">Brand / Business Name</span></label><input class="form-input" id="mi-brand" placeholder="e.g. Silah Shooting Range" /></div>
+          <div><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px"><span data-en="Industry" data-ar="القطاع">Industry</span></label><select class="form-input" id="mi-industry"><option data-en="Furniture & Home Decor" data-ar="أثاث وديكور منزلي">Furniture & Home Decor</option><option data-en="Fashion Retail" data-ar="أزياء وملابس">Fashion Retail</option><option data-en="Car Dealership" data-ar="معرض سيارات">Car Dealership</option><option data-en="Real Estate" data-ar="عقارات">Real Estate</option><option data-en="Restaurant & Food" data-ar="مطاعم وأغذية">Restaurant & Food</option><option data-en="Cafe & Coffee Shop" data-ar="كافيه ومقاهي">Cafe & Coffee Shop</option><option data-en="Marketing Agency" data-ar="وكالة تسويق">Marketing Agency</option><option data-en="Gym / Fitness" data-ar="جيم ولياقة بدنية">Gym / Fitness</option><option data-en="Medical / Healthcare" data-ar="طبي / رعاية صحية">Medical / Healthcare</option><option data-en="Beauty & Skincare" data-ar="جمال وعناية بالبشرة">Beauty & Skincare</option><option data-en="Technology / SaaS" data-ar="تقنية / برمجيات">Technology / SaaS</option><option data-en="Education & Training" data-ar="تعليم وتدريب">Education & Training</option><option data-en="Other" data-ar="أخرى">Other</option></select></div>
+          <div><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px"><span data-en="Target Market" data-ar="السوق المستهدف">Target Market</span></label><select class="form-input" id="mi-market"><option>Saudi Arabia</option><option>UAE</option><option>GCC Region</option><option>MENA Region</option><option>Global</option></select></div>
         </div>
-
-        <div style="margin-bottom:14px">
-          <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">
-            <span data-en="Business Description" data-ar="وصف النشاط التجاري">Business Description</span>
-            <span style="font-weight:400;text-transform:none;font-size:10px;color:var(--text2)">
-              (<span data-en="what you offer, who your customers are" data-ar="ماذا تقدم، من هم عملاؤك">what you offer, who your customers are</span>)
-            </span>
-          </label>
-          <textarea class="form-input" id="mi-desc" rows="2" placeholder="e.g. Premium shooting range in Riyadh..." data-ar-placeholder="مثال: مطعم سعودي أصيل في الرياض يقدم المندي والكبسة..." style="resize:none;font-size:13px;line-height:1.6"></textarea>
-        </div>
-
-        <button onclick="runMarketIntelligence()" id="mi-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:13px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(99,102,241,0.4);transition:all 0.2s">
+        <div style="margin-bottom:14px"><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px"><span data-en="Business Description" data-ar="وصف النشاط التجاري">Business Description</span></label><textarea class="form-input" id="mi-desc" rows="2" placeholder="e.g. Premium shooting range in Riyadh..." style="resize:none;font-size:13px;line-height:1.6"></textarea></div>
+        <button onclick="runMarketIntelligence()" id="mi-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:13px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(99,102,241,0.4)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           <span data-en="Analyze My Market Position" data-ar="تحليل موقعي في السوق">Analyze My Market Position</span>
         </button>
-
         <div id="mi-loading" style="display:none;text-align:center;padding:32px;color:var(--text2)">
           <div style="width:36px;height:36px;border:3px solid rgba(99,102,241,0.2);border-top-color:#6366f1;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px"></div>
-          <div style="font-size:13px;font-weight:600">
-            <span data-en="Analyzing your market..." data-ar="جاري تحليل السوق...">Analyzing your market...</span>
-          </div>
-          <div style="font-size:11px;margin-top:4px">
-            <span data-en="This takes about 15 seconds" data-ar="هذا يستغرق حوالي 15 ثانية">This takes about 15 seconds</span>
-          </div>
+          <div style="font-size:13px;font-weight:600"><span data-en="Analyzing your market..." data-ar="جاري تحليل السوق...">Analyzing your market...</span></div>
         </div>
-
         <div id="mi-result" style="display:none;margin-top:20px"></div>
       </div>
 
-    </div>
 
 
     <!-- ADMIN PANEL -->
@@ -3138,8 +2554,8 @@ document.addEventListener('click', e => {
       <div class="card" style="margin-bottom:16px">
         <div class="card-header">
           <div>
-            <div class="card-title"><span data-en="Content Calendar" data-ar="تقويم المحتوى">Content Calendar</span></div>
-            <div class="card-subtitle"><span data-en="Schedule and track your social media posts" data-ar="جدول ومتابعة منشوراتك على وسائل التواصل">Schedule and track your social media posts</span></div>
+            <div class="card-title">Content Calendar</div>
+            <div class="card-subtitle">Schedule and track your social media posts</div>
           </div>
           <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openCalendarModal()">＋ Add Post</button>
         </div>
@@ -3183,17 +2599,17 @@ document.addEventListener('click', e => {
       <div class="grid-2" style="margin-bottom:16px">
         <div class="card">
           <div class="card-header">
-            <div class="card-title"><span data-en="Deliverables Tracker" data-ar="متتبع التسليمات">Deliverables Tracker</span></div>
-            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openDeliverableModal()"><span data-en="＋ Add Service" data-ar="＋ إضافة خدمة">＋ Add Service</span></button>
+            <div class="card-title">Deliverables Tracker</div>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openDeliverableModal()">＋ Add Service</button>
           </div>
           <div id="deliverables-list">
-            <div style="text-align:center;padding:40px;color:var(--text2)"><span data-en="No deliverables yet" data-ar="لا تسليمات بعد">No deliverables yet</span></div>
+            <div style="text-align:center;padding:40px;color:var(--text2)">No deliverables yet</div>
           </div>
         </div>
         <div class="card">
-          <div class="card-header"><div class="card-title"><span data-en="Monthly Summary" data-ar="ملخص شهري">Monthly Summary</span></div></div>
+          <div class="card-header"><div class="card-title">Monthly Summary</div></div>
           <div id="deliverables-summary">
-            <div style="text-align:center;padding:40px;color:var(--text2)"><span data-en="Add deliverables to see summary" data-ar="أضف تسليمات لرؤية الملخص">Add deliverables to see summary</span></div>
+            <div style="text-align:center;padding:40px;color:var(--text2)">Add deliverables to see summary</div>
           </div>
         </div>
       </div>
@@ -3208,10 +2624,10 @@ document.addEventListener('click', e => {
       </div>
       <div class="card">
         <div class="card-header">
-          <div class="card-title"><span data-en="Invoice Tracker" data-ar="متتبع الفواتير">Invoice Tracker</span></div>
+          <div class="card-title">Invoice Tracker</div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="openVATInvoiceModal()"><span data-en="🧾 VAT Invoice" data-ar="🧾 فاتورة ضريبية">🧾 VAT Invoice</span></button>
-            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInvoiceModal()"><span data-en="＋ New Invoice" data-ar="＋ فاتورة جديدة">＋ New Invoice</span></button>
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="openVATInvoiceModal()">🧾 VAT Invoice</button>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInvoiceModal()">＋ New Invoice</button>
           </div>
         </div>
         <div id="invoices-list">
@@ -3587,7 +3003,7 @@ document.addEventListener('click', e => {
       <!-- Call List -->
       <div class="card" id="cl-card">
         <div class="card-header">
-          <div class="card-title"><span data-en="Call Logs" data-ar="سجلات المكالمات">Call Logs</span></div>
+          <div class="card-title">Call Logs</div>
           <div id="cl-count" style="font-size:13px;color:var(--text2)">0 calls</div>
         </div>
         <div id="cl-list">
@@ -4218,7 +3634,6 @@ function nav(page, el) {
   if(page === 'analytics') loadAndRenderAnalytics();
   if(page === 'contacts') loadContacts();
   if(page === 'admin') { loadTeam(); }
-  if(page === 'leadgen') { /* Lead Gen page - no load needed */ }
   if(page === 'campaigns') { loadCampaignHistory(); }
   if(page === 'calendar') { loadCalendar(); }
   if(page === 'deliverables') { loadDeliverables(); }
@@ -4226,6 +3641,7 @@ function nav(page, el) {
   if(page === 'calls') { loadCallLogs(); }
   if(page === 'settings') { loadSettings(); }
   if(page === 'inbox') setTimeout(loadInbox, 150);
+  if(page === 'leadgen') { /* Lead Gen loaded on demand */ }
   setTimeout(patchHijriDates, 300);
 }
 
@@ -4951,7 +4367,7 @@ const _ar = {
   'Lead Status Breakdown': 'توزيع حالات العملاء',
   'Lead Sources Breakdown': 'توزيع مصادر العملاء',
   'Lead Response Time Tracker': 'متتبع وقت الاستجابة',
-  '<span data-en="How fast are leads being contacted after submission?" data-ar="ما مدى سرعة التواصل مع العملاء بعد التسجيل؟">How fast are leads being contacted after submission?</span>': 'ما مدى سرعة التواصل مع العملاء؟',
+  'How fast are leads being contacted after submission?': 'ما مدى سرعة التواصل مع العملاء؟',
   'Contacted': 'تم التواصل',
   'Waiting': 'في الانتظار',
   'Contact Rate': 'معدل التواصل',
@@ -5072,20 +4488,8 @@ function applyTranslations() {
 
   // Universal: translate all data-en/data-ar elements
   document.querySelectorAll('[data-en]').forEach(el => {
-    const tag = el.tagName;
-    if(tag === 'INPUT' || tag === 'TEXTAREA') {
-      el.placeholder = isAr ? (el.getAttribute('data-ar') || el.placeholder) : (el.getAttribute('data-en') || el.placeholder);
-    } else if(tag === 'OPTION') {
-      el.text = isAr ? (el.getAttribute('data-ar') || el.text) : (el.getAttribute('data-en') || el.text);
-    } else {
-      el.textContent = isAr ? el.getAttribute('data-ar') : el.getAttribute('data-en');
-    }
+    el.textContent = isAr ? el.getAttribute('data-ar') : el.getAttribute('data-en');
   });
-  // Sync AI Market input placeholders
-  const miBrand = document.getElementById('mi-brand');
-  if(miBrand) miBrand.placeholder = isAr ? 'مثال: مطعم المندي الأصيل' : 'e.g. Silah Shooting Range';
-  const miDesc = document.getElementById('mi-desc');
-  if(miDesc) miDesc.placeholder = isAr ? 'مثال: متجر أثاث عصري في الرياض يقدم...' : 'e.g. Premium shooting range in Riyadh...';
 
   // Toggle RTL
   document.body.classList.toggle('rtl', isAr);
@@ -5218,29 +4622,6 @@ function applyTranslations() {
   localStorage.setItem('nexcrm_lang', currentLang);
   // Re-render dynamic content with new language
   if(typeof renderLeads === 'function') renderLeads();
-  // Update topbar title for current page
-  const activePage = document.querySelector('.page.active');
-  if(activePage) {
-    const pageId = activePage.id.replace('page-','');
-    const titleMap = {
-      leadgen: isAr ? 'مولد العملاء' : 'Lead Generator',
-      dashboard: isAr ? 'لوحة التحكم' : 'Dashboard',
-      leads: isAr ? 'العملاء' : 'Leads',
-      pipeline: isAr ? 'خط المبيعات' : 'Pipeline',
-      contacts: isAr ? 'جهات الاتصال' : 'Contacts',
-      campaigns: isAr ? 'الحملات' : 'Campaigns',
-      analytics: isAr ? 'التحليلات' : 'Analytics',
-      admin: isAr ? 'لوحة الإدارة' : 'Admin Panel',
-      calendar: isAr ? 'تقويم المحتوى' : 'Content Calendar',
-      deliverables: isAr ? 'التسليمات' : 'Deliverables',
-      invoices: isAr ? 'الفواتير' : 'Invoices',
-      calls: isAr ? 'سجلات المكالمات' : 'Call Logs',
-      inbox: isAr ? 'صندوق الوارد' : 'WhatsApp Inbox',
-      settings: isAr ? 'الإعدادات' : 'Settings'
-    };
-    const titleEl = document.getElementById('page-title');
-    if(titleEl && titleMap[pageId]) titleEl.textContent = titleMap[pageId];
-  }
   if(typeof renderPipeline === 'function') { try { renderPipeline(); } catch(e){} }
   if(typeof renderAnalytics === 'function') { try { renderAnalytics(); } catch(e){} }
   if(typeof renderCalendar === 'function') { try { renderCalendar(); } catch(e){} }
@@ -6446,8 +5827,8 @@ function renderDeliverables() {
   const summary = document.getElementById('deliverables-summary');
 
   if(!deliverablesList.length) {
-    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">' + __t('No deliverables yet — add your first service!') + '</div>';
-    summary.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)"><span data-en="Add deliverables to see summary" data-ar="أضف تسليمات لرؤية الملخص">Add deliverables to see summary</span></div>';
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No deliverables yet — add your first service!</div>';
+    summary.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">Add deliverables to see summary</div>';
     return;
   }
 
@@ -6562,7 +5943,7 @@ function renderInvoices() {
   if(document.getElementById('inv-outstanding')) document.getElementById('inv-outstanding').textContent = 'SAR ' + outstanding.toLocaleString();
 
   if(!invoicesList.length) {
-    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">' + __t('No invoices yet') + '</div>';
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No invoices yet</div>';
     return;
   }
 
@@ -7050,7 +6431,7 @@ async function loadCampaignHistory() {
     const r = await fetch(SUPABASE_URL + '/rest/v1/campaigns?select=*&order=id.desc&limit=10', { headers: HEADERS });
     const data = await r.json();
     if(!r.ok || !data.length) {
-      el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)"><span data-en="No campaigns sent yet" data-ar="لم يتم إرسال حملات بعد">No campaigns sent yet</span></div>';
+      el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>';
       return;
     }
     el.innerHTML = data.map(c => `
@@ -7437,7 +6818,7 @@ async function loadDashboard() {
     renderMonthlyChart(data);
     renderDonut(data);
     leads = saved;
-    renderFollowUpAlert(data);
+    if(typeof renderFollowUpAlert === 'function') try { renderFollowUpAlert(data); } catch(e) {}
   } catch(e) { console.error(e); }
 }
 
@@ -7487,15 +6868,15 @@ async function loadPerformance() {
 
     teamStats.innerHTML = `
       <div class="stat-card" style="margin-bottom:12px">
-        <div class="stat-label"><span data-en="Total Leads" data-ar="إجمالي العملاء">Total Leads</span></div>
+        <div class="stat-label">Total Leads</div>
         <div class="stat-value">${totalLeads}</div>
       </div>
       <div class="stat-card" style="margin-bottom:12px">
-        <div class="stat-label"><span data-en="Total Pipeline Value" data-ar="قيمة خط المبيعات">Total Pipeline Value</span></div>
+        <div class="stat-label">Total Pipeline Value</div>
         <div class="stat-value">$${totalValue.toLocaleString()}</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label"><span data-en="Conversion Rate" data-ar="معدل التحويل">Conversion Rate</span></div>
+        <div class="stat-label">Conversion Rate</div>
         <div class="stat-value">${convRate}%</div>
       </div>
     `;
@@ -7613,19 +6994,7 @@ function renderActivityFeed() {
     const icon = getSourceIcon(l.source);
     return `<div class="activity-item">
       <div style="width:36px;height:36px;border-radius:10px;background:${icon.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px ${icon.bg}55">${icon.svg}</div>
-      <div><div class="activity-text">New lead: <b>${l.name||'Unknown'}</b>${src}</div><div class="activity-time">${(() => {
-        // Try l.date first, then created_at
-        let d = null;
-        if(l.date && l.date !== 'Invalid Date') {
-          const parsed = new Date(l.date.includes('T') ? l.date : l.date + 'T00:00:00');
-          if(!isNaN(parsed)) d = parsed;
-        }
-        if(!d && l.created_at) {
-          const parsed = new Date(l.created_at);
-          if(!isNaN(parsed)) d = parsed;
-        }
-        return d ? d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : 'Recently';
-      })()} · ${l.status||'New'}</div></div>
+      <div><div class="activity-text">New lead: <b>${l.name||'Unknown'}</b>${src}</div><div class="activity-time">${(() => { let d=null; if(l.date&&l.date!=='Invalid Date'){const p=new Date(l.date.includes('T')?l.date:l.date+'T00:00:00');if(!isNaN(p))d=p;} if(!d&&l.created_at){const p=new Date(l.created_at);if(!isNaN(p))d=p;} return d?d.toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'Recently'; })()} · ${l.status||'New'}</div></div>
     </div>`;
   }).join('');
 }
@@ -7635,7 +7004,7 @@ function renderDashTeamPerf() {
   const el = document.getElementById('dash-team-perf');
   if(!el) return;
   if(!leads || leads.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px"><span data-en="No data yet" data-ar="لا توجد بيانات بعد">No data yet</span></div>';
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">No data yet</div>';
     return;
   }
   // Get valid org names to exclude them from team perf
@@ -7649,7 +7018,7 @@ function renderDashTeamPerf() {
     byRep[rep] += parseInt((l.value||'0').replace(/[$,]/g,''))||0;
   });
   const sorted = Object.entries(byRep).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  if(!sorted.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px"><span data-en="No data yet" data-ar="لا توجد بيانات بعد">No data yet</span></div>'; return; }
+  if(!sorted.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">No data yet</div>'; return; }
   const max = sorted[0][1] || 1;
   el.innerHTML = sorted.map(([name,val],i) =>
     '<div style="margin-top:' + (i?'14':'8') + 'px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px">' + name + '</span><span style="font-size:12px;color:var(--success);font-weight:600">$' + val.toLocaleString() + '</span></div><div class="progress-bar"><div class="progress-fill" style="width:' + Math.round(val/max*100) + '%"></div></div></div>'
@@ -7720,13 +7089,9 @@ async function quickStatus(id, newStatus) {
 
 // ─── ANALYTICS ─────────────────────────────────────────────────
 
-// ─── LOAD LEADS THEN RENDER ANALYTICS ─────────────────────────
 async function loadAndRenderAnalytics() {
   const el = id => document.getElementById(id);
   ['an-conv','an-value','an-total','an-won'].forEach(id => { if(el(id)) el(id).textContent = '…'; });
-  if(el('an-sources')) el('an-sources').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Loading…</div>';
-  if(el('an-statuses')) el('an-statuses').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Loading…</div>';
-  if(el('an-response-detail')) el('an-response-detail').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">Loading…</div>';
   try {
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + orgFilter, { headers: HEADERS });
@@ -7741,8 +7106,8 @@ function renderAnalytics() {
   const el = id => document.getElementById(id);
   if(!leads || leads.length === 0) {
     ['an-conv','an-value','an-total','an-won'].forEach(id => { if(el(id)) el(id).textContent = '0'; });
-    if(el('an-sources')) el('an-sources').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)"><span data-en="No data yet" data-ar="لا توجد بيانات بعد">No data yet</span></div>';
-    if(el('an-statuses')) el('an-statuses').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)"><span data-en="No data yet" data-ar="لا توجد بيانات بعد">No data yet</span></div>';
+    if(el('an-sources')) el('an-sources').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No data yet</div>';
+    if(el('an-statuses')) el('an-statuses').innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No data yet</div>';
     return;
   }
 
@@ -8074,7 +7439,7 @@ function renderDonut(data) {
       </button>
       <button onclick="mobileNav('invoices',null);toggleMobileMenu()" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;border-radius:14px;cursor:pointer;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        <span data-en="Invoices" data-ar="الفواتير">Invoices</span>
+        <span>Invoices</span>
       </button>
       <button onclick="mobileNav('calendar',null);toggleMobileMenu()" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;border-radius:14px;cursor:pointer;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -8261,7 +7626,7 @@ function generatePDFReport() {
   <!-- PIPELINE STATUS -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px">
     <div style="border:1px solid #e2e8f0;border-radius:14px;padding:24px">
-      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:20px"><span data-en="Lead Sources Breakdown" data-ar="توزيع مصادر العملاء">Lead Sources Breakdown</span></div>
+      <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:20px">Lead Sources Breakdown</div>
       ${sourceRows || '<div style="color:#94a3b8;font-size:13px">No source data</div>'}
     </div>
     <div style="border:1px solid #e2e8f0;border-radius:14px;padding:24px">
@@ -8873,7 +8238,7 @@ function previewCampaign() {
 
 function loadCampaignHistory() {
   var el = document.getElementById('campaign-history');
-  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)"><span data-en="No campaigns sent yet" data-ar="لم يتم إرسال حملات بعد">No campaigns sent yet</span></div>';
+  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>';
 }
 
 // Init SMS/WA connection state on load
@@ -9313,7 +8678,15 @@ function elSeek(idx) {
   if(audio && video) audio.currentTime = video.currentTime;
 }
 
-// _lastGeneratedIdeas is set directly in generateCampaignIdeas
+// Patch renderCampaignIdeas to store ideas
+var _origRenderCI = window.renderCampaignIdeas;
+if(typeof renderCampaignIdeas === 'function') {
+  var _patchedRender = renderCampaignIdeas;
+  window.renderCampaignIdeas = function(ideas, brand, lang) {
+    _lastGeneratedIdeas = ideas;
+    _patchedRender(ideas, brand, lang);
+  };
+}
 
 
 
@@ -9392,7 +8765,6 @@ async function generateCampaignIdeas() {
     });
     const data = await response.json();
     if(data.success && data.ideas && data.ideas.length) {
-      _lastGeneratedIdeas = data.ideas;
       renderCampaignIdeas(data.ideas, brand, lang);
       showToast('Ideas generated for ' + brand + '!');
     } else {
@@ -9401,7 +8773,6 @@ async function generateCampaignIdeas() {
   } catch(e) {
     console.error('AI Campaign error:', e);
     const ideas = generateFallbackIdeas(brand, industry, goal, lang, platform);
-    _lastGeneratedIdeas = ideas;
     renderCampaignIdeas(ideas, brand, lang);
     showToast('Showing sample ideas — API error: ' + e.message);
   } finally {
@@ -9532,414 +8903,385 @@ function useCampaignIdea(channel, name, body) {
 
 </script>
 <script>
-
 // ─── AI MARKET INTELLIGENCE ────────────────────────────────────
 async function runMarketIntelligence() {
-  const brand = document.getElementById('mi-brand').value.trim();
-  const industry = document.getElementById('mi-industry').value;
-  const market = document.getElementById('mi-market').value;
-  const desc = document.getElementById('mi-desc').value.trim();
-
-  if(!brand) { showToast('❌ Enter your brand name'); return; }
-  if(!desc) { showToast('❌ Describe your business first'); return; }
-
+  const brand = document.getElementById('mi-brand')?.value.trim();
+  const industry = document.getElementById('mi-industry')?.value;
+  const market = document.getElementById('mi-market')?.value;
+  const desc = document.getElementById('mi-desc')?.value.trim();
+  const isArabic = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  if(!brand) { showToast(isArabic ? '❌ أدخل اسم العلامة' : '❌ Enter your brand name'); return; }
+  if(!desc) { showToast(isArabic ? '❌ أدخل وصف النشاط' : '❌ Describe your business first'); return; }
   const btn = document.getElementById('mi-btn');
   const loading = document.getElementById('mi-loading');
   const result = document.getElementById('mi-result');
-
-  btn.style.display = 'none';
-  loading.style.display = 'block';
-  result.style.display = 'none';
-  result.innerHTML = '';
-
-  // Check if desc looks like a URL
-  const isArabic = (typeof currentLang !== 'undefined' && currentLang === 'ar');
-  const websiteUrl = desc.match(/https?:\/\/[^\s]+/) ? desc.match(/https?:\/\/[^\s]+/)[0] : null;
+  btn.style.display = 'none'; loading.style.display = 'block'; result.style.display = 'none'; result.innerHTML = '';
   const responseLang = isArabic ? 'Arabic' : 'English';
-
-  const prompt = `You are a senior market research analyst specializing in the ${market} market. IMPORTANT: Respond entirely in ${responseLang}. All text values in the JSON must be in ${responseLang}.
-
-You are a senior market research analyst specializing in the ${market} market. Conduct a DEEP, SPECIFIC analysis of the following business. Be highly specific — no generic advice.
-
-BUSINESS TO ANALYZE:
-- Brand: ${brand}
-- Industry: ${industry}  
-- Market: ${market}
-- Info provided: ${desc}
-${websiteUrl ? `- Website: ${websiteUrl} (analyze this URL for products, pricing, UX quality)` : ''}
-
-YOUR TASK: Conduct a thorough market intelligence report. Be VERY SPECIFIC to ${market}. Research:
-1. LOCAL competitors in ${market} (not just global brands — find actual local/regional players)
-2. If a website URL is provided, analyze: product range, pricing competitiveness, website quality, missing features
-3. Find their likely social media presence based on the brand name and industry
-4. Give SPECIFIC, ACTIONABLE recommendations — not generic tips
+  const prompt = `You are a senior market intelligence analyst. IMPORTANT: Respond entirely in ${responseLang}. Research and analyze the brand "${brand}" in the ${market} ${industry} market based on: ${desc}. Identify REAL local competitors in ${market}.
 
 Return ONLY valid JSON:
-{
-  "market_position": {
-    "score": <1-10>,
-    "level": "<Emerging|Growing|Established|Market Leader>",
-    "summary": "<3-4 specific sentences about this brand's actual position in ${market}>"
-  },
-  "website_analysis": {
-    "overall_score": <1-10>,
-    "strengths": ["<specific strength>", "<specific strength>"],
-    "weaknesses": ["<specific weakness>", "<specific weakness>", "<specific weakness>"],
-    "pricing_assessment": "<are prices competitive? too high? too low? compared to what?>",
-    "product_range": "<assessment of product variety and quality based on description>",
-    "ux_issues": ["<specific UX/website issue>", "<specific issue>"],
-    "quick_wins": ["<specific fix that would immediately improve sales>", "<specific fix>", "<specific fix>"]
-  },
-  "social_media_analysis": {
-    "platforms_to_check": [
-      {"platform": "Instagram", "handle": "<likely handle based on brand name>", "strategy": "<what to post>", "frequency": "<posts per week>"},
-      {"platform": "Snapchat", "handle": "<likely handle>", "strategy": "<what to post>", "frequency": "<posts per week>"},
-      {"platform": "TikTok", "handle": "<likely handle>", "strategy": "<what to post>", "frequency": "<posts per week>"}
-    ],
-    "content_gaps": ["<what content they are missing>", "<content gap>"],
-    "best_content_type": "<the single best content type for this business in ${market}>",
-    "influencer_strategy": "<specific influencer collaboration strategy for ${market}>"
-  },
-  "local_competitors": [
-    {
-      "name": "<LOCAL competitor name in ${market}>",
-      "type": "<Online|Physical|Both>",
-      "strength": "<specific strength>",
-      "weakness": "<specific weakness>",
-      "how_to_beat_them": "<specific tactic to win against this competitor>"
-    },
-    {
-      "name": "<LOCAL competitor name>",
-      "type": "<Online|Physical|Both>",
-      "strength": "<specific strength>",
-      "weakness": "<specific weakness>",
-      "how_to_beat_them": "<specific tactic>"
-    },
-    {
-      "name": "<LOCAL or REGIONAL competitor>",
-      "type": "<Online|Physical|Both>",
-      "strength": "<specific strength>",
-      "weakness": "<specific weakness>",
-      "how_to_beat_them": "<specific tactic>"
-    }
-  ],
-  "pricing_strategy": {
-    "market_range": "<specific price range in ${market} for this industry>",
-    "current_assessment": "<assessment of their current pricing>",
-    "recommendation": "<specific pricing recommendation>",
-    "bundle_ideas": ["<specific bundle idea>", "<specific bundle idea>", "<specific bundle idea>"],
-    "upsell_opportunities": ["<specific upsell>", "<specific upsell>"]
-  },
-  "customer_targeting": {
-    "primary_segment": "<specific customer segment in ${market}>",
-    "secondary_segment": "<secondary customer segment>",
-    "where_to_find_them": ["<specific channel>", "<specific channel>", "<specific channel>"],
-    "key_motivations": ["<what drives purchase>", "<motivation>", "<motivation>"],
-    "barriers_to_purchase": ["<what stops them buying>", "<barrier>"]
-  },
-  "growth_plan": {
-    "month_1": {
-      "focus": "<single most important focus>",
-      "actions": ["<specific action>", "<specific action>", "<specific action>"]
-    },
-    "month_3": {
-      "focus": "<focus at 3 months>",
-      "actions": ["<specific action>", "<specific action>", "<specific action>"]
-    },
-    "month_6": {
-      "focus": "<focus at 6 months>",
-      "actions": ["<specific action>", "<specific action>"]
-    }
-  },
-  "key_metrics_to_track": [
-    {"metric": "<metric name>", "target": "<specific target>", "why": "<why this matters>"},
-    {"metric": "<metric name>", "target": "<specific target>", "why": "<why this matters>"},
-    {"metric": "<metric name>", "target": "<specific target>", "why": "<why this matters>"}
-  ]
-}`;
-
+{"market_position":{"score":<1-10>,"level":"<Emerging|Growing|Established|Market Leader>","summary":"<specific 3-sentence assessment>"},"top_competitors":[{"name":"<real local competitor>","type":"<Online|Physical|Both>","strength":"<strength>","weakness":"<weakness>","how_to_beat_them":"<specific tactic>"},{"name":"<competitor>","type":"<type>","strength":"<>","weakness":"<>","how_to_beat_them":"<>"},{"name":"<competitor>","type":"<type>","strength":"<>","weakness":"<>","how_to_beat_them":"<>"}],"social_media_presence":{"primary_platform":"<best platform>","content_that_works":["<type1>","<type2>","<type3>"],"posting_frequency":"<frequency>","best_times":"<times>","winning_strategy":"<key tip>"},"market_opportunities":["<opportunity 1>","<opportunity 2>","<opportunity 3>"],"differentiation_strategy":{"unique_angle":"<what makes brand stand out>","positioning":"<positioning statement>","key_message":"<core message>"},"pricing_strategy":{"market_range":"<price range in market>","recommendation":"<strategy>","tip":"<specific tip>","bundle_ideas":["<bundle 1>","<bundle 2>","<bundle 3>"],"upsell_opportunities":["<upsell 1>","<upsell 2>"]},"customer_targeting":{"primary_segment":"<segment>","secondary_segment":"<segment>","where_to_find_them":["<channel>","<channel>","<channel>"],"key_motivations":["<motivation>","<motivation>"],"barriers_to_purchase":["<barrier>","<barrier>"]},"growth_plan":{"month_1":{"focus":"<focus>","actions":["<action>","<action>","<action>"]},"month_3":{"focus":"<focus>","actions":["<action>","<action>","<action>"]},"month_6":{"focus":"<focus>","actions":["<action>","<action>"]}},"key_metrics_to_track":[{"metric":"<name>","target":"<target>","why":"<reason>"},{"metric":"<name>","target":"<target>","why":"<reason>"},{"metric":"<name>","target":"<target>","why":"<reason>"}]}`;
   try {
     const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-market', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
       body: JSON.stringify({ prompt, brand, industry, market, desc })
     });
     const data = await response.json();
-    
-    let report;
-    try {
-      if(data.success && data.report) {
-        report = data.report;
-      } else if(data.raw) {
-        const jsonMatch = data.raw.match(/\{[\s\S]*\}/);
-        report = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
-      }
-    } catch(e) { report = null; }
-
-    if(report && report.market_position) {
-      renderMarketReport(report, brand);
-    } else {
-      throw new Error('Could not parse response');
-    }
+    let report = data.success && data.report ? data.report : null;
+    if(!report && data.raw) { const m = data.raw.match(/\{[\s\S]*\}/); if(m) report = JSON.parse(m[0]); }
+    if(report && report.market_position) { renderMarketReport(report, brand); }
+    else throw new Error('Parse failed');
   } catch(e) {
-    console.error('Market intelligence error:', e);
+    console.error(e);
     renderMarketReport(generateFallbackReport(brand, industry, market), brand);
-    showToast('Showing sample — check AI connection');
-  } finally {
-    loading.style.display = 'none';
-    btn.style.display = 'flex';
-    result.style.display = 'block';
-  }
+    showToast(isArabic ? 'يعرض نتائج تجريبية' : 'Showing sample analysis');
+  } finally { loading.style.display = 'none'; btn.style.display = 'flex'; result.style.display = 'block'; }
 }
-
-
 
 function generateFallbackReport(brand, industry, market) {
   return {
-    market_position: { score: 5, level: 'Growing', summary: brand + ' is entering the ' + market + ' ' + industry + ' market with room to grow. The key is differentiating through quality, digital presence, and local community engagement before larger players notice the opportunity.' },
-    website_analysis: {
-      overall_score: 6,
-      strengths: ['Online presence established', 'Product catalog available'],
-      weaknesses: ['Limited social proof / reviews', 'Pricing transparency could improve', 'Mobile experience may need optimization'],
-      pricing_assessment: 'Pricing appears competitive but needs clearer value communication',
-      product_range: 'Good starting range — consider adding bundle packages to increase average order value',
-      ux_issues: ['Slow loading images', 'No live chat or WhatsApp button visible', 'Checkout friction'],
-      quick_wins: ['Add WhatsApp button to every product page', 'Show customer reviews prominently', 'Create 3-5 bundle packages at different price points']
-    },
-    social_media_analysis: {
-      platforms_to_check: [
-        { platform: 'Instagram', handle: '@' + brand.toLowerCase().replace(/\s/g, ''), strategy: 'Lifestyle shots in Saudi homes, transformation videos, Arabic content', frequency: '5-7 posts/week' },
-        { platform: 'Snapchat', handle: brand.toLowerCase().replace(/\s/g, ''), strategy: 'Behind-the-scenes, exclusive offers, quick product showcases', frequency: 'Daily stories' },
-        { platform: 'TikTok', handle: '@' + brand.toLowerCase().replace(/\s/g, ''), strategy: 'Room transformation videos, furniture styling tips, trending sounds', frequency: '3-5 videos/week' }
-      ],
-      content_gaps: ['Customer testimonials / before-after content', 'Arabic-language educational content', 'Influencer collaborations with Saudi interior designers'],
-      best_content_type: 'Before/after room transformation videos — highest engagement in ' + market + ' home decor space',
-      influencer_strategy: 'Partner with 3-5 Saudi interior design micro-influencers (50k-200k followers) for product placements in real Saudi homes'
-    },
-    local_competitors: [
-      { name: 'Local Furniture District (Al-Olaya / Al-Malaz)', type: 'Physical', strength: 'Established customer trust, wide selection', weakness: 'No digital presence, old-school experience', how_to_beat_them: 'Win online — be the brand they find when searching Instagram and Google' },
-      { name: 'Regional Home Stores (Tamimi / similar)', type: 'Both', strength: 'Loyalty programs, wide reach', weakness: 'Generic product line, no design identity', how_to_beat_them: 'Position as the design-forward, curated alternative' },
-      { name: 'D2C Instagram Furniture Brands', type: 'Online', strength: 'Trendy content, direct customer relationships', weakness: 'Limited product range, no physical trust', how_to_beat_them: 'Match their content game but add quality assurance and faster delivery' }
-    ],
-    pricing_strategy: {
-      market_range: 'Mid-range ' + market + ' furniture: SAR 500-5,000 per piece for quality items',
-      current_assessment: 'Review pricing against 3 local competitors monthly',
-      recommendation: 'Tiered pricing: Entry / Premium / Luxury collections',
-      bundle_ideas: ['Living Room Starter Pack (sofa + rug + side tables)', 'Home Office Bundle (desk + chair + storage)', 'Bedroom Refresh Kit (bed frame + side tables + lighting)'],
-      upsell_opportunities: ['White-glove delivery & assembly service', 'Interior design consultation add-on']
-    },
-    customer_targeting: {
-      primary_segment: 'Saudi newlyweds and new homeowners (25-35) in Riyadh/Jeddah/Dammam',
-      secondary_segment: 'Corporate clients furnishing offices and hospitality spaces',
-      where_to_find_them: ['Instagram & Snapchat ads targeting new homeowners', 'Google search "furniture store Riyadh"', 'Real estate developer partnerships'],
-      key_motivations: ['Quality that lasts', 'Style that fits Saudi home culture', 'Convenient delivery and installation'],
-      barriers_to_purchase: ['Cannot see/touch products before buying', 'Unclear return policy', 'Delivery time uncertainty']
-    },
-    growth_plan: {
-      month_1: { focus: 'Build online presence and first sales', actions: ['Launch Instagram with 20 high-quality posts', 'Set up Google Business Profile with photos', 'Add WhatsApp Business for instant customer chat'] },
-      month_3: { focus: 'Scale what works and build social proof', actions: ['Launch first influencer campaign', 'Collect 50+ reviews from happy customers', 'Run Ramadan/seasonal sale campaign'] },
-      month_6: { focus: 'Expand customer base and increase order value', actions: ['Launch bundle packages', 'Start B2B outreach to offices and hotels'] }
-    },
-    key_metrics_to_track: [
-      { metric: 'Website Visitors', target: '1,000/month by month 3', why: 'Traffic = opportunity for sales' },
-      { metric: 'Instagram Followers', target: '5,000 by month 3', why: 'Social proof builds purchase confidence' },
-      { metric: 'Average Order Value', target: 'SAR 2,500+', why: 'Bundles and upsells improve profitability' }
-    ]
+    market_position:{score:6,level:'Growing',summary:brand+' is entering the '+market+' '+industry+' market with clear growth potential. The competitive landscape requires strong digital presence and local differentiation. Success depends on speed of execution and community engagement.'},
+    top_competitors:[{name:'Leading Local '+industry+' Brand',type:'Both',strength:'Established brand recognition',weakness:'Slow to adapt digitally',how_to_beat_them:'Win online — be the brand they find on Instagram and Google'},{name:'Regional Digital Player',type:'Online',strength:'Strong social media',weakness:'Less premium positioning',how_to_beat_them:'Position as the quality-first alternative'},{name:'Premium International Brand',type:'Both',strength:'Global trust',weakness:'Less localized',how_to_beat_them:'Emphasize local roots and personalized service'}],
+    social_media_presence:{primary_platform:'Instagram Reels & Snapchat',content_that_works:['Behind-the-scenes videos','Customer testimonials','Educational content'],posting_frequency:'5-7 times per week',best_times:'7-10 PM Saudi time',winning_strategy:'Go all-in on short-form video — brands posting 5+ Reels/week see 3-5x more reach'},
+    market_opportunities:['Growing demand for premium experiences in '+market,'Low competition for brands combining digital presence with quality service','Corporate and B2B packages are underserved in this space'],
+    differentiation_strategy:{unique_angle:brand+' can stand out by combining premium quality with an authentic local social media presence',positioning:'The premium, trusted '+industry+' brand in '+market+' that delivers real results',key_message:'We don\'t just offer a service — we deliver an experience worth sharing'},
+    pricing_strategy:{market_range:'Mid to high-tier pricing is the sweet spot',recommendation:'Tiered packages: Starter / Premium / VIP',tip:'Add a premium tier at 2x your standard price — 15-25% will choose it',bundle_ideas:['Starter Package','Premium Experience','VIP All-Inclusive'],upsell_opportunities:['White-glove service add-on','Priority scheduling']},
+    customer_targeting:{primary_segment:'Saudi professionals 25-40 in '+market,secondary_segment:'Corporate clients and B2B',where_to_find_them:['Instagram & Snapchat ads','Google search','Referrals'],key_motivations:['Quality and reliability','Premium experience','Convenience'],barriers_to_purchase:['Cannot see product before buying','Unclear pricing','Delivery uncertainty']},
+    growth_plan:{month_1:{focus:'Build online presence',actions:['Launch Instagram with 20 high-quality posts','Set up Google Business Profile','Add WhatsApp Business']},month_3:{focus:'Scale and build social proof',actions:['Launch influencer campaign','Collect 50+ reviews','Run seasonal sale']},month_6:{focus:'Expand and increase order value',actions:['Launch bundle packages','Start B2B outreach']}},
+    key_metrics_to_track:[{metric:'Website/Profile Visitors',target:'1,000/month by month 3',why:'Traffic = opportunity'},{metric:'Social Media Followers',target:'5,000 by month 3',why:'Social proof builds trust'},{metric:'Average Order Value',target:'SAR 2,500+',why:'Bundles improve profitability'}]
   };
 }
 
 function toggleSection(id) {
-  const content = document.getElementById(id);
-  const arrow = document.getElementById(id + '-arrow');
-  if(!content) return;
-  const isOpen = content.style.display !== 'none';
-  content.style.display = isOpen ? 'none' : 'block';
+  const el = document.getElementById(id);
+  const arrow = document.getElementById(id+'-arrow');
+  if(!el) return;
+  const isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : 'block';
   if(arrow) arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
 function renderMarketReport(r, brand) {
   const result = document.getElementById('mi-result');
   const scoreColor = r.market_position.score >= 8 ? '#10b981' : r.market_position.score >= 5 ? '#f59e0b' : '#ef4444';
-  const priorityColor = { 'High': '#ef4444', 'Medium': '#f59e0b', 'Low': '#10b981' };
-  const wa = r.website_analysis || {};
-  const sm = r.social_media_analysis || {};
-  const lc = r.local_competitors || [];
+  const priorityColor = {'High':'#ef4444','Medium':'#f59e0b','Low':'#10b981'};
+  const sm = r.social_media_presence || r.social_media_strategy || {};
+  const diff = r.differentiation_strategy || {};
   const ps = r.pricing_strategy || {};
   const ct = r.customer_targeting || {};
   const gp = r.growth_plan || {};
   const km = r.key_metrics_to_track || [];
+  const lc = r.top_competitors || r.local_competitors || [];
+  const opps = r.market_opportunities || [];
 
-  const sectionHeader = (id, icon, title, score) => `
+  const sH = (id, icon, title, score) => `
     <div onclick="toggleSection('${id}')" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:14px 16px;background:var(--bg2);border-radius:12px;margin-bottom:2px;user-select:none">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="display:flex;align-items:center">${icon}</span>
-        <span style="font-size:13px;font-weight:700;color:var(--text)">${title}</span>
-        ${score !== undefined ? `<span style="background:${score>=7?'rgba(16,185,129,0.15)':score>=4?'rgba(245,158,11,0.15)':'rgba(239,68,68,0.15)'};color:${score>=7?'#10b981':score>=4?'#f59e0b':'#ef4444'};font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px">${score}/10</span>` : ''}
-      </div>
-      <svg id="${id}-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+      <div style="display:flex;align-items:center;gap:10px"><span style="display:flex;align-items:center">${icon}</span><span style="font-size:13px;font-weight:700;color:var(--text)">${title}</span>${score!==undefined?`<span style="background:${score>=7?'rgba(16,185,129,0.15)':score>=4?'rgba(245,158,11,0.15)':'rgba(239,68,68,0.15)'};color:${score>=7?'#10b981':score>=4?'#f59e0b':'#ef4444'};font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px">${score}/10</span>`:''}</div>
+      <svg id="${id}-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2.5" style="transition:transform 0.2s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
     </div>
-    <div id="${id}" style="display:none;padding:14px;background:var(--bg3);border-radius:0 0 12px 12px;margin-bottom:12px">
-  `;
+    <div id="${id}" style="display:none;padding:14px;background:var(--bg3);border-radius:0 0 12px 12px;margin-bottom:12px">`;
 
   result.innerHTML = `
     <div style="height:1px;background:var(--border);margin-bottom:20px"></div>
-    
-    <!-- Market Position Header -->
     <div style="display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;background:var(--bg3);border-radius:16px;padding:20px;margin-bottom:16px">
-      <div style="text-align:center;min-width:80px">
-        <div style="font-size:52px;font-weight:900;font-family:'Syne',sans-serif;color:${scoreColor};line-height:1">${r.market_position.score}<span style="font-size:22px;color:var(--text2)">/10</span></div>
-        <div style="font-size:11px;font-weight:700;color:${scoreColor};margin-top:4px;text-transform:uppercase;letter-spacing:1px">${r.market_position.level}</div>
-      </div>
-      <div>
-        <div style="font-size:15px;font-weight:800;font-family:'Syne',sans-serif;color:var(--text);margin-bottom:8px">Market Position — ${brand}</div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.7">${r.market_position.summary}</div>
-      </div>
+      <div style="text-align:center;min-width:80px"><div style="font-size:52px;font-weight:900;font-family:'Syne',sans-serif;color:${scoreColor};line-height:1">${r.market_position.score}<span style="font-size:22px;color:var(--text2)">/10</span></div><div style="font-size:11px;font-weight:700;color:${scoreColor};margin-top:4px;text-transform:uppercase;letter-spacing:1px">${r.market_position.level}</div></div>
+      <div><div style="font-size:15px;font-weight:800;font-family:'Syne',sans-serif;color:var(--text);margin-bottom:8px">Market Position — ${brand}</div><div style="font-size:13px;color:var(--text2);line-height:1.7">${r.market_position.summary}</div></div>
     </div>
-
-    <!-- EXPANDABLE SECTIONS -->
-
-    <!-- 1. Website Analysis -->
-    ${sectionHeader('sec-website', '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>', 'Website & Product Analysis', wa.overall_score)}
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-        <div>
-          <div style="font-size:11px;font-weight:700;color:var(--success);text-transform:uppercase;margin-bottom:8px">✅ Strengths</div>
-          ${(wa.strengths||[]).map(s=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:rgba(16,185,129,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid var(--success)">${s}</div>`).join('')}
-        </div>
-        <div>
-          <div style="font-size:11px;font-weight:700;color:var(--danger);text-transform:uppercase;margin-bottom:8px">⚠️ Weaknesses</div>
-          ${(wa.weaknesses||[]).map(s=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:rgba(239,68,68,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid var(--danger)">${s}</div>`).join('')}
-        </div>
+    ${sH('sec-website','<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg>','Website & Product Analysis')}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><div style="font-size:11px;font-weight:700;color:var(--success);margin-bottom:8px">Strengths</div>${(ps.bundle_ideas||[]).map(b=>`<div style="font-size:12px;padding:6px 10px;background:rgba(16,185,129,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid var(--success)">${b}</div>`).join('')}</div>
+        <div><div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:8px">Bundle Ideas</div>${(ps.upsell_opportunities||[]).map(u=>`<div style="font-size:12px;padding:6px 10px;background:rgba(139,92,246,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid #8b5cf6">${u}</div>`).join('')}</div>
       </div>
-      <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:6px">💰 Pricing Assessment</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.7">${wa.pricing_assessment||'—'}</div>
-      </div>
-      <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:6px">📦 Product Range</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.7">${wa.product_range||'—'}</div>
-      </div>
-      <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:8px">⚡ Quick Wins</div>
-      ${(wa.quick_wins||[]).map((q,i)=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:rgba(59,130,246,0.06);border-radius:8px;margin-bottom:6px;border-left:3px solid var(--accent)"><span style="font-weight:700;color:var(--accent);font-size:12px">${i+1}.</span><div style="font-size:12px;color:var(--text)">${q}</div></div>`).join('')}
+      <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-top:10px"><div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Pricing</div><div style="font-size:12px;color:var(--text)">${ps.market_range||''} — ${ps.recommendation||''}</div></div>
     </div>
-
-    <!-- 2. Social Media Analysis -->
-    ${sectionHeader('sec-social', '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>', 'Social Media Presence & Strategy')}
-      <div style="margin-bottom:12px">
-        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:8px">Platforms to Build</div>
-        ${(sm.platforms_to_check||[]).map(p=>`
-          <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:8px;display:grid;grid-template-columns:80px 1fr 1fr;gap:10px;align-items:start">
-            <div>
-              <div style="font-size:12px;font-weight:700;color:var(--accent)">${p.platform}</div>
-              <div style="font-size:10px;color:var(--text2);margin-top:2px">${p.handle||''}</div>
-            </div>
-            <div style="font-size:11px;color:var(--text);line-height:1.6">${p.strategy||''}</div>
-            <div style="font-size:11px;color:var(--text2);text-align:right">${p.frequency||''}</div>
-          </div>
-        `).join('')}
+    ${sH('sec-social','<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>','Social Media Strategy')}
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px">
+        <div style="background:var(--bg2);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text2);margin-bottom:4px">Best Platform</div><div style="font-size:12px;font-weight:700;color:var(--accent)">${sm.primary_platform||''}</div></div>
+        <div style="background:var(--bg2);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text2);margin-bottom:4px">Frequency</div><div style="font-size:12px;font-weight:700;color:var(--text)">${sm.posting_frequency||''}</div></div>
+        <div style="background:var(--bg2);border-radius:10px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text2);margin-bottom:4px">Best Times</div><div style="font-size:12px;font-weight:700;color:var(--text)">${sm.best_times||''}</div></div>
       </div>
-      <div style="background:rgba(139,92,246,0.08);border-radius:10px;padding:12px;margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:#8b5cf6;text-transform:uppercase;margin-bottom:6px">🌟 Best Content Type</div>
-        <div style="font-size:12px;color:var(--text)">${sm.best_content_type||'—'}</div>
-      </div>
-      <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:6px">🤝 Influencer Strategy</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.7">${sm.influencer_strategy||'—'}</div>
-      </div>
-      <div style="font-size:11px;font-weight:700;color:var(--warning);text-transform:uppercase;margin-bottom:8px">❌ Content Gaps</div>
-      ${(sm.content_gaps||[]).map(g=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:rgba(245,158,11,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid var(--warning)">${g}</div>`).join('')}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">${(sm.content_that_works||[]).map(t=>`<span style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#6366f1">${t}</span>`).join('')}</div>
+      <div style="background:rgba(99,102,241,0.08);border-radius:10px;padding:10px;font-size:12px;color:var(--text)">${sm.winning_strategy||''}</div>
     </div>
-
-    <!-- 3. Local Competitors -->
-    ${sectionHeader('sec-competitors', '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', 'Local Competitors & How to Beat Them')}
-      ${lc.map(c=>`
-        <div style="background:var(--bg2);border-radius:12px;padding:14px;margin-bottom:10px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <div style="font-size:13px;font-weight:700;color:var(--text)">${c.name}</div>
-            <span style="background:var(--bg3);border:1px solid var(--border);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;color:var(--text2)">${c.type||''}</span>
-          </div>
-          <div style="font-size:11px;color:var(--success);margin-bottom:4px">✅ ${c.strength||''}</div>
-          <div style="font-size:11px;color:var(--danger);margin-bottom:8px">⚠️ ${c.weakness||''}</div>
-          <div style="background:rgba(59,130,246,0.08);border-radius:8px;padding:8px;font-size:11px;color:var(--accent)">
-            ⚡ <strong>How to beat them:</strong> ${c.how_to_beat_them||''}
-          </div>
-        </div>
-      `).join('')}
+    ${sH('sec-competitors','<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>','Local Competitors & How to Beat Them')}
+      ${lc.map(c=>`<div style="background:var(--bg2);border-radius:12px;padding:14px;margin-bottom:10px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:13px;font-weight:700;color:var(--text)">${c.name||''}</div><span style="background:var(--bg3);border:1px solid var(--border);padding:2px 8px;border-radius:20px;font-size:10px;color:var(--text2)">${c.type||''}</span></div><div style="font-size:11px;color:var(--success);margin-bottom:4px">✅ ${c.strength||''}</div><div style="font-size:11px;color:var(--danger);margin-bottom:8px">⚠️ ${c.weakness||''}</div><div style="background:rgba(59,130,246,0.08);border-radius:8px;padding:8px;font-size:11px;color:var(--accent)">⚡ ${c.how_to_beat_them||''}</div></div>`).join('')}
+      <div style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:var(--success);margin-bottom:8px">Market Opportunities</div>${opps.map(o=>`<div style="font-size:12px;padding:8px 10px;background:rgba(16,185,129,0.06);border-radius:8px;margin-bottom:6px;border-left:3px solid var(--success)">${o}</div>`).join('')}</div>
     </div>
-
-    <!-- 4. Pricing & Bundles -->
-    ${sectionHeader('sec-pricing', '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>', 'Pricing Strategy & Bundle Ideas')}
-      <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:10px">
-        <div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px">Market Price Range</div>
-        <div style="font-size:13px;font-weight:700;color:var(--accent)">${ps.market_range||'—'}</div>
-      </div>
-      <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:10px">
-        <div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px">Recommendation</div>
-        <div style="font-size:12px;color:var(--text);line-height:1.7">${ps.recommendation||'—'}</div>
-      </div>
-      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:8px">📦 Bundle Ideas</div>
-      ${(ps.bundle_ideas||[]).map((b,i)=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:rgba(16,185,129,0.06);border-radius:8px;margin-bottom:6px;border-left:3px solid var(--success)"><span style="font-weight:700;color:var(--success);font-size:12px">${i+1}.</span><div style="font-size:12px;color:var(--text)">${b}</div></div>`).join('')}
-      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin:10px 0 8px">💎 Upsell Opportunities</div>
-      ${(ps.upsell_opportunities||[]).map(u=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:rgba(139,92,246,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid #8b5cf6">${u}</div>`).join('')}
+    ${sH('sec-customers','<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>','Customer Targeting & Where to Find Them')}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px"><div style="background:var(--bg2);border-radius:10px;padding:12px"><div style="font-size:10px;color:var(--accent);font-weight:600;margin-bottom:6px">PRIMARY SEGMENT</div><div style="font-size:12px;color:var(--text)">${ct.primary_segment||''}</div></div><div style="background:var(--bg2);border-radius:10px;padding:12px"><div style="font-size:10px;color:#8b5cf6;font-weight:600;margin-bottom:6px">SECONDARY SEGMENT</div><div style="font-size:12px;color:var(--text)">${ct.secondary_segment||''}</div></div></div>
+      ${(ct.where_to_find_them||[]).map(w=>`<div style="font-size:12px;padding:6px 10px;background:var(--bg2);border-radius:8px;margin-bottom:4px">${w}</div>`).join('')}
     </div>
-
-    <!-- 5. Customer Targeting -->
-    ${sectionHeader('sec-customers', '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>', 'Customer Targeting & Where to Find Them')}
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div style="background:var(--bg2);border-radius:10px;padding:12px">
-          <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:6px">Primary Segment</div>
-          <div style="font-size:12px;color:var(--text);line-height:1.6">${ct.primary_segment||'—'}</div>
-        </div>
-        <div style="background:var(--bg2);border-radius:10px;padding:12px">
-          <div style="font-size:10px;font-weight:700;color:#8b5cf6;text-transform:uppercase;margin-bottom:6px">Secondary Segment</div>
-          <div style="font-size:12px;color:var(--text);line-height:1.6">${ct.secondary_segment||'—'}</div>
-        </div>
-      </div>
-      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:8px">📍 Where to Find Them</div>
-      ${(ct.where_to_find_them||[]).map(w=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:var(--bg2);border-radius:8px;margin-bottom:4px;display:flex;align-items:center;gap:6px"><div style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0"></div>${w}</div>`).join('')}
-      <div style="font-size:11px;font-weight:700;color:var(--success);text-transform:uppercase;margin:10px 0 8px">✅ What Drives Purchase</div>
-      ${(ct.key_motivations||[]).map(m=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:rgba(16,185,129,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid var(--success)">${m}</div>`).join('')}
-      <div style="font-size:11px;font-weight:700;color:var(--danger);text-transform:uppercase;margin:10px 0 8px">🚫 Purchase Barriers</div>
-      ${(ct.barriers_to_purchase||[]).map(b=>`<div style="font-size:12px;color:var(--text);padding:6px 10px;background:rgba(239,68,68,0.06);border-radius:8px;margin-bottom:4px;border-left:3px solid var(--danger)">${b}</div>`).join('')}
+    ${sH('sec-growth','<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>','6-Month Growth Plan')}
+      ${['month_1','month_3','month_6'].map((m,i)=>{const phase=gp[m]||{};const labels=['Month 1','Month 3','Month 6'];const colors=['var(--danger)','var(--warning)','var(--success)'];return`<div style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="width:28px;height:28px;border-radius:50%;background:${colors[i]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">${i+1}</div><div><div style="font-size:12px;font-weight:700;color:var(--text)">${labels[i]}</div><div style="font-size:11px;color:var(--text2)">${phase.focus||''}</div></div></div>${(phase.actions||[]).map(a=>`<div style="font-size:12px;color:var(--text);padding:6px 10px 6px 36px;background:var(--bg2);border-radius:8px;margin-bottom:4px">${a}</div>`).join('')}</div>`;}).join('')}
     </div>
-
-    <!-- 6. Growth Plan -->
-    ${sectionHeader('sec-growth', '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>', '6-Month Growth Plan')}
-      ${['month_1','month_3','month_6'].map((m,i) => {
-        const phase = gp[m] || {};
-        const labels = ['Month 1', 'Month 3', 'Month 6'];
-        const colors = ['var(--danger)','var(--warning)','var(--success)'];
-        return `
-          <div style="margin-bottom:14px">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-              <div style="width:28px;height:28px;border-radius:50%;background:${colors[i]};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0">${i+1}</div>
-              <div>
-                <div style="font-size:12px;font-weight:700;color:var(--text)">${labels[i]}</div>
-                <div style="font-size:11px;color:var(--text2)">${phase.focus||''}</div>
-              </div>
-            </div>
-            ${(phase.actions||[]).map(a=>`<div style="font-size:12px;color:var(--text);padding:6px 10px 6px 36px;background:var(--bg2);border-radius:8px;margin-bottom:4px">${a}</div>`).join('')}
-          </div>
-        `;
-      }).join('')}
-    </div>
-
-    <!-- 7. Key Metrics -->
-    ${sectionHeader('sec-metrics', '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>', 'Key Metrics to Track')}
-      ${km.map(k=>`
-        <div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:8px;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">
-          <div>
-            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px">${k.metric||''}</div>
-            <div style="font-size:11px;color:var(--text2)">${k.why||''}</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:12px;font-weight:700;color:var(--accent)">${k.target||''}</div>
-          </div>
-        </div>
-      `).join('')}
+    ${sH('sec-metrics','<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>','Key Metrics to Track')}
+      ${km.map(k=>`<div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:start;gap:10px"><div><div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px">${k.metric||''}</div><div style="font-size:11px;color:var(--text2)">${k.why||''}</div></div><div style="font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap">${k.target||''}</div></div>`).join('')}
     </div>
   `;
 }
 
+// ─── SMART FOLLOW-UP SYSTEM ─────────────────────────────────────
+function getHoursAgo(dateStr) {
+  if(!dateStr) return 9999;
+  const d = new Date(dateStr);
+  if(isNaN(d)) return 9999;
+  return (Date.now() - d.getTime()) / 3600000;
+}
+
+function renderFollowUpAlert(data) {
+  const card = document.getElementById('followup-alert-card');
+  const subtitle = document.getElementById('followup-subtitle');
+  const preview = document.getElementById('followup-preview');
+  if(!card || !data) return;
+  const coldLeads = data.filter(l => {
+    const status = (l.status||'').toLowerCase();
+    if(status === 'won' || status === 'lost') return false;
+    return getHoursAgo(l.created_at) > 24;
+  }).sort((a,b) => getHoursAgo(b.created_at) - getHoursAgo(a.created_at));
+  if(coldLeads.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  const hoursStr = h => h > 48 ? Math.round(h/24)+(isAr?' يوم':'d') : Math.round(h)+(isAr?' ساعة':'h');
+  subtitle.textContent = isAr ? coldLeads.length+' عميل لم يتم التواصل معهم منذ أكثر من 24 ساعة' : coldLeads.length+' leads haven\'t been contacted in 24+ hours';
+  preview.innerHTML = coldLeads.slice(0,3).map(l => {
+    const h = getHoursAgo(l.created_at);
+    const urgency = h > 72 ? 'var(--danger)' : h > 48 ? 'var(--warning)' : 'var(--accent)';
+    return `<div style="background:var(--bg2);border:1px solid ${urgency};border-left:3px solid ${urgency};border-radius:8px;padding:8px 14px;font-size:12px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showFollowupList()"><span style="color:${urgency};font-weight:700">${hoursStr(h)}</span><span style="color:var(--text);font-weight:600">${l.name||'Unknown'}</span><span style="color:var(--text2)">${l.source||''}</span></div>`;
+  }).join('');
+}
+
+function showFollowupList() {
+  const modal = document.getElementById('followup-modal');
+  const list = document.getElementById('followup-list');
+  if(!modal||!list) return;
+  modal.style.display = 'flex';
+  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  const coldLeads = leads.filter(l => { const s=(l.status||'').toLowerCase(); if(s==='won'||s==='lost') return false; return getHoursAgo(l.created_at)>24; }).sort((a,b)=>getHoursAgo(b.created_at)-getHoursAgo(a.created_at));
+  if(!coldLeads.length) { list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--success);font-size:14px;font-weight:600">✅ '+(isAr?'تم التواصل مع جميع العملاء!':'All leads contacted!')+'</div>'; return; }
+  const waTemplates = { new: isAr?'مرحباً {name}! 👋\nشكراً لاهتمامك. هل أنت متاح للحديث؟':'Hi {name}! 👋\nThank you for your interest. Are you available to chat?', warm: isAr?'مرحباً {name}! 😊\nكيف حالك؟ هل لديك أي أسئلة؟':'Hey {name}! 😊\nHope you\'re well! Any questions I can help with?' };
+  list.innerHTML = coldLeads.map((l,i) => {
+    const h = getHoursAgo(l.created_at);
+    const urgency = h>72?'#ef4444':h>48?'#f59e0b':'#3b82f6';
+    const urgencyLabel = h>72?(isAr?'عاجل جداً':'Critical'):h>48?(isAr?'عاجل':'Urgent'):(isAr?'تابع':'Follow up');
+    const hoursStr = h>48?Math.round(h/24)+(isAr?' يوم':'d'):Math.round(h)+(isAr?' ساعة':'h');
+    const template = waTemplates[(l.status||'new').toLowerCase()]||waTemplates.new;
+    const msg = encodeURIComponent(template.replace('{name}',(l.name||'').split(' ')[0]));
+    const phone = (l.phone||'').replace(/\D/g,'');
+    const waLink = phone ? 'https://wa.me/'+phone+'?text='+msg : null;
+    return `<div style="background:var(--bg3);border-radius:14px;padding:16px;margin-bottom:10px;border-left:3px solid ${urgency}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:13px;font-weight:700;color:var(--text)">${l.name||'Unknown'}</span><span style="font-size:10px;font-weight:700;color:${urgency};background:${urgency}18;padding:2px 8px;border-radius:20px">${urgencyLabel}</span></div>
+          <div style="font-size:11px;color:var(--text2);display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+            <span style="display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${l.phone||'—'}</span>
+            <span>${l.source||'—'}</span>
+            <span style="color:${urgency};font-weight:600"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${hoursStr} ${isAr?'بدون تواصل':'without contact'}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          ${waLink?`<a href="${waLink}" target="_blank" style="background:#25d366;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:6px"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp</a>`:''}
+          <button onclick="nav('leads')" style="background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">${isAr?'عرض':'View'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function closeFollowupModal() { const m=document.getElementById('followup-modal'); if(m) m.style.display='none'; }
+document.addEventListener('click', e => { const m=document.getElementById('followup-modal'); if(m&&e.target===m) closeFollowupModal(); });
+
+// ─── AI LEAD GENERATOR ─────────────────────────────────────────
+let _generatedLeads = [];
+let _lgMode = 'ai';
+
+function selectLeadGenMode(mode) {
+  _lgMode = mode;
+  const aiCard = document.getElementById('mode-ai-card');
+  const realCard = document.getElementById('mode-real-card');
+  const upgradePrompt = document.getElementById('lg-upgrade-prompt');
+  if(aiCard) aiCard.style.borderColor = mode==='ai' ? 'var(--accent)' : 'var(--border)';
+  if(realCard) realCard.style.borderColor = mode==='real' ? '#f59e0b' : 'var(--border)';
+  if(upgradePrompt) upgradePrompt.style.display = mode==='real' ? 'block' : 'none';
+  const countSel = document.getElementById('lg-count');
+  if(countSel) { if(mode==='real'){countSel.innerHTML='<option value="5">5 (Free trial)</option>';countSel.disabled=true;}else{countSel.innerHTML='<option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option>';countSel.disabled=false;} }
+  const btn = document.getElementById('lg-btn');
+  if(btn) { if(mode==='real'){btn.style.background='linear-gradient(135deg,#f59e0b,#ef4444)';btn.querySelector('span').textContent='Get My 5 Free Real Leads';}else{btn.style.background='linear-gradient(135deg,#3b82f6,#8b5cf6)';btn.querySelector('span').textContent='Generate Leads';} }
+}
+
+function claimFreeRealLeads() {
+  const mybiz = document.getElementById('lg-mybiz')?.value.trim();
+  if(!mybiz) { showToast('❌ Enter your business description first'); document.getElementById('lg-mybiz')?.focus(); return; }
+  runLeadGenerator();
+}
+
+function showUpgradePlans() { const m=document.getElementById('lg-plans-modal'); if(m) m.style.display='flex'; }
+function contactForUpgrade(plan) { const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar'); window.open('https://wa.me/966500000000?text='+encodeURIComponent((isAr?'مرحباً! أود الاشتراك في خطة ':'Hi! I want to subscribe to the ')+plan), '_blank'); }
+
+async function runLeadGenerator() {
+  const mybiz = document.getElementById('lg-mybiz')?.value.trim();
+  const location = document.getElementById('lg-location')?.value;
+  const count = document.getElementById('lg-count')?.value;
+  const details = document.getElementById('lg-details')?.value.trim();
+  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  if(!mybiz) { showToast(isAr?'❌ أدخل وصف نشاطك':'❌ Describe your business first'); return; }
+  const btn=document.getElementById('lg-btn'); const loading=document.getElementById('lg-loading'); const results=document.getElementById('lg-results');
+  btn.style.display='none'; loading.style.display='block'; results.style.display='none'; _generatedLeads=[];
+  const loadingText=document.getElementById('lg-loading-text');
+  if(loadingText) loadingText.innerHTML = _lgMode==='real'?(isAr?'<span>جاري البحث في قاعدة بيانات 265 مليون...</span>':'<span>Searching database of 265M+ verified contacts...</span>'):(isAr?'<span>الذكاء الاصطناعي يحلل ويجد العملاء...</span>':'<span>AI is analyzing your business and finding prospects...</span>');
+  try {
+    const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/apollo-leads', {
+      method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},
+      body:JSON.stringify({mode:_lgMode,mybiz,location,count,details,org_id:currentOrg?.id,user_email:currentUser?.email})
+    });
+    const data = await response.json();
+    if(data.success && data.leads && data.leads.length>0) { _generatedLeads=data.leads; renderGeneratedLeads(data.leads,location,data.target_profile,data.mode); }
+    else if(data.error && _lgMode==='real') { _lgMode='ai'; await runLeadGenerator(); return; }
+    else throw new Error(data.error||'No leads');
+  } catch(e) {
+    console.error(e);
+    _generatedLeads=generateFallbackLeadsLocal(mybiz,location,count);
+    renderGeneratedLeads(_generatedLeads,location,'AI-generated prospects matching your business','ai');
+    showToast(isAr?'يعرض نتائج AI':'Showing AI sample leads');
+  } finally { loading.style.display='none'; btn.style.display='flex'; results.style.display='block'; }
+}
+
+function generateFallbackLeadsLocal(mybiz,location,count) {
+  const city=location.split(',')[0]; const n=Math.min(parseInt(count)||10,15);
+  const names=['Mohammed Al-Otaibi','Faisal Al-Zahrani','Khalid Al-Dosari','Abdullah Al-Shammari','Saad Al-Qahtani','Nour Al-Shammari','Reem Al-Ahmadi','Ahmed Al-Ghamdi','Sultan Al-Anazi','Manal Al-Harbi','Omar Al-Rashid','Sara Al-Mutairi','Abdulaziz Al-Tamimi','Hind Al-Yami','Turki Al-Malki'];
+  const companies=['Al-Riyadh Trading Group','Najma Advanced Solutions','Saudi Tech Ventures','Al-Amal Services','Horizon Business Group','Al-Nakheel Development','Gulf Operations LLC','Tamkeen Solutions','Al-Faisal Enterprises','Crown Commercial Group','Al-Majd Logistics','Platinum Services KSA','Al-Watan Industries','Future Vision Co.','Reach Business Center'];
+  const industries=['Logistics','Manufacturing','Retail','Technology','Construction','Healthcare','Education','F&B','Real Estate','Finance'];
+  return Array.from({length:n},(_,i)=>({name:names[i],company:companies[i],title:['CEO','HR Director','Operations Manager','General Manager','Owner'][i%5],industry:industries[i%industries.length],location:city,phone:'+966 5'+(Math.floor(Math.random()*9)+1)+' '+Math.floor(Math.random()*900+100)+' '+Math.floor(Math.random()*9000+1000),email:companies[i].toLowerCase().replace(/[^a-z]/g,'').slice(0,8)+'@'+companies[i].toLowerCase().replace(/[^a-z]/g,'').slice(0,6)+'.com.sa',company_size:['50-100','100-250','250-500'][i%3]+' employees',why_good_lead:'This company profile matches your target based on industry and size in '+city,approach:'Lead with a quick ROI example from a similar company in '+city,urgency:['High','High','Medium'][i%3],source:'AI Generated',status:'New',verified:false}));
+}
+
+function renderGeneratedLeads(leads,location,targetProfile,mode) {
+  const list=document.getElementById('lg-leads-list'); const title=document.getElementById('lg-results-title'); const profileEl=document.getElementById('lg-target-profile');
+  const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar'); const isReal=mode==='real';
+  title.innerHTML=`<span style="display:flex;align-items:center;gap:8px">${isReal?`<span style="background:rgba(16,185,129,0.12);color:var(--success);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">${isAr?'متحقق':'Verified'}</span>`:`<span style="background:rgba(59,130,246,0.12);color:var(--accent);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">AI</span>`}${leads.length} ${isAr?'عميل محتمل في':'prospects found in'} ${location}</span>`;
+  if(profileEl&&targetProfile) profileEl.textContent=targetProfile;
+  list.innerHTML=leads.map((l,i)=>{
+    const phone=(l.phone||'').replace(/[\s\-\(\)]/g,'');
+    const waMsg=encodeURIComponent(isAr?'مرحباً '+(l.name||'').split(' ')[0]+'، تواصلت معك بخصوص خدماتنا التي قد تفيد '+(l.company||'شركتكم')+'. هل لديك دقيقة؟':'Hi '+(l.name||'').split(' ')[0]+', reaching out about services that could help '+(l.company||'your company')+'. Do you have a minute?');
+    const waLink=phone&&phone.length>7?'https://wa.me/'+phone.replace('+','')+'?text='+waMsg:null;
+    const urgencyColor=l.urgency==='High'?'var(--danger)':l.urgency==='Medium'?'var(--warning)':'var(--success)';
+    return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">${(l.name||'?')[0].toUpperCase()}</div>
+            <div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px;font-weight:700;color:var(--text)">${l.name||'—'}</span>${l.verified?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>':''}<span style="font-size:10px;font-weight:700;color:${urgencyColor};background:${urgencyColor}18;padding:2px 7px;border-radius:20px">${l.urgency||'Medium'}</span></div><div style="font-size:11px;color:var(--text2)">${l.title||'—'} · ${l.company||'—'}</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+            <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${l.phone||'—'}</div>
+            <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;overflow:hidden"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.email||'—'}</span></div>
+            <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.location||location}</div>
+            <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>${l.industry||'—'} ${l.company_size?'· '+l.company_size:''}</div>
+          </div>
+          <div style="background:rgba(59,130,246,0.06);border-radius:8px;padding:8px 10px;margin-bottom:6px"><div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:3px">${isAr?'لماذا هو عميل جيد':'Why good lead'}</div><div style="font-size:12px;color:var(--text);line-height:1.6">${l.why_good_lead||'—'}</div></div>
+          <div style="background:rgba(16,185,129,0.06);border-radius:8px;padding:8px 10px"><div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;margin-bottom:3px">${isAr?'كيفية التواصل':'Opening line'}</div><div style="font-size:12px;color:var(--text);line-height:1.6">${l.approach||'—'}</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;min-width:110px">
+          ${waLink?`<a href="${waLink}" target="_blank" style="background:#25d366;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp</a>`:''}
+          <button onclick="importSingleLead(${i})" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" id="lg-import-btn-${i}">+ CRM</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function importSingleLead(index) {
+  const l=_generatedLeads[index]; if(!l) return;
+  const btn=document.getElementById('lg-import-btn-'+index); if(btn){btn.textContent='...';btn.disabled=true;}
+  const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar');
+  try {
+    const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:l.phone,email:l.email,source:l.source||'AI Generated',status:'New',assigned:currentUser?.email||'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
+    if(r.ok||r.status===201){if(btn){btn.textContent=isAr?'✓ تمت':'✓ Added';btn.style.background='var(--success)';}showToast('✅ '+(l.name||'Lead')+(isAr?' تمت الإضافة!':' added!'));}
+    else throw new Error();
+  } catch(e){if(btn){btn.textContent='+ CRM';btn.disabled=false;}showToast('❌ '+(isAr?'فشل':'Failed'));}
+}
+
+async function importAllLeads() {
+  const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar');
+  if(!_generatedLeads.length) return;
+  showToast(isAr?'جاري الاستيراد...':'Importing...');
+  let ok=0;
+  for(let i=0;i<_generatedLeads.length;i++){
+    const l=_generatedLeads[i];
+    try{const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:l.phone,email:l.email,source:l.source||'AI Generated',status:'New',assigned:currentUser?.email||'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});if(r.ok||r.status===201){ok++;const btn=document.getElementById('lg-import-btn-'+i);if(btn){btn.textContent='✓';btn.style.background='var(--success)';btn.disabled=true;}}}catch(e){}
+  }
+  showToast('✅ '+ok+(isAr?' عميل تم استيراده!':' leads imported!'));
+}
+
+function exportLeadsCSV() {
+  if(!_generatedLeads.length) return;
+  const h=['Name','Company','Title','Industry','Location','Phone','Email','Why Good Lead','Approach'];
+  const rows=_generatedLeads.map(l=>[l.name,l.company,l.title,l.industry,l.location,l.phone,l.email,l.why_good_lead,l.approach].map(v=>'"'+(v||'').replace(/"/g,'""')+'"').join(','));
+  const blob=new Blob(['\ufeff'+[h.join(','),...rows].join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='leads_'+Date.now()+'.csv';a.click();
+  showToast('✅ CSV exported!');
+}
+
+</script>
+</body>
+
+<!-- ONBOARDING MODAL -->
+<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:24px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.5);animation:onboardIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both">
+    <div style="height:3px;background:var(--bg3)"><div id="ob-progress" style="height:100%;background:linear-gradient(90deg,var(--accent),#8b5cf6);border-radius:3px;transition:width 0.4s ease;width:25%"></div></div>
+    <div id="ob-slides" style="padding:40px 40px 28px">
+      <div id="ob-slide-1">
+        <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(99,102,241,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px" id="ob-welcome-title">Welcome aboard!</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px">Your CRM is ready. Let us show you how it works in 30 seconds so you can start turning leads into customers today.</div>
+        <div style="background:var(--bg3);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;background:linear-gradient(135deg,#10b981,#059669);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✓</div><div><div style="font-size:13px;font-weight:700;color:var(--text)">Your workspace is set up</div><div style="font-size:12px;color:var(--text2);margin-top:1px" id="ob-org-name">Ready to receive leads</div></div></div>
+      </div>
+      <div id="ob-slide-2" style="display:none">
+        <div style="width:60px;height:60px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(245,158,11,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">Leads come in automatically</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Every time someone fills your form, their info instantly appears here. No manual entry needed.</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">New leads appear in <strong>Leads</strong> and <strong>Pipeline</strong></div></div>
+          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">You get a <strong>Telegram notification</strong> instantly</div></div>
+          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">Contact fast — <strong>response time drives conversions</strong></div></div>
+        </div>
+      </div>
+      <div id="ob-slide-3" style="display:none">
+        <div style="width:60px;height:60px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(139,92,246,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">Move leads through your pipeline</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Update lead status as you progress. Your pipeline keeps the whole team focused on what matters.</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">New</div></div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Warm</div></div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#8b5cf6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Active</div></div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Won</div></div>
+          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#ef4444;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Lost</div></div>
+        </div>
+      </div>
+      <div id="ob-slide-4" style="display:none">
+        <div style="width:60px;height:60px;background:linear-gradient(135deg,#10b981,#059669);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(16,185,129,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">You are all set!</div>
+        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Generate reports, create VAT invoices, track response times — everything to run your business like a pro.</div>
+        <div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08));border:1px solid rgba(99,102,241,0.15);border-radius:14px;padding:16px 18px">
+          <div style="font-size:12px;color:var(--text2);line-height:2.1\"><div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(59,130,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div><span><strong style="color:var(--text)">Leads</strong> — all incoming leads</span></div><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(139,92,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div><span><strong style="color:var(--text)">Pipeline</strong> — visual deal tracker</span></div><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div><span><strong style="color:var(--text)">Analytics</strong> — PDF reports</span></div><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(245,158,11,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div><span><strong style="color:var(--text)">Invoices</strong> — Saudi VAT compliant</span></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:0 40px 30px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;gap:5px" id="ob-dots">
+        <div style="width:18px;height:5px;border-radius:3px;background:var(--accent);transition:all 0.3s"></div>
+        <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
+        <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
+        <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button onclick="closeOnboarding()" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;padding:8px 12px;border-radius:8px">Skip</button>
+        <button id="ob-next-btn" onclick="nextOnboardingSlide()" style="background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;border-radius:11px;padding:11px 26px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,0.4)">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+<style>@keyframes onboardIn{from{opacity:0;transform:scale(0.92) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}</style>
+<script>
+// ─── VAT INVOICE GENERATOR ────────────────────────────────────
 function openVATInvoiceModal() {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('vat-inv-date').value = today;
@@ -10460,7 +9802,7 @@ if(typeof renderInvoices === 'function') {
   };
 }
 
-// Hijri dates handled in main nav()
+// Hijri handled in main nav()
 
 // Init on load
 document.addEventListener('DOMContentLoaded', () => {
@@ -11150,7 +10492,20 @@ function autoResizeInbox(el) {
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
 
-// inbox handled in main nav()
+document.addEventListener('DOMContentLoaded', function() {
+  var origNav = window.nav;
+  if (typeof origNav === 'function') {
+    var _navWrapped = false;
+    if (!_navWrapped) {
+      _navWrapped = true;
+      var _navOrig = window.nav;
+      window.nav = function(page, el) {
+        _navOrig.apply(this, arguments);
+        if (page === 'inbox') setTimeout(loadInbox, 150);
+      };
+    }
+  }
+});
 </script>
 
 <!-- ═══════════════════════════════════════════════ -->
