@@ -6658,31 +6658,18 @@ async function loadTeam() {
   try {
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
     // Get org members
-    const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?select=*&order=created_at.asc' + orgFilter, { headers: HEADERS });
+    const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?select=*,profiles!org_members_user_id_fkey(id,full_name,email)&order=created_at.asc' + orgFilter, { headers: HEADERS });
     const data = await r.json();
     hideLoader();
     if(!r.ok || !Array.isArray(data) || data.length === 0) {
       list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No team members yet — invite your first one!</div>';
       return;
     }
-    // Get user details for each member
-    const userIds = data.map(m => m.user_id).filter(Boolean);
-    let usersMap = {};
-    try {
-      const ur = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_users_by_ids', {
-        method: 'POST', headers: { ...HEADERS, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_ids: userIds })
-      });
-      if(ur.ok) {
-        const users = await ur.json();
-        if(Array.isArray(users)) users.forEach(u => { usersMap[u.id] = u; });
-      }
-    } catch(e) {}
     teamMembers = data;
     list.innerHTML = data.map(m => {
-      const user = usersMap[m.user_id] || {};
-      const name = user.raw_user_meta_data?.full_name || user.email?.split('@')[0] || m.user_id?.slice(0,8) || '—';
-      const email = user.email || '—';
+      const profile = m.profiles || {};
+      const name = profile.full_name || m.full_name || m.name || profile.email?.split('@')[0] || m.email?.split('@')[0] || ('Member ' + (m.user_id||'').slice(0,6));
+      const email = profile.email || m.email || m.user_id || '—';
       const initials = name[0].toUpperCase();
       const roleColors = { admin: 'var(--accent)', manager: 'var(--warning)', member: 'var(--success)' };
       const roleColor = roleColors[m.role] || 'var(--text2)';
