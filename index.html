@@ -6657,36 +6657,55 @@ async function loadTeam() {
   const list = document.getElementById('team-list');
   try {
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
-    const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?select=*&order=id.asc' + orgFilter, { headers: HEADERS });
+    // Get org members
+    const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?select=*&order=created_at.asc' + orgFilter, { headers: HEADERS });
     const data = await r.json();
     hideLoader();
-    if(!r.ok || data.length === 0) {
-      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No team members yet — add your first one!</div>';
+    if(!r.ok || !Array.isArray(data) || data.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No team members yet — invite your first one!</div>';
       return;
     }
+    // Get user details for each member
+    const userIds = data.map(m => m.user_id).filter(Boolean);
+    let usersMap = {};
+    try {
+      const ur = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_users_by_ids', {
+        method: 'POST', headers: { ...HEADERS, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_ids: userIds })
+      });
+      if(ur.ok) {
+        const users = await ur.json();
+        if(Array.isArray(users)) users.forEach(u => { usersMap[u.id] = u; });
+      }
+    } catch(e) {}
     teamMembers = data;
-    list.innerHTML = data.map(m => `
-      <div class="team-card">
-        <div class="team-avatar-lg">${(m.name||'?')[0].toUpperCase()}</div>
-        <div class="team-info">
-          <div class="team-name">${m.name||'—'}</div>
-          <div class="team-email">${m.email||'—'}</div>
-          <span class="team-role-badge role-${m.active ? m.role : 'inactive'}">${m.active ? m.role.toUpperCase() : 'INACTIVE'}</span>
+    list.innerHTML = data.map(m => {
+      const user = usersMap[m.user_id] || {};
+      const name = user.raw_user_meta_data?.full_name || user.email?.split('@')[0] || m.user_id?.slice(0,8) || '—';
+      const email = user.email || '—';
+      const initials = name[0].toUpperCase();
+      const roleColors = { admin: 'var(--accent)', manager: 'var(--warning)', member: 'var(--success)' };
+      const roleColor = roleColors[m.role] || 'var(--text2)';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:14px;background:var(--bg3);border-radius:12px;margin-bottom:8px;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0">${initials}</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)">${name}</div>
+            <div style="font-size:11px;color:var(--text2)">${email}</div>
+            <span style="font-size:10px;font-weight:700;color:${roleColor};background:${roleColor}18;padding:2px 8px;border-radius:20px;text-transform:uppercase">${m.role||'member'}</span>
+          </div>
         </div>
-        <div class="team-actions">
-          <select class="select-input" onchange="changeRole(${m.id}, this.value)">
-            <option value="sales" ${m.role==='sales'?'selected':''}>Sales Rep</option>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text);font-family:inherit;font-size:12px;cursor:pointer" onchange="changeRole('${m.id}', this.value)">
+            <option value="member" ${m.role==='member'?'selected':''}>Member</option>
             <option value="manager" ${m.role==='manager'?'selected':''}>Manager</option>
             <option value="admin" ${m.role==='admin'?'selected':''}>Admin</option>
           </select>
-          <button class="action-btn ${m.active ? 'btn-delete' : 'btn-edit'}" onclick="toggleMember(${m.id}, ${m.active})" title="${m.active ? 'Deactivate' : 'Activate'}">
-            ${m.active ? '🚫' : '✅'}
-          </button>
-          <button class="action-btn btn-delete" onclick="removeMember(${m.id})" title="Remove">🗑️</button>
+          <button onclick="removeMember('${m.id}')" style="background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit">Remove</button>
         </div>
-      </div>
-    `).join('');
-  } catch(e) { hideLoader(); console.error(e); list.innerHTML = '<div style="color:var(--danger);padding:20px">Error loading team</div>'; }
+      </div>`;
+    }).join('');
+  } catch(e) { hideLoader(); console.error('loadTeam error:', e); list.innerHTML = '<div style="color:var(--danger);padding:20px">Error: ' + e.message + '</div>'; }
 }
 
 async function changeRole(id, role) {
