@@ -6670,7 +6670,6 @@ async function loadTeam() {
       const profile = m.profiles || {};
       const name = profile.full_name || m.full_name || m.name || profile.email?.split('@')[0] || m.email?.split('@')[0] || ('Member ' + (m.user_id||'').slice(0,6));
       const email = profile.email || m.email || m.user_id || '—';
-      const initials = name[0].toUpperCase();
       const initials = (name||'?')[0].toUpperCase();
       return `<div class="team-card">
         <div class="team-avatar-lg">${initials}</div>
@@ -10003,11 +10002,15 @@ function updateOnboardingUI() {
 }
 
 // Hook into loadUserOrgs — show after orgs load for non-admin
-const _origLoadUserOrgs = loadUserOrgs;
-loadUserOrgs = async function() {
-  await _origLoadUserOrgs.apply(this, arguments);
-  setTimeout(showOnboarding, 800);
-};
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof loadUserOrgs === 'function') {
+    const _origLoadUserOrgs = loadUserOrgs;
+    loadUserOrgs = async function() {
+      await _origLoadUserOrgs.apply(this, arguments);
+      setTimeout(showOnboarding, 800);
+    };
+  }
+});
 </script>
 <script>
 // ─── LIGHT / DARK MODE TOGGLE ─────────────────────────────────
