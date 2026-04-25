@@ -9182,14 +9182,41 @@ async function runLeadGenerator() {
       body:JSON.stringify({mode:_lgMode,mybiz,location,count,details,org_id:currentOrg?.id,user_email:currentUser?.email})
     });
     const data = await response.json();
-    if(data.success && data.leads && data.leads.length>0) { _generatedLeads=data.leads; renderGeneratedLeads(data.leads,location,data.target_profile,data.mode); }
-    else if(data.error && _lgMode==='real') { _lgMode='ai'; await runLeadGenerator(); return; }
-    else throw new Error(data.error||'No leads');
+    if(data.success && data.leads && data.leads.length>0) {
+      _generatedLeads=data.leads;
+      renderGeneratedLeads(data.leads,location,data.target_profile,data.mode);
+    } else if(_lgMode==='real') {
+      // Apollo failed — do NOT silently fall back to fake leads
+      loading.style.display='none'; btn.style.display='flex'; results.style.display='block';
+      const errBox = document.getElementById('lg-results');
+      errBox.style.display='block';
+      errBox.innerHTML = `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:16px;padding:24px;text-align:center;">
+        <div style="font-size:28px;margin-bottom:12px">⚠️</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">${isAr?'تعذّر الاتصال بقاعدة البيانات الحقيقية':'Could Not Connect to Real Lead Database'}</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:16px">${isAr?'مشكلة في الاتصال بـ Apollo API. يرجى التأكد من إعداد مفتاح API في Supabase.':'Apollo API connection failed. Please check APOLLO_API_KEY is set in Supabase Vault.'}</div>
+        <div style="font-size:12px;color:var(--text2);background:var(--bg2);border-radius:8px;padding:10px;margin-bottom:16px;text-align:left;direction:ltr;">Error: ${data.error||'No leads returned'}</div>
+        <button onclick="document.getElementById('lg-results').style.display='none';document.getElementById('lg-btn').style.display='flex';" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;">Try Again</button>
+      </div>`;
+      return;
+    } else throw new Error(data.error||'No leads');
   } catch(e) {
-    console.error(e);
-    _generatedLeads=generateFallbackLeadsLocal(mybiz,location,count);
-    renderGeneratedLeads(_generatedLeads,location,'AI-generated prospects matching your business','ai');
-    showToast(isAr?'يعرض نتائج AI':'Showing AI sample leads');
+    console.error('Lead generator error:', e);
+    if(_lgMode==='real') {
+      loading.style.display='none'; btn.style.display='flex';
+      const errBox = document.getElementById('lg-results');
+      errBox.style.display='block';
+      errBox.innerHTML = `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:16px;padding:24px;text-align:center;">
+        <div style="font-size:28px;margin-bottom:12px">⚠️</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">${isAr?'فشل الاتصال بقاعدة البيانات':'Real Lead Database Unreachable'}</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:16px">${isAr?'تحقق من إعداد APOLLO_API_KEY في Supabase Edge Functions':'Check APOLLO_API_KEY in Supabase Vault → Secrets'}</div>
+        <div style="font-size:12px;color:var(--text2);background:var(--bg2);border-radius:8px;padding:10px;margin-bottom:16px;text-align:left;direction:ltr;">Error: ${e.message}</div>
+        <button onclick="document.getElementById('lg-results').style.display='none';document.getElementById('lg-btn').style.display='flex';" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;">Try Again</button>
+      </div>`;
+    } else {
+      _generatedLeads=generateFallbackLeadsLocal(mybiz,location,count);
+      renderGeneratedLeads(_generatedLeads,location,'AI-generated prospects matching your business','ai');
+      showToast(isAr?'يعرض نتائج AI':'Showing AI sample leads');
+    }
   } finally { loading.style.display='none'; btn.style.display='flex'; results.style.display='block'; }
 }
 
