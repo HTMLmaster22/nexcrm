@@ -475,15 +475,307 @@
   ::-webkit-scrollbar-track { background:var(--bg); }
   ::-webkit-scrollbar-thumb { background:var(--bg3); border-radius:3px; }
 
-  /* ANIMATIONS */
-  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  /* ═══════════════════════════════════════════════════════════
+     ANIMATIONS & EFFECTS — NexCRM Design Upgrade
+  ═══════════════════════════════════════════════════════════ */
+
+  /* ── Core keyframes ── */
+  @keyframes fadeIn {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeInScale {
+    from { opacity:0; transform:scale(0.94) translateY(8px); }
+    to   { opacity:1; transform:scale(1) translateY(0); }
+  }
+  @keyframes slideInLeft {
+    from { opacity:0; transform:translateX(-20px); }
+    to   { opacity:1; transform:translateX(0); }
+  }
+  @keyframes slideInRight {
+    from { opacity:0; transform:translateX(20px); }
+    to   { opacity:1; transform:translateX(0); }
+  }
+  @keyframes float {
+    0%,100% { transform:translateY(0px); }
+    50%      { transform:translateY(-6px); }
+  }
+  @keyframes pulse-glow {
+    0%,100% { box-shadow:0 0 0 0 rgba(59,130,246,0); }
+    50%      { box-shadow:0 0 20px 4px rgba(59,130,246,0.25); }
+  }
+  @keyframes shimmer {
+    0%   { background-position:-200% center; }
+    100% { background-position:200% center; }
+  }
+  @keyframes bounce-in {
+    0%   { transform:scale(0.8); opacity:0; }
+    60%  { transform:scale(1.05); opacity:1; }
+    100% { transform:scale(1); }
+  }
+  @keyframes spin-slow {
+    from { transform:rotate(0deg); }
+    to   { transform:rotate(360deg); }
+  }
+  @keyframes count-up {
+    from { opacity:0; transform:translateY(10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes gradient-shift {
+    0%   { background-position:0% 50%; }
+    50%  { background-position:100% 50%; }
+    100% { background-position:0% 50%; }
+  }
+  @keyframes ripple {
+    0%   { transform:scale(0); opacity:0.4; }
+    100% { transform:scale(4); opacity:0; }
+  }
+  @keyframes word-appear {
+    from { opacity:0; transform:translateY(8px) rotateX(-20deg); }
+    to   { opacity:1; transform:translateY(0) rotateX(0deg); }
+  }
+
+  /* ── Page entry animations ── */
   .page.active .stat-card,
   .page.active .card {
-    animation: fadeIn 0.4s ease both;
+    animation: fadeUp 0.45s cubic-bezier(0.22,1,0.36,1) both;
   }
-  .page.active .stat-card:nth-child(2) { animation-delay:0.05s; }
-  .page.active .stat-card:nth-child(3) { animation-delay:0.1s; }
-  .page.active .stat-card:nth-child(4) { animation-delay:0.15s; }
+  .page.active .stat-card:nth-child(1) { animation-delay:0s; }
+  .page.active .stat-card:nth-child(2) { animation-delay:0.06s; }
+  .page.active .stat-card:nth-child(3) { animation-delay:0.12s; }
+  .page.active .stat-card:nth-child(4) { animation-delay:0.18s; }
+  .page.active .card:nth-child(1) { animation-delay:0.05s; }
+  .page.active .card:nth-child(2) { animation-delay:0.1s; }
+  .page.active .card:nth-child(3) { animation-delay:0.15s; }
+
+  /* ── Stat cards — float on hover, glow on active ── */
+  .stat-card {
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1),
+                box-shadow 0.3s ease,
+                border-color 0.3s ease !important;
+    cursor:default;
+    position:relative;
+    overflow:hidden;
+  }
+  .stat-card::before {
+    content:'';
+    position:absolute; inset:0;
+    background:linear-gradient(135deg,rgba(59,130,246,0.04),rgba(139,92,246,0.04));
+    opacity:0; transition:opacity 0.3s;
+    pointer-events:none;
+  }
+  .stat-card:hover {
+    transform:translateY(-4px) !important;
+    box-shadow:0 12px 40px rgba(59,130,246,0.15), var(--glow) !important;
+    border-color:rgba(59,130,246,0.3) !important;
+  }
+  .stat-card:hover::before { opacity:1; }
+
+  /* ── Cards — lift on hover ── */
+  .card {
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1),
+                box-shadow 0.3s ease !important;
+  }
+  .card:hover {
+    transform:translateY(-2px) !important;
+    box-shadow:0 8px 32px rgba(0,0,0,0.25) !important;
+  }
+
+  /* ── Buttons — glow + scale ── */
+  .btn-primary, .auth-btn-primary {
+    position:relative; overflow:hidden;
+    transition: transform 0.2s cubic-bezier(0.22,1,0.36,1),
+                box-shadow 0.2s ease,
+                filter 0.2s ease !important;
+    background:linear-gradient(135deg,#3b82f6,#8b5cf6) !important;
+    background-size:200% 200% !important;
+  }
+  .btn-primary:hover, .auth-btn-primary:hover {
+    transform:translateY(-2px) scale(1.02) !important;
+    box-shadow:0 8px 25px rgba(59,130,246,0.4), 0 0 0 1px rgba(59,130,246,0.3) !important;
+    filter:brightness(1.1) !important;
+  }
+  .btn-primary:active, .auth-btn-primary:active {
+    transform:scale(0.97) !important;
+  }
+
+  /* Ripple effect on buttons */
+  .btn-primary::after, .auth-btn-primary::after {
+    content:'';
+    position:absolute;
+    width:100%; height:100%;
+    top:0; left:0;
+    background:radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    transform:scale(0); opacity:0;
+    transition:transform 0.5s, opacity 0.5s;
+    border-radius:inherit;
+  }
+  .btn-primary:active::after, .auth-btn-primary:active::after {
+    transform:scale(2); opacity:0;
+    transition:0s;
+  }
+
+  /* ── Nav items — slide + glow ── */
+  .nav-item {
+    transition: background 0.2s, color 0.2s, transform 0.2s, padding-left 0.2s !important;
+    position:relative;
+  }
+  .nav-item::before {
+    content:'';
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    width:3px; height:0; border-radius:0 3px 3px 0;
+    background:var(--accent);
+    transition:height 0.2s;
+  }
+  .nav-item.active::before { height:60%; }
+  .nav-item:hover { transform:translateX(3px) !important; }
+
+  /* ── Logo bounce ── */
+  .logo-icon {
+    animation: float 4s ease-in-out infinite;
+    transition: transform 0.2s !important;
+  }
+  .logo-icon:hover { animation:bounce-in 0.4s cubic-bezier(0.22,1,0.36,1) both !important; }
+
+  /* ── Notification bell ── */
+  .notif-btn {
+    transition:transform 0.2s !important;
+  }
+  .notif-btn:hover {
+    transform:rotate(-15deg) scale(1.15) !important;
+  }
+
+  /* ── Add Lead button — animated gradient ── */
+  .btn[onclick*="openAddLeadModal"],
+  button[onclick*="openAddLeadModal"] {
+    background:linear-gradient(270deg,#3b82f6,#8b5cf6,#06b6d4,#3b82f6) !important;
+    background-size:300% 300% !important;
+    animation:gradient-shift 4s ease infinite !important;
+    transition:transform 0.2s, box-shadow 0.2s !important;
+  }
+  button[onclick*="openAddLeadModal"]:hover {
+    transform:translateY(-2px) scale(1.03) !important;
+    box-shadow:0 8px 25px rgba(59,130,246,0.4) !important;
+  }
+
+  /* ── Lead / deal cards ── */
+  .deal-card {
+    transition: transform 0.25s cubic-bezier(0.22,1,0.36,1),
+                box-shadow 0.25s ease,
+                border-color 0.25s !important;
+  }
+  .deal-card:hover {
+    transform:translateY(-3px) scale(1.01) !important;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3) !important;
+    border-color:rgba(59,130,246,0.3) !important;
+  }
+
+  /* ── Table rows ── */
+  .leads-table tbody tr {
+    transition: background 0.15s, transform 0.15s !important;
+  }
+  .leads-table tbody tr:hover {
+    background:rgba(59,130,246,0.06) !important;
+    transform:translateX(2px) !important;
+  }
+
+  /* ── Modal entry ── */
+  .modal {
+    animation: fadeInScale 0.3s cubic-bezier(0.22,1,0.36,1) both !important;
+  }
+
+  /* ── Toast notification ── */
+  .toast.show {
+    animation: slideInRight 0.35s cubic-bezier(0.22,1,0.36,1) both !important;
+  }
+
+  /* ── Sidebar entry ── */
+  .sidebar {
+    animation: slideInLeft 0.4s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  /* ── Stat values — shimmer on load ── */
+  .stat-value {
+    background:linear-gradient(90deg, var(--text) 25%, rgba(139,92,246,0.6) 50%, var(--text) 75%);
+    background-size:200% auto;
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+    animation:shimmer 3s linear infinite;
+  }
+
+  /* ── AI badge pulse ── */
+  .ai-badge, [class*="ai-badge"] {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* ── WhatsApp button ── */
+  a[href*="wa.me"], button[onclick*="wa.me"] {
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s !important;
+  }
+  a[href*="wa.me"]:hover, button[onclick*="wa.me"]:hover {
+    transform:scale(1.05) !important;
+    box-shadow:0 6px 20px rgba(37,211,102,0.35) !important;
+    filter:brightness(1.1) !important;
+  }
+
+  /* ── Contact/campaign cards ── */
+  .contact-card, .campaign-card, .invoice-card {
+    transition: transform 0.25s cubic-bezier(0.22,1,0.36,1),
+                box-shadow 0.25s, border-color 0.25s !important;
+  }
+  .contact-card:hover, .campaign-card:hover, .invoice-card:hover {
+    transform:translateY(-3px) !important;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25) !important;
+    border-color:rgba(59,130,246,0.25) !important;
+  }
+
+  /* ── Status badges bounce in ── */
+  .ap, [class^="ap "], [class*=" ap "] {
+    animation: bounce-in 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    transition: transform 0.15s !important;
+  }
+  .ap:hover { transform:scale(1.08) !important; }
+
+  /* ── Score badges float ── */
+  .score-badge, [class*="score"] {
+    transition: transform 0.2s !important;
+  }
+
+  /* ── Input focus glow ── */
+  .form-input:focus, .form-select:focus, .form-textarea:focus,
+  .auth-input:focus {
+    box-shadow:0 0 0 3px rgba(59,130,246,0.2), 0 0 15px rgba(59,130,246,0.1) !important;
+    border-color:var(--accent) !important;
+    transition: box-shadow 0.2s, border-color 0.2s !important;
+  }
+
+  /* ── Search bar ── */
+  .search-bar:focus-within {
+    box-shadow:0 0 0 2px rgba(59,130,246,0.2) !important;
+    border-color:rgba(59,130,246,0.3) !important;
+    transition:all 0.2s !important;
+  }
+
+  /* ── Pipeline columns ── */
+  .pipeline-col {
+    transition: transform 0.2s !important;
+  }
+  .pipeline-col:hover {
+    transform:translateY(-2px) !important;
+  }
+
+  /* ── Reduced motion support ── */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration:0.01ms !important;
+      transition-duration:0.01ms !important;
+    }
+  }
 
 
 
@@ -1723,11 +2015,16 @@
           <div style="background:var(--bg2);border:1px solid var(--border);border-radius:24px;width:100%;max-width:700px;padding:32px;box-shadow:0 40px 80px rgba(0,0,0,0.4)">
             <div style="text-align:center;margin-bottom:28px"><div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px"><span data-en="Choose Your Plan" data-ar="اختر خطتك">Choose Your Plan</span></div></div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
-              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center"><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Starter</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 99<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">50 leads/month</div><button onclick="contactForUpgrade('Starter - SAR 99')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
-              <div style="background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.08));border:2px solid var(--accent);border-radius:16px;padding:20px;text-align:center;position:relative"><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap">MOST POPULAR</div><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Growth</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 299<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">200 leads/month</div><button onclick="contactForUpgrade('Growth - SAR 299')" style="width:100%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
-              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center"><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Pro</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 599<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">Unlimited leads</div><button onclick="contactForUpgrade('Pro - SAR 599')" style="width:100%;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
+              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center"><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Starter</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 350<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">Core CRM + 1 workspace</div><button onclick="contactForUpgrade('Starter - SAR 350')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
+              <div style="background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.08));border:2px solid var(--accent);border-radius:16px;padding:20px;text-align:center;position:relative"><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap">MOST POPULAR</div><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Pro</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 699<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">AI features + 3 workspaces</div><button onclick="contactForUpgrade('Pro - SAR 699')" style="width:100%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
+              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center"><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Agency</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 999<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">Unlimited workspaces + white-label</div><button onclick="contactForUpgrade('Agency - SAR 999')" style="width:100%;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
             </div>
-            <button onclick="document.getElementById('lg-plans-modal').style.display='none'" style="width:100%;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;cursor:pointer;font-family:inherit">Maybe later</button>
+            <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:4px">
+                <span style="font-size:12px;font-weight:700;color:#f59e0b">➕ Lead Generator Add-on</span>
+                <span style="font-size:20px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif;margin:0 8px">SAR 200<span style="font-size:11px;font-weight:400;color:var(--text2)">/mo</span></span>
+                <span style="font-size:11px;color:var(--text2)">Real verified leads — add to any plan</span>
+              </div>
+              <button onclick="document.getElementById('lg-plans-modal').style.display='none'" style="width:100%;background:var(--bg3);color:var(--text2);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;cursor:pointer;font-family:inherit">Maybe later</button>
           </div>
         </div>
 
@@ -5203,7 +5500,22 @@ function exportCallsPDF() {
     <span>Exported by ${currentUser?.email || 'Admin'} · ${new Date().toLocaleDateString()}</span>
   </div>
   <\x73cript>window.onload=()=>{window.print()}<\/script>
-  </body></html>`;
+  <script>
+// ── Scroll animations init ──
+setTimeout(()=>{ document.querySelectorAll('.stat-card,.card').forEach(el=>{el.style.opacity='0';el.style.animation='fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both';setTimeout(()=>{el.style.opacity='';},100);}); },200);
+
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.btn-primary,.auth-btn-primary');
+  if(!btn)return;
+  const r=document.createElement('span');
+  const rect=btn.getBoundingClientRect();
+  const size=Math.max(rect.width,rect.height);
+  r.style.cssText=`position:absolute;width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;background:rgba(255,255,255,0.2);border-radius:50%;transform:scale(0);animation:ripple 0.6s linear;pointer-events:none;z-index:9`;
+  btn.style.position='relative';btn.style.overflow='hidden';
+  btn.appendChild(r);setTimeout(()=>r.remove(),600);
+});
+</script>
+</body></html>`;
 
   const win = window.open('', '_blank');
   win.document.write(html);
@@ -7731,6 +8043,21 @@ function generatePDFReport() {
   <button onclick="window.close()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:12px;padding:14px 20px;font-size:15px;cursor:pointer">✕ Close</button>
 </div>
 
+<script>
+// ── Scroll animations init ──
+setTimeout(()=>{ document.querySelectorAll('.stat-card,.card').forEach(el=>{el.style.opacity='0';el.style.animation='fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both';setTimeout(()=>{el.style.opacity='';},100);}); },200);
+
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.btn-primary,.auth-btn-primary');
+  if(!btn)return;
+  const r=document.createElement('span');
+  const rect=btn.getBoundingClientRect();
+  const size=Math.max(rect.width,rect.height);
+  r.style.cssText=`position:absolute;width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;background:rgba(255,255,255,0.2);border-radius:50%;transform:scale(0);animation:ripple 0.6s linear;pointer-events:none;z-index:9`;
+  btn.style.position='relative';btn.style.overflow='hidden';
+  btn.appendChild(r);setTimeout(()=>r.remove(),600);
+});
+</script>
 </body></html>`;
 
   const win = window.open('', '_blank');
@@ -9298,6 +9625,21 @@ function exportLeadsCSV() {
 }
 
 </script>
+<script>
+// ── Scroll animations init ──
+setTimeout(()=>{ document.querySelectorAll('.stat-card,.card').forEach(el=>{el.style.opacity='0';el.style.animation='fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both';setTimeout(()=>{el.style.opacity='';},100);}); },200);
+
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.btn-primary,.auth-btn-primary');
+  if(!btn)return;
+  const r=document.createElement('span');
+  const rect=btn.getBoundingClientRect();
+  const size=Math.max(rect.width,rect.height);
+  r.style.cssText=`position:absolute;width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;background:rgba(255,255,255,0.2);border-radius:50%;transform:scale(0);animation:ripple 0.6s linear;pointer-events:none;z-index:9`;
+  btn.style.position='relative';btn.style.overflow='hidden';
+  btn.appendChild(r);setTimeout(()=>r.remove(),600);
+});
+</script>
 </body>
 
 <!-- ONBOARDING MODAL -->
@@ -9557,6 +9899,21 @@ function generateVATInvoice() {
   <button onclick="window.print()" style="background:linear-gradient(135deg,#1e293b,#0f172a);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,0.3)">🖨️ Print / Save PDF</button>
   <button onclick="window.close()" style="background:#f1f5f9;color:#64748b;border:none;border-radius:12px;padding:14px 20px;font-size:15px;cursor:pointer">✕</button>
 </div>
+<script>
+// ── Scroll animations init ──
+setTimeout(()=>{ document.querySelectorAll('.stat-card,.card').forEach(el=>{el.style.opacity='0';el.style.animation='fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both';setTimeout(()=>{el.style.opacity='';},100);}); },200);
+
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.btn-primary,.auth-btn-primary');
+  if(!btn)return;
+  const r=document.createElement('span');
+  const rect=btn.getBoundingClientRect();
+  const size=Math.max(rect.width,rect.height);
+  r.style.cssText=`position:absolute;width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;background:rgba(255,255,255,0.2);border-radius:50%;transform:scale(0);animation:ripple 0.6s linear;pointer-events:none;z-index:9`;
+  btn.style.position='relative';btn.style.overflow='hidden';
+  btn.appendChild(r);setTimeout(()=>r.remove(),600);
+});
+</script>
 </body></html>`;
   const vatWin = window.open('', '_blank');
   vatWin.document.write(html);
