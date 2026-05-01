@@ -7085,15 +7085,16 @@ async function loadTeam() {
           </div>
         </div>
           <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
-          ${!isMe ? `
-          <select onchange="changeTeamMemberRole('${m.id||m.user_id}', this.value)" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer;font-family:inherit">
-            <option value="admin" ${role==='admin'?'selected':''}>👑 Admin</option>
-            <option value="manager" ${role==='manager'?'selected':''}>🧑‍💼 Manager</option>
-            <option value="sales" ${role==='sales'?'selected':''}>🎯 Sales</option>
-          </select>
-          <button onclick="toggleMemberActive('${m.id||m.user_id}', ${m.active})" style="background:${m.active?'rgba(239,68,68,0.1)':'rgba(16,185,129,0.1)'};border:1px solid ${m.active?'rgba(239,68,68,0.2)':'rgba(16,185,129,0.2)'};color:${m.active?'var(--danger)':'var(--success)'};border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer;font-family:inherit">
-            ${m.active ? '🚫 Deactivate' : '✅ Activate'}
-          </button>` : '<div style="font-size:11px;color:var(--text2);padding:4px">Your account</div>'}
+          ${!isMe ?
+          '<select onchange="changeTeamMemberRole(\'' + (m.id||m.user_id) + '\', this.value)" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer;font-family:inherit">' +
+          '<option value=\"admin\" ' + (role==='admin'?'selected':'') + '>👑 Admin</option>' +
+          '<option value=\"manager\" ' + (role==='manager'?'selected':'') + '>🧑‍💼 Manager</option>' +
+          '<option value=\"sales\" ' + (role==='sales'?'selected':'') + '>🎯 Sales</option>' +
+          '</select>' +
+          '<button onclick="toggleMemberActive(\'' + (m.id||m.user_id) + '\', ' + m.active + ')" style="background:' + (m.active?'rgba(239,68,68,0.1)':'rgba(16,185,129,0.1)') + ';border:1px solid ' + (m.active?'rgba(239,68,68,0.2)':'rgba(16,185,129,0.2)') + ';color:' + (m.active?'var(--danger)':'var(--success)') + ';border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer;font-family:inherit">' +
+          (m.active ? '🚫 Deactivate' : '✅ Activate') +
+          '</button>'
+          : '<div style="font-size:11px;color:var(--text2);padding:4px">Your account</div>'}
         </div>
       </div>`; }).join('');
   } catch(e) { hideLoader(); console.error('loadTeam error:', e); list.innerHTML = '<div style="color:var(--danger);padding:20px">Error: ' + e.message + '</div>'; }
