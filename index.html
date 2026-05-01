@@ -5527,19 +5527,6 @@ function exportCallsPDF() {
   <\x73cript>window.onload=()=>{window.print()}<\/script>
   <script>
 // ── Scroll animations init ──
-setTimeout(()=>{ document.querySelectorAll('.stat-card,.card').forEach(el=>{el.style.opacity='0';el.style.animation='fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both';setTimeout(()=>{el.style.opacity='';},100);}); },200);
-
-document.addEventListener('click',function(e){
-  const btn=e.target.closest('.btn-primary,.auth-btn-primary');
-  if(!btn)return;
-  const r=document.createElement('span');
-  const rect=btn.getBoundingClientRect();
-  const size=Math.max(rect.width,rect.height);
-  r.style.cssText=`position:absolute;width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;background:rgba(255,255,255,0.2);border-radius:50%;transform:scale(0);animation:ripple 0.6s linear;pointer-events:none;z-index:9`;
-  btn.style.position='relative';btn.style.overflow='hidden';
-  btn.appendChild(r);setTimeout(()=>r.remove(),600);
-});
-</script>
 </body></html>`;
 
   const win = window.open('', '_blank');
@@ -8070,19 +8057,6 @@ function generatePDFReport() {
 
 <script>
 // ── Scroll animations init ──
-setTimeout(()=>{ document.querySelectorAll('.stat-card,.card').forEach(el=>{el.style.opacity='0';el.style.animation='fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both';setTimeout(()=>{el.style.opacity='';},100);}); },200);
-
-document.addEventListener('click',function(e){
-  const btn=e.target.closest('.btn-primary,.auth-btn-primary');
-  if(!btn)return;
-  const r=document.createElement('span');
-  const rect=btn.getBoundingClientRect();
-  const size=Math.max(rect.width,rect.height);
-  r.style.cssText=`position:absolute;width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;background:rgba(255,255,255,0.2);border-radius:50%;transform:scale(0);animation:ripple 0.6s linear;pointer-events:none;z-index:9`;
-  btn.style.position='relative';btn.style.overflow='hidden';
-  btn.appendChild(r);setTimeout(()=>r.remove(),600);
-});
-</script>
 </body></html>`;
 
   const win = window.open('', '_blank');
@@ -9926,19 +9900,6 @@ function generateVATInvoice() {
 </div>
 <script>
 // ── Scroll animations init ──
-setTimeout(()=>{ document.querySelectorAll('.stat-card,.card').forEach(el=>{el.style.opacity='0';el.style.animation='fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both';setTimeout(()=>{el.style.opacity='';},100);}); },200);
-
-document.addEventListener('click',function(e){
-  const btn=e.target.closest('.btn-primary,.auth-btn-primary');
-  if(!btn)return;
-  const r=document.createElement('span');
-  const rect=btn.getBoundingClientRect();
-  const size=Math.max(rect.width,rect.height);
-  r.style.cssText=`position:absolute;width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;background:rgba(255,255,255,0.2);border-radius:50%;transform:scale(0);animation:ripple 0.6s linear;pointer-events:none;z-index:9`;
-  btn.style.position='relative';btn.style.overflow='hidden';
-  btn.appendChild(r);setTimeout(()=>r.remove(),600);
-});
-</script>
 </body></html>`;
   const vatWin = window.open('', '_blank');
   vatWin.document.write(html);
