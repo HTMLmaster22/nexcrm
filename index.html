@@ -761,12 +761,11 @@
     border-color:rgba(59,130,246,0.25) !important;
   }
 
-  /* ── Status badges bounce in ── */
-  .ap, [class^="ap "], [class*=" ap "] {
-    animation: bounce-in 0.4s cubic-bezier(0.22,1,0.36,1) both;
-    transition: transform 0.15s !important;
+  /* ── Status badges - subtle hover only ── */
+  .ap {
+    transition: transform 0.15s, opacity 0.15s !important;
   }
-  .ap:hover { transform:scale(1.08) !important; }
+  .ap:hover { transform:scale(1.06) !important; }
 
   /* ── Score badges float ── */
   .score-badge, [class*="score"] {
