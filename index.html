@@ -661,10 +661,12 @@
 
   /* ── Logo bounce ── */
   .logo-icon {
-    animation: float 7s ease-in-out infinite;
-    transition: transform 0.3s !important;
+    animation: none;
+    transition: transform 0.3s cubic-bezier(0.22,1,0.36,1) !important;
   }
-  .logo-icon:hover { animation:bounce-in 0.5s cubic-bezier(0.22,1,0.36,1) both !important; }
+  .logo-icon:hover {
+    transform: scale(1.12) rotate(-5deg) !important;
+  }
 
   /* ── Notification bell ── */
   .notif-btn {
@@ -2780,35 +2782,80 @@
 
     <!-- IMPORT MODAL -->
     <div class="modal-overlay" id="invite-modal">
-      <div class="modal">
+      <div class="modal" style="max-width:480px">
         <div class="modal-header">
-          <div class="modal-title">Invite New Client</div>
+          <div class="modal-title">➕ Add Team Member</div>
           <div class="modal-close" onclick="closeInviteModal()">✕</div>
         </div>
+
+        <!-- Role selector cards -->
+        <div style="margin-bottom:20px">
+          <label class="form-label" style="margin-bottom:10px;display:block">Select Role</label>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" id="role-cards">
+            <div class="role-card" id="rc-admin" onclick="selectRole('admin')" style="border:2px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg2)">
+              <div style="font-size:24px;margin-bottom:6px">👑</div>
+              <div style="font-size:12px;font-weight:700;color:var(--text)">Admin</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:3px">Full access</div>
+            </div>
+            <div class="role-card" id="rc-manager" onclick="selectRole('manager')" style="border:2px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg2)">
+              <div style="font-size:24px;margin-bottom:6px">🧑‍💼</div>
+              <div style="font-size:12px;font-weight:700;color:var(--text)">Manager</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:3px">Team leads</div>
+            </div>
+            <div class="role-card" id="rc-sales" onclick="selectRole('sales')" style="border:2px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg2)">
+              <div style="font-size:24px;margin-bottom:6px">🎯</div>
+              <div style="font-size:12px;font-weight:700;color:var(--text)">Sales Rep</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:3px">Own leads only</div>
+            </div>
+          </div>
+          <!-- Role description -->
+          <div id="role-desc" style="margin-top:10px;background:var(--bg3);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text2);display:none"></div>
+        </div>
+
         <div class="form-group">
-          <label class="form-label">Client Name</label>
-          <input class="form-input" id="inv-name" placeholder="Majnoon Laila" />
+          <label class="form-label">Full Name</label>
+          <input class="form-input" id="inv-name" placeholder="e.g. Tariq Hassan" />
         </div>
         <div class="form-group">
-          <label class="form-label">Client Email</label>
-          <input class="form-input" id="inv-email" type="email" placeholder="client@company.com" />
+          <label class="form-label">Email Address</label>
+          <input class="form-input" id="inv-email" type="email" placeholder="tariq@company.com" />
         </div>
         <div class="form-group">
           <label class="form-label">Temporary Password</label>
-          <input class="form-input" id="inv-password" type="password" placeholder="Min 6 characters" />
+          <div style="position:relative">
+            <input class="form-input" id="inv-password" type="password" placeholder="Min 6 characters" style="padding-right:40px" />
+            <button onclick="toggleInvitePassword()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text2);font-size:14px">👁</button>
+          </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Assign to Organization</label>
+          <label class="form-label">Assign to Workspace</label>
           <select class="form-input" id="inv-org">
-            <option value="">— Select Organization —</option>
+            <option value="">— Select Workspace —</option>
           </select>
         </div>
-        <div style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--text2)">
-          💡 The client will use this email and password to log in. They will only see their own org leads.
+
+        <!-- Permission summary -->
+        <div id="perm-summary" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px">🔐 Permissions for this role:</div>
+          <div id="perm-list" style="display:flex;flex-direction:column;gap:5px;font-size:12px"></div>
         </div>
+
+        <!-- Send via -->
+        <div style="margin-bottom:16px">
+          <label class="form-label" style="margin-bottom:8px;display:block">Notify via</label>
+          <div style="display:flex;gap:8px">
+            <label style="flex:1;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;font-size:13px">
+              <input type="radio" name="notify-via" value="whatsapp" checked style="accent-color:var(--accent)"> 💬 WhatsApp
+            </label>
+            <label style="flex:1;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;font-size:13px">
+              <input type="radio" name="notify-via" value="email" style="accent-color:var(--accent)"> 📧 Email only
+            </label>
+          </div>
+        </div>
+
         <div style="display:flex;gap:10px">
           <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
-          <button class="btn btn-primary" style="flex:2" onclick="createClientAccount()">✉️ Create Account</button>
+          <button class="btn btn-primary" style="flex:2" onclick="createMemberAccount()">✉️ Create & Invite</button>
         </div>
       </div>
     </div>
@@ -7011,31 +7058,44 @@ async function loadTeam() {
       return;
     }
     teamMembers = data;
+    const roleColors = {
+      admin: { bg:'rgba(139,92,246,0.15)', color:'#c4b5fd', icon:'👑' },
+      manager: { bg:'rgba(59,130,246,0.15)', color:'#93c5fd', icon:'🧑‍💼' },
+      sales: { bg:'rgba(16,185,129,0.15)', color:'#6ee7b7', icon:'🎯' },
+      inactive: { bg:'rgba(148,163,184,0.1)', color:'#94a3b8', icon:'⏸️' }
+    };
     list.innerHTML = data.map(m => {
       const profile = m.profiles || {};
       const name = profile.full_name || m.full_name || m.name || profile.email?.split('@')[0] || m.email?.split('@')[0] || ('Member ' + (m.user_id||'').slice(0,6));
       const email = profile.email || m.email || m.user_id || '—';
       const initials = (name||'?')[0].toUpperCase();
-      return `<div class="team-card">
-        <div class="team-avatar-lg">${initials}</div>
-        <div class="team-info">
-          <div class="team-name">${name}</div>
-          <div class="team-email">${email}</div>
-          <span class="team-role-badge role-${m.active ? m.role : 'inactive'}">${m.active ? m.role.toUpperCase() : 'INACTIVE'}</span>
+      const role = m.active ? (m.role||'sales') : 'inactive';
+      const rc = roleColors[role] || roleColors.sales;
+      const isMe = currentUser && (m.email === currentUser.email || m.user_id === currentUser.id);
+      return `<div class="team-card" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;margin-bottom:10px">
+        <div style="width:46px;height:46px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff">${initials}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="font-size:14px;font-weight:700;color:var(--text)">${name}</div>
+            ${isMe ? '<span style="font-size:10px;background:rgba(59,130,246,0.15);color:var(--accent);padding:2px 8px;border-radius:20px;font-weight:600">YOU</span>' : ''}
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">${email}</div>
+          <div style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:${rc.bg};color:${rc.color}">${rc.icon} ${role.toUpperCase()}</span>
+          </div>
         </div>
-        <div class="team-actions">
-          <select class="select-input" onchange="changeRole(${m.id}, this.value)">
-            <option value="sales" ${m.role==='sales'?'selected':''}>Sales Rep</option>
-            <option value="manager" ${m.role==='manager'?'selected':''}>Manager</option>
-            <option value="admin" ${m.role==='admin'?'selected':''}>Admin</option>
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          ${!isMe ? `
+          <select onchange="changeTeamMemberRole('${m.id||m.user_id}', this.value)" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer;font-family:inherit">
+            <option value="admin" ${role==='admin'?'selected':''}>👑 Admin</option>
+            <option value="manager" ${role==='manager'?'selected':''}>🧑‍💼 Manager</option>
+            <option value="sales" ${role==='sales'?'selected':''}>🎯 Sales</option>
           </select>
-          <button class="action-btn ${m.active ? 'btn-delete' : 'btn-edit'}" onclick="toggleMember(${m.id}, ${m.active})" title="${m.active ? 'Deactivate' : 'Activate'}">
-            ${m.active ? '🚫' : '✅'}
-          </button>
-          <button class="action-btn btn-delete" onclick="removeMember(${m.id})" title="Remove">🗑️</button>
+          <button onclick="toggleMemberActive('${m.id||m.user_id}', ${m.active})" style="background:${m.active?'rgba(239,68,68,0.1)':'rgba(16,185,129,0.1)'};border:1px solid ${m.active?'rgba(239,68,68,0.2)':'rgba(16,185,129,0.2)'};color:${m.active?'var(--danger)':'var(--success)'};border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer;font-family:inherit">
+            ${m.active ? '🚫 Deactivate' : '✅ Activate'}
+          </button>` : '<div style="font-size:11px;color:var(--text2);padding:4px">Your account</div>'}
         </div>
-      </div>`;
-    }).join('');
+      </div>`; }).join('');
   } catch(e) { hideLoader(); console.error('loadTeam error:', e); list.innerHTML = '<div style="color:var(--danger);padding:20px">Error: ' + e.message + '</div>'; }
 }
 
@@ -7082,6 +7142,173 @@ function closeAddMemberModal() {
 document.getElementById('member-modal').addEventListener('click', function(e) {
   if(e.target === this) closeAddMemberModal();
 });
+
+// ─── ROLE DESCRIPTIONS ────────────────────────────────────────
+const roleDescriptions = {
+  admin: {
+    desc: 'Full access to everything — leads, analytics, team, settings, billing.',
+    perms: ['✅ View & edit ALL leads', '✅ Manage team members & roles', '✅ Access analytics & reports', '✅ Edit organization settings', '✅ Create & send campaigns', '✅ View invoices & financials']
+  },
+  manager: {
+    desc: 'Can manage the team's leads and see reports, but cannot change settings or billing.',
+    perms: ['✅ View & edit ALL leads', '✅ Reassign leads to sales reps', '✅ Access analytics & reports', '✅ Create & send campaigns', '❌ Cannot edit org settings', '❌ Cannot manage team members']
+  },
+  sales: {
+    desc: 'Can only see and manage leads assigned to them. No access to other reps' data.',
+    perms: ['✅ View & edit OWN leads only', '✅ Add notes & update status', '✅ Send WhatsApp messages', '❌ Cannot see other reps' leads', '❌ Cannot access analytics', '❌ Cannot change any settings']
+  }
+};
+
+function selectRole(role) {
+  // Highlight selected card
+  document.querySelectorAll('.role-card').forEach(c => {
+    c.style.borderColor = 'var(--border)';
+    c.style.background = 'var(--bg2)';
+  });
+  const card = document.getElementById('rc-' + role);
+  if(card) {
+    card.style.borderColor = 'var(--accent)';
+    card.style.background = 'rgba(59,130,246,0.08)';
+  }
+  document.getElementById('invite-modal').dataset.role = role;
+
+  // Show description
+  const descEl = document.getElementById('role-desc');
+  if(descEl && roleDescriptions[role]) {
+    descEl.style.display = 'block';
+    descEl.textContent = roleDescriptions[role].desc;
+  }
+
+  // Show permissions
+  const permSummary = document.getElementById('perm-summary');
+  const permList = document.getElementById('perm-list');
+  if(permSummary && permList && roleDescriptions[role]) {
+    permSummary.style.display = 'block';
+    permList.innerHTML = roleDescriptions[role].perms.map(p =>
+      `<div style="color:${p.startsWith('✅')?'var(--success)':'var(--danger)'}">${p}</div>`
+    ).join('');
+  }
+}
+
+function toggleInvitePassword() {
+  const inp = document.getElementById('inv-password');
+  if(inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+async function createMemberAccount() {
+  const name = document.getElementById('inv-name').value.trim();
+  const email = document.getElementById('inv-email').value.trim();
+  const password = document.getElementById('inv-password').value;
+  const orgId = document.getElementById('inv-org').value;
+  const role = document.getElementById('invite-modal').dataset.role || 'sales';
+  const notifyVia = document.querySelector('input[name="notify-via"]:checked')?.value || 'whatsapp';
+
+  if(!name) { showToast('❌ Enter a name'); return; }
+  if(!email || !email.includes('@')) { showToast('❌ Enter a valid email'); return; }
+  if(!password || password.length < 6) { showToast('❌ Password must be at least 6 characters'); return; }
+  if(!role) { showToast('❌ Select a role first'); return; }
+
+  const btn = document.querySelector('#invite-modal .btn-primary');
+  if(btn) { btn.textContent = '⏳ Creating...'; btn.disabled = true; }
+
+  try {
+    // Step 1: Create auth user via admin-action edge function
+    const createRes = await fetch(SUPABASE_URL + '/functions/v1/admin-action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+      body: JSON.stringify({ action: 'create_user', email, password, full_name: name })
+    });
+    const createData = await createRes.json();
+    const userId = createData.user?.id || createData.id;
+
+    // Step 2: Add to org_members with role
+    if(orgId && userId) {
+      await fetch(SUPABASE_URL + '/rest/v1/org_members', {
+        method: 'POST',
+        headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ user_id: userId, org_id: orgId, role, active: true, email, full_name: name })
+      });
+    }
+
+    // Step 3: Add to team_members table
+    await fetch(SUPABASE_URL + '/rest/v1/team_members', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ name, email, role, active: true, user_id: userId || null })
+    });
+
+    // Step 4: Notify via WhatsApp or just show credentials
+    const loginUrl = 'https://htmlmaster22.github.io/nexcrm/';
+    const roleLabel = role === 'admin' ? 'Admin 👑' : role === 'manager' ? 'Manager 🧑‍💼' : 'Sales Rep 🎯';
+
+    if(notifyVia === 'whatsapp') {
+      const msg = encodeURIComponent(
+        `مرحباً ${name} 👋
+
+تم إضافتك إلى NexCRM بصلاحية: ${roleLabel}
+
+` +
+        `رابط الدخول: ${loginUrl}
+` +
+        `الإيميل: ${email}
+` +
+        `كلمة المرور: ${password}
+
+` +
+        `تواصل معنا إذا احتجت مساعدة ✅`
+      );
+      window.open('https://wa.me/?text=' + msg, '_blank');
+    }
+
+    showToast('✅ ' + name + ' added as ' + role + '!');
+    closeInviteModal();
+    loadTeam();
+
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Error creating account: ' + e.message);
+  } finally {
+    if(btn) { btn.textContent = '✉️ Create & Invite'; btn.disabled = false; }
+  }
+}
+
+async function changeTeamMemberRole(memberId, newRole) {
+  try {
+    // Update in team_members
+    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + memberId, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ role: newRole })
+    });
+    // Also update in org_members if exists
+    await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + memberId, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ role: newRole })
+    });
+    const roleLabels = { admin:'Admin 👑', manager:'Manager 🧑‍💼', sales:'Sales Rep 🎯' };
+    showToast('✅ Role changed to ' + (roleLabels[newRole]||newRole));
+    loadTeam();
+  } catch(e) { showToast('❌ Error changing role'); }
+}
+
+async function toggleMemberActive(memberId, currentlyActive) {
+  const newState = !currentlyActive;
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + memberId, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ active: newState })
+    });
+    await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + memberId, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ active: newState })
+    });
+    showToast(newState ? '✅ Member activated' : '🚫 Member deactivated');
+    loadTeam();
+  } catch(e) { showToast('❌ Error updating member'); }
+}
 
 async function addTeamMember() {
   const name = document.getElementById('m-name').value.trim();
