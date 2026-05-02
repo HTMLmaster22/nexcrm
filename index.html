@@ -5132,6 +5132,20 @@ async function handleAuth() {
   const password = document.getElementById('auth-password').value;
   const btn = document.getElementById('auth-submit-btn');
   if(!email || !password) { showAuthError('Please fill in all fields'); return; }
+
+  // ── Rate limit check ──
+  if(typeof checkLoginRateLimit === 'function') {
+    const rateCheck = checkLoginRateLimit(email);
+    if(!rateCheck.allowed) { showAuthError(rateCheck.message); return; }
+    if(rateCheck.warning) showToast('⚠️ ' + rateCheck.warning);
+  }
+
+  // ── Email validation ──
+  if(typeof isValidEmail === 'function' && !isValidEmail(email)) {
+    showAuthError('Please enter a valid email address');
+    return;
+  }
+
   btn.textContent = 'Please wait...'; btn.disabled = true;
 
   const endpoint = currentTab === 'login'
@@ -5173,6 +5187,8 @@ function loginSuccess(data) {
   localStorage.setItem('nexcrm_token', data.access_token);
   localStorage.setItem('nexcrm_user', JSON.stringify(data.user));
   document.getElementById('auth-overlay').style.display = 'none';
+  if(typeof resetLoginAttempts === 'function') resetLoginAttempts(currentUser.email);
+  resetSessionTimer();
   const uname = currentUser.email.split('@')[0];
   document.querySelector('.user-name') && (document.querySelector('.user-name').textContent = uname);
   const sbu = document.getElementById('sidebar-username');
@@ -5562,6 +5578,10 @@ function exportCallsPDF() {
   `).join('');
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="noindex, nofollow">
   <title>NexCRM — Call Logs Report</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
@@ -9778,6 +9798,134 @@ function useCampaignIdea(channel, name, body) {
 
 </script>
 <script>
+// ═══════════════════════════════════════════════════════
+// SECURITY LAYER — NexCRM
+// ═══════════════════════════════════════════════════════
+
+// ── 1. HTML escape — prevents XSS ──
+function escapeHtml(str) {
+  if(str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+    .replace(/\//g, '&#x2F;');
+}
+
+// ── 2. Sanitize user input before saving ──
+function sanitizeInput(str, maxLength = 500) {
+  if(!str) return '';
+  return String(str).trim().substring(0, maxLength);
+}
+
+// ── 3. Validate email format ──
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// ── 4. Login rate limiter ──
+const _loginAttempts = {};
+function checkLoginRateLimit(email) {
+  const key = email.toLowerCase();
+  const now = Date.now();
+  if(!_loginAttempts[key]) _loginAttempts[key] = { count:0, firstAttempt:now, lockedUntil:0 };
+  const record = _loginAttempts[key];
+
+  // If locked, check if lock has expired
+  if(record.lockedUntil > now) {
+    const mins = Math.ceil((record.lockedUntil - now) / 60000);
+    return { allowed:false, message:`Too many attempts. Try again in ${mins} minute${mins>1?'s':''}.` };
+  }
+
+  // Reset if window has passed (15 min)
+  if(now - record.firstAttempt > 15 * 60 * 1000) {
+    record.count = 0;
+    record.firstAttempt = now;
+  }
+
+  record.count++;
+
+  // Lock after 5 failed attempts for 15 minutes
+  if(record.count > 5) {
+    record.lockedUntil = now + 15 * 60 * 1000;
+    return { allowed:false, message:'Too many failed attempts. Account temporarily locked for 15 minutes.' };
+  }
+
+  // Warn after 3 attempts
+  if(record.count >= 3) {
+    return { allowed:true, warning:`Warning: ${6 - record.count} attempt${6-record.count>1?'s':''} remaining before lockout.` };
+  }
+
+  return { allowed:true };
+}
+
+function resetLoginAttempts(email) {
+  const key = email.toLowerCase();
+  if(_loginAttempts[key]) delete _loginAttempts[key];
+}
+
+// ── 5. Session timeout (30 min idle) ──
+let _sessionTimer = null;
+const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
+function resetSessionTimer() {
+  clearTimeout(_sessionTimer);
+  _sessionTimer = setTimeout(() => {
+    if(currentUser) {
+      showToast('⏰ Session expired due to inactivity. Please sign in again.');
+      setTimeout(() => { supabase.auth.signOut(); location.reload(); }, 2000);
+    }
+  }, SESSION_TIMEOUT);
+}
+
+// Reset timer on user activity
+['click','keydown','mousemove','touchstart'].forEach(evt => {
+  document.addEventListener(evt, resetSessionTimer, { passive:true });
+});
+
+// ── 6. Sanitize all form inputs before DB writes ──
+function sanitizeLeadData(data) {
+  const safe = {};
+  const textFields = ['name','company','phone','email','source','status','notes','title','value','location','website'];
+  textFields.forEach(f => {
+    if(data[f] !== undefined) safe[f] = sanitizeInput(data[f], 500);
+  });
+  // Non-text fields pass through
+  Object.keys(data).forEach(k => {
+    if(!(k in safe)) safe[k] = data[k];
+  });
+  return safe;
+}
+
+// ── 7. Content Security check for lead imports ──
+function validateLeadImport(lead) {
+  const errors = [];
+  if(!lead.name || lead.name.trim().length < 1) errors.push('Name required');
+  if(lead.email && !isValidEmail(lead.email)) errors.push('Invalid email format');
+  if(lead.phone && !/^[\d\s\+\-\(\)]{7,20}$/.test(lead.phone)) errors.push('Invalid phone format');
+  return errors;
+}
+
+// ── 8. Detect suspicious activity ──
+const _suspiciousPatterns = [/<script/i, /javascript:/i, /on\w+\s*=/i, /eval\s*\(/i, /document\.\w/i];
+function isSuspiciousInput(str) {
+  return _suspiciousPatterns.some(p => p.test(str));
+}
+
+function secureSave(data) {
+  // Check all string values for XSS patterns
+  for(const [key, val] of Object.entries(data)) {
+    if(typeof val === 'string' && isSuspiciousInput(val)) {
+      console.warn('Suspicious input blocked in field:', key);
+      showToast('⚠️ Invalid characters detected in ' + key);
+      return null;
+    }
+  }
+  return sanitizeLeadData(data);
+}
+
 // ─── AI MARKET INTELLIGENCE ────────────────────────────────────
 async function runMarketIntelligence() {
   const brand = document.getElementById('mi-brand')?.value.trim();
