@@ -6908,14 +6908,11 @@ async function parseCampaignCsv(input) {
   }
 
   const text = await file.text();
-  const lines = text.split(/
-?
-/).filter(l => l.trim());
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
   if(lines.length < 2) { preview.innerHTML = '<div style="color:var(--danger);font-size:12px">File is empty or invalid</div>'; return; }
 
-  const sep = lines[0].includes('	') ? '	' : ',';
-  const headers = lines[0].split(sep).map(h => h.trim().toLowerCase().replace(/["
-]/g,''));
+  const sep = lines[0].includes('\t') ? '\t' : ',';
+  const headers = lines[0].split(sep).map(h => h.trim().toLowerCase().replace(/["\r]/g,''));
 
   const nameIdx = headers.findIndex(h => ['name','full name','fullname'].includes(h));
   const emailIdx = headers.findIndex(h => ['email','email address'].includes(h));
@@ -6931,8 +6928,7 @@ async function parseCampaignCsv(input) {
   let skipped = 0;
 
   lines.slice(1).forEach(line => {
-    const cols = line.split(sep).map(c => c.trim().replace(/["
-]/g,''));
+    const cols = line.split(sep).map(c => c.trim().replace(/["\r]/g,''));
     const email = cols[emailIdx];
     if(!email || !email.includes('@')) { skipped++; return; }
     _csvContacts.push({
