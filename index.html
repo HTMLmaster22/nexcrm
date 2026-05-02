@@ -2646,6 +2646,7 @@
         <button class="admin-tab" onclick="adminTab('performance',this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Performance</button>
         <button class="admin-tab" onclick="adminTab('clients',this)">🏢 Client Management</button>
         <button class="admin-tab" onclick="adminTab('branding',this)">🎨 Branding</button>
+        <button class="admin-tab" onclick="adminTab('users',this)">👥 All Users</button>
         <button class="admin-tab" onclick="adminTab('requests',this)" id="requests-tab">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
           Access Requests <span id="requests-badge" style="background:#ef4444;color:#fff;padding:1px 6px;border-radius:10px;font-size:10px;margin-left:4px;display:none">0</span>
@@ -2679,6 +2680,42 @@
       </div>
 
       <!-- CLIENTS -->
+      <div id="admin-users" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">👥 All Registered Users</div>
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadAllUsers()">🔄 Refresh</button>
+          </div>
+          <!-- Summary stats -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px" id="users-stats">
+            <div style="background:var(--bg3);border-radius:12px;padding:14px;text-align:center">
+              <div style="font-size:22px;font-weight:900;color:var(--accent)" id="stat-total-users">—</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:3px">Total Users</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:12px;padding:14px;text-align:center">
+              <div style="font-size:22px;font-weight:900;color:#c4b5fd" id="stat-admins">—</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:3px">Admins 👑</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:12px;padding:14px;text-align:center">
+              <div style="font-size:22px;font-weight:900;color:var(--success)" id="stat-active-users">—</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:3px">Active</div>
+            </div>
+            <div style="background:var(--bg3);border-radius:12px;padding:14px;text-align:center">
+              <div style="font-size:22px;font-weight:900;color:var(--danger)" id="stat-inactive-users">—</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:3px">Inactive</div>
+            </div>
+          </div>
+          <!-- Search -->
+          <div style="margin-bottom:16px">
+            <input class="form-input" id="users-search" placeholder="🔍 Search by name, email or role..." oninput="filterUsers(this.value)" style="width:100%" />
+          </div>
+          <!-- Users list -->
+          <div id="all-users-list">
+            <div style="text-align:center;padding:40px;color:var(--text2)">Click Refresh to load users</div>
+          </div>
+        </div>
+      </div>
+
       <div id="admin-clients" style="display:none">
         <div class="card">
           <div class="card-header">
@@ -2740,7 +2777,8 @@
         </div>
       </div>
 
-      <!-- CLIENT MANAGEMENT -->
+
+
       <div id="admin-clients" style="display:none">
         <div class="card" style="margin-bottom:16px;background:#0f1629;border:1px solid rgba(59,130,246,0.2);border-radius:16px;padding:22px">
           <div class="card-header">
@@ -7034,6 +7072,8 @@ function adminTab(tab, el) {
   _s('admin-performance', tab === 'performance');
   _s('admin-branding', tab === 'branding');
   _s('admin-requests', tab === 'requests');
+  _s('admin-users', tab === 'users');
+  if(tab === 'users') loadAllUsers();
   if(tab === 'team') loadTeam();
   if(tab === 'clients') loadClients();
   if(tab === 'allleads') loadAllLeads();
@@ -7043,6 +7083,240 @@ function adminTab(tab, el) {
 }
 
 // ─── TEAM ──────────────────────────────────────────────────────
+// ─── ALL USERS MANAGEMENT ─────────────────────────────────────
+let _allUsersCache = [];
+
+async function loadAllUsers() {
+  const list = document.getElementById('all-users-list');
+  if(!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">⏳ Loading users...</div>';
+
+  try {
+    // Primary source: team_members (has real names and emails)
+    const r = await fetch(SUPABASE_URL + '/rest/v1/team_members?select=*&order=created_at.desc', { headers: HEADERS });
+    const tmRaw = await r.json();
+    const teamMembers = Array.isArray(tmRaw) ? tmRaw : [];
+
+    // Secondary: org_members for role/workspace info
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const r2 = await fetch(SUPABASE_URL + '/rest/v1/org_members?select=*&order=created_at.desc' + orgFilter, { headers: HEADERS });
+    const omRaw = await r2.json();
+    const orgMembers = Array.isArray(omRaw) ? omRaw : [];
+
+    const merged = [];
+    const seen = new Set();
+
+    // First: use team_members as they have real names/emails
+    teamMembers.forEach(tm => {
+      const key = tm.email || tm.user_id || tm.id;
+      if(seen.has(key)) return;
+      seen.add(key);
+      // Find matching org_member for role
+      const om = orgMembers.find(o => o.user_id === tm.user_id || o.email === tm.email);
+      merged.push({
+        id: tm.id,
+        user_id: tm.user_id || om?.user_id,
+        email: tm.email || '—',
+        name: tm.name || tm.email?.split('@')[0] || 'Unknown',
+        role: om?.role || tm.role || 'sales',
+        active: (om?.active !== false) && (tm.active !== false),
+        org_id: om?.org_id,
+        created_at: tm.created_at,
+      });
+    });
+
+    // Add any org_members not already in team_members
+    orgMembers.forEach(om => {
+      const key = om.email || om.user_id;
+      if(seen.has(key)) return;
+      seen.add(key);
+      merged.push({
+        id: om.id || om.user_id,
+        user_id: om.user_id,
+        email: om.email || '(email hidden)',
+        name: om.full_name || om.email?.split('@')[0] || 'User ' + (om.user_id||'').slice(0,6),
+        role: om.role || 'sales',
+        active: om.active !== false,
+        org_id: om.org_id,
+        created_at: om.created_at,
+      });
+    });
+
+    _allUsersCache = merged;
+
+    // Stats
+    const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+    setEl('stat-total-users', merged.length);
+    setEl('stat-admins', merged.filter(u => u.role === 'admin').length);
+    setEl('stat-active-users', merged.filter(u => u.active).length);
+    setEl('stat-inactive-users', merged.filter(u => !u.active).length);
+
+    renderUsersList(merged);
+
+  } catch(e) {
+    console.error(e);
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--danger)">❌ Error: ' + e.message + '</div>';
+  }
+}
+
+function filterUsers(query) {
+  if(!_allUsersCache.length) return;
+  const q = query.toLowerCase();
+  const filtered = _allUsersCache.filter(u =>
+    (u.name||'').toLowerCase().includes(q) ||
+    (u.email||'').toLowerCase().includes(q) ||
+    (u.role||'').toLowerCase().includes(q)
+  );
+  renderUsersList(filtered);
+}
+
+function renderUsersList(users) {
+  const list = document.getElementById('all-users-list');
+  if(!list) return;
+
+  if(!users || users.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No users found</div>';
+    return;
+  }
+
+  const roleInfo = {
+    admin:   { icon:'👑', color:'#c4b5fd', bg:'rgba(139,92,246,0.15)', label:'Admin' },
+    manager: { icon:'🧑‍💼', color:'#93c5fd', bg:'rgba(59,130,246,0.15)', label:'Manager' },
+    sales:   { icon:'🎯', color:'#6ee7b7', bg:'rgba(16,185,129,0.15)', label:'Sales Rep' },
+  };
+
+  list.innerHTML = users.map(u => {
+    const ri = roleInfo[u.role] || roleInfo.sales;
+    const initials = (u.name||'?').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+    const isMe = currentUser && (u.email === currentUser.email || u.user_id === currentUser.id);
+    const joined = u.created_at ? new Date(u.created_at).toLocaleDateString('en-GB') : '—';
+
+    return `<div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);transition:background 0.15s" onmouseover="this.style.background='var(--bg3)'" onmouseout="this.style.background=''">
+      <!-- Avatar -->
+      <div style="width:42px;height:42px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff">${initials}</div>
+
+      <!-- Info -->
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:14px;font-weight:700;color:var(--text)">${u.name}</span>
+          ${isMe ? '<span style="font-size:10px;background:rgba(59,130,246,0.15);color:var(--accent);padding:2px 8px;border-radius:20px;font-weight:600">YOU</span>' : ''}
+          <span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;background:${ri.bg};color:${ri.color}">${ri.icon} ${ri.label}</span>
+          <span style="font-size:11px;padding:2px 10px;border-radius:20px;background:${u.active?'rgba(16,185,129,0.12)':'rgba(239,68,68,0.1)'};color:${u.active?'var(--success)':'var(--danger)'}">${u.active?'● Active':'○ Inactive'}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-top:3px">${u.email}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">Joined: ${joined}</div>
+      </div>
+
+      <!-- Actions -->
+      ${!isMe ? ('<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">' +
+        '<select onchange="changeUserRole(\'' + u.id + '\',\'' + (u.user_id||u.id) + '\', this.value)" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer;font-family:inherit">' +
+          '<option value="admin" ' + (u.role==='admin'?'selected':'') + '>👑 Admin</option>' +
+          '<option value="manager" ' + (u.role==='manager'?'selected':'') + '>🧑‍💼 Manager</option>' +
+          '<option value="sales" ' + (u.role==='sales'?'selected':'') + '>🎯 Sales</option>' +
+        '</select>' +
+        '<button onclick="removeUserAccess(\'' + u.id + '\',\'' + (u.user_id||u.id) + '\',\'' + u.name + '\')" ' +
+          'style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:var(--danger);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600">' +
+          '🗑️ Remove' +
+        '</button>' +
+        '<button onclick="restoreUserAccess(\'' + u.id + '\',\'' + (u.user_id||u.id) + '\')" ' +
+          'style="display:' + (!u.active?'block':'none') + ';background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600">' +
+          '✅ Restore' +
+        '</button>' +
+      '</div>') : '<div style="font-size:11px;color:var(--text2);padding:4px 8px">Your account</div>'}
+    </div>`;
+  }).join('');
+}
+
+async function removeUserAccess(memberId, userId, userName) {
+  if(!confirm('Remove ' + userName + ' from NexCRM? They will lose all access immediately. You can restore them later.')) return;
+  try {
+    // Remove from org_members
+    await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + userId, {
+      method:'DELETE', headers:{ ...HEADERS, 'Prefer':'return=minimal' }
+    });
+    // Set inactive in team_members (keep record for restore)
+    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + memberId, {
+      method:'PATCH', headers:{ ...HEADERS, 'Prefer':'return=minimal' },
+      body:JSON.stringify({ active:false })
+    });
+    const u = _allUsersCache.find(x => x.id === memberId);
+    if(u) u.active = false;
+    showToast('🗑️ ' + userName + ' removed. They can no longer access NexCRM.');
+    renderUsersList(_allUsersCache);
+    const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+    setEl('stat-active-users', _allUsersCache.filter(u=>u.active).length);
+    setEl('stat-inactive-users', _allUsersCache.filter(u=>!u.active).length);
+  } catch(e) { showToast('❌ Error: ' + e.message); }
+}
+
+async function restoreUserAccess(memberId, userId) {
+  try {
+    const u = _allUsersCache.find(x => x.id === memberId);
+    if(!u) return;
+    // Re-add to org_members
+    if(currentOrg) {
+      await fetch(SUPABASE_URL + '/rest/v1/org_members', {
+        method:'POST', headers:{ ...HEADERS, 'Prefer':'return=minimal' },
+        body:JSON.stringify({ user_id:userId, org_id:currentOrg.id, role:u.role, active:true, email:u.email, full_name:u.name })
+      });
+    }
+    // Reactivate in team_members
+    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + memberId, {
+      method:'PATCH', headers:{ ...HEADERS, 'Prefer':'return=minimal' },
+      body:JSON.stringify({ active:true })
+    });
+    u.active = true;
+    showToast('✅ ' + u.name + ' restored! They can now access NexCRM again.');
+    renderUsersList(_allUsersCache);
+    const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+    setEl('stat-active-users', _allUsersCache.filter(u=>u.active).length);
+    setEl('stat-inactive-users', _allUsersCache.filter(u=>!u.active).length);
+  } catch(e) { showToast('❌ Error: ' + e.message); }
+}
+
+async function changeUserRole(memberId, userId, newRole) {
+  try {
+    const roleLabels = { admin:'Admin 👑', manager:'Manager 🧑‍💼', sales:'Sales Rep 🎯' };
+    // Update org_members
+    await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + userId, {
+      method:'PATCH', headers:{ ...HEADERS, 'Prefer':'return=minimal' },
+      body:JSON.stringify({ role:newRole })
+    });
+    // Update team_members
+    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + memberId, {
+      method:'PATCH', headers:{ ...HEADERS, 'Prefer':'return=minimal' },
+      body:JSON.stringify({ role:newRole })
+    });
+    // Update cache
+    const u = _allUsersCache.find(x => x.id === memberId);
+    if(u) u.role = newRole;
+    showToast('✅ Role changed to ' + (roleLabels[newRole]||newRole));
+    renderUsersList(_allUsersCache);
+  } catch(e) { showToast('❌ Error: ' + e.message); }
+}
+
+async function toggleUserActive(memberId, userId, currentlyActive) {
+  const newState = !currentlyActive;
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + userId, {
+      method:'PATCH', headers:{ ...HEADERS, 'Prefer':'return=minimal' },
+      body:JSON.stringify({ active:newState })
+    });
+    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + memberId, {
+      method:'PATCH', headers:{ ...HEADERS, 'Prefer':'return=minimal' },
+      body:JSON.stringify({ active:newState })
+    });
+    const u = _allUsersCache.find(x => x.id === memberId);
+    if(u) u.active = newState;
+    showToast(newState ? '✅ User activated' : '🚫 User deactivated');
+    renderUsersList(_allUsersCache);
+    // Update stats
+    const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+    setEl('stat-active-users', _allUsersCache.filter(u=>u.active).length);
+    setEl('stat-inactive-users', _allUsersCache.filter(u=>!u.active).length);
+  } catch(e) { showToast('❌ Error: ' + e.message); }
+}
+
 async function loadTeam() {
   showLoader('Loading team...');
   const list = document.getElementById('team-list');
