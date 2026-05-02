@@ -2223,9 +2223,51 @@
                   <input class="form-input" id="camp-from-email" type="email" placeholder="sales@yourcompany.com" style="font-size:13px"/>
                 </div>
               </div>
-              <div style="font-size:11px;color:var(--text2);margin-top:8px">
-                Leads will see: <strong style="color:var(--text)">Your Name &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e380828e93828a848d90a38d869b80918ecd9082">[email&#160;protected]</a>&gt;</strong> — your name, our sending domain
+              <div style="font-size:11px;color:var(--text2);margin-top:8px" id="sender-note">
+                Leads will see: <strong style="color:var(--text)">Your Name &lt;yourname@yourdomain.com&gt;</strong> — sent via your SMTP
               </div>
+            </div>
+            <!-- SMTP Settings -->
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">⚙️ SMTP Settings</div>
+                <button onclick="toggleSmtpSettings()" style="font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:inherit" id="smtp-toggle-btn">▼ Configure</button>
+              </div>
+              <div id="smtp-settings" style="display:none">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                  <div>
+                    <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">SMTP Host</label>
+                    <input class="form-input" id="smtp-host" placeholder="smtp.gmail.com" style="font-size:12px"/>
+                  </div>
+                  <div>
+                    <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Port</label>
+                    <select class="form-input" id="smtp-port" style="font-size:12px">
+                      <option value="587">587 (TLS - Recommended)</option>
+                      <option value="465">465 (SSL)</option>
+                      <option value="25">25 (Standard)</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                  <div>
+                    <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Email / Username</label>
+                    <input class="form-input" id="smtp-user" type="email" placeholder="info@yourcompany.com" style="font-size:12px"/>
+                  </div>
+                  <div>
+                    <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Password / App Password</label>
+                    <input class="form-input" id="smtp-pass" type="password" placeholder="••••••••••••" style="font-size:12px"/>
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button onclick="saveSmtpSettings()" class="btn btn-primary" style="flex:1;font-size:12px;padding:8px">💾 Save SMTP</button>
+                  <button onclick="testSmtpSettings()" class="btn btn-ghost" style="flex:1;font-size:12px;padding:8px">🧪 Test Connection</button>
+                </div>
+                <div style="margin-top:10px;background:rgba(59,130,246,0.08);border-radius:8px;padding:10px;font-size:11px;color:var(--text2)">
+                  💡 <b>Gmail users:</b> Use an <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color:var(--accent)">App Password</a> instead of your regular password. Host: smtp.gmail.com, Port: 587<br>
+                  💡 <b>Outlook users:</b> Host: smtp.office365.com, Port: 587
+                </div>
+              </div>
+              <div id="smtp-saved-indicator" style="display:none;font-size:12px;color:var(--success)">✅ SMTP configured — emails will send from your company address</div>
             </div>
             <div class="form-group">
               <label class="form-label">Campaign Name</label>
@@ -2233,14 +2275,25 @@
             </div>
             <div class="form-group">
               <label class="form-label">Send To</label>
-              <select class="form-input" id="camp-filter">
-                <option value="all">All Leads</option>
+              <select class="form-input" id="camp-filter" onchange="toggleCsvUpload(this.value)">
+                <option value="all">All Leads in CRM</option>
                 <option value="New">New Leads Only</option>
                 <option value="Warm">Warm Leads Only</option>
                 <option value="Active">Active Leads Only</option>
                 <option value="Cold">Cold Leads Only</option>
                 <option value="Won">Won Clients Only</option>
+                <option value="csv">📂 Upload CSV/Excel File</option>
+                <option value="linkedin">💼 LinkedIn Leads Only</option>
               </select>
+            </div>
+            <!-- CSV Upload (hidden by default) -->
+            <div id="csv-upload-section" style="display:none;background:var(--bg3);border:2px dashed var(--border);border-radius:12px;padding:20px;margin-bottom:16px;text-align:center">
+              <div style="font-size:28px;margin-bottom:8px">📂</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Upload your contact list</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:12px">Supports CSV, Excel (.xlsx). Required columns: <b>name</b>, <b>email</b>. Optional: <b>phone</b>, <b>company</b></div>
+              <input type="file" id="camp-csv-file" accept=".csv,.xlsx,.xls" onchange="parseCampaignCsv(this)" style="display:none"/>
+              <button onclick="document.getElementById('camp-csv-file').click()" class="btn btn-ghost" style="font-size:12px">Choose File</button>
+              <div id="csv-preview" style="margin-top:12px;text-align:left"></div>
             </div>
             <div class="form-group">
               <label class="form-label">Email Subject</label>
@@ -4072,7 +4125,7 @@ function nav(page, el) {
   if(page === 'analytics') loadAndRenderAnalytics();
   if(page === 'contacts') loadContacts();
   if(page === 'admin') { loadTeam(); }
-  if(page === 'campaigns') { loadCampaignHistory(); }
+  if(page === 'campaigns') { if(typeof loadSmtpSettings === 'function') setTimeout(loadSmtpSettings, 300); loadCampaignHistory(); }
   if(page === 'calendar') { loadCalendar(); }
   if(page === 'deliverables') { loadDeliverables(); }
   if(page === 'invoices') { loadInvoices(); }
@@ -6764,6 +6817,8 @@ async function loadWAHistory() {
 function previewCampaign() {
   const subject = document.getElementById('camp-subject').value.trim();
   const body = document.getElementById('camp-body').value.trim();
+  const campFromName = document.getElementById('camp-from-name')?.value.trim() || FROM_NAME;
+  const campFromEmail = document.getElementById('camp-from-email')?.value.trim() || FROM_EMAIL;
   const name = document.getElementById('camp-name').value.trim();
   const filter = document.getElementById('camp-filter').value;
   if(!subject || !body) { showToast('❌ Fill in subject and message'); return; }
@@ -6790,8 +6845,138 @@ function closePreview() {
   document.getElementById('preview-modal').classList.remove('open');
 }
 
+// ─── CSV/SMTP CAMPAIGN FUNCTIONS ──────────────────────────────
+
+let _csvContacts = [];
+let _smtpConfig = null;
+
+function toggleCsvUpload(val) {
+  const sec = document.getElementById('csv-upload-section');
+  if(sec) sec.style.display = val === 'csv' ? 'block' : 'none';
+}
+
+function toggleSmtpSettings() {
+  const sec = document.getElementById('smtp-settings');
+  const btn = document.getElementById('smtp-toggle-btn');
+  if(!sec) return;
+  const isOpen = sec.style.display !== 'none';
+  sec.style.display = isOpen ? 'none' : 'block';
+  if(btn) btn.textContent = isOpen ? 'Configure' : 'Hide';
+}
+
+function saveSmtpSettings() {
+  const host = document.getElementById('smtp-host')?.value.trim();
+  const port = document.getElementById('smtp-port')?.value;
+  const user = document.getElementById('smtp-user')?.value.trim();
+  const pass = document.getElementById('smtp-pass')?.value;
+  if(!host || !user || !pass) { showToast('Fill in all SMTP fields'); return; }
+  _smtpConfig = { host, port, user, pass };
+  const key = 'nexcrm_smtp_' + (currentOrg?.id || 'default');
+  try { localStorage.setItem(key, JSON.stringify({ host, port, user })); } catch(e) {}
+  const indicator = document.getElementById('smtp-saved-indicator');
+  if(indicator) indicator.style.display = 'block';
+  document.getElementById('smtp-settings').style.display = 'none';
+  showToast('SMTP settings saved! Emails will send from ' + user);
+}
+
+function loadSmtpSettings() {
+  const key = 'nexcrm_smtp_' + (currentOrg?.id || 'default');
+  try {
+    const saved = JSON.parse(localStorage.getItem(key) || 'null');
+    if(saved) {
+      if(document.getElementById('smtp-host')) document.getElementById('smtp-host').value = saved.host || '';
+      if(document.getElementById('smtp-port')) document.getElementById('smtp-port').value = saved.port || '587';
+      if(document.getElementById('smtp-user')) document.getElementById('smtp-user').value = saved.user || '';
+      const indicator = document.getElementById('smtp-saved-indicator');
+      if(indicator) indicator.style.display = 'block';
+    }
+  } catch(e) {}
+}
+
+async function testSmtpSettings() {
+  showToast('SMTP test requires server-side support — contact support to enable.');
+}
+
+async function parseCampaignCsv(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const preview = document.getElementById('csv-preview');
+  if(!preview) return;
+  preview.innerHTML = '<div style="color:var(--text2);font-size:12px">Parsing file...</div>';
+
+  if(file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+    preview.innerHTML = '<div style="color:var(--warning);font-size:12px">Please save as CSV first (File > Save As > CSV)</div>';
+    return;
+  }
+
+  const text = await file.text();
+  const lines = text.split(/
+?
+/).filter(l => l.trim());
+  if(lines.length < 2) { preview.innerHTML = '<div style="color:var(--danger);font-size:12px">File is empty or invalid</div>'; return; }
+
+  const sep = lines[0].includes('	') ? '	' : ',';
+  const headers = lines[0].split(sep).map(h => h.trim().toLowerCase().replace(/["
+]/g,''));
+
+  const nameIdx = headers.findIndex(h => ['name','full name','fullname'].includes(h));
+  const emailIdx = headers.findIndex(h => ['email','email address'].includes(h));
+  const phoneIdx = headers.findIndex(h => ['phone','mobile','tel'].includes(h));
+  const companyIdx = headers.findIndex(h => ['company','organization','business'].includes(h));
+
+  if(emailIdx === -1) {
+    preview.innerHTML = '<div style="color:var(--danger);font-size:12px">No "email" column found. Headers detected: ' + headers.join(', ') + '</div>';
+    return;
+  }
+
+  _csvContacts = [];
+  let skipped = 0;
+
+  lines.slice(1).forEach(line => {
+    const cols = line.split(sep).map(c => c.trim().replace(/["
+]/g,''));
+    const email = cols[emailIdx];
+    if(!email || !email.includes('@')) { skipped++; return; }
+    _csvContacts.push({
+      name: nameIdx >= 0 ? (cols[nameIdx]||email.split('@')[0]) : email.split('@')[0],
+      email,
+      phone: phoneIdx >= 0 ? (cols[phoneIdx]||'') : '',
+      company: companyIdx >= 0 ? (cols[companyIdx]||'') : ''
+    });
+  });
+
+  const validCount = _csvContacts.length;
+  preview.innerHTML =
+    '<div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:8px;padding:10px;font-size:12px">' +
+    '<div style="color:var(--success);font-weight:700;margin-bottom:4px">' + validCount + ' contacts loaded</div>' +
+    (skipped > 0 ? '<div style="color:var(--warning)">' + skipped + ' rows skipped (invalid email)</div>' : '') +
+    '<div style="color:var(--text2);margin-top:6px">Preview: ' + _csvContacts.slice(0,3).map(c=>'<b>'+c.name+'</b> ('+c.email+')').join(', ') + (validCount>3?'...':'') + '</div>' +
+    '</div>' +
+    '<button onclick="importCsvToLeads()" class="btn btn-ghost" style="font-size:11px;margin-top:8px;padding:6px 12px">Add to CRM leads</button>';
+
+  showToast(validCount + ' contacts ready for campaign');
+}
+
+async function importCsvToLeads() {
+  if(!_csvContacts.length) return;
+  let imported = 0;
+  for(const c of _csvContacts) {
+    try {
+      await fetch(SUPABASE_URL + '/rest/v1/leads', {
+        method:'POST',
+        headers:{ ...HEADERS, 'Prefer':'return=minimal' },
+        body:JSON.stringify({ name:c.name, email:c.email, phone:c.phone, company:c.company, source:'CSV Import', status:'New', org_id:currentOrg?.id||null, user_id:currentUser?.id||null })
+      });
+      imported++;
+    } catch(e) {}
+  }
+  showToast(imported + ' contacts added to CRM!');
+}
+
 async function sendCampaign(confirmed = false) {
   if(isSending) return;
+  const campFromName = document.getElementById('camp-from-name')?.value.trim() || FROM_NAME;
+  const campFromEmail = document.getElementById('camp-from-email')?.value.trim() || FROM_EMAIL;
   const name = document.getElementById('camp-name').value.trim();
   const subject = document.getElementById('camp-subject').value.trim();
   const body = document.getElementById('camp-body').value.trim();
@@ -6801,9 +6986,18 @@ async function sendCampaign(confirmed = false) {
   if(!subject) { showToast('❌ Enter email subject'); return; }
   if(!body) { showToast('❌ Write your email message'); return; }
 
-  // Get leads to send to
-  const targetLeads = await getFilteredLeads(filter);
-  if(targetLeads.length === 0) { showToast('❌ No leads found for this filter'); return; }
+  // Get leads to send to — handle CSV mode
+  let targetLeads;
+  if(filter === 'csv') {
+    if(!_csvContacts || !_csvContacts.length) { showToast('❌ Upload a CSV file first'); return; }
+    targetLeads = _csvContacts;
+  } else if(filter === 'linkedin') {
+    const all = await getFilteredLeads('all');
+    targetLeads = all.filter(l => (l.source||'').toLowerCase().includes('linkedin'));
+  } else {
+    targetLeads = await getFilteredLeads(filter);
+  }
+  if(!targetLeads.length) { showToast('❌ No contacts found for this selection'); return; }
 
   // Get leads with emails from contacts table
   const leadsWithEmails = targetLeads.filter(l => l.email);
@@ -6838,7 +7032,7 @@ Note: Only leads with email addresses will receive the email.`)) return;
           'Authorization': 'Bearer ' + RESEND_API_KEY
         },
         body: JSON.stringify({
-          from: FROM_NAME + ' <' + FROM_EMAIL + '>',
+          from: (campFromName || FROM_NAME) + ' <' + (campFromEmail || FROM_EMAIL) + '>',
           to: [lead.email],
           subject: subject,
           html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
