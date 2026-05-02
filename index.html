@@ -564,18 +564,14 @@
     to   { opacity:1; transform:translateY(0) rotateX(0deg); }
   }
 
-  /* ── Page entry animations ── */
-  .page.active .stat-card,
-  .page.active .card {
+  /* ── Page entry animations — stat cards only, not inner elements ── */
+  .page.active > .stat-card {
     animation: fadeUp 0.45s cubic-bezier(0.22,1,0.36,1) both;
   }
-  .page.active .stat-card:nth-child(1) { animation-delay:0s; }
-  .page.active .stat-card:nth-child(2) { animation-delay:0.06s; }
-  .page.active .stat-card:nth-child(3) { animation-delay:0.12s; }
-  .page.active .stat-card:nth-child(4) { animation-delay:0.18s; }
-  .page.active .card:nth-child(1) { animation-delay:0.05s; }
-  .page.active .card:nth-child(2) { animation-delay:0.1s; }
-  .page.active .card:nth-child(3) { animation-delay:0.15s; }
+  .page.active > .stat-card:nth-child(1) { animation-delay:0s; }
+  .page.active > .stat-card:nth-child(2) { animation-delay:0.06s; }
+  .page.active > .stat-card:nth-child(3) { animation-delay:0.12s; }
+  .page.active > .stat-card:nth-child(4) { animation-delay:0.18s; }
 
   /* ── Stat cards — float on hover, glow on active ── */
   .stat-card {
@@ -725,14 +721,9 @@
     animation: slideInLeft 0.4s cubic-bezier(0.22,1,0.36,1) both;
   }
 
-  /* ── Stat values — shimmer on load ── */
+  /* ── Stat values — clean, no shimmer ── */
   .stat-value {
-    background:linear-gradient(90deg, var(--text) 25%, rgba(139,92,246,0.6) 50%, var(--text) 75%);
-    background-size:200% auto;
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    background-clip:text;
-    animation:shimmer 3s linear infinite;
+    color: var(--text);
   }
 
   /* ── AI badge pulse ── */
@@ -10275,7 +10266,7 @@ function exportLeadsCSV() {
 </script>
 <script>
 // ── Scroll animations init ──
-setTimeout(()=>{ document.querySelectorAll('.stat-card,.card').forEach(el=>{el.style.opacity='0';el.style.animation='fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both';setTimeout(()=>{el.style.opacity='';},100);}); },200);
+// Scroll animations disabled globally to prevent button flashing
 
 document.addEventListener('click',function(e){
   const btn=e.target.closest('.btn-primary,.auth-btn-primary');
