@@ -1460,10 +1460,83 @@
     body.rtl .main { margin-right:0 !important; margin-left:0 !important; }
   }
 
+  /* ── Arabic RTL fixes ── */
+  body[dir="rtl"], .rtl {
+    direction: rtl;
+    text-align: right;
+  }
+  body[dir="rtl"] .sidebar { right:0; left:auto; border-left:1px solid var(--border); border-right:none; }
+  body[dir="rtl"] .main { margin-right:240px; margin-left:0; }
+  body[dir="rtl"] .topbar { right:240px; left:0; }
+  body[dir="rtl"] .form-row { direction:rtl; }
+  body[dir="rtl"] .form-input, body[dir="rtl"] .form-select { text-align:right; }
+  body[dir="rtl"] .modal { direction:rtl; }
+  body[dir="rtl"] .toast { right:auto; left:20px; }
+  body[dir="rtl"] .mobile-nav-btn { font-family:'IBM Plex Sans Arabic','Tajawal',sans-serif; }
+  body[dir="rtl"] .leads-table td, body[dir="rtl"] .leads-table th { text-align:right; }
+  body[dir="rtl"] .msg-bubble { direction:rtl; text-align:right; }
+  body[dir="rtl"] .nav-label { font-family:'IBM Plex Sans Arabic','Tajawal',sans-serif; font-size:13px; }
+  @media(max-width:900px) {
+    body[dir="rtl"] .main { margin-right:0; }
+    body[dir="rtl"] .mobile-fab-btn { right:auto; left:20px; }
+    body[dir="rtl"] .leads-table tbody td::before { margin-left:8px; margin-right:0; }
+  }
+
   @media(max-width:380px) {
     .stats-grid { grid-template-columns:1fr !important; }
     .contacts-grid { grid-template-columns:1fr !important; }
     .stat-value { font-size:20px; }
+  }
+
+  /* ── Mobile UX improvements ── */
+  @media(max-width:900px) {
+    /* Bigger touch targets */
+    .btn { min-height:44px; }
+    .form-input, .form-select { min-height:44px; font-size:16px !important; } /* 16px prevents iOS zoom */
+    .nav-item { min-height:44px; }
+
+    /* Better stat cards on mobile */
+    .stat-card { padding:14px; }
+    .stat-value { font-size:24px !important; }
+
+    /* Leads table — card view on mobile */
+    .leads-table thead { display:none; }
+    .leads-table tbody tr {
+      display:flex; flex-direction:column;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:10px;
+    }
+    .leads-table tbody td {
+      display:flex; align-items:center;
+      padding:4px 0; border:none;
+      font-size:13px;
+    }
+    .leads-table tbody td::before {
+      content:attr(data-label);
+      font-size:10px; font-weight:700;
+      color:var(--text2); text-transform:uppercase;
+      letter-spacing:0.5px; min-width:80px; flex-shrink:0;
+    }
+
+    /* Modal full screen on mobile */
+    .modal-overlay { align-items:flex-end; }
+    .modal {
+      border-radius:24px 24px 0 0 !important;
+      max-height:90vh;
+      overflow-y:auto;
+      width:100% !important;
+      max-width:100% !important;
+    }
+
+    /* Source picker grid on mobile */
+    .src-pick { min-height:60px; }
+
+    /* Pipeline horizontal scroll */
+    .pipeline { flex-direction:row; overflow-x:auto; padding-bottom:16px; }
+    .pipeline-col { min-width:240px; flex-shrink:0; }
   }
 
   /* RESPONSIVE */
@@ -3774,56 +3847,109 @@
 
 <!-- ADD LEAD MODAL -->
 <div class="modal-overlay" id="modal">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Add New Lead</div>
+  <div class="modal" style="max-width:460px">
+    <!-- Step progress bar -->
+    <div style="height:3px;background:var(--bg3);border-radius:3px 3px 0 0;overflow:hidden;margin:-1px -1px 0">
+      <div id="lead-step-bar" style="height:100%;background:linear-gradient(90deg,var(--accent),#8b5cf6);border-radius:3px;transition:width 0.4s ease;width:33%"></div>
+    </div>
+    <div class="modal-header" style="padding-bottom:8px">
+      <div>
+        <div class="modal-title" id="lead-step-title">➕ Add Lead — Basic Info</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px" id="lead-step-sub">Step 1 of 3</div>
+      </div>
       <div class="modal-close" onclick="closeModal()">✕</div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">First Name</label>
-        <input class="form-input" id="f-fname" placeholder="Mohammed" />
+
+    <!-- STEP 1: Basic Info -->
+    <div id="lead-step-1">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name <span style="color:var(--danger)">*</span></label>
+          <input class="form-input" id="f-fname" placeholder="Mohammed" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input class="form-input" id="f-lname" placeholder="Al-Otaibi" />
+        </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Last Name</label>
-        <input class="form-input" id="f-lname" placeholder="Al-Otaibi" />
+        <label class="form-label">Company</label>
+        <input class="form-input" id="f-company" placeholder="Company name (optional)" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Source — Where did this lead come from?</label>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px">
+          <button type="button" onclick="selectSource(this,'WhatsApp')" class="src-pick" style="padding:8px 4px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:600;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:4px;transition:all 0.2s">💬<span>WhatsApp</span></button>
+          <button type="button" onclick="selectSource(this,'Instagram')" class="src-pick" style="padding:8px 4px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:600;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:4px;transition:all 0.2s">📸<span>Instagram</span></button>
+          <button type="button" onclick="selectSource(this,'TikTok')" class="src-pick" style="padding:8px 4px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:600;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:4px;transition:all 0.2s">🎵<span>TikTok</span></button>
+          <button type="button" onclick="selectSource(this,'Snapchat')" class="src-pick" style="padding:8px 4px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:600;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:4px;transition:all 0.2s">👻<span>Snapchat</span></button>
+          <button type="button" onclick="selectSource(this,'Facebook')" class="src-pick" style="padding:8px 4px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:600;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:4px;transition:all 0.2s">👍<span>Facebook</span></button>
+          <button type="button" onclick="selectSource(this,'Google Ads')" class="src-pick" style="padding:8px 4px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:600;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:4px;transition:all 0.2s">🔍<span>Google</span></button>
+          <button type="button" onclick="selectSource(this,'Referral')" class="src-pick" style="padding:8px 4px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:600;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:4px;transition:all 0.2s">🤝<span>Referral</span></button>
+          <button type="button" onclick="selectSource(this,'Direct')" class="src-pick" style="padding:8px 4px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:600;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:4px;transition:all 0.2s">📞<span>Direct</span></button>
+        </div>
+        <input type="hidden" id="f-source" value="WhatsApp"/>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" style="flex:2" onclick="leadStep(2)">Next — Contact Info →</button>
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Company</label>
-      <input class="form-input" id="f-company" placeholder="Company name" />
+
+    <!-- STEP 2: Contact Info -->
+    <div id="lead-step-2" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input class="form-input" id="f-phone" placeholder="+966 5X XXX XXXX" type="tel"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" id="f-email" placeholder="email@company.com" type="email"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status — What stage is this lead at?</label>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+          <button type="button" onclick="selectStatus(this,'New')" class="stat-pick" style="padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px">
+            <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0"></div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--text)">New</div><div style="font-size:11px;color:var(--text2)">Just came in, haven'''t contacted yet</div></div>
+          </button>
+          <button type="button" onclick="selectStatus(this,'Warm')" class="stat-pick" style="padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px">
+            <div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;flex-shrink:0"></div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--text)">Warm</div><div style="font-size:11px;color:var(--text2)">Contacted, showing interest</div></div>
+          </button>
+          <button type="button" onclick="selectStatus(this,'Active')" class="stat-pick" style="padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px">
+            <div style="width:8px;height:8px;border-radius:50%;background:#8b5cf6;flex-shrink:0"></div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--text)">Active</div><div style="font-size:11px;color:var(--text2)">In negotiation or proposal stage</div></div>
+          </button>
+        </div>
+        <input type="hidden" id="f-status" value="New"/>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-ghost" style="flex:1" onclick="leadStep(1)">← Back</button>
+        <button class="btn btn-primary" style="flex:2" onclick="leadStep(3)">Next — Deal Details →</button>
+      </div>
     </div>
-    <div class="form-row">
+
+    <!-- STEP 3: Deal Details -->
+    <div id="lead-step-3" style="display:none">
       <div class="form-group">
-        <label class="form-label">Source</label>
-        <select class="form-input" id="f-source">
-          <option>WhatsApp</option><option>Instagram</option><option>TikTok</option>
-          <option>Google Ads</option><option>Snapchat</option><option>Facebook</option>
-          <option>Referral</option><option>Direct</option>
-        </select>
+        <label class="form-label">Deal Value (SAR) <span style="color:var(--text2);font-weight:400">— optional</span></label>
+        <input class="form-input" id="f-value" type="number" placeholder="e.g. 5000" />
       </div>
       <div class="form-group">
-        <label class="form-label">Status</label>
-        <select class="form-input" id="f-status">
-          <option>New</option><option>Warm</option><option>Active</option><option>Cold</option><option>Won</option><option>Lost</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Deal Value (SAR)</label>
-        <input class="form-input" id="f-value" type="number" placeholder="5000" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Assigned To</label>
+        <label class="form-label">Assigned To <span style="color:var(--text2);font-weight:400">— optional</span></label>
         <select class="form-input" id="f-assign">
           <option value="">— Select Team Member —</option>
         </select>
       </div>
-    </div>
-    <div style="display:flex;gap:10px;margin-top:8px">
-      <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" style="flex:2" onclick="addLead()">💾 Save Lead</button>
+      <div class="form-group">
+        <label class="form-label">Notes <span style="color:var(--text2);font-weight:400">— optional</span></label>
+        <textarea class="form-input" id="f-notes" placeholder="Any notes about this lead..." rows="3" style="resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-ghost" style="flex:1" onclick="leadStep(2)">← Back</button>
+        <button class="btn btn-primary" style="flex:2" onclick="addLead()">💾 Save Lead</button>
+      </div>
     </div>
   </div>
 </div>
@@ -4160,7 +4286,61 @@ function nav(page, el) {
 // ─── MODAL ─────────────────────────────────────────────────────
 function openModal() {
   populateAssignDropdown();
+  leadStep(1); // reset to step 1
   document.getElementById('modal').classList.add('open');
+}
+
+function leadStep(step) {
+  // Hide all steps
+  [1,2,3].forEach(s => {
+    const el = document.getElementById('lead-step-' + s);
+    if(el) el.style.display = s === step ? 'block' : 'none';
+  });
+  // Update progress bar
+  const bar = document.getElementById('lead-step-bar');
+  if(bar) bar.style.width = (step * 33.3) + '%';
+  // Update title
+  const titles = { 1:'➕ Add Lead — Basic Info', 2:'📞 Contact Details', 3:'💰 Deal Details' };
+  const subs = { 1:'Step 1 of 3', 2:'Step 2 of 3', 3:'Step 3 of 3 — almost done!' };
+  const titleEl = document.getElementById('lead-step-title');
+  const subEl = document.getElementById('lead-step-sub');
+  if(titleEl) titleEl.textContent = titles[step];
+  if(subEl) subEl.textContent = subs[step];
+  // Validate step 1 before proceeding to step 2
+  if(step === 2) {
+    const fname = document.getElementById('f-fname').value.trim();
+    if(!fname) {
+      document.getElementById('f-fname').focus();
+      document.getElementById('f-fname').style.borderColor = 'var(--danger)';
+      setTimeout(() => { document.getElementById('f-fname').style.borderColor = ''; }, 2000);
+      leadStep(1);
+      return;
+    }
+  }
+}
+
+function selectSource(btn, source) {
+  document.querySelectorAll('.src-pick').forEach(b => {
+    b.style.background = 'var(--bg3)';
+    b.style.borderColor = 'var(--border)';
+    b.style.color = 'var(--text2)';
+  });
+  btn.style.background = 'rgba(59,130,246,0.1)';
+  btn.style.borderColor = 'var(--accent)';
+  btn.style.color = 'var(--accent)';
+  const input = document.getElementById('f-source');
+  if(input) input.value = source;
+}
+
+function selectStatus(btn, status) {
+  document.querySelectorAll('.stat-pick').forEach(b => {
+    b.style.background = 'var(--bg3)';
+    b.style.borderColor = 'var(--border)';
+  });
+  btn.style.background = 'rgba(59,130,246,0.08)';
+  btn.style.borderColor = 'var(--accent)';
+  const input = document.getElementById('f-status');
+  if(input) input.value = status;
 }
 function closeModal() {
   document.getElementById('modal').classList.remove('open');
@@ -4176,21 +4356,27 @@ async function addLead() {
   const fname = document.getElementById('f-fname').value.trim();
   const lname = document.getElementById('f-lname').value.trim();
   const company = document.getElementById('f-company').value.trim();
-  const source = document.getElementById('f-source').value;
-  const status = document.getElementById('f-status').value;
+  const source = document.getElementById('f-source').value || 'WhatsApp';
+  const status = document.getElementById('f-status').value || 'New';
   const value = document.getElementById('f-value').value;
   const assigned = document.getElementById('f-assign').value;
+  const phone = document.getElementById('f-phone')?.value.trim() || '';
+  const email = document.getElementById('f-email')?.value.trim() || '';
+  const notes = document.getElementById('f-notes')?.value.trim() || '';
   if(!fname) { document.getElementById('f-fname').focus(); return; }
 
   const now = new Date();
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const newLead = {
-    name: fname + ' ' + lname,
+    name: (fname + ' ' + lname).trim(),
     company: company || '—',
     source,
     status,
     value: value ? 'SAR ' + parseInt(value).toLocaleString() : '—',
     assigned,
+    phone: phone || null,
+    email: email || null,
+    notes: notes || null,
     date: months[now.getMonth()] + ' ' + now.getDate(),
     user_id: currentUser ? currentUser.id : null,
     org_id: currentOrg ? currentOrg.id : null
@@ -5005,6 +5191,8 @@ function applyTranslations() {
 
   // Toggle RTL
   document.body.classList.toggle('rtl', isAr);
+  document.documentElement.setAttribute('dir', isAr ? 'rtl' : 'ltr');
+  document.documentElement.setAttribute('lang', isAr ? 'ar' : 'en');
 
   // Lang button
   const langLabel = document.getElementById('lang-label'); if(langLabel) langLabel.textContent = isAr ? 'English' : 'عربي';
@@ -5916,10 +6104,13 @@ async function updateLead(id) {
   const fname = document.getElementById('f-fname').value.trim();
   const lname = document.getElementById('f-lname').value.trim();
   const company = document.getElementById('f-company').value.trim();
-  const source = document.getElementById('f-source').value;
-  const status = document.getElementById('f-status').value;
+  const source = document.getElementById('f-source').value || 'WhatsApp';
+  const status = document.getElementById('f-status').value || 'New';
   const value = document.getElementById('f-value').value;
   const assigned = document.getElementById('f-assign').value;
+  const phone = document.getElementById('f-phone')?.value.trim() || '';
+  const email = document.getElementById('f-email')?.value.trim() || '';
+  const notes = document.getElementById('f-notes')?.value.trim() || '';
   if(!fname) return;
   const updated = {
     name: fname + ' ' + lname,
@@ -11337,9 +11528,10 @@ function updateThemeIcon(isLight) {
 // Apply saved theme on load
 (function() {
   const saved = localStorage.getItem('nexcrm_theme');
-  if(saved === 'light') {
+  // Default to light mode if no preference saved
+  if(saved === 'light' || saved === null) {
     document.body.classList.add('light-mode');
-    document.addEventListener('DOMContentLoaded', () => updateThemeIcon(true));
+    document.addEventListener('DOMContentLoaded', () => { if(typeof updateThemeIcon === 'function') updateThemeIcon(true); });
   }
 })();
 </script>
