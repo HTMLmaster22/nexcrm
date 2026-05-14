@@ -3863,14 +3863,22 @@ async function loadUserOrgs() {
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + currentUser.id + '&select=org_id,role,organizations(id,name)', { headers: HEADERS });
     const data = await r.json();
-    if(r.ok && data && data.length > 0) {
-      userOrgs = data.map(m => ({ id: m.organizations.id, name: m.organizations.name, role: m.role }));
-      currentOrg = userOrgs[0];
-      renderOrgSwitcher();
-      autoApplyBranding();
-      loadDashboard();
+    if(r.ok && Array.isArray(data) && data.length > 0) {
+      userOrgs = data.filter(m => m.organizations).map(m => ({ id: m.organizations.id, name: m.organizations.name, role: m.role }));
+      if(userOrgs.length > 0) {
+        currentOrg = userOrgs[0];
+        renderOrgSwitcher();
+        autoApplyBranding();
+        loadDashboard();
+        return;
+      }
     }
-  } catch(e) { console.error('Org load error:', e); }
+    // Fallback: try loading all orgs (for super admin)
+    await loadAdminOrgs();
+  } catch(e) {
+    console.error('Org load error:', e);
+    await loadAdminOrgs();
+  }
 }
 async function loadAdminOrgs() {
   try {
@@ -3889,7 +3897,20 @@ function renderOrgSwitcher() {
   if(!switcher) return;
   if(userOrgs.length === 0) { switcher.style.display = 'none'; return; }
   switcher.style.display = 'block';
-  switcher.innerHTML = '<div style="padding:0 12px;margin-bottom:8px"><div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Workspace</div><select onchange="switchOrg(this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:DM Sans,sans-serif;font-size:13px;outline:none;cursor:pointer">' + userOrgs.map(o => '<option value="' + o.id + '"' + (currentOrg && currentOrg.id === o.id ? ' selected' : '') + '>' + o.name + '</option>').join('') + '</select></div>';
+  const roleColor = {'admin':'rgba(139,92,246,0.15)','manager':'rgba(59,130,246,0.15)','sales':'rgba(16,185,129,0.15)'};
+  const roleText = {'admin':'#c4b5fd','manager':'#93c5fd','sales':'#6ee7b7'};
+  const curRole = currentOrg?.role || 'admin';
+  switcher.innerHTML = '<div style="padding:0 12px;margin-bottom:8px">' +
+    '<div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">WORKSPACE</div>' +
+    '<div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px">' +
+      '<div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;flex-shrink:0;box-shadow:0 0 6px rgba(59,130,246,0.5)"></div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (currentOrg ? currentOrg.name : 'No workspace') + '</div>' +
+        '<div style="font-size:10px;color:var(--text2)">Active workspace</div>' +
+      '</div>' +
+    '</div>' +
+    (userOrgs.length > 1 ? '<select onchange="switchOrg(this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-family:inherit;font-size:12px;outline:none;cursor:pointer">' + userOrgs.map(o => '<option value="' + o.id + '"' + (currentOrg && currentOrg.id === o.id ? ' selected' : '') + '>' + o.name + '</option>').join('') + '</select>' : '') +
+    '</div>';
 }
 function switchOrg(orgId) {
   currentOrg = userOrgs.find(o => o.id === orgId);
@@ -7903,7 +7924,16 @@ async function loadDashboard() {
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*' + orgFilter, { headers: HEADERS });
     const data = await r.json();
-    if(!r.ok || !Array.isArray(data)) return;
+    // If RLS blocks and returns error, try without org filter
+    if(!r.ok || !Array.isArray(data)) {
+      if(!currentOrg) {
+        // Try to load orgs first
+        await loadUserOrgs();
+        if(!currentOrg) await loadAdminOrgs();
+        return; // loadDashboard will be called again after orgs load
+      }
+      return;
+    }
 
     const total = data.length;
     const won = data.filter(l => l.status === 'Won').length;
