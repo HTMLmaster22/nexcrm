@@ -4040,9 +4040,28 @@ async function loadAdminOrgs() {
 }
 function renderOrgSwitcher() {
   const switcher = document.getElementById('org-switcher');
+  if(switcher) {
+    if(userOrgs.length === 0) { switcher.style.display = 'none'; }
+    else { switcher.style.display = 'block'; }
+  }
+
+  // On mobile, sidebar is hidden — but we still need to load data
+  // Force dashboard and leads reload whenever org changes
+  const isMobile = window.innerWidth <= 900;
+  if(isMobile && currentOrg) {
+    setTimeout(() => {
+      loadDashboard();
+      loadLeads();
+    }, 100);
+    // Update mobile org name display
+    const mobileOrgEl = document.getElementById('mobile-org-name');
+    if(mobileOrgEl) {
+      mobileOrgEl.style.display = 'block';
+      mobileOrgEl.textContent = '● ' + currentOrg.name;
+    }
+    return;
+  }
   if(!switcher) return;
-  if(userOrgs.length === 0) { switcher.style.display = 'none'; return; }
-  switcher.style.display = 'block';
   const roleColor = {'admin':'rgba(139,92,246,0.15)','manager':'rgba(59,130,246,0.15)','sales':'rgba(16,185,129,0.15)'};
   const roleText = {'admin':'#c4b5fd','manager':'#93c5fd','sales':'#6ee7b7'};
   const curRole = currentOrg?.role || 'admin';
