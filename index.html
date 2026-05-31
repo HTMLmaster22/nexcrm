@@ -3987,16 +3987,28 @@ let userOrgs = [];
 async function loadUserOrgs() {
   if(!currentUser) return;
   try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + currentUser.id + '&select=org_id,role,organizations(id,name)', { headers: HEADERS });
-    const data = await r.json();
-    if(r.ok && Array.isArray(data) && data.length > 0) {
-      userOrgs = data.filter(m => m.organizations).map(m => ({ id: m.organizations.id, name: m.organizations.name, role: m.role }));
+    // Step 1: Get org_ids and roles from org_members (no join to avoid RLS conflict)
+    const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + currentUser.id + '&select=org_id,role', { headers: HEADERS });
+    const members = await r.json();
+
+    if(r.ok && Array.isArray(members) && members.length > 0) {
+      // Step 2: Fetch org names separately
+      const orgIds = members.map(m => m.org_id).filter(Boolean);
+      const orgFilter = 'id=in.(' + orgIds.join(',') + ')';
+      const r2 = await fetch(SUPABASE_URL + '/rest/v1/organizations?' + orgFilter + '&select=id,name', { headers: HEADERS });
+      const orgs = r2.ok ? await r2.json() : [];
+
+      userOrgs = members.map(m => {
+        const org = Array.isArray(orgs) ? orgs.find(o => o.id === m.org_id) : null;
+        return { id: m.org_id, name: org ? org.name : ('Workspace ' + m.org_id.slice(0,6)), role: m.role || 'admin' };
+      }).filter(o => o.id);
+
       if(userOrgs.length > 0) {
         currentOrg = userOrgs[0];
         renderOrgSwitcher();
         autoApplyBranding();
         loadDashboard();
-        loadLeads(); // also load leads so mobile sees data immediately
+        loadLeads();
         return;
       }
     }
@@ -4013,22 +4025,25 @@ async function loadAdminOrgs() {
     const r = await fetch(SUPABASE_URL + '/rest/v1/organizations?select=*&order=name.asc', { headers: HEADERS });
     const data = await r.json();
     if(r.ok && Array.isArray(data) && data.length > 0) {
-      userOrgs = data.map(o => ({ id: o.id, name: o.name, role: 'admin' }));
+      userOrgs = data.map(o => ({ id: o.id, name: o.name || 'Workspace', role: 'admin' }));
       currentOrg = userOrgs[0];
       renderOrgSwitcher();
       loadDashboard();
       loadLeads();
       return;
     }
-    // Fallback: get orgs from org_members (works with RLS)
-    const r2 = await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + currentUser.id + '&select=org_id,role,organizations(id,name)', { headers: HEADERS });
-    const data2 = await r2.json();
-    if(r2.ok && Array.isArray(data2) && data2.length > 0) {
-      userOrgs = data2.filter(m => m.organizations).map(m => ({
-        id: m.organizations.id,
-        name: m.organizations.name || 'Workspace',
-        role: m.role || 'admin'
-      }));
+    // Fallback: get orgs from org_members WITHOUT join (avoids RLS conflict)
+    if(!currentUser) return;
+    const r2 = await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + currentUser.id + '&select=org_id,role', { headers: HEADERS });
+    const members = await r2.json();
+    if(r2.ok && Array.isArray(members) && members.length > 0) {
+      const orgIds = members.map(m => m.org_id).filter(Boolean);
+      const r3 = await fetch(SUPABASE_URL + '/rest/v1/organizations?id=in.(' + orgIds.join(',') + ')&select=id,name', { headers: HEADERS });
+      const orgs = r3.ok ? await r3.json() : [];
+      userOrgs = members.map(m => {
+        const org = Array.isArray(orgs) ? orgs.find(o => o.id === m.org_id) : null;
+        return { id: m.org_id, name: org ? org.name : ('Workspace ' + m.org_id.slice(0,6)), role: m.role || 'admin' };
+      }).filter(o => o.id);
       if(userOrgs.length > 0) {
         currentOrg = userOrgs[0];
         renderOrgSwitcher();
