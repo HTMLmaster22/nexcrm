@@ -6510,7 +6510,8 @@ function openCalendarModal() {
 
 async function loadCalendar() {
   try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/content_calendar?select=*&order=post_date.asc', { headers: HEADERS });
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const r = await fetch(SUPABASE_URL + '/rest/v1/content_calendar?select=*&order=post_date.asc' + orgFilter, { headers: HEADERS });
     const data = await r.json();
     if(!r.ok) { renderCalendar(); return; }
     calendarPosts = data || [];
@@ -6567,7 +6568,8 @@ async function saveCalendarPost() {
     caption_status: document.getElementById('cal-caption-status').value,
     visual_status: document.getElementById('cal-visual-status').value,
     assigned_to: document.getElementById('cal-assigned').value.trim(),
-    user_id: currentUser ? currentUser.id : null
+    user_id: currentUser ? currentUser.id : null,
+    org_id: currentOrg ? currentOrg.id : null
   };
   if(!post.post_date) { showToast('❌ Pick a post date'); return; }
   showLoader('Saving...');
@@ -6599,7 +6601,8 @@ function openDeliverableModal() {
 
 async function loadDeliverables() {
   try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/deliverables?select=*&order=id.desc', { headers:HEADERS });
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const r = await fetch(SUPABASE_URL + '/rest/v1/deliverables?select=*&order=id.desc' + orgFilter, { headers:HEADERS });
     const data = await r.json();
     if(!r.ok) { renderDeliverables(); return; }
     deliverablesList = data || [];
@@ -6674,7 +6677,8 @@ async function saveDeliverable() {
     client_name: document.getElementById('del-client').value.trim(),
     month: document.getElementById('del-month').value,
     status: document.getElementById('del-status').value,
-    user_id: currentUser ? currentUser.id : null
+    user_id: currentUser ? currentUser.id : null,
+    org_id: currentOrg ? currentOrg.id : null
   };
   if(!d.service_name) { showToast('❌ Enter service name'); return; }
   showLoader('Saving...');
@@ -6708,7 +6712,8 @@ function openInvoiceModal() {
 
 async function loadInvoices() {
   try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/invoices?select=*&order=id.desc', { headers:HEADERS });
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const r = await fetch(SUPABASE_URL + '/rest/v1/invoices?select=*&order=id.desc' + orgFilter, { headers:HEADERS });
     const data = await r.json();
     if(!r.ok) { renderInvoices(); return; }
     invoicesList = data || [];
@@ -6767,7 +6772,8 @@ async function saveInvoice() {
     due_date: document.getElementById('inv-due').value,
     description: document.getElementById('inv-desc').value.trim(),
     status: document.getElementById('inv-status').value,
-    user_id: currentUser ? currentUser.id : null
+    user_id: currentUser ? currentUser.id : null,
+    org_id: currentOrg ? currentOrg.id : null
   };
   if(!inv.client_name) { showToast('❌ Enter client name'); return; }
   showLoader('Saving...');
@@ -8103,7 +8109,7 @@ async function addTeamMember() {
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/team_members', {
       method: 'POST', headers: HEADERS,
-      body: JSON.stringify({ name, email, role, active: true })
+      body: JSON.stringify({ name, email, role, active: true, org_id: currentOrg ? currentOrg.id : null })
     });
     if(!r.ok) { showToast('❌ Failed to add member'); return; }
     showToast('✅ Team member added!');
