@@ -4146,7 +4146,7 @@ async function openNewOrgModal() {
 }
 
 async function createOrg() {
-  const name = document.getElementById('new-org-name').value.trim();
+  const name = document.getElementById('new-org-name')?.value.trim() || document.getElementById('onboard-org-name')?.value.trim();
   if(!name) { showToast('❌ Enter org name'); return; }
   try {
     const data = await adminAction('create_org', { name, admin_user_id: currentUser.id });
@@ -4157,7 +4157,192 @@ async function createOrg() {
     renderOrgsList();
     document.getElementById('new-org-modal').classList.remove('open');
     showToast('✅ Organization "' + name + '" created!');
+    return data;
   } catch(e) { showToast('❌ Network error'); }
+}
+
+function closeOnboardModal() {
+  document.getElementById('new-org-modal').classList.remove('open');
+  // Reset form
+  ['onboard-org-name','onboard-admin-name','onboard-admin-email','onboard-admin-phone','onboard-admin-pass'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  onboardStep(1);
+}
+
+function onboardStep(step) {
+  [1,2,3].forEach(s => {
+    const el = document.getElementById('onboard-step-' + s);
+    if(el) el.style.display = s === step ? 'block' : 'none';
+  });
+  const bar = document.getElementById('onboard-step-bar');
+  if(bar) bar.style.width = (step * 33.3) + '%';
+  const titles = {1:'🏢 Step 1 — Company Info', 2:'👤 Step 2 — Admin Account', 3:'✅ Step 3 — Review & Send'};
+  const subs = {1:'Step 1 of 3', 2:'Step 2 of 3', 3:'Step 3 of 3 — ready to go!'};
+  const titleEl = document.getElementById('onboard-step-title');
+  const subEl = document.getElementById('onboard-step-sub');
+  if(titleEl) titleEl.textContent = titles[step];
+  if(subEl) subEl.textContent = subs[step];
+
+  // Validate before step 2
+  if(step === 2) {
+    const name = document.getElementById('onboard-org-name').value.trim();
+    if(!name) {
+      document.getElementById('onboard-org-name').focus();
+      document.getElementById('onboard-org-name').style.borderColor = 'var(--danger)';
+      setTimeout(() => { document.getElementById('onboard-org-name').style.borderColor = ''; }, 2000);
+      onboardStep(1); return;
+    }
+    // Auto-generate password if empty
+    if(!document.getElementById('onboard-admin-pass').value) generatePassword();
+  }
+
+  // Build review before step 3
+  if(step === 3) {
+    const email = document.getElementById('onboard-admin-email').value.trim();
+    const adminName = document.getElementById('onboard-admin-name').value.trim();
+    if(!email || !adminName) {
+      showToast('❌ Fill in admin name and email');
+      onboardStep(2); return;
+    }
+    const review = document.getElementById('onboard-review');
+    if(review) {
+      const plan = document.getElementById('onboard-plan').value;
+      const planLabels = {starter:'Starter — SAR 350/mo', pro:'Pro — SAR 699/mo', agency:'Agency — SAR 999/mo'};
+      review.innerHTML =
+        '<div><strong>🏢 Company:</strong> ' + document.getElementById('onboard-org-name').value + '</div>' +
+        '<div><strong>📋 Plan:</strong> ' + (planLabels[plan] || plan) + '</div>' +
+        '<div><strong>👤 Admin:</strong> ' + adminName + '</div>' +
+        '<div><strong>📧 Email:</strong> ' + email + '</div>' +
+        '<div><strong>📱 WhatsApp:</strong> ' + (document.getElementById('onboard-admin-phone').value || 'Not provided') + '</div>' +
+        '<div><strong>🔑 Password:</strong> <code style="background:var(--bg2);padding:2px 6px;border-radius:4px">' + document.getElementById('onboard-admin-pass').value + '</code></div>';
+    }
+  }
+}
+
+function selectPlan(btn, plan) {
+  document.querySelectorAll('.plan-pick').forEach(b => {
+    b.style.borderColor = 'var(--border)';
+    b.style.background = 'var(--bg3)';
+    b.style.color = 'var(--text2)';
+    b.style.borderWidth = '1px';
+  });
+  btn.style.borderColor = 'var(--accent)';
+  btn.style.borderWidth = '2px';
+  btn.style.background = 'rgba(59,130,246,0.08)';
+  btn.style.color = 'var(--accent)';
+  const inp = document.getElementById('onboard-plan');
+  if(inp) inp.value = plan;
+}
+
+function generatePassword() {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789@#$!';
+  let pwd = '';
+  for(let i = 0; i < 10; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
+  const inp = document.getElementById('onboard-admin-pass');
+  if(inp) { inp.value = pwd; inp.type = 'text'; }
+}
+
+async function submitOnboarding() {
+  const orgName    = document.getElementById('onboard-org-name').value.trim();
+  const adminName  = document.getElementById('onboard-admin-name').value.trim();
+  const email      = document.getElementById('onboard-admin-email').value.trim();
+  const phone      = document.getElementById('onboard-admin-phone').value.trim();
+  const password   = document.getElementById('onboard-admin-pass').value;
+  const plan       = document.getElementById('onboard-plan').value;
+  const notifyVia  = document.querySelector('input[name="onboard-notify"]:checked')?.value || 'whatsapp';
+
+  if(!orgName || !adminName || !email || !password) {
+    showToast('❌ Fill in all required fields'); onboardStep(2); return;
+  }
+  if(password.length < 6) { showToast('❌ Password too short'); onboardStep(2); return; }
+
+  const btn = document.getElementById('onboard-submit-btn');
+  btn.textContent = '⏳ Creating...'; btn.disabled = true;
+
+  try {
+    // Step 1: Create organization
+    const orgData = await adminAction('create_org', { name: orgName, admin_user_id: currentUser.id });
+    if(!orgData || !orgData.id) throw new Error('Failed to create organization');
+    const orgId = orgData.id;
+
+    // Step 2: Create user account
+    const userData = await adminAction('create_user', { email, password, name: adminName });
+    const userId = userData?.user?.id || userData?.id;
+
+    // Step 3: Add user to org as admin
+    if(userId && orgId) {
+      await fetch(SUPABASE_URL + '/rest/v1/org_members', {
+        method: 'POST',
+        headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ user_id: userId, org_id: orgId, role: 'admin' })
+      });
+      // Also add to team_members
+      await fetch(SUPABASE_URL + '/rest/v1/team_members', {
+        method: 'POST',
+        headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ name: adminName, email, role: 'admin', active: true, org_id: orgId })
+      });
+    }
+
+    // Step 4: Add to userOrgs and refresh
+    const newOrg = { id: orgId, name: orgName, role: 'admin' };
+    if(!userOrgs.find(o => o.id === orgId)) userOrgs.push(newOrg);
+    renderOrgSwitcher();
+    renderOrgsList();
+
+    // Step 5: Notify
+    const crmUrl = 'https://htmlmaster22.github.io/nexcrm/';
+    const planLabels = {starter:'Starter (SAR 350/شهر)', pro:'Pro (SAR 699/شهر)', agency:'Agency (SAR 999/شهر)'};
+
+    if(notifyVia === 'whatsapp' && phone) {
+      const msg = encodeURIComponent(
+        'مرحباً ' + adminName + ' 👋
+
+' +
+        'تم إنشاء حسابك في NexCRM بنجاح!
+
+' +
+        '🏢 الشركة: ' + orgName + '
+' +
+        '📋 الباقة: ' + (planLabels[plan] || plan) + '
+
+' +
+        '🔐 بيانات الدخول:
+' +
+        '📧 الإيميل: ' + email + '
+' +
+        '🔑 كلمة المرور: ' + password + '
+
+' +
+        '🔗 رابط الدخول: ' + crmUrl + '
+
+' +
+        '⚠️ يرجى تغيير كلمة المرور بعد أول دخول.
+' +
+        'تواصل معنا لأي استفسار ✅'
+      );
+      window.open('https://wa.me/' + phone.replace(/[^0-9]/g, '') + '?text=' + msg, '_blank');
+    } else {
+      // Copy credentials to clipboard
+      const creds = 'Company: ' + orgName + '
+Email: ' + email + '
+Password: ' + password + '
+URL: ' + crmUrl;
+      navigator.clipboard?.writeText(creds).then(() => showToast('📋 Credentials copied!'));
+    }
+
+    closeOnboardModal();
+    showToast('✅ ' + orgName + ' onboarded successfully!');
+    loadClients();
+
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Error: ' + e.message);
+  } finally {
+    btn.textContent = '🚀 Create & Send'; btn.disabled = false;
+  }
 }
 const sb = {
   from: (table) => ({
@@ -8754,18 +8939,98 @@ function renderDonut(data) {
 
 <!-- NEW ORG MODAL -->
 <div class="modal-overlay" id="new-org-modal">
-  <div class="modal" style="max-width:400px">
+  <div class="modal" style="max-width:500px">
+    <div style="height:3px;background:var(--bg3);border-radius:3px 3px 0 0;overflow:hidden;margin:-1px -1px 0">
+      <div id="onboard-step-bar" style="height:100%;background:linear-gradient(90deg,var(--accent),#8b5cf6);width:33%;transition:width 0.4s ease;border-radius:3px"></div>
+    </div>
     <div class="modal-header">
-      <div class="modal-title">🏢 New Organization</div>
-      <div class="modal-close" onclick="document.getElementById('new-org-modal').classList.remove('open')">✕</div>
+      <div>
+        <div class="modal-title" id="onboard-step-title">🏢 Step 1 — Company Info</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px" id="onboard-step-sub">Step 1 of 3</div>
+      </div>
+      <div class="modal-close" onclick="closeOnboardModal()">✕</div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Organization Name</label>
-      <input class="form-input" id="new-org-name" placeholder="e.g. Mazen Motors" />
+
+    <!-- STEP 1 -->
+    <div id="onboard-step-1">
+      <div class="form-group">
+        <label class="form-label">Company Name <span style="color:var(--danger)">*</span></label>
+        <input class="form-input" id="onboard-org-name" placeholder="e.g. Silah Tamkeen" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Industry</label>
+        <select class="form-input" id="onboard-industry">
+          <option value="">— Select Industry —</option>
+          <option>Marketing Agency</option><option>Real Estate</option>
+          <option>Healthcare</option><option>Retail</option>
+          <option>Technology</option><option>Recruitment</option>
+          <option>Construction</option><option>Food & Beverage</option>
+          <option>Education</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Subscription Plan</label>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <button type="button" onclick="selectPlan(this,'starter')" class="plan-pick" style="padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:700;color:var(--text2);text-align:center;transition:all 0.2s"><div style="font-size:16px;margin-bottom:3px">⭐</div><div>Starter</div><div style="font-size:10px;font-weight:400">SAR 350/mo</div></button>
+          <button type="button" onclick="selectPlan(this,'pro')" class="plan-pick selected-plan" style="padding:10px 6px;border-radius:10px;border:2px solid var(--accent);background:rgba(59,130,246,0.08);cursor:pointer;font-size:11px;font-weight:700;color:var(--accent);text-align:center;transition:all 0.2s"><div style="font-size:16px;margin-bottom:3px">🚀</div><div>Pro</div><div style="font-size:10px;font-weight:400">SAR 699/mo</div></button>
+          <button type="button" onclick="selectPlan(this,'agency')" class="plan-pick" style="padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:700;color:var(--text2);text-align:center;transition:all 0.2s"><div style="font-size:16px;margin-bottom:3px">🏢</div><div>Agency</div><div style="font-size:10px;font-weight:400">SAR 999/mo</div></button>
+        </div>
+        <input type="hidden" id="onboard-plan" value="pro"/>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeOnboardModal()">Cancel</button>
+        <button class="btn btn-primary" style="flex:2" onclick="onboardStep(2)">Next — Admin Account →</button>
+      </div>
     </div>
-    <div style="display:flex;gap:10px;margin-top:8px">
-      <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('new-org-modal').classList.remove('open')">Cancel</button>
-      <button class="btn btn-primary" style="flex:2" onclick="createOrg()">🏢 Create Org</button>
+
+    <!-- STEP 2 -->
+    <div id="onboard-step-2" style="display:none">
+      <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text2)">
+        This will be the <strong style="color:var(--text)">company admin</strong> — the main person who logs in and manages the CRM for their team.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Admin Full Name <span style="color:var(--danger)">*</span></label>
+        <input class="form-input" id="onboard-admin-name" placeholder="e.g. Ahmed Al-Otaibi" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Admin Email <span style="color:var(--danger)">*</span></label>
+        <input class="form-input" id="onboard-admin-email" type="email" placeholder="ahmed@company.com" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">WhatsApp Number</label>
+        <input class="form-input" id="onboard-admin-phone" placeholder="+966 5X XXX XXXX" type="tel"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Temporary Password <span style="color:var(--danger)">*</span></label>
+        <div style="position:relative">
+          <input class="form-input" id="onboard-admin-pass" type="text" placeholder="Min 8 characters" style="padding-right:90px;font-family:monospace"/>
+          <button type="button" onclick="generatePassword()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Auto</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-ghost" style="flex:1" onclick="onboardStep(1)">← Back</button>
+        <button class="btn btn-primary" style="flex:2" onclick="onboardStep(3)">Next — Review →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div id="onboard-step-3" style="display:none">
+      <div id="onboard-review" style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px;line-height:2.2"></div>
+      <div class="form-group">
+        <label class="form-label">Notify via</label>
+        <div style="display:flex;gap:8px">
+          <label style="flex:1;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;font-size:13px">
+            <input type="radio" name="onboard-notify" value="whatsapp" checked style="accent-color:var(--accent)"> 💬 WhatsApp
+          </label>
+          <label style="flex:1;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;font-size:13px">
+            <input type="radio" name="onboard-notify" value="copy" style="accent-color:var(--accent)"> 📋 Copy only
+          </label>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="btn btn-ghost" style="flex:1" onclick="onboardStep(2)">← Back</button>
+        <button class="btn btn-primary" style="flex:2" id="onboard-submit-btn" onclick="submitOnboarding()">🚀 Create & Send</button>
+      </div>
     </div>
   </div>
 </div>
