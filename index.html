@@ -4318,10 +4318,7 @@ async function submitOnboarding() {
       window.open('https://wa.me/' + phone.replace(/[^0-9]/g, '') + '?text=' + msg, '_blank');
     } else {
       // Copy credentials to clipboard
-      const creds = 'Company: ' + orgName + '
-Email: ' + email + '
-Password: ' + password + '
-URL: ' + crmUrl;
+      const creds = ['Company: ' + orgName, 'Email: ' + email, 'Password: ' + password, 'URL: ' + crmUrl].join('\n');
       navigator.clipboard?.writeText(creds).then(() => showToast('📋 Credentials copied!'));
     }
 
