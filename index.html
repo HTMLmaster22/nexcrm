@@ -4089,11 +4089,24 @@ function renderOrgSwitcher() {
     setTimeout(() => { loadDashboard(); loadLeads(); }, 200);
     // Retry after 2s in case first attempt failed
     setTimeout(() => {
-      const totalEl = document.getElementById('stat-total');
-      if(totalEl && (totalEl.textContent === '0' || totalEl.textContent === '—')) {
+      const el1 = document.getElementById('dash-total');
+      const el2 = document.getElementById('stat-total');
+      const val1 = el1 ? el1.textContent.trim() : '';
+      const val2 = el2 ? el2.textContent.trim() : '';
+      if((!val1 || val1 === '0' || val1 === '—') && (!val2 || val2 === '0' || val2 === '—')) {
         loadDashboard(); loadLeads();
       }
     }, 2000);
+    // Second retry at 4s for slow connections
+    setTimeout(() => {
+      const el1 = document.getElementById('dash-total');
+      const el2 = document.getElementById('stat-total');
+      const val1 = el1 ? el1.textContent.trim() : '';
+      const val2 = el2 ? el2.textContent.trim() : '';
+      if((!val1 || val1 === '0' || val1 === '—') && (!val2 || val2 === '0' || val2 === '—')) {
+        loadDashboard(); loadLeads();
+      }
+    }, 4000);
     return;
   }
   if(!switcher) return;
@@ -4480,6 +4493,11 @@ async function loadLeads() {
   const tbody = document.getElementById('leads-tbody');
   tbody.innerHTML = '';
   try {
+    // Ensure JWT token is always fresh (critical for mobile)
+    const savedToken = localStorage.getItem('nexcrm_token');
+    if(savedToken && HEADERS['Authorization'] === 'Bearer ' + SUPABASE_KEY) {
+      HEADERS['Authorization'] = 'Bearer ' + savedToken;
+    }
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + orgFilter, { headers: HEADERS });
     const data = await r.json();
@@ -8375,6 +8393,11 @@ async function adminDeleteLead(id) {
 // ─── PERFORMANCE ───────────────────────────────────────────────
 async function loadDashboard() {
   try {
+    // Ensure JWT token is always fresh from localStorage (critical for mobile)
+    const savedToken = localStorage.getItem('nexcrm_token');
+    if(savedToken && HEADERS['Authorization'] === 'Bearer ' + SUPABASE_KEY) {
+      HEADERS['Authorization'] = 'Bearer ' + savedToken;
+    }
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*' + orgFilter, { headers: HEADERS });
     const data = await r.json();
@@ -12837,7 +12860,7 @@ function exitViewAsClient() {
 }
 
 // ─── MOYASAR PAYMENT ───────────────────────────────────────────
-const MOYASAR_API_KEY = 'pk_test_yourMoyasarPublishableKeyHere'; // Replace with real key from moyasar.com
+const MOYASAR_API_KEY = 'pk_live_wQLNzmEBfB2xDbeEyBwnaqX6Dh8JzTYsYyFtLeLW'; // Moyasar Live Key
 let _moyasarPlan = '';
 let _moyasarAmount = 0;
 
