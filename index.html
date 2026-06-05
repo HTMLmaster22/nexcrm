@@ -4297,32 +4297,24 @@ async function submitOnboarding() {
     const planLabels = {starter:'Starter (SAR 350/شهر)', pro:'Pro (SAR 699/شهر)', agency:'Agency (SAR 999/شهر)'};
 
     if(notifyVia === 'whatsapp' && phone) {
-      const msg = encodeURIComponent(
-        'مرحباً ' + adminName + ' 👋
-
-' +
-        'تم إنشاء حسابك في NexCRM بنجاح!
-
-' +
-        '🏢 الشركة: ' + orgName + '
-' +
-        '📋 الباقة: ' + (planLabels[plan] || plan) + '
-
-' +
-        '🔐 بيانات الدخول:
-' +
-        '📧 الإيميل: ' + email + '
-' +
-        '🔑 كلمة المرور: ' + password + '
-
-' +
-        '🔗 رابط الدخول: ' + crmUrl + '
-
-' +
-        '⚠️ يرجى تغيير كلمة المرور بعد أول دخول.
-' +
+      const msgLines = [
+        'مرحباً ' + adminName + ' 👋',
+        '',
+        'تم إنشاء حسابك في NexCRM بنجاح!',
+        '',
+        '🏢 الشركة: ' + orgName,
+        '📋 الباقة: ' + (planLabels[plan] || plan),
+        '',
+        '🔐 بيانات الدخول:',
+        '📧 الإيميل: ' + email,
+        '🔑 كلمة المرور: ' + password,
+        '',
+        '🔗 رابط الدخول: ' + crmUrl,
+        '',
+        '⚠️ يرجى تغيير كلمة المرور بعد أول دخول.',
         'تواصل معنا لأي استفسار ✅'
-      );
+      ];
+      const msg = encodeURIComponent(msgLines.join('\n'));
       window.open('https://wa.me/' + phone.replace(/[^0-9]/g, '') + '?text=' + msg, '_blank');
     } else {
       // Copy credentials to clipboard
