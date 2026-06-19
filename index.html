@@ -13055,6 +13055,7 @@ async function loadDashboardLayout() {
     }
     const r = await fetch(SUPABASE_URL + '/rest/v1/dashboard_layouts?user_id=eq.' + currentUser.id + '&select=widget_id,position,visible&order=position.asc', { headers: HEADERS });
     const data = await r.json();
+    if(!r.ok) console.error('loadDashboardLayout fetch failed:', r.status, data);
     if(r.ok && Array.isArray(data) && data.length > 0) {
       const savedIds = data.map(d => d.widget_id);
       const missing = Object.keys(DASH_WIDGET_DEFS).filter(id => !savedIds.includes(id))
@@ -13080,11 +13081,16 @@ async function saveDashboardLayout() {
     const rows = dashLayout.map(w => ({
       user_id: currentUser.id, widget_id: w.widget_id, position: w.position, visible: w.visible
     }));
-    await fetch(SUPABASE_URL + '/rest/v1/dashboard_layouts?on_conflict=user_id,widget_id', {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/dashboard_layouts?on_conflict=user_id,widget_id', {
       method: 'POST',
       headers: { ...HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
       body: JSON.stringify(rows)
     });
+    if(!r.ok) {
+      const errText = await r.text();
+      console.error('saveDashboardLayout failed:', r.status, errText);
+      showToast('❌ Could not save layout — check console');
+    }
   } catch(e) { console.error('saveDashboardLayout error:', e); }
 }
 
@@ -13121,6 +13127,7 @@ function hideDashWidget(widgetId) {
   const el = document.getElementById('dw-' + widgetId);
   if(el) el.style.display = 'none';
   renderAddWidgetList();
+  saveDashboardLayout();
 }
 
 function showDashWidget(widgetId) {
@@ -13129,6 +13136,7 @@ function showDashWidget(widgetId) {
   const el = document.getElementById('dw-' + widgetId);
   if(el) el.style.display = '';
   renderAddWidgetList();
+  saveDashboardLayout();
 }
 
 function openAddWidgetPanel() {
