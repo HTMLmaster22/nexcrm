@@ -3629,6 +3629,35 @@
         </div>
       </div>
 
+      <!-- AI Sentiment Analytics -->
+      <div class="card" id="cl-sentiment-card" style="margin-bottom:16px;display:none">
+        <div class="card-header">
+          <div>
+            <div class="card-title">🤖 AI Call Insights</div>
+            <div class="card-subtitle">Sentiment &amp; quality across analyzed calls</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+          <div style="text-align:center;padding:14px;background:rgba(34,197,94,0.08);border-radius:12px;border:1px solid rgba(34,197,94,0.2)">
+            <div style="font-size:22px;font-weight:800;color:#22c55e" id="cl-sent-positive">0</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:2px">🟢 Positive</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:rgba(245,158,11,0.08);border-radius:12px;border:1px solid rgba(245,158,11,0.2)">
+            <div style="font-size:22px;font-weight:800;color:#f59e0b" id="cl-sent-neutral">0</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:2px">🟡 Neutral</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:rgba(239,68,68,0.08);border-radius:12px;border:1px solid rgba(239,68,68,0.2)">
+            <div style="font-size:22px;font-weight:800;color:var(--danger)" id="cl-sent-negative">0</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:2px">🔴 Negative</div>
+          </div>
+          <div style="text-align:center;padding:14px;background:rgba(59,130,246,0.08);border-radius:12px;border:1px solid rgba(59,130,246,0.2)">
+            <div style="font-size:22px;font-weight:800;color:var(--accent)" id="cl-avg-quality">—</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:2px">⭐ Avg Quality</div>
+          </div>
+        </div>
+        <div id="cl-action-items-preview" style="margin-top:14px"></div>
+      </div>
+
       <!-- Call List -->
       <div class="card" id="cl-card">
         <div class="card-header">
@@ -5941,6 +5970,45 @@ function updateCallStats(calls) {
   document.getElementById('cl-transcribed').textContent = transcribed;
   document.getElementById('cl-duration').textContent = avgDur + 'm';
   document.getElementById('cl-count').textContent = total + ' call' + (total !== 1 ? 's' : '');
+
+  renderCallSentimentAnalytics(calls);
+}
+
+function renderCallSentimentAnalytics(calls) {
+  const analyzed = calls.filter(c => c.sentiment);
+  const sentCard = document.getElementById('cl-sentiment-card');
+  if (!sentCard) return;
+  if (analyzed.length === 0) { sentCard.style.display = 'none'; return; }
+  sentCard.style.display = 'block';
+
+  const positive = analyzed.filter(c => c.sentiment === 'positive').length;
+  const neutral = analyzed.filter(c => c.sentiment === 'neutral').length;
+  const negative = analyzed.filter(c => c.sentiment === 'negative').length;
+  const scores = analyzed.filter(c => c.ai_quality_score).map(c => c.ai_quality_score);
+  const avgQuality = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : '—';
+
+  document.getElementById('cl-sent-positive').textContent = positive;
+  document.getElementById('cl-sent-neutral').textContent = neutral;
+  document.getElementById('cl-sent-negative').textContent = negative;
+  document.getElementById('cl-avg-quality').textContent = avgQuality;
+
+  // Show top action items from negative-sentiment calls (most urgent)
+  const negativeWithActions = analyzed
+    .filter(c => c.sentiment === 'negative' && c.ai_action_items)
+    .slice(0, 3);
+  const preview = document.getElementById('cl-action-items-preview');
+  if (negativeWithActions.length > 0) {
+    preview.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:8px">⚠️ Needs Attention</div>' +
+      negativeWithActions.map(c => {
+        let items = [];
+        try { items = JSON.parse(c.ai_action_items); } catch(e) {}
+        const firstItem = items[0] || c.ai_summary || '';
+        return '<div style="font-size:12px;color:var(--text2);padding:6px 0;border-bottom:1px solid var(--border)">' +
+          '<strong style="color:var(--text)">' + (c.caller_name || c.phone_number || 'Unknown') + '</strong> — ' + firstItem + '</div>';
+      }).join('');
+  } else {
+    preview.innerHTML = '';
+  }
 }
 
 function renderCallLogs(calls) {
@@ -5967,6 +6035,12 @@ function renderCallLogs(calls) {
     const dur = call.duration ? call.duration + ' min' : '—';
     const hasTranscript = call.transcript && call.transcript.length > 5;
     const needsCallback = call.callback_needed && !call.callback_done;
+    const sentimentBadge = call.sentiment ? ({
+      positive: '<span style="background:rgba(34,197,94,0.1);color:#22c55e;padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">🟢 Positive</span>',
+      neutral: '<span style="background:rgba(245,158,11,0.1);color:#f59e0b;padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">🟡 Neutral</span>',
+      negative: '<span style="background:rgba(239,68,68,0.1);color:var(--danger);padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">🔴 Negative</span>'
+    }[call.sentiment] || '') : '';
+    const qualityBadge = call.ai_quality_score ? '<span style="background:rgba(139,92,246,0.1);color:#8b5cf6;padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">⭐ ' + call.ai_quality_score + '/10</span>' : '';
 
     return `<div style="display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)" id="call-${call.id}">
       <div style="width:36px;height:36px;border-radius:10px;background:${typeBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${typeColor}">${typeIcon}</div>
@@ -5976,6 +6050,8 @@ function renderCallLogs(calls) {
           <span style="background:${typeBg};color:${typeColor};padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">${typeLabel}</span>
           ${needsCallback ? '<span style="background:rgba(245,158,11,0.1);color:#f59e0b;padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">Callback needed</span>' : ''}
           ${hasTranscript ? '<span style="background:rgba(59,130,246,0.1);color:var(--accent);padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">Transcript</span>' : ''}
+          ${sentimentBadge}
+          ${qualityBadge}
         </div>
         <div style="font-size:12px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap">
           <span>${call.phone_number || '—'}</span>
@@ -5983,9 +6059,11 @@ function renderCallLogs(calls) {
           <span>${date}</span>
         </div>
         ${call.notes ? `<div style="font-size:12px;color:var(--text2);margin-top:6px;padding:8px 10px;background:var(--bg3);border-radius:8px;line-height:1.5">${call.notes.slice(0,120)}${call.notes.length > 120 ? '...' : ''}</div>` : ''}
+        ${call.ai_summary ? `<div style="font-size:12px;color:var(--text);margin-top:6px;padding:8px 10px;background:rgba(139,92,246,0.06);border:1px solid rgba(139,92,246,0.15);border-radius:8px;line-height:1.5"><strong>🤖 AI:</strong> ${call.ai_summary}</div>` : ''}
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
         ${hasTranscript ? `<button onclick="viewTranscript('${call.id}')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">View Transcript</button>` : ''}
+        ${hasTranscript && !call.sentiment ? `<button onclick="analyzeCallAI('${call.id}')" id="analyze-btn-${call.id}" style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2);color:#8b5cf6;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">🤖 Analyze</button>` : ''}
         ${call.call_type === 'missed' || needsCallback ? `<button onclick="scheduleCallback('${call.id}','${call.caller_name || ''}','${call.phone_number || ''}')" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);color:#f59e0b;padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Call Back</button>` : ''}
         <button onclick="deleteCall('${call.id}')" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);color:var(--danger);padding:5px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Delete</button>
       </div>
@@ -6315,6 +6393,64 @@ async function deleteCall(id) {
   });
   showToast('🗑️ Call deleted');
   loadCallLogs();
+}
+
+async function analyzeCallAI(id) {
+  const call = allCalls.find(c => c.id === id);
+  if (!call || !call.transcript) { showToast('❌ No transcript to analyze'); return; }
+
+  const btn = document.getElementById('analyze-btn-' + id);
+  if (btn) { btn.textContent = '⏳ Analyzing...'; btn.disabled = true; }
+
+  try {
+    const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-call-analysis', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': HEADERS['Authorization']
+      },
+      body: JSON.stringify({
+        transcript: call.transcript,
+        caller_name: call.caller_name,
+        call_type: call.call_type,
+        duration: call.duration
+      })
+    });
+
+    if (!response.ok) throw new Error('Analysis request failed: ' + response.status);
+    const parsed = await response.json();
+    if (parsed.error) throw new Error(parsed.error);
+
+    // Save to Supabase
+    await fetch(SUPABASE_URL + '/rest/v1/call_logs?id=eq.' + id, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        sentiment: parsed.sentiment,
+        ai_quality_score: parsed.quality_score,
+        ai_summary: parsed.summary,
+        ai_action_items: JSON.stringify(parsed.action_items || []),
+        ai_analyzed_at: new Date().toISOString()
+      })
+    });
+
+    // Update local cache and re-render
+    Object.assign(call, {
+      sentiment: parsed.sentiment,
+      ai_quality_score: parsed.quality_score,
+      ai_summary: parsed.summary,
+      ai_action_items: JSON.stringify(parsed.action_items || [])
+    });
+    renderCallLogs(allCalls);
+    updateCallStats(allCalls);
+    showToast('✅ Call analyzed');
+
+  } catch (e) {
+    console.error('analyzeCallAI error:', e);
+    showToast('❌ Analysis failed — check console');
+    if (btn) { btn.textContent = '🤖 Analyze'; btn.disabled = false; }
+  }
 }
 
 function viewTranscript(id) {
