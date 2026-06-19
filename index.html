@@ -5790,6 +5790,7 @@ function loginSuccess(data) {
   checkAdminStatus();
   applyMobileLayout();
   setTimeout(loadReminders, 500);
+  setTimeout(function() { if(typeof loadDashboardLayout === 'function') loadDashboardLayout(); }, 600);
   nav('dashboard', document.querySelector('.nav-item'));
 }
 
@@ -13072,7 +13073,7 @@ async function loadDashboardLayout() {
 }
 
 async function saveDashboardLayout() {
-  if(!currentUser) return;
+  if(!currentUser) { console.warn('saveDashboardLayout skipped: no currentUser'); return; }
   try {
     const savedToken = localStorage.getItem('nexcrm_token');
     if(savedToken && HEADERS['Authorization'] === 'Bearer ' + SUPABASE_KEY) {
@@ -13081,15 +13082,19 @@ async function saveDashboardLayout() {
     const rows = dashLayout.map(w => ({
       user_id: currentUser.id, widget_id: w.widget_id, position: w.position, visible: w.visible
     }));
+    console.log('saveDashboardLayout sending rows:', rows);
     const r = await fetch(SUPABASE_URL + '/rest/v1/dashboard_layouts?on_conflict=user_id,widget_id', {
       method: 'POST',
       headers: { ...HEADERS, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
       body: JSON.stringify(rows)
     });
+    console.log('saveDashboardLayout response status:', r.status);
     if(!r.ok) {
       const errText = await r.text();
       console.error('saveDashboardLayout failed:', r.status, errText);
       showToast('❌ Could not save layout — check console');
+    } else {
+      console.log('saveDashboardLayout: saved successfully');
     }
   } catch(e) { console.error('saveDashboardLayout error:', e); }
 }
@@ -13123,7 +13128,9 @@ function toggleDashCustomize() {
 
 function hideDashWidget(widgetId) {
   const w = dashLayout.find(x => x.widget_id === widgetId);
+  console.log('hideDashWidget called for:', widgetId, 'found in dashLayout:', !!w, 'currentUser:', !!currentUser);
   if(w) w.visible = false;
+  else console.warn('hideDashWidget: widget_id not found in dashLayout array:', widgetId, dashLayout);
   const el = document.getElementById('dw-' + widgetId);
   if(el) el.style.display = 'none';
   renderAddWidgetList();
@@ -13132,6 +13139,7 @@ function hideDashWidget(widgetId) {
 
 function showDashWidget(widgetId) {
   const w = dashLayout.find(x => x.widget_id === widgetId);
+  console.log('showDashWidget called for:', widgetId, 'found in dashLayout:', !!w);
   if(w) w.visible = true;
   const el = document.getElementById('dw-' + widgetId);
   if(el) el.style.display = '';
@@ -13195,15 +13203,9 @@ function enableDashDragDrop() {
   });
 }
 
-(function() {
-  if (typeof loadUserOrgs === 'function') {
-    const _origLoadUserOrgsForLayout = loadUserOrgs;
-    loadUserOrgs = async function() {
-      await _origLoadUserOrgsForLayout.apply(this, arguments);
-      loadDashboardLayout();
-    };
-  }
-})();
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Dashboard customization JS loaded successfully');
+});
 
 </script>
 </body>
