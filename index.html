@@ -4776,6 +4776,44 @@ document.getElementById('modal').addEventListener('click', function(e) {
 });
 
 // ─── ADD LEAD → SAVE TO SUPABASE ──────────────────────────────
+// ─── REAL-TIME NEW LEAD ALERT ──────────────────────────────────
+async function sendNewLeadAlert(lead) {
+  if (!currentOrg || !currentOrg.id) return;
+  try {
+    // Fetch org admins to notify
+    const r = await fetch(SUPABASE_URL + '/rest/v1/team_members?org_id=eq.' + currentOrg.id + '&role=eq.admin&active=eq.true&select=email,name', { headers: HEADERS });
+    const admins = await r.json();
+    if (!Array.isArray(admins) || admins.length === 0) return;
+
+    const subject = '🆕 New lead: ' + (lead.name || 'Unknown') + ' via ' + (lead.source || 'unknown');
+    const html = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#f8f9fb">' +
+      '<div style="background:#fff;border-radius:14px;padding:28px;border:1px solid #eee">' +
+      '<h2 style="margin:0 0 12px;color:#3b82f6">🆕 New Lead Captured</h2>' +
+      '<p style="font-size:14px;color:#444"><strong>Name:</strong> ' + (lead.name || '—') + '</p>' +
+      '<p style="font-size:14px;color:#444"><strong>Company:</strong> ' + (lead.company || '—') + '</p>' +
+      '<p style="font-size:14px;color:#444"><strong>Source:</strong> ' + (lead.source || '—') + '</p>' +
+      '<p style="font-size:14px;color:#444"><strong>Phone:</strong> ' + (lead.phone || '—') + '</p>' +
+      '<a href="https://htmlmaster22.github.io/nexcrm/" style="display:inline-block;margin-top:14px;padding:12px 24px;background:#3b82f6;color:#fff;border-radius:8px;text-decoration:none;font-weight:700">Open Leads →</a>' +
+      '</div></div>';
+
+    for (const admin of admins) {
+      if (!admin.email) continue;
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_API_KEY },
+        body: JSON.stringify({
+          from: FROM_NAME + ' <' + FROM_EMAIL + '>',
+          to: [admin.email],
+          subject,
+          html
+        })
+      });
+    }
+  } catch (e) {
+    console.error('sendNewLeadAlert error:', e);
+  }
+}
+
 async function addLead() {
   const fname = document.getElementById('f-fname').value.trim();
   const lname = document.getElementById('f-lname').value.trim();
@@ -4812,6 +4850,9 @@ async function addLead() {
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads', { method: 'POST', headers: HEADERS, body: JSON.stringify(newLead) });
     if (!r.ok) { const e = await r.json(); console.error(e); showToast('❌ Failed to save lead'); hideLoader(); return; }
   } catch(e) { console.error(e); showToast('❌ Failed to save lead'); hideLoader(); return; }
+
+  // Real-time alert: notify org admins of the new lead (fire-and-forget, doesn't block UI)
+  sendNewLeadAlert(newLead).catch(e => console.error('sendNewLeadAlert failed:', e));
 
   // Reload from DB
   await loadLeads();
