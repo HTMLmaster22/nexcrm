@@ -2828,6 +2828,7 @@
         <button class="admin-tab" onclick="adminTab('clients',this)">🏢 Client Management</button>
         <button class="admin-tab" onclick="adminTab('branding',this)">🎨 Branding</button>
         <button class="admin-tab" onclick="adminTab('billing',this)">💳 Billing</button>
+        <button class="admin-tab" onclick="adminTab('integrations',this)">🔗 Integrations</button>
         <button class="admin-tab" onclick="adminTab('users',this)">👥 All Users</button>
         <button class="admin-tab" onclick="adminTab('requests',this)" id="requests-tab">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
@@ -4777,6 +4778,31 @@ document.getElementById('modal').addEventListener('click', function(e) {
 
 // ─── ADD LEAD → SAVE TO SUPABASE ──────────────────────────────
 // ─── REAL-TIME NEW LEAD ALERT ──────────────────────────────────
+// ─── OUTGOING WEBHOOK (Zapier / Make.com / custom integrations) ──
+async function sendOutgoingWebhook(eventType, data) {
+  if (!currentOrg || !currentOrg.id) return;
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/organizations?id=eq.' + currentOrg.id + '&select=outgoing_webhook_url', { headers: HEADERS });
+    const orgData = await r.json();
+    const org = Array.isArray(orgData) ? orgData[0] : null;
+    if (!org || !org.outgoing_webhook_url) return; // no webhook configured, skip silently
+
+    await fetch(org.outgoing_webhook_url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        event: eventType,
+        org_id: currentOrg.id,
+        org_name: currentOrg.name,
+        timestamp: new Date().toISOString(),
+        data
+      })
+    });
+  } catch (e) {
+    console.error('sendOutgoingWebhook error:', e);
+  }
+}
+
 async function sendNewLeadAlert(lead) {
   if (!currentOrg || !currentOrg.id) return;
   try {
@@ -4853,6 +4879,7 @@ async function addLead() {
 
   // Real-time alert: notify org admins of the new lead (fire-and-forget, doesn't block UI)
   sendNewLeadAlert(newLead).catch(e => console.error('sendNewLeadAlert failed:', e));
+  sendOutgoingWebhook('lead.created', newLead).catch(e => console.error('sendOutgoingWebhook failed:', e));
 
   // Reload from DB
   await loadLeads();
@@ -8188,6 +8215,7 @@ function adminTab(tab, el) {
   _s('admin-billing', tab === 'billing');
   _s('admin-requests', tab === 'requests');
   _s('admin-users', tab === 'users');
+  _s('admin-integrations', tab === 'integrations');
   if(tab === 'users') loadAllUsers();
   if(tab === 'team') loadTeam();
   if(tab === 'clients') loadClients();
@@ -8195,6 +8223,7 @@ function adminTab(tab, el) {
   if(tab === 'performance') loadPerformance();
   if(tab === 'branding') loadBrandingPanel();
   if(tab === 'requests') loadAccessRequests();
+  if(tab === 'integrations') loadIntegrationsPanel();
 }
 
 // ─── TEAM ──────────────────────────────────────────────────────
@@ -9339,6 +9368,47 @@ function renderDonut(data) {
         </div>
       </div>
 
+    <!-- INTEGRATIONS PANEL -->
+      <div id="admin-integrations" style="display:none">
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header">
+            <div class="card-title">🔗 Outgoing Webhook</div>
+            <div style="font-size:12px;color:var(--text2)">Send new lead events to Zapier, Make.com, or any URL</div>
+          </div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
+            Whenever a new lead is created in this workspace, NexCRM will send a POST request with the lead's
+            details to the URL below. Paste a "Webhooks by Zapier" or "Webhooks by Make" trigger URL here to
+            automatically sync new leads into Google Sheets, Slack, email, or 5000+ other apps.
+          </div>
+          <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Webhook URL</label>
+          <input id="outgoing-webhook-input" type="url" placeholder="https://hooks.zapier.com/hooks/catch/..." style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:13px;outline:none;font-family:inherit;margin-bottom:12px"/>
+          <button onclick="saveOutgoingWebhook()" class="btn btn-primary" style="font-size:13px">Save Webhook URL</button>
+          <span id="webhook-save-status" style="font-size:12px;color:var(--success);margin-left:10px;display:none">✅ Saved</span>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📥 Incoming Webhook (Add Leads From Anywhere)</div>
+            <div style="font-size:12px;color:var(--text2)">Let Zapier, Google Forms, or any tool create leads here</div>
+          </div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.7">
+            Use this URL as a "Webhooks by Zapier" POST action (or any custom integration) to automatically
+            create new leads in this workspace from external forms, ads platforms, or other tools.
+          </div>
+          <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Your Incoming Webhook URL</label>
+          <div style="display:flex;gap:8px;margin-bottom:14px">
+            <input id="incoming-webhook-display" type="text" readonly style="flex:1;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:12px;outline:none;font-family:monospace"/>
+            <button onclick="copyIncomingWebhook()" class="btn btn-ghost" style="font-size:12px;white-space:nowrap">📋 Copy</button>
+          </div>
+          <div style="background:var(--bg3);border-radius:10px;padding:14px;font-size:12px;color:var(--text2);line-height:1.7">
+            <strong style="color:var(--text)">Expected JSON body:</strong><br/>
+            <code style="font-size:11px">{"name": "...", "phone": "...", "email": "...", "company": "...", "source": "Zapier", "value": 5000, "notes": "..."}</code><br/><br/>
+            Only <code>name</code>, <code>phone</code>, or <code>email</code> is required — send whichever you have.
+          </div>
+          <button onclick="regenerateWebhookSecret()" class="btn btn-ghost" style="font-size:12px;margin-top:14px;color:var(--danger)">🔄 Regenerate Secret (invalidates old URL)</button>
+        </div>
+      </div>
+
     <!-- MOYASAR MODAL -->
     <div class="modal-overlay" id="moyasar-modal">
       <div class="modal" style="max-width:460px">
@@ -9937,6 +10007,89 @@ async function generatePDFReport(btn) {
 
 // ─── WHITE-LABEL BRANDING ──────────────────────────────────────
 const BRANDING_KEY = 'nexcrm_branding_';
+
+// ─── INTEGRATIONS PANEL ─────────────────────────────────────────
+function generateRandomSecret() {
+  return Array.from(crypto.getRandomValues(new Uint8Array(24))).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function loadIntegrationsPanel() {
+  if (!currentOrg || !currentOrg.id) return;
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/organizations?id=eq.' + currentOrg.id + '&select=outgoing_webhook_url,webhook_secret', { headers: HEADERS });
+    const data = await r.json();
+    const org = Array.isArray(data) ? data[0] : null;
+    if (!org) return;
+
+    const outgoingInput = document.getElementById('outgoing-webhook-input');
+    if (outgoingInput) outgoingInput.value = org.outgoing_webhook_url || '';
+
+    let secret = org.webhook_secret;
+    if (!secret) {
+      // Auto-generate a secret on first visit so the incoming webhook works immediately
+      secret = generateRandomSecret();
+      await fetch(SUPABASE_URL + '/rest/v1/organizations?id=eq.' + currentOrg.id, {
+        method: 'PATCH', headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ webhook_secret: secret })
+      });
+    }
+
+    const incomingDisplay = document.getElementById('incoming-webhook-display');
+    if (incomingDisplay) {
+      incomingDisplay.value = 'https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/lead-webhook?org_id=' + currentOrg.id + '&secret=' + secret;
+    }
+  } catch (e) {
+    console.error('loadIntegrationsPanel error:', e);
+  }
+}
+
+async function saveOutgoingWebhook() {
+  if (!currentOrg || !currentOrg.id) return;
+  const url = document.getElementById('outgoing-webhook-input').value.trim();
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/organizations?id=eq.' + currentOrg.id, {
+      method: 'PATCH', headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ outgoing_webhook_url: url || null })
+    });
+    const status = document.getElementById('webhook-save-status');
+    if (status) {
+      status.style.display = 'inline';
+      setTimeout(() => { status.style.display = 'none'; }, 3000);
+    }
+    showToast('✅ Webhook URL saved');
+  } catch (e) {
+    console.error('saveOutgoingWebhook error:', e);
+    showToast('❌ Failed to save webhook URL');
+  }
+}
+
+function copyIncomingWebhook() {
+  const input = document.getElementById('incoming-webhook-display');
+  if (!input) return;
+  navigator.clipboard.writeText(input.value).then(() => {
+    showToast('📋 Webhook URL copied to clipboard');
+  }).catch(() => {
+    input.select();
+    showToast('📋 Selected — press Ctrl+C to copy');
+  });
+}
+
+async function regenerateWebhookSecret() {
+  if (!currentOrg || !currentOrg.id) return;
+  if (!confirm('This will invalidate your current incoming webhook URL. Any Zapier zaps or integrations using the old URL will stop working. Continue?')) return;
+  try {
+    const newSecret = generateRandomSecret();
+    await fetch(SUPABASE_URL + '/rest/v1/organizations?id=eq.' + currentOrg.id, {
+      method: 'PATCH', headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ webhook_secret: newSecret })
+    });
+    loadIntegrationsPanel();
+    showToast('🔄 Webhook secret regenerated');
+  } catch (e) {
+    console.error('regenerateWebhookSecret error:', e);
+    showToast('❌ Failed to regenerate secret');
+  }
+}
 
 function loadBrandingPanel() {
   // Populate org selector
