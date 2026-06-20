@@ -4085,6 +4085,48 @@ async function adminAction(action, params = {}) {
 }
 let currentOrg = null;
 let userOrgs = [];
+// ─── TRIAL STATUS CHECK ───────────────────────────────────────
+function checkTrialStatus() {
+  if (!currentOrg) return;
+  const overlay = document.getElementById('trial-expired-overlay');
+  if (!overlay) return;
+
+  // Super admin always bypasses trial restrictions
+  if (currentUser && currentUser.id === '5f338ea8-b071-445b-97a5-47e7c7c4bfa4') {
+    overlay.style.display = 'none';
+    return;
+  }
+
+  if (currentOrg.plan_status === 'trial' && currentOrg.trial_ends_at) {
+    const endsAt = new Date(currentOrg.trial_ends_at);
+    const now = new Date();
+    if (now > endsAt) {
+      overlay.style.display = 'flex';
+      const daysAgo = Math.floor((now - endsAt) / (1000*60*60*24));
+      const msgEl = document.getElementById('trial-expired-message');
+      if (msgEl) msgEl.textContent = 'Your 14-day free trial ended ' + (daysAgo <= 0 ? 'today' : daysAgo + ' day' + (daysAgo > 1 ? 's' : '') + ' ago') + '. Upgrade now to keep using NexCRM.';
+      return;
+    } else {
+      // Still in trial — show days remaining banner (non-blocking)
+      const daysLeft = Math.ceil((endsAt - now) / (1000*60*60*24));
+      showTrialBanner(daysLeft);
+    }
+  }
+  overlay.style.display = 'none';
+}
+
+function showTrialBanner(daysLeft) {
+  let banner = document.getElementById('trial-days-banner');
+  if (!banner) return;
+  if (daysLeft <= 3) {
+    banner.style.display = 'flex';
+    banner.querySelector('.trial-banner-text').textContent =
+      daysLeft <= 0 ? 'Your trial ends today!' : 'Your trial ends in ' + daysLeft + ' day' + (daysLeft > 1 ? 's' : '') + '.';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
 async function loadUserOrgs() {
   if(!currentUser) return;
   try {
@@ -4096,12 +4138,19 @@ async function loadUserOrgs() {
       // Step 2: Fetch org names separately
       const orgIds = members.map(m => m.org_id).filter(Boolean);
       const orgFilter = 'id=in.(' + orgIds.join(',') + ')';
-      const r2 = await fetch(SUPABASE_URL + '/rest/v1/organizations?' + orgFilter + '&select=id,name', { headers: HEADERS });
+      const r2 = await fetch(SUPABASE_URL + '/rest/v1/organizations?' + orgFilter + '&select=id,name,plan_status,trial_ends_at,plan', { headers: HEADERS });
       const orgs = r2.ok ? await r2.json() : [];
 
       userOrgs = members.map(m => {
         const org = Array.isArray(orgs) ? orgs.find(o => o.id === m.org_id) : null;
-        return { id: m.org_id, name: org ? org.name : ('Workspace ' + m.org_id.slice(0,6)), role: m.role || 'admin' };
+        return {
+          id: m.org_id,
+          name: org ? org.name : ('Workspace ' + m.org_id.slice(0,6)),
+          role: m.role || 'admin',
+          plan_status: org ? org.plan_status : null,
+          trial_ends_at: org ? org.trial_ends_at : null,
+          plan: org ? org.plan : null
+        };
       }).filter(o => o.id);
 
       if(userOrgs.length > 0) {
@@ -4116,6 +4165,7 @@ async function loadUserOrgs() {
         currentOrg = userOrgs[0];
         renderOrgSwitcher();
         autoApplyBranding();
+        checkTrialStatus();
         loadDashboard();
         loadLeads();
         return;
@@ -9171,9 +9221,26 @@ function renderDonut(data) {
       <button class="auth-btn auth-btn-primary" id="auth-submit-btn" onclick="handleAuth()">Sign In</button>
     </div>
     <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--text2)">
-      Want to try NexCRM? <button onclick="openRequestModal()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;text-decoration:underline;font-family:inherit">Request Free Trial →</button>
+      Want to try NexCRM? <button onclick="openSignupModal()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;text-decoration:underline;font-family:inherit">Start Free Trial →</button>
     </div>
   </div>
+</div>
+
+<!-- TRIAL EXPIRED BLOCKING OVERLAY -->
+<div id="trial-expired-overlay" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(15,15,20,0.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:440px;padding:36px 32px;text-align:center;box-shadow:0 40px 80px rgba(0,0,0,0.4)">
+    <div style="font-size:42px;margin-bottom:14px">⏰</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:20px;color:var(--text);margin-bottom:8px">Trial Expired</div>
+    <div id="trial-expired-message" style="font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6">Your 14-day free trial has ended. Upgrade now to keep using NexCRM.</div>
+    <button onclick="document.getElementById('trial-expired-overlay').style.display='none';nav('admin-billing',null);" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-bottom:10px">Upgrade Now →</button>
+    <button onclick="supabase.auth.signOut();location.reload();" style="width:100%;padding:10px;background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">Sign out</button>
+  </div>
+</div>
+
+<!-- TRIAL COUNTDOWN BANNER (non-blocking, shows when ≤3 days left) -->
+<div id="trial-days-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9000;background:linear-gradient(135deg,#f59e0b,#ea580c);color:#fff;padding:9px 20px;align-items:center;justify-content:center;gap:14px;font-size:13px;font-weight:600">
+  <span class="trial-banner-text">Your trial ends soon.</span>
+  <button onclick="nav('admin-billing',null)" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:4px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Upgrade →</button>
 </div>
 
 
@@ -12770,7 +12837,179 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- ═══════════════════════════════════════════════ -->
 
 <!-- REQUEST MODAL HTML -->
-<div id="request-modal-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+<!-- INSTANT SELF-SIGNUP MODAL -->
+<div id="signup-modal-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:480px;padding:28px;animation:onboardIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--text)">Start Free Trial</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px">14 days free — full access, no credit card needed</div>
+      </div>
+      <button onclick="closeSignupModal()" style="background:var(--bg3);border:none;color:var(--text2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Company / Agency Name *</label>
+        <input id="su-company" type="text" placeholder="Your company or agency" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;font-family:inherit"/>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Full Name *</label>
+        <input id="su-name" type="text" placeholder="Your name" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;font-family:inherit"/>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Email Address *</label>
+        <input id="su-email" type="email" placeholder="your@email.com" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;font-family:inherit"/>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Password *</label>
+        <input id="su-password" type="password" placeholder="At least 6 characters" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:14px;outline:none;font-family:inherit"/>
+      </div>
+      <div id="signup-error" style="color:var(--danger);font-size:13px;display:none"></div>
+      <button onclick="submitSelfSignup()" id="signup-submit-btn" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#6366f1);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.2s">
+        Create My Account →
+      </button>
+      <div style="text-align:center;font-size:11px;color:var(--text2)">
+        Need a custom enterprise plan? <button onclick="closeSignupModal();openRequestModal()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:11px;font-weight:600;text-decoration:underline;font-family:inherit">Talk to Sales</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+#signup-modal-overlay.open { display:flex !important; }
+</style>
+
+<!-- INSTANT SELF-SIGNUP LOGIC -->
+<script>
+function openSignupModal() {
+  document.getElementById('signup-modal-overlay').classList.add('open');
+}
+function closeSignupModal() {
+  document.getElementById('signup-modal-overlay').classList.remove('open');
+  document.getElementById('signup-error').style.display = 'none';
+}
+document.getElementById('signup-modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeSignupModal();
+});
+
+async function submitSelfSignup() {
+  const company = document.getElementById('su-company').value.trim();
+  const name = document.getElementById('su-name').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const password = document.getElementById('su-password').value;
+  const errEl = document.getElementById('signup-error');
+  const btn = document.getElementById('signup-submit-btn');
+
+  errEl.style.display = 'none';
+
+  if (!company || !name || !email || !password) {
+    errEl.textContent = '❌ Please fill in all required fields';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (password.length < 6) {
+    errEl.textContent = '❌ Password must be at least 6 characters';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.textContent = 'Checking company name...';
+  btn.disabled = true;
+
+  // Duplicate company name check
+  try {
+    const checkR = await fetch(
+      SUPABASE_URL + '/rest/v1/organizations?select=id,name&name=ilike.' + encodeURIComponent(company),
+      { headers: HEADERS }
+    );
+    const existing = await checkR.json();
+    if (existing && existing.length > 0) {
+      errEl.textContent = '⚠️ A company with this name already exists. Please contact us if this is you.';
+      errEl.style.display = 'block';
+      btn.textContent = 'Create My Account →';
+      btn.disabled = false;
+      return;
+    }
+  } catch(e) { /* continue anyway if check fails */ }
+
+  btn.textContent = 'Creating your account...';
+
+  try {
+    // Step 1: Sign up via Supabase Auth directly (client-side, no admin privileges needed)
+    const signupRes = await fetch(SUPABASE_URL + '/auth/v1/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
+      body: JSON.stringify({
+        email, password,
+        data: { full_name: name }
+      })
+    });
+    const signupData = await signupRes.json();
+
+    if (!signupRes.ok) {
+      throw new Error(signupData.msg || signupData.error_description || 'Signup failed');
+    }
+
+    const newUserId = signupData.user?.id || signupData.id;
+    if (!newUserId) throw new Error('Could not create user account');
+
+    // Step 2: Create organization with trial status
+    const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+    const orgRes = await fetch(SUPABASE_URL + '/rest/v1/organizations', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=representation' },
+      body: JSON.stringify({
+        name: company,
+        plan_status: 'trial',
+        plan: 'starter',
+        trial_ends_at: trialEndsAt,
+        created_via: 'self_signup'
+      })
+    });
+    const orgData = await orgRes.json();
+    const newOrg = Array.isArray(orgData) ? orgData[0] : orgData;
+    if (!newOrg || !newOrg.id) throw new Error('Could not create organization');
+
+    // Step 3: Link user to org as admin
+    await fetch(SUPABASE_URL + '/rest/v1/org_members', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ user_id: newUserId, org_id: newOrg.id, role: 'admin' })
+    });
+    await fetch(SUPABASE_URL + '/rest/v1/team_members', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ name, email, role: 'admin', active: true, org_id: newOrg.id })
+    });
+
+    closeSignupModal();
+
+    // If email confirmation is required, Supabase won't return a session yet
+    if (signupData.access_token) {
+      // Auto-confirmed (email confirmations disabled in Supabase settings) — log in immediately
+      loginSuccess({ user: signupData.user, access_token: signupData.access_token });
+      showToast('🎉 Welcome to NexCRM! Your 14-day trial has started.');
+    } else {
+      const successEl = document.getElementById('auth-success');
+      if (successEl) {
+        successEl.textContent = '✅ Account created! Check your email to confirm, then sign in.';
+        successEl.style.display = 'block';
+        setTimeout(() => { successEl.style.display = 'none'; }, 8000);
+      }
+    }
+
+  } catch (e) {
+    console.error('submitSelfSignup error:', e);
+    errEl.textContent = '❌ ' + (e.message || 'Something went wrong. Please try again.');
+    errEl.style.display = 'block';
+  }
+
+  btn.textContent = 'Create My Account →';
+  btn.disabled = false;
+}
+</script>
+
+
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;width:100%;max-width:480px;padding:28px;animation:onboardIn 0.3s cubic-bezier(0.34,1.56,0.64,1) both">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
       <div>
