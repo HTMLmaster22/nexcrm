@@ -2732,7 +2732,7 @@
           <div style="font-size:20px;font-weight:800;color:var(--text)">Analytics</div>
           <div style="font-size:13px;color:var(--text2);margin-top:2px" id="report-org-label"><span data-en="Current workspace" data-ar="مساحة العمل الحالية">Current workspace</span></div>
         </div>
-        <button onclick="generatePDFReport()" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(99,102,241,0.4);transition:all 0.2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+        <button onclick="generatePDFReport(this)" id="generate-report-btn" style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(99,102,241,0.4);transition:all 0.2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
           📄 <span><span data-en="Generate PDF Report" data-ar="توليد تقرير PDF">Generate PDF Report</span></span>
         </button>
       </div>
@@ -9684,7 +9684,8 @@ window.addEventListener('appinstalled', () => {
 });
 
 // ─── PDF REPORT GENERATOR ─────────────────────────────────────
-function generatePDFReport() {
+async function generatePDFReport(btn) {
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; }
   const orgName = currentOrg ? currentOrg.name : 'NexCRM';
   const now = new Date();
   const monthName = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
@@ -9700,6 +9701,25 @@ function generatePDFReport() {
   const newL = reportLeads.filter(l => l.status === 'New').length;
   const convRate = total > 0 ? Math.round((won / total) * 100) : 0;
   const pipelineVal = reportLeads.reduce((s, l) => s + (parseFloat(l.value) || 0), 0);
+
+  // Fetch call center data for this org (for the new Call Center Analytics section)
+  let callStats = { total: 0, positive: 0, neutral: 0, negative: 0, avgQuality: '—', intents: {} };
+  try {
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const callR = await fetch(SUPABASE_URL + '/rest/v1/call_logs?select=sentiment,ai_quality_score,ai_intent' + orgFilter, { headers: HEADERS });
+    const callData = await callR.json();
+    if (Array.isArray(callData)) {
+      callStats.total = callData.length;
+      callStats.positive = callData.filter(c => c.sentiment === 'positive').length;
+      callStats.neutral = callData.filter(c => c.sentiment === 'neutral').length;
+      callStats.negative = callData.filter(c => c.sentiment === 'negative').length;
+      const scores = callData.filter(c => c.ai_quality_score).map(c => c.ai_quality_score);
+      callStats.avgQuality = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : '—';
+      callData.forEach(c => {
+        if (c.ai_intent) callStats.intents[c.ai_intent] = (callStats.intents[c.ai_intent] || 0) + 1;
+      });
+    }
+  } catch(e) { console.error('Failed to fetch call stats for report:', e); }
 
   // Sources breakdown
   const sourceCounts = {};
@@ -9753,6 +9773,17 @@ function generatePDFReport() {
       </td>
       <td style="padding:10px 8px;font-size:12px;font-weight:700;color:#222">${l.value ? 'SAR ' + Number(l.value).toLocaleString() : '—'}</td>
     </tr>`).join('');
+
+  const intentLabels = { complaint: 'Complaint', refund_request: 'Refund Request', inquiry: 'Inquiry', support: 'Support', sales: 'Sales', other: 'Other' };
+  const intentRows = Object.entries(callStats.intents).sort((a,b) => b[1]-a[1]).map(([intent, count]) => {
+    const pct = callStats.total > 0 ? Math.round((count/callStats.total)*100) : 0;
+    return `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="flex:1;font-size:12px;color:#444;font-weight:600">${intentLabels[intent] || intent}</div>
+        <div style="font-size:13px;font-weight:800;color:#222">${count}</div>
+        <div style="font-size:11px;color:#94a3b8">${pct}%</div>
+      </div>`;
+  }).join('');
 
   const html = `<!DOCTYPE html>
 <html dir="ltr">
@@ -9847,6 +9878,31 @@ function generatePDFReport() {
     </table>
   </div>
 
+  <!-- CALL CENTER ANALYTICS -->
+  ${callStats.total > 0 ? `
+  <div style="border:1px solid #e2e8f0;border-radius:14px;padding:24px;margin-bottom:28px">
+    <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:16px">📞 Call Center Analytics</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
+      <div style="text-align:center;padding:14px;background:#f0fdf4;border-radius:10px">
+        <div style="font-size:20px;font-weight:800;color:#22c55e">${callStats.positive}</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px">Positive</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:#fffbeb;border-radius:10px">
+        <div style="font-size:20px;font-weight:800;color:#f59e0b">${callStats.neutral}</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px">Neutral</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:#fef2f2;border-radius:10px">
+        <div style="font-size:20px;font-weight:800;color:#ef4444">${callStats.negative}</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px">Negative</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:#eff6ff;border-radius:10px">
+        <div style="font-size:20px;font-weight:800;color:#3b82f6">${callStats.avgQuality}</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px">Avg Quality</div>
+      </div>
+    </div>
+    ${intentRows ? `<div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Call Intent Breakdown</div>${intentRows}` : ''}
+  </div>` : ''}
+
   <!-- INSIGHT BOX -->
   ${insight ? `
   <div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(99,102,241,0.08));border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:20px;margin-bottom:28px;display:flex;gap:14px;align-items:flex-start">
@@ -9876,6 +9932,7 @@ function generatePDFReport() {
   const win = window.open('', '_blank');
   win.document.write(html);
   win.document.close();
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
 }
 
 // ─── WHITE-LABEL BRANDING ──────────────────────────────────────
