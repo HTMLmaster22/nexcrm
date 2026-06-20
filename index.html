@@ -3607,6 +3607,9 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Log Call
           </button>
+          <button class="btn btn-ghost" onclick="simulateWebhookTest()" id="cl-test-webhook-btn" style="font-size:13px">
+            🧪 Simulate Webhook
+          </button>
           <!-- Export Dropdown -->
           <div style="position:relative" id="cl-export-wrap">
             <button onclick="toggleCallExportMenu(event)" style="display:flex;align-items:center;gap:7px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:9px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s" onmouseover="this.style.background='rgba(59,130,246,0.18)'" onmouseout="this.style.background='rgba(59,130,246,0.08)'">
@@ -3654,6 +3657,10 @@
             <div style="font-size:22px;font-weight:800;color:var(--accent)" id="cl-avg-quality">—</div>
             <div style="font-size:11px;color:var(--text2);margin-top:2px">⭐ Avg Quality</div>
           </div>
+        </div>
+        <div id="cl-intent-breakdown" style="margin-top:14px;display:none">
+          <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Call Intent Breakdown</div>
+          <div id="cl-intent-bars" style="display:flex;flex-wrap:wrap;gap:8px"></div>
         </div>
         <div id="cl-action-items-preview" style="margin-top:14px"></div>
       </div>
@@ -5992,6 +5999,26 @@ function renderCallSentimentAnalytics(calls) {
   document.getElementById('cl-sent-negative').textContent = negative;
   document.getElementById('cl-avg-quality').textContent = avgQuality;
 
+  // Intent breakdown
+  const withIntent = analyzed.filter(c => c.ai_intent);
+  const intentBreakdownEl = document.getElementById('cl-intent-breakdown');
+  const intentBarsEl = document.getElementById('cl-intent-bars');
+  if (withIntent.length > 0 && intentBreakdownEl && intentBarsEl) {
+    intentBreakdownEl.style.display = 'block';
+    const intentLabels = { complaint: '⚠️ Complaint', refund_request: '💰 Refund', inquiry: '❓ Inquiry', support: '🛟 Support', sales: '💼 Sales', other: '📋 Other' };
+    const counts = {};
+    withIntent.forEach(c => { counts[c.ai_intent] = (counts[c.ai_intent] || 0) + 1; });
+    intentBarsEl.innerHTML = Object.entries(counts)
+      .sort((a,b) => b[1]-a[1])
+      .map(([intent, count]) => {
+        const label = intentLabels[intent] || intent;
+        return '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600">' +
+          label + ' <span style="color:var(--text2)">×' + count + '</span></div>';
+      }).join('');
+  } else if (intentBreakdownEl) {
+    intentBreakdownEl.style.display = 'none';
+  }
+
   // Show top action items from negative-sentiment calls (most urgent)
   const negativeWithActions = analyzed
     .filter(c => c.sentiment === 'negative' && c.ai_action_items)
@@ -6041,6 +6068,8 @@ function renderCallLogs(calls) {
       negative: '<span style="background:rgba(239,68,68,0.1);color:var(--danger);padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">🔴 Negative</span>'
     }[call.sentiment] || '') : '';
     const qualityBadge = call.ai_quality_score ? '<span style="background:rgba(139,92,246,0.1);color:#8b5cf6;padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">⭐ ' + call.ai_quality_score + '/10</span>' : '';
+    const intentLabels = { complaint: '⚠️ Complaint', refund_request: '💰 Refund', inquiry: '❓ Inquiry', support: '🛟 Support', sales: '💼 Sales', other: '📋 Other' };
+    const intentBadge = call.ai_intent && intentLabels[call.ai_intent] ? '<span style="background:rgba(59,130,246,0.1);color:var(--accent);padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">' + intentLabels[call.ai_intent] + '</span>' : '';
 
     return `<div style="display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)" id="call-${call.id}">
       <div style="width:36px;height:36px;border-radius:10px;background:${typeBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;color:${typeColor}">${typeIcon}</div>
@@ -6052,6 +6081,7 @@ function renderCallLogs(calls) {
           ${hasTranscript ? '<span style="background:rgba(59,130,246,0.1);color:var(--accent);padding:2px 9px;border-radius:100px;font-size:11px;font-weight:600">Transcript</span>' : ''}
           ${sentimentBadge}
           ${qualityBadge}
+          ${intentBadge}
         </div>
         <div style="font-size:12px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap">
           <span>${call.phone_number || '—'}</span>
@@ -6386,6 +6416,67 @@ async function saveCall() {
   }
 }
 
+// ─── TEST WEBHOOK SIMULATOR ───────────────────────────────────
+// Sends fake call data through the generic call-webhook endpoint to test
+// the FusionPBX/Twilio/any-PBX integration pipeline without touching real client data.
+const _testCallSamples = [
+  {
+    caller_name: 'رومان السلامي', phone_number: '0501234567', call_type: 'inbound', duration: 4,
+    transcript: 'العميل: السلام عليكم، أنا اتصلت من أسبوع بخصوص طلبي ولسه ما حد رد عليّ. هذا أول مرة أتعامل معكم وفعلاً مستوى الخدمة مخيب للآمال.\nالموظف: السلام عليكم أستاذ رومان، أنا فاهم انزعاجك ومعك حق تماماً، أنا أعتذر عن التأخير. خليني أتأكد من حالة طلبك الآن.\nالعميل: تمام، بس أبغى أعرف ليه ما اتصل بي أحد، هذا غير مقبول صراحة.\nالموظف: أنا أتفهم، حقيقي ما كان المفروض يصير كذا. طلبك جاهز وممكن يوصلك بكرة الصبح، وراح أتابع معك شخصياً عشان أضمن إنه يوصل بدون مشاكل.\nالعميل: طيب تمام، بس أبغى أحد يتصل بي يأكد قبل التوصيل.\nالموظف: تمام أستاذ رومان، راح أتصل بك شخصياً قبل الساعة 10 الصبح أأكد لك. وآسف مرة ثانية على التأخير.'
+  },
+  {
+    caller_name: 'نورة العتيبي', phone_number: '0559876543', call_type: 'inbound', duration: 2,
+    transcript: 'العميل: السلام عليكم، أبغى أستفسر عن باقة الاشتراك الجديدة اللي شفتها في الموقع.\nالموظف: حياكم الله أستاذة نورة، أكيد. الباقة الجديدة فيها مميزات إضافية وسعرها 699 ريال بالشهر.\nالعميل: تمام، وهل فيها خصم لو اشتركت سنة كاملة؟\nالموظف: نعم فيه خصم 15% على الاشتراك السنوي.\nالعميل: ممتاز، شكراً على المعلومات.\nالموظف: عفواً، أي خدمة أخرى؟\nالعميل: لا شكراً، تم.'
+  },
+  {
+    caller_name: 'خالد الدوسري', phone_number: '0567891234', call_type: 'inbound', duration: 6,
+    transcript: 'العميل: أبغى أرجع المنتج اللي طلبته، فيه عيب وما يشتغل صحيح من أول يوم.\nالموظف: متأسف جداً على هذا. ممكن توضح لي العيب بالتفصيل؟\nالعميل: الجهاز ما يشتغل خالص، جربته أكثر من مرة وما تغير شيء.\nالموظف: تمام، راح أرسل لك رابط لإرجاع المنتج واسترداد المبلغ كامل خلال 3 أيام عمل.\nالعميل: تمام بس أبغى أعرف هل في رسوم شحن للإرجاع؟\nالموظف: لا، الشحن مجاني في حالة العيب المصنعي. آسف مرة ثانية على التجربة السيئة.\nالعميل: تمام، شكراً.'
+  }
+];
+let _testCallIndex = 0;
+
+async function simulateWebhookTest() {
+  const btn = document.getElementById('cl-test-webhook-btn');
+  if (btn) { btn.textContent = '⏳ Sending...'; btn.disabled = true; }
+
+  try {
+    const sample = _testCallSamples[_testCallIndex % _testCallSamples.length];
+    _testCallIndex++;
+
+    const payload = {
+      source: 'manual_test',
+      caller_name: sample.caller_name,
+      phone_number: sample.phone_number,
+      call_type: sample.call_type,
+      duration: sample.duration,
+      transcript: sample.transcript,
+      org_id: currentOrg ? currentOrg.id : null
+    };
+
+    const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/call-webhook', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': HEADERS['Authorization']
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (!response.ok || result.error) throw new Error(result.error || 'Webhook test failed');
+
+    showToast('✅ Test call simulated & analyzed: ' + sample.caller_name);
+    loadCallLogs();
+
+  } catch (e) {
+    console.error('simulateWebhookTest error:', e);
+    showToast('❌ Webhook test failed — check console');
+  } finally {
+    if (btn) { btn.textContent = '🧪 Simulate Webhook'; btn.disabled = false; }
+  }
+}
+
 async function deleteCall(id) {
   if (!confirm('Delete this call log?')) return;
   await fetch(SUPABASE_URL + '/rest/v1/call_logs?id=eq.' + id, {
@@ -6431,6 +6522,7 @@ async function analyzeCallAI(id) {
         ai_quality_score: parsed.quality_score,
         ai_summary: parsed.summary,
         ai_action_items: JSON.stringify(parsed.action_items || []),
+        ai_intent: parsed.intent || null,
         ai_analyzed_at: new Date().toISOString()
       })
     });
@@ -6440,7 +6532,8 @@ async function analyzeCallAI(id) {
       sentiment: parsed.sentiment,
       ai_quality_score: parsed.quality_score,
       ai_summary: parsed.summary,
-      ai_action_items: JSON.stringify(parsed.action_items || [])
+      ai_action_items: JSON.stringify(parsed.action_items || []),
+      ai_intent: parsed.intent || null
     });
     renderCallLogs(allCalls);
     updateCallStats(allCalls);
