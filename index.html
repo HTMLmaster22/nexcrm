@@ -9436,6 +9436,79 @@ function renderDonut(data) {
           </div>
           <button onclick="regenerateWebhookSecret()" class="btn btn-ghost" style="font-size:12px;margin-top:14px;color:var(--danger)">🔄 Regenerate Secret (invalidates old URL)</button>
         </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="card-header">
+            <div class="card-title">📲 Capture Leads from Social Ads (TikTok, Instagram, Snapchat)</div>
+            <div style="font-size:12px;color:var(--text2)">How real ad-form submissions reach this CRM, platform by platform</div>
+          </div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.7">
+            None of these platforms let you "search" their users for leads — that data isn't public on any platform.
+            What <em>does</em> work: run a Lead Generation ad with an in-app form. When someone fills it out, their
+            details flow into this CRM automatically. Setup differs by platform:
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="border:1px solid var(--border);border-radius:12px;padding:14px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <svg width="16" height="16" viewBox="0 0 24 24"><defs><linearGradient id="igGradPanel" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FFDC80"/><stop offset="25%" stop-color="#FCAF45"/><stop offset="50%" stop-color="#E1306C"/><stop offset="75%" stop-color="#C13584"/><stop offset="100%" stop-color="#833AB4"/></linearGradient></defs><path fill="url(#igGradPanel)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                <strong style="font-size:13px;color:var(--text)">Instagram / Facebook</strong>
+                <span style="font-size:10px;background:rgba(34,197,94,0.12);color:#22c55e;padding:2px 8px;border-radius:20px;font-weight:700">Native webhook — fully automatic</span>
+              </div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.7">
+                Meta has a real Lead Ads API with native webhooks. Run a Lead Gen ad on Instagram or Facebook,
+                connect it to a Meta App, and submissions flow into this CRM in real time — no Zapier needed.
+                Ask your developer to deploy the <code>meta-leads-webhook</code> function and follow Meta's
+                Lead Ads webhook setup at developers.facebook.com.
+              </div>
+            </div>
+
+            <div style="border:1px solid var(--border);border-radius:12px;padding:14px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#000000"><path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 10.692 6.33 6.33 0 0 0 10.857-4.424V8.687a8.182 8.182 0 0 0 4.773 1.526V6.79a4.831 4.831 0 0 1-1.003-.104z"/></svg>
+                <strong style="font-size:13px;color:var(--text)">TikTok</strong>
+                <span style="font-size:10px;background:rgba(245,158,11,0.12);color:#f59e0b;padding:2px 8px;border-radius:20px;font-weight:700">Via Zapier/Make.com bridge</span>
+              </div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.7">
+                TikTok Lead Generation ads capture form submissions, but TikTok doesn't post directly to a custom URL.
+                Connect TikTok Lead Generation in Zapier or Make.com, then set the action to POST to your
+                <strong style="color:var(--text)">Incoming Webhook URL</strong> above with <code>source: "TikTok"</code>.
+              </div>
+            </div>
+
+            <div style="border:1px solid var(--border);border-radius:12px;padding:14px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFFC00" stroke="#333" stroke-width="0.5"><path d="M12.006.408c-2.353 0-4.86 1.31-5.34 4.55-.085.567-.07 1.165-.058 1.737l.005.272c0 .135-.069.193-.158.27-.073.063-.16.137-.27.207-.398.255-1.018.426-1.604.426-.387 0-.752-.071-1.078-.207-.226-.095-.39-.143-.524-.143-.235 0-.38.142-.392.327-.013.196.083.4.31.61.137.127.34.245.55.366.428.247.93.532.93.95 0 .27-.226.535-.677.79-.292.165-.61.27-.892.357-.273.084-.61.187-.66.412-.045.198.057.379.273.5.295.165.81.224 1.197.224.124 0 .224-.005.298-.01.064-.005.131-.01.187-.01.198 0 .342.067.51.317.115.171.246.388.43.617.348.434.83.916 1.59 1.296.696.348 1.475.524 2.317.524.073 0 .145-.002.217-.005.062-.003.124-.005.184-.005.06 0 .121.002.184.005.072.003.144.005.216.005.842 0 1.622-.176 2.318-.524.76-.38 1.242-.862 1.59-1.296.184-.23.314-.446.43-.617.168-.25.312-.317.51-.317.056 0 .123.005.187.01.074.005.174.01.298.01.387 0 .902-.06 1.197-.224.216-.121.318-.302.273-.5-.05-.225-.387-.328-.66-.412-.281-.087-.6-.192-.892-.357-.45-.255-.677-.52-.677-.79 0-.418.502-.703.93-.95.21-.121.413-.24.55-.366.227-.21.323-.414.31-.61-.013-.185-.157-.327-.392-.327-.134 0-.298.048-.524.143-.326.136-.69.207-1.078.207-.586 0-1.206-.171-1.604-.426-.11-.07-.197-.144-.27-.207-.089-.077-.158-.135-.158-.27l.005-.272c.013-.572.027-1.17-.058-1.737C16.866 1.718 14.36.408 12.006.408z"/></svg>
+                <strong style="font-size:13px;color:var(--text)">Snapchat</strong>
+                <span style="font-size:10px;background:rgba(245,158,11,0.12);color:#f59e0b;padding:2px 8px;border-radius:20px;font-weight:700">Via Zapier/Make.com bridge</span>
+              </div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.7">
+                Same approach as TikTok — Snapchat Lead Generation ads connect through Zapier or Make.com's
+                Snapchat connector, posting to your Incoming Webhook URL with <code>source: "Snapchat"</code>.
+              </div>
+            </div>
+
+            <div style="border:1px solid var(--border);border-radius:12px;padding:14px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#0A66C2"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM7.114 20.452H3.558V9h3.556v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                <strong style="font-size:13px;color:var(--text)">LinkedIn</strong>
+                <span style="font-size:10px;background:rgba(245,158,11,0.12);color:#f59e0b;padding:2px 8px;border-radius:20px;font-weight:700">Via Zapier/Make.com bridge</span>
+              </div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.7">
+                LinkedIn Lead Gen Forms also route through Zapier or Make.com's LinkedIn connector to your
+                Incoming Webhook URL with <code>source: "LinkedIn"</code>. (For LinkedIn <em>contact discovery</em>
+                instead of ad-form leads, use the Real Leads / Apollo mode in Lead Generator.)
+              </div>
+            </div>
+          </div>
+
+          <div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px 14px;margin-top:16px;font-size:12px;color:var(--text2);line-height:1.7">
+            <strong style="color:var(--accent)">Honest note:</strong> No platform exposes a database of "people interested in X" —
+            leads only exist once someone actually fills out a form. This is the same model every legitimate
+            ad platform uses; any tool claiming to "scan" social platforms for ready-made leads is either
+            doing this same ads-to-form process under the hood, or not delivering what it claims.
+          </div>
+        </div>
       </div>
 
     <!-- MOYASAR MODAL -->
