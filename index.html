@@ -2301,6 +2301,58 @@
               <select class="form-input" id="scraper-count"><option value="10">10</option><option value="20" selected>20</option><option value="40">40</option><option value="60">60 (max)</option></select>
             </div>
           </div>
+
+          <!-- ADVANCED FILTERS (collapsed by default) -->
+          <button type="button" onclick="toggleScraperFilters()" id="scraper-filters-toggle" style="display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;cursor:pointer;font-family:inherit">
+            <span style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--text2)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+              <span data-en="Advanced Filters (optional)" data-ar="فلاتر متقدمة (اختياري)">Advanced Filters (optional)</span>
+            </span>
+            <svg id="scraper-filters-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition:transform 0.2s"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div id="scraper-filters-panel" style="display:none;background:var(--bg3);border-radius:10px;padding:16px;margin-bottom:16px">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:14px">
+              <div>
+                <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Minimum Rating" data-ar="أقل تقييم">Minimum Rating</span></label>
+                <select class="form-input" id="scraper-min-rating">
+                  <option value="">Any rating</option>
+                  <option value="3">⭐ 3.0+</option>
+                  <option value="3.5">⭐ 3.5+</option>
+                  <option value="4">⭐ 4.0+</option>
+                  <option value="4.5">⭐ 4.5+</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Search Radius" data-ar="نطاق البحث">Search Radius</span></label>
+                <select class="form-input" id="scraper-radius">
+                  <option value="">Whole city (default)</option>
+                  <option value="3000">Within 3 km of city center</option>
+                  <option value="5000">Within 5 km of city center</option>
+                  <option value="10000">Within 10 km of city center</option>
+                  <option value="25000">Within 25 km of city center</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:18px">
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
+                <input type="checkbox" id="scraper-open-now" style="width:16px;height:16px;cursor:pointer"/>
+                <span data-en="Open right now only" data-ar="مفتوح الآن فقط">Open right now only</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
+                <input type="checkbox" id="scraper-must-have-phone" style="width:16px;height:16px;cursor:pointer"/>
+                <span data-en="Must have a phone number" data-ar="يجب أن يحتوي على رقم هاتف">Must have a phone number</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);cursor:pointer">
+                <input type="checkbox" id="scraper-must-have-website" style="width:16px;height:16px;cursor:pointer"/>
+                <span data-en="Must have a website" data-ar="يجب أن يحتوي على موقع إلكتروني">Must have a website</span>
+              </label>
+            </div>
+            <div style="font-size:11px;color:var(--text2);margin-top:12px;line-height:1.6">
+              Tip: Search Radius narrows results to a specific area within the city — useful for targeting one district
+              instead of the whole metro area. Leave filters unset for the broadest results.
+            </div>
+          </div>
+
           <div style="background:var(--bg3);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text2);line-height:1.6">
             Returns real business name, phone number, address, rating, and website — sourced live from Google's
             business directory (Google Places API). No fabricated data.
@@ -12051,11 +12103,24 @@ function exportLeadsCSV() {
 // ─── BUSINESS SCRAPER (Google Places — real, live business data) ──
 let _scrapedLeads = [];
 
+function toggleScraperFilters() {
+  const panel = document.getElementById('scraper-filters-panel');
+  const chevron = document.getElementById('scraper-filters-chevron');
+  const isOpen = panel.style.display === 'block';
+  panel.style.display = isOpen ? 'none' : 'block';
+  chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
 async function runScraperSearch() {
   const catSel = document.getElementById('scraper-category');
   const customInput = document.getElementById('scraper-custom-category');
   const location = document.getElementById('scraper-location')?.value;
   const count = document.getElementById('scraper-count')?.value;
+  const minRating = document.getElementById('scraper-min-rating')?.value;
+  const radius = document.getElementById('scraper-radius')?.value;
+  const openNow = document.getElementById('scraper-open-now')?.checked;
+  const mustHavePhone = document.getElementById('scraper-must-have-phone')?.checked;
+  const mustHaveWebsite = document.getElementById('scraper-must-have-website')?.checked;
 
   const category = (catSel?.value === 'custom') ? (customInput?.value || '').trim() : catSel?.value;
   if (!category) { showToast('❌ Select or enter a business category'); return; }
@@ -12070,13 +12135,31 @@ async function runScraperSearch() {
     const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/places-scraper', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
-      body: JSON.stringify({ category, location, count: Math.min(parseInt(count) || 20, 60) })
+      body: JSON.stringify({
+        category, location, count: Math.min(parseInt(count) || 20, 60),
+        minRating: minRating || null,
+        radius: radius || null,
+        openNow: !!openNow
+      })
     });
     const data = await response.json();
 
     if (data.success && data.businesses && data.businesses.length > 0) {
-      _scrapedLeads = data.businesses;
-      renderScrapedLeads(data.businesses, category, location);
+      let filtered = data.businesses;
+      // Client-side post-filters — these aren't Google search parameters, they refine what's already returned
+      if (mustHavePhone) filtered = filtered.filter(b => b.phone);
+      if (mustHaveWebsite) filtered = filtered.filter(b => b.website);
+
+      if (filtered.length === 0) {
+        loading.style.display = 'none'; btn.style.display = 'flex'; results.style.display = 'block';
+        document.getElementById('scraper-leads-list').innerHTML =
+          '<div style="text-align:center;padding:30px;color:var(--text2)"><div style="font-size:14px;font-weight:700;margin-bottom:8px">No results match your filters</div><div style="font-size:13px">Try relaxing "Must have phone/website" or widening the search.</div></div>';
+        document.getElementById('scraper-results-title').textContent = '';
+        return;
+      }
+
+      _scrapedLeads = filtered;
+      renderScrapedLeads(filtered, category, location);
     } else {
       loading.style.display = 'none'; btn.style.display = 'flex'; results.style.display = 'block';
       document.getElementById('scraper-leads-list').innerHTML =
