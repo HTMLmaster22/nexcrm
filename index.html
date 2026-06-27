@@ -2163,10 +2163,11 @@
 
         <!-- Scraper info banner (shown only in scraper mode) -->
         <div id="lg-scraper-info" style="display:none;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:14px;padding:16px 18px;margin-bottom:20px;font-size:12px;color:var(--text2);line-height:1.7">
-          <strong style="color:#10b981">How this works:</strong> This searches Google's live business directory — the same data behind Google Maps —
+          <strong style="color:#10b981" data-en="How this works:" data-ar="كيف يعمل هذا:">How this works:</strong>
+          <span data-en='This searches Google&#39;s live business directory — the same data behind Google Maps — for real companies matching your category and location, with verified phone numbers, addresses, and ratings. It does NOT scrape LinkedIn, Instagram, or TikTok directly (no tool can do that reliably or legally on-demand); for named decision-maker contacts at these companies, use "Real Verified Leads" mode afterward.' data-ar='يبحث هذا في دليل أعمال Google المباشر — نفس البيانات الموجودة في خرائط Google — عن شركات حقيقية تطابق فئتك وموقعك، مع أرقام هواتف وعناوين وتقييمات حقيقية. هذا لا يستخرج بيانات من LinkedIn أو Instagram أو TikTok مباشرة (لا توجد أداة تقوم بذلك بشكل موثوق أو قانوني عند الطلب)؛ للحصول على بيانات اتصال أصحاب القرار في هذه الشركات، استخدم وضع "عملاء حقيقيون ومتحققون" بعد ذلك.'> This searches Google's live business directory — the same data behind Google Maps —
           for real companies matching your category and location, with verified phone numbers, addresses, and ratings.
           It does <strong>not</strong> scrape LinkedIn, Instagram, or TikTok directly (no tool can do that reliably or legally on-demand);
-          for named decision-maker contacts at these companies, use "Real Verified Leads" mode afterward.
+          for named decision-maker contacts at these companies, use "Real Verified Leads" mode afterward.</span>
         </div>
 
         <!-- Upgrade prompt (hidden by default) -->
@@ -2296,7 +2297,7 @@
               <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Location" data-ar="الموقع">Location</span></label>
               <input class="form-input" id="scraper-location" autocomplete="off" oninput="handleScraperLocationInput(this.value)" onblur="setTimeout(hideScraperLocationSuggestions, 150)" placeholder="e.g. Riyadh, Saudi Arabia — or a street, district, even a specific address" value="Riyadh, Saudi Arabia" />
               <div id="scraper-location-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:50;background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-top:4px;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.15)"></div>
-              <div style="font-size:11px;color:var(--text2);margin-top:6px;line-height:1.5">Type any city, district, street, or even a slightly misspelled address — matching suggestions appear as you type.</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:6px;line-height:1.5"><span data-en="Type any city, district, street, or even a slightly misspelled address — matching suggestions appear as you type." data-ar="اكتب أي مدينة أو حي أو شارع، حتى لو كانت الكتابة غير دقيقة — تظهر اقتراحات مطابقة فور الكتابة.">Type any city, district, street, or even a slightly misspelled address — matching suggestions appear as you type.</span></div>
             </div>
             <div>
               <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Number of Results" data-ar="عدد النتائج">Number of Results</span></label>
@@ -2351,15 +2352,15 @@
               </label>
             </div>
             <div style="font-size:11px;color:var(--text2);margin-top:12px;line-height:1.6">
-              Tip: type a specific street or district in the Location field above (e.g. "King Fahd Road, Riyadh") for
+              <span data-en='Tip: type a specific street or district in the Location field above (e.g. "King Fahd Road, Riyadh") for tightly-targeted results, then optionally add a Search Radius to stay close to that exact spot. Leave filters unset for the broadest results across the whole area you typed.' data-ar='نصيحة: اكتب شارعاً أو حياً محدداً في حقل الموقع أعلاه (مثل "طريق الملك فهد، الرياض") للحصول على نتائج دقيقة، ثم أضف نطاق بحث اختياري للبقاء قريباً من هذا الموقع بالضبط. اترك الفلاتر بدون تحديد للحصول على أوسع نتائج في المنطقة التي كتبتها.'>Tip: type a specific street or district in the Location field above (e.g. "King Fahd Road, Riyadh") for
               tightly-targeted results, then optionally add a Search Radius to stay close to that exact spot.
-              Leave filters unset for the broadest results across the whole area you typed.
+              Leave filters unset for the broadest results across the whole area you typed.</span>
             </div>
           </div>
 
           <div style="background:var(--bg3);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:var(--text2);line-height:1.6">
-            Returns real business name, phone number, address, rating, and website — sourced live from Google's
-            business directory (Google Places API). No fabricated data.
+            <span data-en="Returns real business name, phone number, address, rating, and website — sourced live from Google's business directory (Google Places API). No fabricated data." data-ar="يعرض اسم النشاط الحقيقي ورقم الهاتف والعنوان والتقييم والموقع الإلكتروني — مأخوذة مباشرة من دليل أعمال Google (Google Places API). لا توجد بيانات مُصطنعة.">Returns real business name, phone number, address, rating, and website — sourced live from Google's
+            business directory (Google Places API). No fabricated data.</span>
           </div>
           <button onclick="runScraperSearch()" id="scraper-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(16,185,129,0.4)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -2367,7 +2368,7 @@
           </button>
           <div id="scraper-loading" style="display:none;text-align:center;padding:32px;color:var(--text2)">
             <div style="width:36px;height:36px;border:3px solid rgba(16,185,129,0.2);border-top-color:#10b981;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px"></div>
-            <div style="font-size:13px;font-weight:600">Searching Google's business directory...</div>
+            <div style="font-size:13px;font-weight:600"><span data-en="Searching Google's business directory..." data-ar="جاري البحث في دليل أعمال Google...">Searching Google's business directory...</span></div>
           </div>
         </div>
 
@@ -2376,7 +2377,7 @@
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
             <div><div style="font-size:14px;font-weight:700;color:var(--text)" id="scraper-results-title"></div></div>
             <div style="display:flex;gap:8px">
-              <button onclick="importAllScrapedLeads()" style="background:var(--success);color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Import All to CRM</button>
+              <button onclick="importAllScrapedLeads()" style="background:var(--success);color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><span data-en="Import All to CRM" data-ar="استيراد الكل إلى CRM">Import All to CRM</span></button>
               <button onclick="exportScrapedLeadsCSV()" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">CSV</button>
             </div>
           </div>
@@ -12177,9 +12178,10 @@ async function runScraperSearch() {
   const openNow = document.getElementById('scraper-open-now')?.checked;
   const mustHavePhone = document.getElementById('scraper-must-have-phone')?.checked;
   const mustHaveWebsite = document.getElementById('scraper-must-have-website')?.checked;
+  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
 
   const category = (catSel?.value === 'custom') ? (customInput?.value || '').trim() : catSel?.value;
-  if (!category) { showToast('❌ Select or enter a business category'); return; }
+  if (!category) { showToast(isAr ? '❌ اختر أو أدخل فئة النشاط' : '❌ Select or enter a business category'); return; }
 
   const btn = document.getElementById('scraper-btn');
   const loading = document.getElementById('scraper-loading');
@@ -12208,8 +12210,9 @@ async function runScraperSearch() {
 
       if (filtered.length === 0) {
         loading.style.display = 'none'; btn.style.display = 'flex'; results.style.display = 'block';
-        document.getElementById('scraper-leads-list').innerHTML =
-          '<div style="text-align:center;padding:30px;color:var(--text2)"><div style="font-size:14px;font-weight:700;margin-bottom:8px">No results match your filters</div><div style="font-size:13px">Try relaxing "Must have phone/website" or widening the search.</div></div>';
+        document.getElementById('scraper-leads-list').innerHTML = isAr
+          ? '<div style="text-align:center;padding:30px;color:var(--text2)"><div style="font-size:14px;font-weight:700;margin-bottom:8px">لا توجد نتائج تطابق الفلاتر</div><div style="font-size:13px">حاول تخفيف شرط "يجب أن يحتوي على هاتف/موقع" أو وسّع نطاق البحث.</div></div>'
+          : '<div style="text-align:center;padding:30px;color:var(--text2)"><div style="font-size:14px;font-weight:700;margin-bottom:8px">No results match your filters</div><div style="font-size:13px">Try relaxing "Must have phone/website" or widening the search.</div></div>';
         document.getElementById('scraper-results-title').textContent = '';
         return;
       }
@@ -12218,17 +12221,20 @@ async function runScraperSearch() {
       renderScrapedLeads(filtered, category, location);
     } else {
       loading.style.display = 'none'; btn.style.display = 'flex'; results.style.display = 'block';
+      const noResultsTitle = isAr ? 'لا توجد نتائج' : 'No results found';
+      const noResultsDefault = isAr ? 'جرّب فئة أو موقعاً مختلفاً.' : 'Try a different category or location.';
       document.getElementById('scraper-leads-list').innerHTML =
-        '<div style="text-align:center;padding:30px;color:var(--text2)"><div style="font-size:14px;font-weight:700;margin-bottom:8px">No results found</div><div style="font-size:13px">' +
-        (data.error || 'Try a different category or location.') + '</div></div>';
+        '<div style="text-align:center;padding:30px;color:var(--text2)"><div style="font-size:14px;font-weight:700;margin-bottom:8px">' + noResultsTitle + '</div><div style="font-size:13px">' +
+        (data.error || noResultsDefault) + '</div></div>';
       document.getElementById('scraper-results-title').textContent = '';
       return;
     }
   } catch (e) {
     console.error('runScraperSearch error:', e);
     loading.style.display = 'none'; btn.style.display = 'flex'; results.style.display = 'block';
-    document.getElementById('scraper-leads-list').innerHTML =
-      '<div style="text-align:center;padding:30px;color:var(--danger)">❌ Search failed — check console for details.</div>';
+    document.getElementById('scraper-leads-list').innerHTML = isAr
+      ? '<div style="text-align:center;padding:30px;color:var(--danger)">❌ فشل البحث — راجع الـ console للتفاصيل.</div>'
+      : '<div style="text-align:center;padding:30px;color:var(--danger)">❌ Search failed — check console for details.</div>';
     return;
   }
 
@@ -12236,21 +12242,26 @@ async function runScraperSearch() {
 }
 
 function renderScrapedLeads(businesses, category, location) {
+  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
   const list = document.getElementById('scraper-leads-list');
   const title = document.getElementById('scraper-results-title');
   title.innerHTML = '<span style="display:flex;align-items:center;gap:8px"><span style="background:rgba(16,185,129,0.12);color:#10b981;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">LIVE</span>' +
-    businesses.length + ' businesses found in ' + location + '</span>';
+    businesses.length + (isAr ? ' نشاط تم العثور عليه في ' : ' businesses found in ') + location + '</span>';
 
   list.innerHTML = businesses.map((b, i) => {
     const phone = (b.phone || '').replace(/[\s\-\(\)]/g, '');
     const waLink = phone && phone.length > 7 ? 'https://wa.me/' + phone.replace('+', '') + '?text=' + encodeURIComponent('Hi ' + (b.name || '') + ', reaching out regarding your business.') : null;
     const stars = b.rating ? '⭐ ' + b.rating + (b.rating_count ? ' (' + b.rating_count + ')' : '') : '';
+    const openLabel = isAr ? ' · 🟢 مفتوح الآن' : ' · 🟢 Open now';
+    const closedLabel = isAr ? ' · 🔴 مغلق' : ' · 🔴 Closed';
+    const waText = isAr ? 'واتساب' : 'WhatsApp';
+    const crmText = isAr ? '+ إضافة' : '+ CRM';
     return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px" onmouseover="this.style.borderColor='#10b981'" onmouseout="this.style.borderColor='var(--border)'">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
         <div style="flex:1;min-width:200px">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
             <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#10b981,#059669);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0">${(b.name||'?')[0].toUpperCase()}</div>
-            <div><div style="font-size:13px;font-weight:700;color:var(--text)">${b.name||'—'}</div><div style="font-size:11px;color:var(--text2)">${stars}${b.open_now!==undefined?(b.open_now?' · 🟢 Open now':' · 🔴 Closed'):''}</div></div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--text)">${b.name||'—'}</div><div style="font-size:11px;color:var(--text2)">${stars}${b.open_now!==undefined?(b.open_now?openLabel:closedLabel):''}</div></div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
             <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px">📞 ${b.phone||'—'}</div>
@@ -12259,8 +12270,8 @@ function renderScrapedLeads(businesses, category, location) {
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;min-width:110px">
-          ${waLink?`<a href="${waLink}" target="_blank" style="background:#25d366;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;text-align:center">WhatsApp</a>`:''}
-          <button onclick="importSingleScrapedLead(${i})" id="scraper-import-btn-${i}" style="background:#10b981;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ CRM</button>
+          ${waLink?`<a href="${waLink}" target="_blank" style="background:#25d366;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;text-align:center">${waText}</a>`:''}
+          <button onclick="importSingleScrapedLead(${i})" id="scraper-import-btn-${i}" style="background:#10b981;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">${crmText}</button>
         </div>
       </div>
     </div>`;
