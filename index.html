@@ -10620,73 +10620,6 @@ function generateFallbackIdeas(brand, industry, goal, lang, platform) {
   ];
 }
 
-function renderCampaignIdeas(ideas, brand, lang) {
-  const container = document.getElementById('ai-ideas-content');
-  container.innerHTML = '';
-  const colors = ['#8b5cf6','#3b82f6','#06b6d4','#10b981'];
-
-  ideas.forEach(function(idea, i) {
-    const color = colors[i % colors.length];
-    const div = document.createElement('div');
-    div.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px';
-
-    const scriptSafe = idea.script.replace(/"/g,'&quot;');
-    const captionSafe = idea.caption.replace(/"/g,'&quot;');
-
-    div.innerHTML =
-      '<div style="background:' + color + '18;border-bottom:1px solid ' + color + '22;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">' +
-        '<div style="display:flex;align-items:center;gap:10px">' +
-          '<div style="width:28px;height:28px;background:' + color + ';border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">' + (i+1) + '</div>' +
-          '<div style="font-weight:700;font-size:14px;color:var(--text)">' + idea.name + '</div>' +
-        '</div>' +
-        '<button onclick="this.closest(\'div\').nextElementSibling.style.display=this.closest(\'div\').nextElementSibling.style.display===\'none\'?\'flex\':\'none\'" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;font-family:inherit">▾</button>' +
-      '</div>' +
-      '<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">' +
-        '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px">' +
-          '<div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">HOOK — First 3 Seconds</div>' +
-          '<div style="font-size:14px;font-weight:600;color:var(--text)">' + idea.hook + '</div>' +
-        '</div>' +
-        '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px">' +
-          '<div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
-            '<span>REEL SCRIPT</span>' +
-            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
-          '</div>' +
-          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.script + '</div>' +
-        '</div>' +
-        '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;padding:12px">' +
-          '<div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
-            '<span>READY-TO-POST CAPTION</span>' +
-            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--success);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
-          '</div>' +
-          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.caption + '</div>' +
-        '</div>' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
-          '<div style="font-size:12px;color:var(--text2)"><strong style="color:var(--text)">CTA:</strong> ' + idea.cta + '</div>' +
-          '<div style="display:flex;gap:8px">' +
-            '<button onclick="useCampaignIdea(\'email\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.caption.replace(/'/g,"\\'").replace(/\n/g,' ') + '\')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for Email</button>' +
-            '<button onclick="useCampaignIdea(\'sms\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.cta.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for SMS</button>' +
-            '<button onclick="generateVideoFromIdea(' + i + ')" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video</button>' +
-          '</div>' +
-        '</div>' +
-        '<div id="video-result-' + i + '" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px"></div>' +
-      '</div>';
-    container.appendChild(div);
-  });
-
-  document.getElementById('ai-ideas-result').style.display = 'block';
-}
-
-function useCampaignIdea(channel, name, body) {
-  switchCampTab(channel);
-  if(channel === 'email') {
-    var n = document.getElementById('camp-name'); if(n) n.value = name;
-    var b = document.getElementById('camp-body'); if(b) b.value = body;
-  } else if(channel === 'sms') {
-    var n2 = document.getElementById('sms-name'); if(n2) n2.value = name;
-    var b2 = document.getElementById('sms-body'); if(b2) b2.value = body;
-  }
-  showToast('Campaign idea loaded — ready to send!');
-}
 
 
 // ═══════════════════════════════════════════════════════
@@ -10972,73 +10905,6 @@ function generateFallbackIdeas(brand, industry, goal, lang, platform) {
   ];
 }
 
-function renderCampaignIdeas(ideas, brand, lang) {
-  const container = document.getElementById('ai-ideas-content');
-  container.innerHTML = '';
-  const colors = ['#8b5cf6','#3b82f6','#06b6d4','#10b981'];
-
-  ideas.forEach(function(idea, i) {
-    const color = colors[i % colors.length];
-    const div = document.createElement('div');
-    div.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:4px';
-
-    const scriptSafe = idea.script.replace(/"/g,'&quot;');
-    const captionSafe = idea.caption.replace(/"/g,'&quot;');
-
-    div.innerHTML =
-      '<div style="background:' + color + '18;border-bottom:1px solid ' + color + '22;padding:14px 18px;display:flex;align-items:center;justify-content:space-between">' +
-        '<div style="display:flex;align-items:center;gap:10px">' +
-          '<div style="width:28px;height:28px;background:' + color + ';border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:12px">' + (i+1) + '</div>' +
-          '<div style="font-weight:700;font-size:14px;color:var(--text)">' + idea.name + '</div>' +
-        '</div>' +
-        '<button onclick="this.closest(\'div\').nextElementSibling.style.display=this.closest(\'div\').nextElementSibling.style.display===\'none\'?\'flex\':\'none\'" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;font-family:inherit">▾</button>' +
-      '</div>' +
-      '<div style="padding:16px 18px;display:flex;flex-direction:column;gap:12px">' +
-        '<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:12px">' +
-          '<div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">HOOK — First 3 Seconds</div>' +
-          '<div style="font-size:14px;font-weight:600;color:var(--text)">' + idea.hook + '</div>' +
-        '</div>' +
-        '<div style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:12px">' +
-          '<div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
-            '<span>REEL SCRIPT</span>' +
-            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);color:var(--accent);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
-          '</div>' +
-          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.script + '</div>' +
-        '</div>' +
-        '<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;padding:12px">' +
-          '<div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
-            '<span>READY-TO-POST CAPTION</span>' +
-            '<button onclick="navigator.clipboard.writeText(this.closest(\'div\').nextElementSibling.textContent).then(()=>{this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',2000)})" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--success);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit">Copy</button>' +
-          '</div>' +
-          '<div style="font-size:13px;color:var(--text2);line-height:1.8;white-space:pre-line">' + idea.caption + '</div>' +
-        '</div>' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
-          '<div style="font-size:12px;color:var(--text2)"><strong style="color:var(--text)">CTA:</strong> ' + idea.cta + '</div>' +
-          '<div style="display:flex;gap:8px">' +
-            '<button onclick="useCampaignIdea(\'email\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.caption.replace(/'/g,"\\'").replace(/\n/g,' ') + '\')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:var(--accent);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for Email</button>' +
-            '<button onclick="useCampaignIdea(\'sms\',\'' + idea.name.replace(/'/g,"\\'") + '\',\'' + idea.cta.replace(/'/g,"\\'") + '\')" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:var(--success);padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Use for SMS</button>' +
-            '<button onclick="generateVideoFromIdea(' + i + ')" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> Generate Video</button>' +
-          '</div>' +
-        '</div>' +
-        '<div id="video-result-' + i + '" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px"></div>' +
-      '</div>';
-    container.appendChild(div);
-  });
-
-  document.getElementById('ai-ideas-result').style.display = 'block';
-}
-
-function useCampaignIdea(channel, name, body) {
-  switchCampTab(channel);
-  if(channel === 'email') {
-    var n = document.getElementById('camp-name'); if(n) n.value = name;
-    var b = document.getElementById('camp-body'); if(b) b.value = body;
-    } else if(channel === 'sms') {
-    var n2 = document.getElementById('sms-name'); if(n2) n2.value = name;
-    var b2 = document.getElementById('sms-body'); if(b2) b2.value = body;
-  }
-  showToast('Campaign idea loaded — ready to send!');
-}
 
 // ── VIDEO MODAL STYLES ───────────────────────────────────────────────────────
 (function() {
@@ -11232,7 +11098,7 @@ function selectPrompt(el, idx) {
 
 async function startVideoGeneration() {
   var state = _videoModalState;
-  if(!state.selectedPrompt) return;
+  if(!state.selectedPrompt) { showToast('⚠️ Pick a prompt angle first'); return; }
 
   closeVideoModal();
 
@@ -11332,16 +11198,6 @@ function elSeek(idx) {
   var audio = document.getElementById('el-audio-' + idx);
   var video = document.getElementById('el-video-' + idx);
   if(audio && video) audio.currentTime = video.currentTime;
-}
-
-// Patch renderCampaignIdeas to store ideas
-var _origRenderCI = window.renderCampaignIdeas;
-if(typeof renderCampaignIdeas === 'function') {
-  var _patchedRender = renderCampaignIdeas;
-  window.renderCampaignIdeas = function(ideas, brand, lang) {
-    _lastGeneratedIdeas = ideas;
-    _patchedRender(ideas, brand, lang);
-  };
 }
 
 
@@ -11489,6 +11345,7 @@ function generateFallbackIdeas(brand, industry, goal, lang, platform) {
 }
 
 function renderCampaignIdeas(ideas, brand, lang) {
+  _lastGeneratedIdeas = ideas; // fixes Generate Video modal having no data to work with
   const container = document.getElementById('ai-ideas-content');
   container.innerHTML = '';
   const colors = ['#8b5cf6','#3b82f6','#06b6d4','#10b981'];
