@@ -11110,12 +11110,13 @@ async function startVideoGeneration() {
     resultDiv.style.display = 'block';
     resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)">' +
       '<div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>' +
-      'Submitting to Runway Gen-3...</div>';
+      'Submitting to Kling...</div>';
   }
 
   var EDGE_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-video';
 
   try {
+    // ── STAGE 1: submit silent video + generate narration ──
     var submitRes = await fetch(EDGE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -11131,45 +11132,87 @@ async function startVideoGeneration() {
     var reqId = submitData.requestId;
     var audioBase64 = submitData.audioBase64 || null;
     var voiceName = submitData.voiceName || '';
-    var voiceLang = submitData.language || 'ar';
     console.log('Audio ready:', audioBase64 ? 'YES (' + voiceName + ')' : 'NO');
     if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video + AI voice (' + (voiceName || 'Arabic') + ')...</div>';
 
-    var videoUrl = null;
+    // ── STAGE 2: poll the silent video job. On completion, the edge function automatically
+    //    submits the lip-sync merge job and hands back a lipsyncRequestId to poll next. ──
+    var lipsyncReqId = null;
+    var finalVideoUrl = null;
+    var finalHasAudio = false;
+
     for(var attempt = 0; attempt < 72; attempt++) {
       await new Promise(function(r) { setTimeout(r, 5000); });
       var checkRes = await fetch(EDGE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'check', requestId: reqId })
+        body: JSON.stringify({ action: 'check', requestId: reqId, audioBase64: audioBase64 })
       });
       var checkText = await checkRes.text();
       var checkData;
       try { checkData = JSON.parse(checkText); } catch(e) { continue; }
-      console.log('Check:', checkData.status);
+      console.log('Check:', checkData.status, '| stage:', checkData.stage);
 
-      if(checkData.status === 'COMPLETED') { console.log('COMPLETED full response:', JSON.stringify(checkData)); var raw = checkData.raw || {}; videoUrl = checkData.videoUrl || checkData.video_url || (raw.video && raw.video.url) || raw.video_url || raw.url || null; console.log('Extracted videoUrl:', videoUrl); break; }
       if(checkData.status === 'FAILED') throw new Error('Video generation failed on FAL side');
+
+      if(checkData.status === 'COMPLETED') {
+        if(checkData.stage === 'final') {
+          // No audio was available, or lipsync submission itself failed — silent video stands as final
+          finalVideoUrl = checkData.videoUrl;
+          finalHasAudio = !!checkData.hasAudio;
+          break;
+        }
+        if(checkData.stage === 'lipsync' && checkData.lipsyncRequestId) {
+          lipsyncReqId = checkData.lipsyncRequestId;
+          break; // move to stage 3 polling below
+        }
+      }
 
       var secs = (attempt + 1) * 5;
       if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Generating video... ' + secs + 's elapsed</div>';
     }
 
-    if(!videoUrl) throw new Error('Timed out after 6 minutes — please try again');
+    // ── STAGE 3: poll the lip-sync merge job (only runs if stage 2 produced a lipsync job) ──
+    if(lipsyncReqId && !finalVideoUrl) {
+      if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Syncing voice to lips...</div>';
 
-    var idxKey = state.ideaIndex;
-    var hasAudio = audioBase64 ? true : false;
+      for(var attempt2 = 0; attempt2 < 60; attempt2++) {
+        await new Promise(function(r) { setTimeout(r, 5000); });
+        var lipsyncRes = await fetch(EDGE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'checkLipsync', requestId: lipsyncReqId })
+        });
+        var lipsyncText = await lipsyncRes.text();
+        var lipsyncData;
+        try { lipsyncData = JSON.parse(lipsyncText); } catch(e) { continue; }
+        console.log('CheckLipsync:', lipsyncData.status);
+
+        if(lipsyncData.status === 'FAILED') throw new Error('Lip-sync merge failed on FAL side');
+        if(lipsyncData.status === 'COMPLETED' && lipsyncData.videoUrl) {
+          finalVideoUrl = lipsyncData.videoUrl;
+          finalHasAudio = !!lipsyncData.hasAudio;
+          break;
+        }
+
+        var secs2 = (attempt2 + 1) * 5;
+        if(resultDiv) resultDiv.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2)"><div style="width:32px;height:32px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px"></div>Syncing voice to lips... ' + secs2 + 's elapsed</div>';
+      }
+    }
+
+    if(!finalVideoUrl) throw new Error('Timed out — please try again');
+
+    // One single, real video file — has embedded synced audio if finalHasAudio is true.
+    // No separate <audio> element, no manual JS sync, no silent download: this URL IS the
+    // complete file in both cases.
     if(resultDiv) resultDiv.innerHTML =
-      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:8px">✅ VIDEO READY ' + (hasAudio ? '🔊 Arabic Voice' : '') + '</div>' +
-      (hasAudio ? '<audio id="el-audio-' + idxKey + '" src="' + audioBase64 + '"></audio>' : '') +
-      '<video id="el-video-' + idxKey + '" src="' + videoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"' +
-      (hasAudio ? ' onplay="elPlay(' + idxKey + ')" onpause="elPause(' + idxKey + ')" onseeked="elSeek(' + idxKey + ')" onended="elPause(' + idxKey + ')"' : '') +
-      '></video>' +
-      (hasAudio ? '<div style="font-size:10px;color:var(--text2);text-align:center;margin:6px 0">🎙️ Saudi Arabic voiceover — press play</div>' : '') +
+      '<div style="font-size:12px;font-weight:700;color:#8b5cf6;margin-bottom:8px">✅ VIDEO READY ' + (finalHasAudio ? '🔊 Synced Voice' : '(silent)') + '</div>' +
+      '<video src="' + finalVideoUrl + '" controls playsinline style="width:100%;max-width:280px;border-radius:12px;display:block;margin:0 auto 12px"></video>' +
+      (finalHasAudio ? '<div style="font-size:10px;color:var(--text2);text-align:center;margin:6px 0">🎙️ ' + (voiceName || 'Arabic voice') + ' — lips synced to audio</div>' : '<div style="font-size:10px;color:var(--text2);text-align:center;margin:6px 0">No narration was generated for this clip</div>') +
       '<div style="text-align:center;margin-top:8px">' +
-        '<a href="' + videoUrl + '" download target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">⬇ Download Video</a>' +
+        '<a href="' + finalVideoUrl + '" download target="_blank" style="background:linear-gradient(135deg,#8b5cf6,#3b82f6);color:#fff;padding:8px 20px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:inline-block">⬇ Download Video</a>' +
       '</div>';
-    showToast('🎬 Video ' + (hasAudio ? '+ Arabic Voice' : '') + ' ready!');
+    showToast('🎬 Video ' + (finalHasAudio ? '+ synced voice' : '') + ' ready!');
 
   } catch(e) {
     if(resultDiv) resultDiv.innerHTML = '<div style="color:var(--danger);font-size:12px;padding:10px">Error: ' + e.message + '</div>';
@@ -11183,22 +11226,6 @@ async function startVideoGeneration() {
 }
 
 function generateVideoFromIdea(index) { openVideoModal(index); }
-
-// ElevenLabs audio sync with video
-function elPlay(idx) {
-  var audio = document.getElementById('el-audio-' + idx);
-  var video = document.getElementById('el-video-' + idx);
-  if(audio && video) { audio.currentTime = video.currentTime; audio.play(); }
-}
-function elPause(idx) {
-  var audio = document.getElementById('el-audio-' + idx);
-  if(audio) audio.pause();
-}
-function elSeek(idx) {
-  var audio = document.getElementById('el-audio-' + idx);
-  var video = document.getElementById('el-video-' + idx);
-  if(audio && video) audio.currentTime = video.currentTime;
-}
 
 
 
