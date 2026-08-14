@@ -8720,7 +8720,7 @@ async function loadTeam() {
   const list = document.getElementById('team-list');
   try {
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
-    // Get org members
+    // Get org members — source of truth for who has access + their role
     const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?select=*&order=created_at.asc' + orgFilter, { headers: HEADERS });
     const data = await r.json();
     hideLoader();
@@ -8728,21 +8728,30 @@ async function loadTeam() {
       list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No team members yet — invite your first one!</div>';
       return;
     }
+
+    // profiles: real email/name, auto-synced from auth.users on every signup
+    const r2 = await fetch(SUPABASE_URL + '/rest/v1/profiles?select=id,email,full_name', { headers: HEADERS });
+    const pRaw = await r2.json();
+    const profileMap = {};
+    (Array.isArray(pRaw) ? pRaw : []).forEach(p => { profileMap[p.id] = p; });
+
     teamMembers = data;
+    const validRoles = ['admin','manager','sales'];
     const roleColors = {
       admin: { bg:'rgba(139,92,246,0.15)', color:'#c4b5fd', icon:'👑' },
       manager: { bg:'rgba(59,130,246,0.15)', color:'#93c5fd', icon:'🧑‍💼' },
       sales: { bg:'rgba(16,185,129,0.15)', color:'#6ee7b7', icon:'🎯' },
-      inactive: { bg:'rgba(148,163,184,0.1)', color:'#94a3b8', icon:'⏸️' }
     };
     list.innerHTML = data.map(m => {
-      const profile = m.profiles || {};
-      const name = profile.full_name || m.full_name || m.name || profile.email?.split('@')[0] || m.email?.split('@')[0] || ('Member ' + (m.user_id||'').slice(0,6));
-      const email = profile.email || m.email || m.user_id || '—';
+      const p = profileMap[m.user_id];
+      const email = p?.email || '(email hidden)';
+      const name = p?.full_name || p?.email?.split('@')[0] || ('Member ' + (m.user_id||'').slice(0,6));
       const initials = (name||'?')[0].toUpperCase();
-      const role = m.active ? (m.role||'sales') : 'inactive';
-      const rc = roleColors[role] || roleColors.sales;
-      const isMe = currentUser && (m.email === currentUser.email || m.user_id === currentUser.id);
+      let role = m.role || 'sales';
+      if(!validRoles.includes(role)) role = 'sales'; // normalize legacy values (e.g. 'member')
+      const rc = roleColors[role];
+      const isMe = currentUser && currentUser.id === m.user_id;
+      const safeName = (name||'').replace(/'/g, "\\'");
       return `<div class="team-card" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;margin-bottom:10px">
         <div style="width:46px;height:46px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff">${initials}</div>
         <div style="flex:1;min-width:0">
@@ -8757,51 +8766,27 @@ async function loadTeam() {
         </div>
           <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
           ${!isMe ?
-          '<select onchange="changeTeamMemberRole(\'' + (m.id||m.user_id) + '\', this.value)" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer;font-family:inherit">' +
+          '<select onchange="changeTeamMemberRole(\'' + m.user_id + '\', this.value)" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer;font-family:inherit">' +
           '<option value=\"admin\" ' + (role==='admin'?'selected':'') + '>👑 Admin</option>' +
           '<option value=\"manager\" ' + (role==='manager'?'selected':'') + '>🧑‍💼 Manager</option>' +
           '<option value=\"sales\" ' + (role==='sales'?'selected':'') + '>🎯 Sales</option>' +
           '</select>' +
-          '<button onclick="toggleMemberActive(\'' + (m.id||m.user_id) + '\', ' + m.active + ')" style="background:' + (m.active?'rgba(239,68,68,0.1)':'rgba(16,185,129,0.1)') + ';border:1px solid ' + (m.active?'rgba(239,68,68,0.2)':'rgba(16,185,129,0.2)') + ';color:' + (m.active?'var(--danger)':'var(--success)') + ';border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer;font-family:inherit">' +
-          (m.active ? '🚫 Deactivate' : '✅ Activate') +
-          '</button>'
+          '<button onclick="removeTeamMember(\'' + m.user_id + '\',\'' + safeName + '\')" style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:var(--danger);border-radius:8px;padding:5px 8px;font-size:11px;cursor:pointer;font-family:inherit">🚫 Remove</button>'
           : '<div style="font-size:11px;color:var(--text2);padding:4px">Your account</div>'}
         </div>
       </div>`; }).join('');
   } catch(e) { hideLoader(); console.error('loadTeam error:', e); list.innerHTML = '<div style="color:var(--danger);padding:20px">Error: ' + e.message + '</div>'; }
 }
 
-async function changeRole(id, role) {
+async function removeTeamMember(userId, name) {
+  if(!confirm('Remove ' + name + ' from NexCRM? They will lose all access immediately.')) return;
   try {
-    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + id, {
-      method: 'PATCH', headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ role })
+    await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + userId, {
+      method: 'DELETE', headers: { ...HEADERS, 'Prefer': 'return=minimal' }
     });
-    showToast('✅ Role updated!');
+    showToast('🗑️ ' + name + ' removed.');
     loadTeam();
-  } catch(e) { showToast('❌ Error updating role'); }
-}
-
-async function toggleMember(id, active) {
-  try {
-    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + id, {
-      method: 'PATCH', headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ active: !active })
-    });
-    showToast(active ? '🚫 Member deactivated' : '✅ Member activated');
-    loadTeam();
-  } catch(e) { showToast('❌ Error'); }
-}
-
-async function removeMember(id) {
-  if(!confirm('Remove this team member?')) return;
-  try {
-    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + id, {
-      method: 'DELETE', headers: HEADERS
-    });
-    showToast('🗑️ Member removed');
-    loadTeam();
-  } catch(e) { showToast('❌ Error'); }
+  } catch(e) { showToast('❌ Error: ' + e.message); }
 }
 
 function openAddMemberModal() {
@@ -8944,16 +8929,9 @@ async function createMemberAccount() {
   }
 }
 
-async function changeTeamMemberRole(memberId, newRole) {
+async function changeTeamMemberRole(userId, newRole) {
   try {
-    // Update in team_members
-    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + memberId, {
-      method: 'PATCH',
-      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ role: newRole })
-    });
-    // Also update in org_members if exists
-    await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + memberId, {
+    await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + userId, {
       method: 'PATCH',
       headers: { ...HEADERS, 'Prefer': 'return=minimal' },
       body: JSON.stringify({ role: newRole })
@@ -8962,24 +8940,6 @@ async function changeTeamMemberRole(memberId, newRole) {
     showToast('✅ Role changed to ' + (roleLabels[newRole]||newRole));
     loadTeam();
   } catch(e) { showToast('❌ Error changing role'); }
-}
-
-async function toggleMemberActive(memberId, currentlyActive) {
-  const newState = !currentlyActive;
-  try {
-    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + memberId, {
-      method: 'PATCH',
-      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ active: newState })
-    });
-    await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + memberId, {
-      method: 'PATCH',
-      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ active: newState })
-    });
-    showToast(newState ? '✅ Member activated' : '🚫 Member deactivated');
-    loadTeam();
-  } catch(e) { showToast('❌ Error updating member'); }
 }
 
 async function addTeamMember() {
