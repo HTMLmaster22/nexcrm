@@ -3307,6 +3307,16 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
       </div>
     </div>
 
+    <!-- AI LEAD SCORE MODAL (CSS already existed for this; the HTML shell was missing) -->
+    <div class="ai-modal-overlay" id="ai-modal">
+      <div class="ai-modal">
+        <div class="ai-modal-header">
+          <div class="ai-modal-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> AI Lead Score</div>
+          <div class="modal-close" onclick="closeAIModal()">✕</div>
+        </div>
+        <div id="ai-modal-content"></div>
+      </div>
+    </div>
 
     <!-- IMPORT MODAL -->
     <div class="modal-overlay" id="invite-modal">
@@ -4722,12 +4732,6 @@ async function submitOnboarding() {
         headers: { ...HEADERS, 'Prefer': 'return=minimal' },
         body: JSON.stringify({ user_id: userId, org_id: orgId, role: 'admin' })
       });
-      // Also add to team_members
-      await fetch(SUPABASE_URL + '/rest/v1/team_members', {
-        method: 'POST',
-        headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ name: adminName, email, role: 'admin', active: true, org_id: orgId })
-      });
     }
 
     // Step 4: Add to userOrgs and refresh
@@ -5066,8 +5070,13 @@ async function sendOutgoingWebhook(eventType, data) {
 async function sendNewLeadAlert(lead) {
   if (!currentOrg || !currentOrg.id) return;
   try {
-    // Fetch org admins to notify
-    const r = await fetch(SUPABASE_URL + '/rest/v1/team_members?org_id=eq.' + currentOrg.id + '&role=eq.admin&active=eq.true&select=email,name', { headers: HEADERS });
+    // Fetch org admins to notify: org_members has the role, profiles has the real email
+    const omR = await fetch(SUPABASE_URL + '/rest/v1/org_members?org_id=eq.' + currentOrg.id + '&role=eq.admin&select=user_id', { headers: HEADERS });
+    const omData = await omR.json();
+    const adminIds = (Array.isArray(omData) ? omData : []).map(m => m.user_id).filter(Boolean);
+    if (!adminIds.length) return;
+    const idFilter = adminIds.map(id => '"' + id + '"').join(',');
+    const r = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=in.(' + idFilter + ')&select=email', { headers: HEADERS });
     const admins = await r.json();
     if (!Array.isArray(admins) || admins.length === 0) return;
 
@@ -8649,28 +8658,6 @@ async function changeUserRole(memberId, userId, newRole) {
   } catch(e) { showToast('❌ Error: ' + e.message); }
 }
 
-async function toggleUserActive(memberId, userId, currentlyActive) {
-  const newState = !currentlyActive;
-  try {
-    await fetch(SUPABASE_URL + '/rest/v1/org_members?user_id=eq.' + userId, {
-      method:'PATCH', headers:{ ...HEADERS, 'Prefer':'return=minimal' },
-      body:JSON.stringify({ active:newState })
-    });
-    await fetch(SUPABASE_URL + '/rest/v1/team_members?id=eq.' + memberId, {
-      method:'PATCH', headers:{ ...HEADERS, 'Prefer':'return=minimal' },
-      body:JSON.stringify({ active:newState })
-    });
-    const u = _allUsersCache.find(x => x.id === memberId);
-    if(u) u.active = newState;
-    showToast(newState ? '✅ User activated' : '🚫 User deactivated');
-    renderUsersList(_allUsersCache);
-    // Update stats
-    const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
-    setEl('stat-active-users', _allUsersCache.filter(u=>u.active).length);
-    setEl('stat-inactive-users', _allUsersCache.filter(u=>!u.active).length);
-  } catch(e) { showToast('❌ Error: ' + e.message); }
-}
-
 async function loadTeam() {
   showLoader('Loading team...');
   const list = document.getElementById('team-list');
@@ -9312,10 +9299,19 @@ async function populateAssignDropdown() {
   const sel = document.getElementById('f-assign');
   if(!sel) return;
   try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/team_members?select=name&active=eq.true&order=name.asc', { headers: HEADERS });
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const omR = await fetch(SUPABASE_URL + '/rest/v1/org_members?select=user_id' + orgFilter, { headers: HEADERS });
+    const omData = await omR.json();
+    const ids = (Array.isArray(omData) ? omData : []).map(m => m.user_id).filter(Boolean);
+    if(!ids.length) { sel.innerHTML = '<option value="">— No team members yet —</option>'; return; }
+    const idFilter = ids.map(id => '"' + id + '"').join(',');
+    const r = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=in.(' + idFilter + ')&select=full_name,email&order=full_name.asc', { headers: HEADERS });
     const data = await r.json();
     if(r.ok && data && data.length > 0) {
-      sel.innerHTML = '<option value="">— Assign To —</option>' + data.map(m => '<option value="' + m.name + '">' + m.name + '</option>').join('');
+      sel.innerHTML = '<option value="">— Assign To —</option>' + data.map(m => {
+        const n = m.full_name || m.email;
+        return '<option value="' + n + '">' + n + '</option>';
+      }).join('');
     } else {
       sel.innerHTML = '<option value="">— No team members yet —</option>';
     }
@@ -10451,58 +10447,7 @@ function autoApplyBranding() {
 <script>
 
 // ─── VIEW AS CLIENT ──────────────────────────────────────────
-
-async function viewAsClient(orgId, orgName) {
-  if (!confirm('Switch to view ' + orgName + ' workspace?\n\nA banner will show at the top. This access is logged for transparency.')) return;
-
-  // Save admin state
-  _adminOrigOrg = currentOrg;
-  _isViewingAsClient = true;
-
-  // Log the admin access to Supabase
-  try {
-    await fetch(SUPABASE_URL + '/rest/v1/admin_access_log', {
-      method: 'POST',
-      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({
-        admin_id: currentUser.id,
-        org_id: orgId,
-        org_name: orgName,
-        accessed_at: new Date().toISOString()
-      })
-    });
-  } catch(e) { /* table may not exist yet, ignore */ }
-
-  // Switch to client org
-  const allOrgsR = await fetch(SUPABASE_URL + '/rest/v1/organizations?id=eq.' + orgId + '&select=*', { headers: HEADERS });
-  const allOrgs = await allOrgsR.json();
-  if (allOrgs && allOrgs[0]) {
-    currentOrg = allOrgs[0];
-    // Show banner
-    document.getElementById('view-as-client-banner').classList.add('active');
-    document.getElementById('view-as-banner-name').textContent = '👁️ Viewing as: ' + orgName;
-    document.body.classList.add('viewing-as-client');
-    // Navigate to dashboard
-    nav('dashboard', document.querySelector('.nav-item'));
-    // Reload data for this org
-    await loadLeads();
-    updateLeadStats();
-    showToast('👁️ Now viewing ' + orgName + ' workspace');
-  }
-}
-
-function exitViewAsClient() {
-  if (!_adminOrigOrg) return;
-  currentOrg = _adminOrigOrg;
-  _isViewingAsClient = false;
-  _adminOrigOrg = null;
-  document.getElementById('view-as-client-banner').classList.remove('active');
-  document.body.classList.remove('viewing-as-client');
-  nav('admin', document.getElementById('admin-nav-item'));
-  adminTab('clients', document.querySelector('.admin-tab'));
-  loadLeads();
-  showToast('✅ Back to your admin view');
-}
+// Implementation lives further down, alongside its state variables.
 
 // ═══════════════════════════════════════════════════════
 // AI CAMPAIGN IDEAS GENERATOR
@@ -10954,7 +10899,6 @@ function openVideoModal(index) {
     b.classList.toggle('active', b.dataset.dur === '16');
   });
   document.getElementById('vm-generate-btn').classList.remove('ready');
-  document.getElementById('vm-modal-overlay');
 
   // Show modal
   document.getElementById('video-modal-overlay').classList.add('open');
@@ -12156,7 +12100,6 @@ document.addEventListener('click',function(e){
   btn.appendChild(r);setTimeout(()=>r.remove(),600);
 });
 </script>
-</body>
 
 <!-- ONBOARDING MODAL -->
 <div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
@@ -13592,11 +13535,6 @@ async function submitSelfSignup() {
       headers: { ...HEADERS, 'Prefer': 'return=minimal' },
       body: JSON.stringify({ user_id: newUserId, org_id: newOrg.id, role: 'admin' })
     });
-    await fetch(SUPABASE_URL + '/rest/v1/team_members', {
-      method: 'POST',
-      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ name, email, role: 'admin', active: true, org_id: newOrg.id })
-    });
 
     closeSignupModal();
 
@@ -13963,19 +13901,22 @@ async function viewAsClient(orgId, orgName) {
   _adminOrigOrg = currentOrg;
   _isViewingAsClient = true;
 
-  // Log the admin access to Supabase
+  // Log the admin access — the confirm dialog promises this, so make it real
   try {
-    await fetch(SUPABASE_URL + '/rest/v1/admin_access_log', {
+    await fetch(SUPABASE_URL + '/rest/v1/audit_log', {
       method: 'POST',
       headers: { ...HEADERS, 'Prefer': 'return=minimal' },
       body: JSON.stringify({
-        admin_id: currentUser.id,
         org_id: orgId,
-        org_name: orgName,
-        accessed_at: new Date().toISOString()
+        actor_id: currentUser.id,
+        actor_email: currentUser.email,
+        action: 'view_as',
+        table_name: 'organizations',
+        record_id: orgId,
+        summary: 'viewed workspace as ' + orgName
       })
     });
-  } catch(e) { /* table may not exist yet, ignore */ }
+  } catch(e) { /* non-blocking */ }
 
   // Switch to client org
   const allOrgsR = await fetch(SUPABASE_URL + '/rest/v1/organizations?id=eq.' + orgId + '&select=*', { headers: HEADERS });
