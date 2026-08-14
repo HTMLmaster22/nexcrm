@@ -3123,6 +3123,22 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
           Access Requests <span id="requests-badge" style="background:#ef4444;color:#fff;padding:1px 6px;border-radius:10px;font-size:10px;margin-left:4px;display:none">0</span>
         </button>
+        <button class="admin-tab" onclick="adminTab('audit',this)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          Audit Log
+        </button>
+      </div>
+
+      <!-- AUDIT LOG -->
+      <div id="admin-audit" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔒 Audit Log</div>
+            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadAuditLog()">🔄 Refresh</button>
+          </div>
+          <div style="font-size:12px;color:var(--text2);padding:0 0 12px">Every lead, invoice, contact, and team change — who did what, and when.</div>
+          <div id="audit-log-list" style="display:flex;flex-direction:column;gap:0"></div>
+        </div>
       </div>
       
       <!-- ACCESS REQUESTS -->
@@ -3213,7 +3229,10 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
         <div class="card">
           <div class="card-header">
             <div class="card-title">All Leads — All Users</div>
-            <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadAllLeads()">🔄 Refresh</button>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="exportAllLeadsCSV()">⬇️ Export CSV</button>
+              <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="loadAllLeads()">🔄 Refresh</button>
+            </div>
           </div>
           <div class="table-wrap">
             <table>
@@ -3330,13 +3349,6 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <input class="form-input" id="inv-email" type="email" placeholder="tariq@company.com" />
         </div>
         <div class="form-group">
-          <label class="form-label">Temporary Password</label>
-          <div style="position:relative">
-            <input class="form-input" id="inv-password" type="password" placeholder="Min 6 characters" style="padding-right:40px" />
-            <button onclick="toggleInvitePassword()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text2);font-size:14px">👁</button>
-          </div>
-        </div>
-        <div class="form-group">
           <label class="form-label">Assign to Workspace</label>
           <select class="form-input" id="inv-org">
             <option value="">— Select Workspace —</option>
@@ -3349,52 +3361,11 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <div id="perm-list" style="display:flex;flex-direction:column;gap:5px;font-size:12px"></div>
         </div>
 
-        <!-- Send via -->
-        <div style="margin-bottom:16px">
-          <label class="form-label" style="margin-bottom:8px;display:block">Notify via</label>
-          <div style="display:flex;gap:8px">
-            <label style="flex:1;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;font-size:13px">
-              <input type="radio" name="notify-via" value="whatsapp" checked style="accent-color:var(--accent)"> 💬 WhatsApp
-            </label>
-            <label style="flex:1;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;cursor:pointer;font-size:13px">
-              <input type="radio" name="notify-via" value="email" style="accent-color:var(--accent)"> 📧 Email only
-            </label>
-          </div>
-        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:16px">📧 They'll get an email with a secure link to set their own password and sign in.</div>
 
         <div style="display:flex;gap:10px">
           <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
-          <button class="btn btn-primary" style="flex:2" onclick="createMemberAccount()">✉️ Create & Invite</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ADD MEMBER MODAL -->
-    <div class="modal-overlay" id="member-modal">
-      <div class="modal">
-        <div class="modal-header">
-          <div class="modal-title">Add Team Member</div>
-          <div class="modal-close" onclick="closeAddMemberModal()">✕</div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Full Name</label>
-          <input class="form-input" id="m-name" placeholder="Tariq Hassan" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input class="form-input" id="m-email" type="email" placeholder="tariq@company.com" />
-        </div>
-        <div class="form-group">
-          <label class="form-label">Role</label>
-          <select class="form-input" id="m-role">
-            <option value="sales">Sales Rep</option>
-            <option value="manager">Manager</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:10px;margin-top:8px">
-          <button class="btn btn-ghost" style="flex:1" onclick="closeAddMemberModal()">Cancel</button>
-          <button class="btn btn-primary" style="flex:2" onclick="addTeamMember()">💾 Add Member</button>
+          <button class="btn btn-primary" style="flex:2" onclick="createMemberAccount()">✉️ Send Invite</button>
         </div>
       </div>
     </div>
@@ -7257,38 +7228,21 @@ async function openInviteModal() {
       sel.innerHTML = '<option value="">— Select Organization —</option>' +
         userOrgs.map(o => '<option value="' + o.id + '">' + o.name + '</option>').join('');
     }
+    // Default to the workspace currently open — covers the common "add a teammate" case
+    if(currentOrg && sel.querySelector('option[value="' + currentOrg.id + '"]')) {
+      sel.value = currentOrg.id;
+    }
   }
   document.getElementById('invite-modal').classList.add('open');
 }
 function closeInviteModal() {
   document.getElementById('invite-modal').classList.remove('open');
-  ['inv-name','inv-email','inv-password'].forEach(id => document.getElementById(id).value = '');
+  ['inv-name','inv-email'].forEach(id => document.getElementById(id).value = '');
 }
 document.addEventListener('DOMContentLoaded', function() {
   const inv = document.getElementById('invite-modal');
   if(inv) inv.addEventListener('click', function(e) { if(e.target === this) closeInviteModal(); });
 });
-
-async function createClientAccount() {
-  const name = document.getElementById('inv-name').value.trim();
-  const email = document.getElementById('inv-email').value.trim();
-  const password = document.getElementById('inv-password').value;
-  if(!name || !email || !password) { showToast('❌ Fill in all fields'); return; }
-  if(password.length < 6) { showToast('❌ Password must be at least 6 characters'); return; }
-  const btn = document.querySelector('#invite-modal .btn-primary');
-  btn.textContent = 'Creating...'; btn.disabled = true;
-  try {
-    const data = await adminAction('create_user', { email, password, name, org_id: orgId });
-    if(!data || data.error) {
-      showToast('❌ ' + (data?.error?.message || 'Failed to create account'));
-    } else {
-      showToast('✅ Account created for ' + name + (orgId ? ' & added to org!' : '!'));
-      closeInviteModal();
-      loadClients();
-    }
-  } catch(e) { showToast('❌ Network error'); }
-  btn.textContent = '✉️ Create Account'; btn.disabled = false;
-}
 
 async function loadClients() {
   renderOrgsList();
@@ -8505,6 +8459,7 @@ function adminTab(tab, el) {
   _s('admin-requests', tab === 'requests');
   _s('admin-users', tab === 'users');
   _s('admin-integrations', tab === 'integrations');
+  _s('admin-audit', tab === 'audit');
   if(tab === 'users') loadAllUsers();
   if(tab === 'team') loadTeam();
   if(tab === 'clients') loadClients();
@@ -8513,6 +8468,7 @@ function adminTab(tab, el) {
   if(tab === 'branding') loadBrandingPanel();
   if(tab === 'requests') loadAccessRequests();
   if(tab === 'integrations') loadIntegrationsPanel();
+  if(tab === 'audit') loadAuditLog();
 }
 
 // ─── TEAM ──────────────────────────────────────────────────────
@@ -8790,15 +8746,8 @@ async function removeTeamMember(userId, name) {
 }
 
 function openAddMemberModal() {
-  document.getElementById('member-modal').classList.add('open');
+  openInviteModal();
 }
-function closeAddMemberModal() {
-  document.getElementById('member-modal').classList.remove('open');
-  ['m-name','m-email'].forEach(id => document.getElementById(id).value = '');
-}
-document.getElementById('member-modal').addEventListener('click', function(e) {
-  if(e.target === this) closeAddMemberModal();
-});
 
 // ─── ROLE DESCRIPTIONS ────────────────────────────────────────
 const roleDescriptions = {
@@ -8847,85 +8796,39 @@ function selectRole(role) {
   }
 }
 
-function toggleInvitePassword() {
-  const inp = document.getElementById('inv-password');
-  if(inp) inp.type = inp.type === 'password' ? 'text' : 'password';
-}
-
 async function createMemberAccount() {
   const name = document.getElementById('inv-name').value.trim();
   const email = document.getElementById('inv-email').value.trim();
-  const password = document.getElementById('inv-password').value;
   const orgId = document.getElementById('inv-org').value;
   const role = document.getElementById('invite-modal').dataset.role || 'sales';
-  const notifyVia = document.querySelector('input[name="notify-via"]:checked')?.value || 'whatsapp';
 
   if(!name) { showToast('❌ Enter a name'); return; }
   if(!email || !email.includes('@')) { showToast('❌ Enter a valid email'); return; }
-  if(!password || password.length < 6) { showToast('❌ Password must be at least 6 characters'); return; }
+  if(!orgId) { showToast('❌ Select a workspace'); return; }
   if(!role) { showToast('❌ Select a role first'); return; }
 
   const btn = document.querySelector('#invite-modal .btn-primary');
-  if(btn) { btn.textContent = '⏳ Creating...'; btn.disabled = true; }
+  if(btn) { btn.textContent = '⏳ Sending...'; btn.disabled = true; }
 
   try {
-    // Step 1: Create auth user via admin-action edge function
-    const createRes = await fetch(SUPABASE_URL + '/functions/v1/admin-action', {
+    const res = await fetch(SUPABASE_URL + '/functions/v1/invite-member', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
-      body: JSON.stringify({ action: 'create_user', email, password, full_name: name })
+      body: JSON.stringify({ email, name, org_id: orgId, role })
     });
-    const createData = await createRes.json();
-    const userId = createData.user?.id || createData.id;
+    const data = await res.json();
+    if(!res.ok || data.error) throw new Error(data.error || 'Invite failed');
 
-    // Step 2: Add to org_members with role
-    if(orgId && userId) {
-      await fetch(SUPABASE_URL + '/rest/v1/org_members', {
-        method: 'POST',
-        headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ user_id: userId, org_id: orgId, role, active: true, email, full_name: name })
-      });
-    }
-
-    // Step 3: Add to team_members table
-    await fetch(SUPABASE_URL + '/rest/v1/team_members', {
-      method: 'POST',
-      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ name, email, role, active: true, user_id: userId || null })
-    });
-
-    // Step 4: Notify via WhatsApp or just show credentials
-    const loginUrl = 'https://htmlmaster22.github.io/nexcrm/';
-    const roleLabel = role === 'admin' ? 'Admin 👑' : role === 'manager' ? 'Manager 🧑‍💼' : 'Sales Rep 🎯';
-
-    if(notifyVia === 'whatsapp') {
-      const msg = encodeURIComponent(
-        `مرحباً ${name} 👋
-
-تم إضافتك إلى NexCRM بصلاحية: ${roleLabel}
-
-` +
-        `رابط الدخول: ${loginUrl}
-` +
-        `الإيميل: ${email}
-` +
-        `كلمة المرور: ${password}
-
-` +
-        `تواصل معنا إذا احتجت مساعدة ✅`
-      );
-      window.open('https://wa.me/?text=' + msg, '_blank');
-    }
-
-    showToast('✅ ' + name + ' added as ' + role + '!');
+    showToast('✅ Invite sent to ' + email);
     closeInviteModal();
-    loadTeam();
+    try { loadTeam(); } catch(_) {}
+    try { loadClients(); } catch(_) {}
 
   } catch(e) {
     console.error(e);
-    showToast('❌ Error creating account: ' + e.message);
+    showToast('❌ ' + e.message);
   } finally {
-    if(btn) { btn.textContent = '✉️ Create & Invite'; btn.disabled = false; }
+    if(btn) { btn.textContent = '✉️ Send Invite'; btn.disabled = false; }
   }
 }
 
@@ -8940,23 +8843,6 @@ async function changeTeamMemberRole(userId, newRole) {
     showToast('✅ Role changed to ' + (roleLabels[newRole]||newRole));
     loadTeam();
   } catch(e) { showToast('❌ Error changing role'); }
-}
-
-async function addTeamMember() {
-  const name = document.getElementById('m-name').value.trim();
-  const email = document.getElementById('m-email').value.trim();
-  const role = document.getElementById('m-role').value;
-  if(!name || !email) { showToast('❌ Fill in all fields'); return; }
-  try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/team_members', {
-      method: 'POST', headers: HEADERS,
-      body: JSON.stringify({ name, email, role, active: true, org_id: currentOrg ? currentOrg.id : null })
-    });
-    if(!r.ok) { showToast('❌ Failed to add member'); return; }
-    showToast('✅ Team member added!');
-    closeAddMemberModal();
-    loadTeam();
-  } catch(e) { showToast('❌ Error'); }
 }
 
 // ─── ALL LEADS (ADMIN VIEW) ────────────────────────────────────
@@ -8995,6 +8881,54 @@ async function loadAllLeads() {
       </tr>
     `).join('');
   } catch(e) { console.error(e); tbody.innerHTML = '<tr><td colspan="8" style="color:var(--danger);padding:20px">Error loading leads</td></tr>'; }
+}
+
+function exportAllLeadsCSV() {
+  if(!allLeads || !allLeads.length) { showToast('❌ No leads to export'); return; }
+  const fields = ['name','company','source','status','value','assigned','user_id','date'];
+  const csv = [
+    fields.join(','),
+    ...allLeads.map(l => fields.map(f => {
+      const val = String(l[f] || '').replace(/"/g,'""');
+      return val.includes(',') || val.includes('\n') ? `"${val}"` : val;
+    }).join(','))
+  ].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'nexcrm-all-leads-' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('✅ ' + allLeads.length + ' leads exported!');
+}
+
+// ─── AUDIT LOG ───────────────────────────────────────────────
+async function loadAuditLog() {
+  const list = document.getElementById('audit-log-list');
+  if(!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">⏳ Loading...</div>';
+  try {
+    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const r = await fetch(SUPABASE_URL + '/rest/v1/audit_log?select=*&order=created_at.desc&limit=200' + orgFilter, { headers: HEADERS });
+    const data = await r.json();
+    if(!r.ok || !Array.isArray(data) || data.length === 0) {
+      list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No activity logged yet.</div>';
+      return;
+    }
+    const actionIcon = { insert:'➕', update:'✏️', delete:'🗑️' };
+    const tableLabel = { leads:'Lead', invoices:'Invoice', contacts:'Contact', org_members:'Team' };
+    list.innerHTML = data.map(e => `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--border)">
+        <div style="width:28px;text-align:center;font-size:14px">${actionIcon[e.action]||'•'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;color:var(--text)">
+            <b>${e.actor_email || 'System'}</b> ${e.action} ${tableLabel[e.table_name] || e.table_name}
+            ${e.summary ? ' — ' + e.summary : ''}
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:2px">${new Date(e.created_at).toLocaleString()}</div>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { console.error(e); list.innerHTML = '<div style="color:var(--danger);padding:20px">Error loading audit log</div>'; }
 }
 
 async function reassignLead(id, assigned) {
@@ -9136,30 +9070,6 @@ async function deleteClient(userId, email) {
     showToast('🗑️ Account deleted for ' + email);
     loadClients();
   } catch(e) { console.error(e); showToast('❌ Error deleting account'); }
-}
-
-// ─── INVITE CLIENT ─────────────────────────────────────────────
-// openInviteModal defined above
-function closeInviteModal() {
-  document.getElementById('invite-modal').classList.remove('open');
-  ['invite-email','invite-name'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
-}
-
-async function inviteClient() {
-  const email = document.getElementById('invite-email') ? document.getElementById('invite-email').value.trim() : '';
-  if(!email) { showToast('❌ Enter an email address'); return; }
-  try {
-    const r = await fetch(SUPABASE_URL + '/auth/v1/invite', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
-      body: JSON.stringify({ email })
-    });
-    const data = await r.json();
-    if(!r.ok) { showToast('❌ ' + (data.msg || data.error_description || 'Failed to send invite')); return; }
-    showToast('✉️ Invite sent to ' + email + '!');
-    closeInviteModal();
-    loadClients();
-  } catch(e) { showToast('❌ Error sending invite'); }
 }
 
 // ─── INIT ──────────────────────────────────────────────────────
