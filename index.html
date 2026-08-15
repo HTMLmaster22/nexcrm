@@ -3214,22 +3214,29 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
       </div>
 
       <div id="admin-clients" style="display:none">
-        <div class="card">
+        <div class="card" style="margin-bottom:16px;background:#0f1629;border:1px solid rgba(59,130,246,0.2);border-radius:16px;padding:22px">
           <div class="card-header">
-            <div class="card-title">Client Management</div>
-            <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInviteModal()">＋ Add Client</button>
+            <div>
+              <div class="card-title">Client Management</div>
+              <div class="card-subtitle">All workspaces — click one to see its members</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="openNewOrgModal()">🏢 New Workspace</button>
+              <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInviteModal()">✉️ Invite Member</button>
+            </div>
           </div>
+          <!-- Orgs list -->
+          <div id="orgs-list" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:0 2px"></div>
           <div style="overflow-x:auto">
             <table class="leads-table" style="width:100%">
               <thead><tr>
-                <th>Email</th><th>ID</th><th>Joined</th><th>Org</th><th>Last Lead</th><th>Leads</th><th>Status</th><th>Actions</th>
+                <th>Email</th><th>User ID</th><th>Joined</th><th>Leads</th><th>Last Lead</th><th>Organization</th><th>Status</th><th>Actions</th>
               </tr></thead>
               <tbody id="clients-tbody">
                 <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>
               </tbody>
             </table>
           </div>
-          <div id="orgs-list" style="margin-top:20px"></div>
         </div>
       </div>
 
@@ -3279,41 +3286,6 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
 
 
 
-      <div id="admin-clients" style="display:none">
-        <div class="card" style="margin-bottom:16px;background:#0f1629;border:1px solid rgba(59,130,246,0.2);border-radius:16px;padding:22px">
-          <div class="card-header">
-            <div>
-              <div class="card-title">Client Management</div>
-              <div class="card-subtitle">All registered users and their access</div>
-            </div>
-            <div style="display:flex;gap:8px">
-              <button class="btn btn-ghost" style="font-size:12px;padding:6px 14px" onclick="openNewOrgModal()">🏢 New Organization</button>
-              <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openInviteModal()">✉️ Invite Client</button>
-            </div>
-          </div>
-          <!-- Orgs list -->
-          <div id="orgs-list" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;padding:0 2px"></div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Email</th>
-                  <th>User ID</th>
-                  <th>Joined</th>
-                  <th>Leads</th>
-                  <th>Last Lead</th>
-                  <th>Organization</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="clients-tbody">
-                <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text2)">Loading clients...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- AI LEAD SCORE MODAL (CSS already existed for this; the HTML shell was missing) -->
@@ -7295,10 +7267,12 @@ async function openInviteModal() {
       sel.innerHTML = '<option value="">— Select Organization —</option>' +
         userOrgs.map(o => '<option value="' + o.id + '">' + o.name + '</option>').join('');
     }
-    // Default to the workspace currently open — covers the common "add a teammate" case
-    if(currentOrg && sel.querySelector('option[value="' + currentOrg.id + '"]')) {
-      sel.value = currentOrg.id;
-    }
+    // Default to whichever workspace is on screen: the one being browsed in
+    // Client Management if there is one, else the admin's own active workspace.
+    const preselect = (_selectedClientOrg && sel.querySelector('option[value="' + _selectedClientOrg.id + '"]'))
+      ? _selectedClientOrg.id
+      : (currentOrg && sel.querySelector('option[value="' + currentOrg.id + '"]')) ? currentOrg.id : '';
+    if(preselect) sel.value = preselect;
   }
   document.getElementById('invite-modal').classList.add('open');
 }
@@ -7362,7 +7336,7 @@ async function loadClients() {
       const initial = (u.email || 'C')[0].toUpperCase();
       const joinDate = u.created_at ? new Date(u.created_at).toLocaleDateString() : '—';
       const lastDate = stats.last ? new Date(stats.last).toLocaleDateString() : '—';
-      const orgName = currentOrg ? currentOrg.name : '—';
+      const orgName = filterOrg ? filterOrg.name : '—';
       return `
         <tr>
           <td>
