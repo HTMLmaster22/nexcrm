@@ -12273,42 +12273,25 @@ document.addEventListener('click',function(e){
 <div id="onboarding-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--bg2);border:1px solid var(--border);border-radius:24px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.5);animation:onboardIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both">
     <div style="height:3px;background:var(--bg3)"><div id="ob-progress" style="height:100%;background:linear-gradient(90deg,var(--accent),#8b5cf6);border-radius:3px;transition:width 0.4s ease;width:25%"></div></div>
-    <div id="ob-slides" style="padding:40px 40px 28px">
+    <div style="display:flex;justify-content:flex-end;padding:12px 16px 0">
+      <button onclick="toggleOnboardingLang()" id="ob-lang-btn" style="background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-size:11px;font-weight:700;padding:5px 12px;border-radius:100px;cursor:pointer;font-family:inherit">🌐 العربية</button>
+    </div>
+    <div id="ob-slides" style="padding:20px 40px 28px">
       <div id="ob-slide-1">
         <div style="width:60px;height:60px;background:linear-gradient(135deg,var(--accent),#8b5cf6);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(99,102,241,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></div>
-        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px" id="ob-welcome-title">Welcome aboard!</div>
-        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px">Your CRM is ready. Let us show you how it works in 30 seconds so you can start turning leads into customers today.</div>
-        <div style="background:var(--bg3);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;background:linear-gradient(135deg,#10b981,#059669);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✓</div><div><div style="font-size:13px;font-weight:700;color:var(--text)">Your workspace is set up</div><div style="font-size:12px;color:var(--text2);margin-top:1px" id="ob-org-name">Ready to receive leads</div></div></div>
+        <div id="ob-s1-content"></div>
       </div>
       <div id="ob-slide-2" style="display:none">
         <div style="width:60px;height:60px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(245,158,11,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">Leads come in automatically</div>
-        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Every time someone fills your form, their info instantly appears here. No manual entry needed.</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">New leads appear in <strong>Leads</strong> and <strong>Pipeline</strong></div></div>
-          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">You get a <strong>Telegram notification</strong> instantly</div></div>
-          <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">Contact fast — <strong>response time drives conversions</strong></div></div>
-        </div>
+        <div id="ob-s2-content"></div>
       </div>
       <div id="ob-slide-3" style="display:none">
         <div style="width:60px;height:60px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(139,92,246,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></div>
-        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">Move leads through your pipeline</div>
-        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Update lead status as you progress. Your pipeline keeps the whole team focused on what matters.</div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
-          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">New</div></div>
-          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Warm</div></div>
-          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#8b5cf6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Active</div></div>
-          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Won</div></div>
-          <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#ef4444;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Lost</div></div>
-        </div>
+        <div id="ob-s3-content"></div>
       </div>
       <div id="ob-slide-4" style="display:none">
         <div style="width:60px;height:60px;background:linear-gradient(135deg,#10b981,#059669);border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 24px rgba(16,185,129,0.35)"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
-        <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">You are all set!</div>
-        <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Generate reports, create VAT invoices, track response times — everything to run your business like a pro.</div>
-        <div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08));border:1px solid rgba(99,102,241,0.15);border-radius:14px;padding:16px 18px">
-          <div style="font-size:12px;color:var(--text2);line-height:2.1\"><div style="display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(59,130,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div><span><strong style="color:var(--text)">Leads</strong> — all incoming leads</span></div><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(139,92,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div><span><strong style="color:var(--text)">Pipeline</strong> — visual deal tracker</span></div><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div><span><strong style="color:var(--text)">Analytics</strong> — PDF reports</span></div><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(245,158,11,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div><span><strong style="color:var(--text)">Invoices</strong> — Saudi VAT compliant</span></div></div></div>
-        </div>
+        <div id="ob-s4-content"></div>
       </div>
     </div>
     <div style="padding:0 40px 30px;display:flex;align-items:center;justify-content:space-between">
@@ -12319,7 +12302,7 @@ document.addEventListener('click',function(e){
         <div style="width:5px;height:5px;border-radius:3px;background:var(--bg3);transition:all 0.3s"></div>
       </div>
       <div style="display:flex;gap:10px;align-items:center">
-        <button onclick="closeOnboarding()" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;padding:8px 12px;border-radius:8px">Skip</button>
+        <button onclick="closeOnboarding()" id="ob-skip-btn" style="background:none;border:none;color:var(--text2);font-size:13px;cursor:pointer;padding:8px 12px;border-radius:8px">Skip</button>
         <button id="ob-next-btn" onclick="nextOnboardingSlide()" style="background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;border-radius:11px;padding:11px 26px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,0.4)">Next →</button>
       </div>
     </div>
@@ -12963,20 +12946,108 @@ if(typeof renderAnalytics === 'function') {
 let obCurrentSlide = 1;
 const obTotalSlides = 4;
 
+const OB_TEXT = {
+  en: {
+    skip: 'Skip', next: 'Next →', done: "Let's go! 🚀", langBtn: '🌐 العربية',
+    welcomeTitle: 'Welcome aboard!', welcomeTitleOrg: (org) => 'Welcome, ' + org + '!',
+    orgReady: (org) => org + ' workspace is ready',
+    s1: `<div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px" id="ob-welcome-title">Welcome aboard!</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px">Your CRM is ready. Let us show you how it works in 30 seconds so you can start turning leads into customers today.</div>
+      <div style="background:var(--bg3);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;background:linear-gradient(135deg,#10b981,#059669);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✓</div><div><div style="font-size:13px;font-weight:700;color:var(--text)">Your workspace is set up</div><div style="font-size:12px;color:var(--text2);margin-top:1px" id="ob-org-name">Ready to receive leads</div></div></div>`,
+    s2: `<div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">Leads come in automatically</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Every time someone fills your form, their info instantly appears here. No manual entry needed.</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">New leads appear in <strong>Leads</strong> and <strong>Pipeline</strong></div></div>
+        <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">Fast replies win deals — <strong>respond quickly</strong></div></div>
+        <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">Contact fast — <strong>response time drives conversions</strong></div></div>
+      </div>`,
+    s3: `<div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">Move leads through your pipeline</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Update lead status as you progress. Your pipeline keeps the whole team focused on what matters.</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+        <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">New</div></div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Warm</div></div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#8b5cf6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Active</div></div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Won</div></div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#ef4444;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">Lost</div></div>
+      </div>`,
+    s4: `<div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">You are all set!</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:20px">Generate reports, create VAT invoices, track response times — everything to run your business like a pro.</div>
+      <div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08));border:1px solid rgba(99,102,241,0.15);border-radius:14px;padding:16px 18px">
+        <div style="font-size:12px;color:var(--text2);line-height:2.1"><div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(59,130,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div><span><strong style="color:var(--text)">Leads</strong> — all incoming leads</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(139,92,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div><span><strong style="color:var(--text)">Pipeline</strong> — visual deal tracker</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div><span><strong style="color:var(--text)">Analytics</strong> — PDF reports</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(245,158,11,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div><span><strong style="color:var(--text)">Invoices</strong> — Saudi VAT compliant</span></div>
+        </div></div>
+      </div>`,
+  },
+  ar: {
+    skip: 'تخطي', next: 'التالي ←', done: 'يلا نبدأ! 🚀', langBtn: '🌐 English',
+    welcomeTitle: 'أهلاً بيك! 👋', welcomeTitleOrg: (org) => 'أهلاً بيك في ' + org + '! 👋',
+    orgReady: (org) => 'مساحة عمل ' + org + ' جاهزة',
+    s1: `<div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px" id="ob-welcome-title">أهلاً بيك! 👋</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:24px">نظام الـ CRM بتاعك جاهز. خلينا نوريك يشتغل إزاي في 30 ثانية عشان تبدأ تحوّل العملاء المحتملين لعملاء فعليين من النهارده.</div>
+      <div style="background:var(--bg3);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px"><div style="width:38px;height:38px;background:linear-gradient(135deg,#10b981,#059669);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">✓</div><div><div style="font-size:13px;font-weight:700;color:var(--text)">مساحة عملك جاهزة</div><div style="font-size:12px;color:var(--text2);margin-top:1px" id="ob-org-name">جاهزة لاستقبال العملاء</div></div></div>`,
+    s2: `<div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">العملاء بييجوا تلقائي</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:20px">كل ما حد يملى الفورم بتاعك، بياناته تظهر هنا فوراً. من غير ما تدخّل أي بيانات يدوي.</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">العملاء الجدد يظهروا في <strong>العملاء</strong> و<strong>خط المبيعات</strong></div></div>
+        <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">الرد السريع بيكسّب الصفقات — <strong>رد بسرعة</strong></div></div>
+        <div style="background:var(--bg3);border-radius:11px;padding:13px 15px;display:flex;align-items:center;gap:11px"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0"></div><div style="font-size:13px;color:var(--text)">تواصل بسرعة — <strong>سرعة الرد بتزوّد نسبة التحويل</strong></div></div>
+      </div>`,
+    s3: `<div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">حرّك العملاء في خط المبيعات</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:20px">حدّث حالة العميل وانت شغال. خط المبيعات بيخلي الفريق كله مركّز على الأهم.</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+        <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#f59e0b;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">جديد</div></div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">دافئ</div></div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#8b5cf6;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">نشط</div></div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#10b981;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">فوز</div></div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px 4px;text-align:center"><div style="width:7px;height:7px;border-radius:50%;background:#ef4444;margin:0 auto 5px"></div><div style="font-size:10px;font-weight:700;color:var(--text)">خسارة</div></div>
+      </div>`,
+    s4: `<div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px;letter-spacing:-0.5px">كل حاجة جاهزة!</div>
+      <div style="font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:20px">اعمل تقارير، أنشئ فواتير ضريبية، وتابع أوقات الرد — كل حاجة تدير بيها بزنسك زي المحترفين.</div>
+      <div style="background:linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08));border:1px solid rgba(99,102,241,0.15);border-radius:14px;padding:16px 18px">
+        <div style="font-size:12px;color:var(--text2);line-height:2.1"><div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(59,130,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></div><span><strong style="color:var(--text)">العملاء</strong> — كل العملاء الواردين</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(139,92,246,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div><span><strong style="color:var(--text)">خط المبيعات</strong> — متابعة الصفقات بصرياً</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(16,185,129,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div><span><strong style="color:var(--text)">التحليلات</strong> — تقارير PDF</span></div>
+          <div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;background:rgba(245,158,11,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div><span><strong style="color:var(--text)">الفواتير</strong> — متوافقة مع ضريبة القيمة المضافة السعودية</span></div>
+        </div></div>
+      </div>`,
+  }
+};
+
+function renderOnboardingSlides() {
+  const lg = (typeof currentLang !== 'undefined' && currentLang === 'ar') ? 'ar' : 'en';
+  const T = OB_TEXT[lg];
+  ['ob-s1-content','ob-s2-content','ob-s3-content','ob-s4-content'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = T['s' + (i + 1)];
+  });
+  const skipBtn = document.getElementById('ob-skip-btn'); if(skipBtn) skipBtn.textContent = T.skip;
+  const langBtn = document.getElementById('ob-lang-btn'); if(langBtn) langBtn.textContent = T.langBtn;
+  const orgName = currentOrg ? currentOrg.name : '';
+  if(orgName) {
+    const orgEl = document.getElementById('ob-org-name');
+    if(orgEl) orgEl.textContent = T.orgReady(orgName);
+    const title = document.getElementById('ob-welcome-title');
+    if(title) title.textContent = T.welcomeTitleOrg(orgName);
+  }
+  updateOnboardingUI();
+}
+
+function toggleOnboardingLang() {
+  if(typeof toggleLang === 'function') { toggleLang(); }
+  else { currentLang = currentLang === 'ar' ? 'en' : 'ar'; }
+  renderOnboardingSlides();
+}
+
 function showOnboarding() {
   if(!currentUser) return;
   const key = 'nexcrm_onboarded_' + currentUser.id;
   if(localStorage.getItem(key)) return; // already seen
-  // Set org name in welcome slide
-  const orgName = currentOrg ? currentOrg.name : '';
-  if(orgName) {
-    const el = document.getElementById('ob-org-name');
-    if(el) el.textContent = orgName + ' workspace is ready';
-    const title = document.getElementById('ob-welcome-title');
-    if(title) title.textContent = 'Welcome, ' + orgName + '!';
-  }
   obCurrentSlide = 1;
-  updateOnboardingUI();
+  renderOnboardingSlides();
   const overlay = document.getElementById('onboarding-overlay');
   if(overlay) { overlay.style.display = 'flex'; }
 }
@@ -12998,6 +13069,8 @@ function nextOnboardingSlide() {
 }
 
 function updateOnboardingUI() {
+  const lg = (typeof currentLang !== 'undefined' && currentLang === 'ar') ? 'ar' : 'en';
+  const T = OB_TEXT[lg];
   // Show correct slide
   for(let i = 1; i <= obTotalSlides; i++) {
     const slide = document.getElementById('ob-slide-' + i);
@@ -13017,7 +13090,8 @@ function updateOnboardingUI() {
   }
   // Next button text
   const btn = document.getElementById('ob-next-btn');
-  if(btn) btn.textContent = obCurrentSlide === obTotalSlides ? "Let's go! 🚀" : 'Next →';
+  if(btn) btn.textContent = obCurrentSlide === obTotalSlides ? T.done : T.next;
+
 }
 
 // Hook into loadUserOrgs — show after orgs load for non-admin
