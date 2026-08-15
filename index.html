@@ -3307,6 +3307,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <div class="modal-close" onclick="closeInviteModal()">✕</div>
         </div>
 
+        <div id="invite-form-view">
         <!-- Role selector cards -->
         <div style="margin-bottom:20px">
           <label class="form-label" style="margin-bottom:10px;display:block">Select Role</label>
@@ -3352,11 +3353,29 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <div id="perm-list" style="display:flex;flex-direction:column;gap:5px;font-size:12px"></div>
         </div>
 
-        <div style="font-size:12px;color:var(--text2);margin-bottom:16px">📧 They'll get an email with a secure link to set their own password and sign in.</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:16px">🔗 You'll get a secure link to send them yourself — WhatsApp, SMS, anywhere.</div>
 
         <div style="display:flex;gap:10px">
           <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
-          <button class="btn btn-primary" style="flex:2" onclick="createMemberAccount()">✉️ Send Invite</button>
+          <button class="btn btn-primary" style="flex:2" onclick="createMemberAccount()">🔗 Generate Invite Link</button>
+        </div>
+        </div>
+
+        <!-- LINK READY VIEW -->
+        <div id="invite-link-view" style="display:none">
+          <div style="text-align:center;padding:6px 0 18px">
+            <div style="font-size:38px;margin-bottom:8px">✅</div>
+            <div style="font-size:15px;font-weight:700;color:var(--text)" id="il-title">Invite link ready</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:4px" id="il-sub">Send this to them — it lets them set a password and join.</div>
+          </div>
+          <div class="form-group">
+            <input class="form-input" id="il-link" readonly style="font-size:11px;direction:ltr;text-align:left" />
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:10px">
+            <button class="btn btn-ghost" style="flex:1" onclick="copyInviteLink()">📋 Copy Link</button>
+            <a id="il-wa-btn" href="#" target="_blank" class="btn btn-primary" style="flex:1;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center">💬 Send via WhatsApp</a>
+          </div>
+          <button class="btn btn-ghost" style="width:100%" onclick="closeInviteModal()">Done</button>
         </div>
       </div>
     </div>
@@ -7274,11 +7293,27 @@ async function openInviteModal() {
       : (currentOrg && sel.querySelector('option[value="' + currentOrg.id + '"]')) ? currentOrg.id : '';
     if(preselect) sel.value = preselect;
   }
+  document.getElementById('invite-form-view').style.display = 'block';
+  document.getElementById('invite-link-view').style.display = 'none';
   document.getElementById('invite-modal').classList.add('open');
 }
 function closeInviteModal() {
   document.getElementById('invite-modal').classList.remove('open');
   ['inv-name','inv-email'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('invite-form-view').style.display = 'block';
+  document.getElementById('invite-link-view').style.display = 'none';
+}
+function copyInviteLink() {
+  const input = document.getElementById('il-link');
+  input.select();
+  input.setSelectionRange(0, 99999);
+  try {
+    navigator.clipboard.writeText(input.value);
+    showToast('📋 Link copied');
+  } catch(e) {
+    document.execCommand('copy');
+    showToast('📋 Link copied');
+  }
 }
 document.addEventListener('DOMContentLoaded', function() {
   const inv = document.getElementById('invite-modal');
@@ -8889,7 +8924,7 @@ async function createMemberAccount() {
   if(!role) { showToast('❌ Select a role first'); return; }
 
   const btn = document.querySelector('#invite-modal .btn-primary');
-  if(btn) { btn.textContent = '⏳ Sending...'; btn.disabled = true; }
+  if(btn) { btn.textContent = '⏳ Generating...'; btn.disabled = true; }
 
   try {
     const res = await fetch(SUPABASE_URL + '/functions/v1/invite-member', {
@@ -8900,8 +8935,21 @@ async function createMemberAccount() {
     const data = await res.json();
     if(!res.ok || data.error) throw new Error(data.error || 'Invite failed');
 
-    showToast(data.already_existed ? ('✅ ' + email + ' added to workspace') : ('✅ Invite sent to ' + email));
-    closeInviteModal();
+    if(data.already_existed) {
+      showToast('✅ ' + email + ' added to workspace — they can sign in with their existing password');
+      closeInviteModal();
+    } else if(data.invite_link) {
+      document.getElementById('il-title').textContent = name + ' is ready to join';
+      document.getElementById('il-sub').textContent = email + ' — send this link so they can set a password and sign in.';
+      document.getElementById('il-link').value = data.invite_link;
+      const waBtn = document.getElementById('il-wa-btn');
+      if(waBtn) waBtn.href = 'https://wa.me/?text=' + encodeURIComponent('مرحباً ' + name + '! انضم إلى NexCRM من هنا:\n' + data.invite_link);
+      document.getElementById('invite-form-view').style.display = 'none';
+      document.getElementById('invite-link-view').style.display = 'block';
+    } else {
+      showToast('✅ Added');
+      closeInviteModal();
+    }
     try { loadTeam(); } catch(_) {}
     try { loadClients(); } catch(_) {}
 
@@ -8909,7 +8957,7 @@ async function createMemberAccount() {
     console.error(e);
     showToast('❌ ' + e.message);
   } finally {
-    if(btn) { btn.textContent = '✉️ Send Invite'; btn.disabled = false; }
+    if(btn) { btn.textContent = '🔗 Generate Invite Link'; btn.disabled = false; }
   }
 }
 
