@@ -3353,11 +3353,14 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <div id="perm-list" style="display:flex;flex-direction:column;gap:5px;font-size:12px"></div>
         </div>
 
-        <div style="font-size:12px;color:var(--text2);margin-bottom:16px">🔗 You'll get a secure link to send them yourself — WhatsApp, SMS, anywhere.</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">✉️ They'll get an email with a secure link to set their own password and sign in.</div>
 
-        <div style="display:flex;gap:10px">
+        <div style="display:flex;gap:10px;margin-bottom:10px">
           <button class="btn btn-ghost" style="flex:1" onclick="closeInviteModal()">Cancel</button>
-          <button class="btn btn-primary" style="flex:2" onclick="createMemberAccount()">🔗 Generate Invite Link</button>
+          <button class="btn btn-primary" style="flex:2" onclick="createMemberAccount('email')">✉️ Send Invite</button>
+        </div>
+        <div style="text-align:center">
+          <button onclick="createMemberAccount('link')" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:12px;text-decoration:underline;font-family:inherit">Or generate a link to send yourself (WhatsApp, etc.)</button>
         </div>
         </div>
 
@@ -8912,7 +8915,8 @@ function selectRole(role) {
   }
 }
 
-async function createMemberAccount() {
+async function createMemberAccount(mode) {
+  mode = mode === 'link' ? 'link' : 'email';
   const name = document.getElementById('inv-name').value.trim();
   const email = document.getElementById('inv-email').value.trim();
   const orgId = document.getElementById('inv-org').value;
@@ -8924,13 +8928,13 @@ async function createMemberAccount() {
   if(!role) { showToast('❌ Select a role first'); return; }
 
   const btn = document.querySelector('#invite-modal .btn-primary');
-  if(btn) { btn.textContent = '⏳ Generating...'; btn.disabled = true; }
+  if(btn) { btn.textContent = mode === 'email' ? '⏳ Sending...' : '⏳ Generating...'; btn.disabled = true; }
 
   try {
     const res = await fetch(SUPABASE_URL + '/functions/v1/invite-member', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': HEADERS['Authorization'] || ('Bearer ' + SUPABASE_KEY) },
-      body: JSON.stringify({ email, name, org_id: orgId, role })
+      body: JSON.stringify({ email, name, org_id: orgId, role, mode })
     });
     const data = await res.json();
     if(!res.ok || data.error) throw new Error(data.error || 'Invite failed');
@@ -8947,7 +8951,7 @@ async function createMemberAccount() {
       document.getElementById('invite-form-view').style.display = 'none';
       document.getElementById('invite-link-view').style.display = 'block';
     } else {
-      showToast('✅ Added');
+      showToast('✅ Invite emailed to ' + email);
       closeInviteModal();
     }
     try { loadTeam(); } catch(_) {}
@@ -8957,7 +8961,7 @@ async function createMemberAccount() {
     console.error(e);
     showToast('❌ ' + e.message);
   } finally {
-    if(btn) { btn.textContent = '🔗 Generate Invite Link'; btn.disabled = false; }
+    if(btn) { btn.textContent = '✉️ Send Invite'; btn.disabled = false; }
   }
 }
 
