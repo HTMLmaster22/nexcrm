@@ -3190,7 +3190,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
             </div>
             <div style="background:var(--bg3);border-radius:12px;padding:14px;text-align:center">
               <div style="font-size:22px;font-weight:900;color:var(--danger)" id="stat-inactive-users">—</div>
-              <div style="font-size:11px;color:var(--text2);margin-top:3px">Inactive</div>
+              <div style="font-size:11px;color:var(--text2);margin-top:3px">Elsewhere / Unassigned</div>
             </div>
           </div>
           <!-- Search -->
@@ -3201,6 +3201,15 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <div id="all-users-list">
             <div style="text-align:center;padding:40px;color:var(--text2)">Click Refresh to load users</div>
           </div>
+        </div>
+
+        <!-- OTHER REGISTERED USERS — no hidden accounts anywhere in the system -->
+        <div class="card" style="margin-top:16px">
+          <div class="card-header">
+            <div class="card-title">🌐 Other Users in the System</div>
+          </div>
+          <div style="font-size:12px;color:var(--text2);padding:0 0 12px">Everyone registered project-wide who isn't a member of this workspace — either in another workspace, or with no workspace at all.</div>
+          <div id="other-users-list"></div>
         </div>
       </div>
 
@@ -7005,14 +7014,22 @@ async function checkSession() {
   if(hash.includes('access_token')) {
     const params = new URLSearchParams(hash.substring(1));
     const token = params.get('access_token');
+    const linkType = params.get('type'); // 'invite' | 'recovery' | 'magiclink' | 'signup' | null
     if(token) {
       const r = await fetch(SUPABASE_URL + '/auth/v1/user', {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token }
       });
       if(r.ok) {
         const user = await r.json();
-        loginSuccess({ user, access_token: token });
         window.history.replaceState({}, '', window.location.pathname);
+        if(linkType === 'invite' || linkType === 'recovery') {
+          // Fresh invite or password-reset link: this person has no password
+          // yet. Don't silently sign them in — have them set one first, or
+          // they'd be locked out the moment this one-time link expires.
+          showSetPasswordScreen(user, token);
+          return;
+        }
+        loginSuccess({ user, access_token: token });
         return;
       }
     }
@@ -7033,6 +7050,47 @@ async function checkSession() {
   }
 }
 checkSession();
+
+let _spToken = null, _spUser = null;
+
+function showSetPasswordScreen(user, token) {
+  _spToken = token; _spUser = user;
+  const w = document.getElementById('sp-welcome');
+  if(w) w.textContent = 'Welcome, ' + (user.user_metadata?.full_name || user.email) + '! Set a password to finish joining.';
+  document.getElementById('auth-overlay').style.display = 'none';
+  document.getElementById('set-password-overlay').style.display = 'flex';
+}
+
+async function submitSetPassword() {
+  const pw = document.getElementById('sp-password').value;
+  const pw2 = document.getElementById('sp-password-confirm').value;
+  const errEl = document.getElementById('sp-error');
+  errEl.classList.remove('show');
+
+  if(!pw || pw.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; errEl.classList.add('show'); return; }
+  if(pw !== pw2) { errEl.textContent = 'Passwords do not match'; errEl.classList.add('show'); return; }
+
+  const btn = document.getElementById('sp-submit-btn');
+  btn.disabled = true; btn.textContent = 'Activating...';
+
+  try {
+    const r = await fetch(SUPABASE_URL + '/auth/v1/user', {
+      method: 'PUT',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + _spToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    if(!r.ok) {
+      const data = await r.json().catch(()=>({}));
+      throw new Error(data.msg || data.error_description || 'Failed to set password');
+    }
+    document.getElementById('set-password-overlay').style.display = 'none';
+    loginSuccess({ user: _spUser, access_token: _spToken });
+  } catch(e) {
+    errEl.textContent = e.message;
+    errEl.classList.add('show');
+    btn.disabled = false; btn.textContent = 'Activate & Sign In';
+  }
+}
 
 
 // ─── EDIT LEAD ─────────────────────────────────────────────────
@@ -8490,11 +8548,11 @@ async function loadAllUsers() {
   list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">⏳ Loading users...</div>';
 
   try {
-    // org_members: role + org membership (source of truth for who has access)
-    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
-    const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?select=*&order=created_at.desc' + orgFilter, { headers: HEADERS });
+    // ALL org_members project-wide — this is what lets us show who's a member
+    // where, and who's registered but nowhere at all (no more hidden accounts).
+    const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?select=*&order=created_at.desc', { headers: HEADERS });
     const omRaw = await r.json();
-    const orgMembers = Array.isArray(omRaw) ? omRaw : [];
+    const allOrgMembers = Array.isArray(omRaw) ? omRaw : [];
 
     // profiles: real email/name, auto-synced from auth.users on every signup
     const r2 = await fetch(SUPABASE_URL + '/rest/v1/profiles?select=id,email,full_name', { headers: HEADERS });
@@ -8503,7 +8561,15 @@ async function loadAllUsers() {
     const profileMap = {};
     profiles.forEach(p => { profileMap[p.id] = p; });
 
+    // organizations: to label which workspace someone belongs to
+    const r3 = await fetch(SUPABASE_URL + '/rest/v1/organizations?select=id,name', { headers: HEADERS });
+    const orgsRaw = await r3.json();
+    const orgNameMap = {};
+    (Array.isArray(orgsRaw) ? orgsRaw : []).forEach(o => { orgNameMap[o.id] = o.name; });
+
     const validRoles = ['admin','manager','sales'];
+    const orgMembers = allOrgMembers.filter(om => currentOrg && om.org_id === currentOrg.id);
+
     const merged = orgMembers.map(om => {
       const p = profileMap[om.user_id];
       let role = om.role || 'sales';
@@ -8522,12 +8588,28 @@ async function loadAllUsers() {
 
     _allUsersCache = merged;
 
+    // Everyone registered project-wide who is NOT a member of the current org
+    const currentOrgUserIds = new Set(orgMembers.map(m => m.user_id));
+    const orgsByUser = {};
+    allOrgMembers.forEach(om => {
+      (orgsByUser[om.user_id] ||= []).push(orgNameMap[om.org_id] || 'Unknown workspace');
+    });
+    const others = profiles
+      .filter(p => !currentOrgUserIds.has(p.id))
+      .map(p => ({
+        user_id: p.id,
+        email: p.email || '(no email)',
+        name: p.full_name || (p.email ? p.email.split('@')[0] : 'User ' + p.id.slice(0,6)),
+        orgs: orgsByUser[p.id] || [],
+      }));
+    renderOtherUsersList(others);
+
     // Stats
     const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
     setEl('stat-total-users', merged.length);
     setEl('stat-admins', merged.filter(u => u.role === 'admin').length);
     setEl('stat-active-users', merged.filter(u => u.active).length);
-    setEl('stat-inactive-users', merged.filter(u => !u.active).length);
+    setEl('stat-inactive-users', others.length);
 
     renderUsersList(merged);
 
@@ -8535,6 +8617,44 @@ async function loadAllUsers() {
     console.error(e);
     list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--danger)">❌ Error: ' + e.message + '</div>';
   }
+}
+
+function renderOtherUsersList(others) {
+  const container = document.getElementById('other-users-list');
+  if(!container) return;
+  if(!others.length) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">No other registered users — everyone in the system is already in this workspace.</div>';
+    return;
+  }
+  container.innerHTML = others.map(u => {
+    const initials = (u.name||'?').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+    const hasOrgs = u.orgs.length > 0;
+    const safeName = (u.name||'').replace(/'/g,"\\'");
+    return `<div style="display:flex;align-items:center;gap:14px;padding:12px 16px;border-bottom:1px solid var(--border)">
+      <div style="width:36px;height:36px;border-radius:10px;flex-shrink:0;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text2)">${initials}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${u.name}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">${u.email}</div>
+        <div style="font-size:11px;margin-top:2px;color:${hasOrgs?'var(--text2)':'#f59e0b'}">${hasOrgs ? '📁 ' + u.orgs.join(', ') : '⚠️ No workspace — unassigned'}</div>
+      </div>
+      <button onclick="addExistingUserToOrg('${u.user_id}','${safeName}')" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);color:var(--accent);border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600;white-space:nowrap">+ Add here</button>
+    </div>`;
+  }).join('');
+}
+
+async function addExistingUserToOrg(userId, name) {
+  if(!currentOrg) return;
+  if(!confirm('Add ' + name + ' to ' + currentOrg.name + '?')) return;
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?on_conflict=org_id,user_id', {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal,resolution=merge-duplicates' },
+      body: JSON.stringify({ user_id: userId, org_id: currentOrg.id, role: 'sales' })
+    });
+    if(!r.ok) throw new Error('Failed');
+    showToast('✅ ' + name + ' added to ' + currentOrg.name);
+    loadAllUsers();
+  } catch(e) { showToast('❌ Error adding user'); }
 }
 
 function filterUsers(query) {
@@ -9412,6 +9532,28 @@ function renderDonut(data) {
     </div>
     <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--text2)">
       Want to try NexCRM? <button onclick="openSignupModal()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;text-decoration:underline;font-family:inherit">Start Free Trial →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SET PASSWORD — shown when an invite or password-reset email link is clicked.
+     Without this, invited users were silently signed in with no password ever
+     set, leaving them unable to log back in once the one-time link expired. -->
+<div class="auth-overlay" id="set-password-overlay" style="display:none">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="logo-icon">N</div>
+      NexCRM
+    </div>
+    <div class="auth-title">Activate your account</div>
+    <div class="auth-sub" id="sp-welcome">Set a password to finish joining.</div>
+
+    <div class="auth-error" id="sp-error"></div>
+
+    <div class="auth-form">
+      <input class="auth-input" id="sp-password" type="password" placeholder="Choose a password (min 6 characters)" />
+      <input class="auth-input" id="sp-password-confirm" type="password" placeholder="Confirm password" />
+      <button class="auth-btn auth-btn-primary" id="sp-submit-btn" onclick="submitSetPassword()">Activate &amp; Sign In</button>
     </div>
   </div>
 </div>
