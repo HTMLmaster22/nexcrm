@@ -12251,6 +12251,11 @@ function renderScrapedLeads(businesses, category, location) {
   const title = document.getElementById('scraper-results-title');
   title.innerHTML = '<span style="display:flex;align-items:center;gap:8px"><span style="background:rgba(16,185,129,0.12);color:#10b981;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">LIVE</span>' +
     businesses.length + (isAr ? ' نشاط تم العثور عليه في ' : ' businesses found in ') + location + '</span>';
+  _lastScrapeLoc = location;
+  const _hrDone = businesses.some(b => b.hr);
+  title.innerHTML += '<button onclick="findHRContacts()" id="hr-enrich-btn" ' + (_hrDone ? 'disabled ' : '') +
+    'style="margin-top:8px;background:' + (_hrDone ? 'rgba(16,185,129,0.15)' : 'linear-gradient(135deg,#10b981,#059669)') + ';color:' + (_hrDone ? '#10b981' : '#fff') + ';border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:block">' +
+    (_hrDone ? (isAr ? '✓ تم إيجاد مسارات الموارد البشرية' : '✓ HR contacts found') : (isAr ? '🎯 إيجاد جهات الموارد البشرية' : '🎯 Find HR Contacts')) + '</button>';
 
   list.innerHTML = businesses.map((b, i) => {
     const phone = (b.phone || '').replace(/[\s\-\(\)]/g, '');
@@ -12260,6 +12265,11 @@ function renderScrapedLeads(businesses, category, location) {
     const closedLabel = isAr ? ' · 🔴 مغلق' : ' · 🔴 Closed';
     const waText = isAr ? 'واتساب' : 'WhatsApp';
     const crmText = isAr ? '+ إضافة' : '+ CRM';
+    const hrBlock = b.hr ? `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)">
+        <div style="font-size:10px;font-weight:700;color:#10b981;margin-bottom:6px">🎯 ${isAr?'مسار الموارد البشرية':'HR CONTACT ROUTE'} · ${b.hr.email_status==='domain_accepts_email'?(isAr?'نطاق البريد مؤكد ✓':'Email domain verified ✓'):(isAr?'لا بريد — استخدم الهاتف':'No email — use phone')}</div>
+        ${(b.hr.email_candidates||[]).slice(0,4).map(em=>`<a href="mailto:${em}" style="display:inline-block;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--text2);text-decoration:none;margin:0 4px 4px 0">${em}</a>`).join('')}
+        ${b.hr.opener?`<button onclick="copyHROpener(${i})" style="display:inline-block;background:var(--bg);border:1px solid #10b981;border-radius:6px;padding:3px 8px;font-size:10px;color:#10b981;cursor:pointer;font-family:inherit">📋 ${isAr?'نسخ رسالة الافتتاح':'Copy opener'}</button>`:''}
+      </div>` : '';
     return `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px" onmouseover="this.style.borderColor='#10b981'" onmouseout="this.style.borderColor='var(--border)'">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
         <div style="flex:1;min-width:200px">
@@ -12272,6 +12282,7 @@ function renderScrapedLeads(businesses, category, location) {
             <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;overflow:hidden">🌐 <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.website||'—'}</span></div>
             <div style="font-size:11px;color:var(--text2);grid-column:1/-1">📍 ${b.address||'—'}</div>
           </div>
+          ${hrBlock}
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;min-width:110px">
           ${waLink?`<a href="${waLink}" target="_blank" style="background:#25d366;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;text-align:center">${waText}</a>`:''}
@@ -12312,10 +12323,42 @@ async function importAllScrapedLeads() {
   showToast('✅ ' + ok + ' businesses imported!');
 }
 
+let _lastScrapeLoc = '';
+
+async function findHRContacts() {
+  if (!_scrapedLeads.length) return;
+  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  const btn = document.getElementById('hr-enrich-btn');
+  if (btn) { btn.disabled = true; btn.textContent = isAr ? 'جاري التحليل...' : 'Analyzing companies...'; }
+  try {
+    const r = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/find-hr-contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+      body: JSON.stringify({ businesses: _scrapedLeads, sender: (typeof currentOrg !== 'undefined' && currentOrg && currentOrg.name) || (isAr ? 'فريقنا' : 'our team') })
+    });
+    const data = await r.json();
+    if (data.success && Array.isArray(data.contacts)) {
+      data.contacts.forEach((c, i) => { if (_scrapedLeads[i]) _scrapedLeads[i].hr = c; });
+      renderScrapedLeads(_scrapedLeads, '', _lastScrapeLoc);
+      showToast('🎯 ' + (data.summary?.with_email_domain ?? 0) + (isAr ? ' شركة بنطاق بريد مؤكد' : ' companies with verified email domains'));
+    } else throw new Error(data.error || 'enrichment failed');
+  } catch (e) {
+    console.error('findHRContacts error:', e);
+    showToast(isAr ? '❌ فشل تحليل جهات الاتصال' : '❌ HR enrichment failed');
+    if (btn) { btn.disabled = false; btn.textContent = isAr ? '🎯 إيجاد جهات الموارد البشرية' : '🎯 Find HR Contacts'; }
+  }
+}
+
+function copyHROpener(i) {
+  const b = _scrapedLeads[i];
+  if (!b || !b.hr || !b.hr.opener) return;
+  navigator.clipboard.writeText(b.hr.opener).then(() => showToast('📋 Copied!')).catch(() => {});
+}
+
 function exportScrapedLeadsCSV() {
   if (!_scrapedLeads.length) return;
-  const h = ['Name', 'Phone', 'Address', 'Website', 'Rating', 'Rating Count'];
-  const rows = _scrapedLeads.map(b => [b.name, b.phone, b.address, b.website, b.rating, b.rating_count].map(v => '"' + (v || '').toString().replace(/"/g, '""') + '"').join(','));
+  const h = ['Name', 'Phone', 'Address', 'Website', 'Rating', 'Rating Count', 'HR Emails', 'Email Status'];
+  const rows = _scrapedLeads.map(b => [b.name, b.phone, b.address, b.website, b.rating, b.rating_count, (b.hr && (b.hr.email_candidates||[]).join('; ')) || '', (b.hr && b.hr.email_status) || ''].map(v => '"' + (v || '').toString().replace(/"/g, '""') + '"').join(','));
   const blob = new Blob(['\ufeff' + [h.join(','), ...rows].join('\n')], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'scraped_businesses_' + Date.now() + '.csv'; a.click();
   showToast('✅ CSV exported!');
