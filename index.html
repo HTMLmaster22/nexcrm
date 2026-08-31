@@ -8861,6 +8861,19 @@ async function loadTeam() {
     const profileMap = {};
     (Array.isArray(pRaw) ? pRaw : []).forEach(p => { profileMap[p.id] = p; });
 
+    // Real invite/signin status — was anyone actually confirmed here before,
+    // or is it just an org_members row with no login ever?
+    const statusMap = {};
+    try {
+      const userIds = data.map(m => m.user_id).filter(Boolean);
+      const r3 = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_member_invite_status', {
+        method: 'POST', headers: { ...HEADERS, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ p_user_ids: userIds })
+      });
+      const statusRows = await r3.json();
+      (Array.isArray(statusRows) ? statusRows : []).forEach(s => { statusMap[s.user_id] = s; });
+    } catch(e) {}
+
     teamMembers = data;
     const validRoles = ['admin','manager','sales'];
     const roleColors = {
@@ -8878,6 +8891,11 @@ async function loadTeam() {
       const rc = roleColors[role];
       const isMe = currentUser && currentUser.id === m.user_id;
       const safeName = (name||'').replace(/'/g, "\\'");
+      const status = statusMap[m.user_id];
+      const hasSignedIn = status && (status.confirmed_at || status.last_sign_in_at);
+      const statusBadge = hasSignedIn
+        ? '<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(16,185,129,0.15);color:var(--success)">✅ Active</span>'
+        : '<span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(245,158,11,0.15);color:#f59e0b">⏳ Pending invite</span>';
       return `<div class="team-card" style="display:flex;align-items:center;gap:14px;padding:16px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;margin-bottom:10px">
         <div style="width:46px;height:46px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff">${initials}</div>
         <div style="flex:1;min-width:0">
@@ -8888,6 +8906,7 @@ async function loadTeam() {
           <div style="font-size:11px;color:var(--text2);margin-top:2px">${email}</div>
           <div style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:${rc.bg};color:${rc.color}">${rc.icon} ${role.toUpperCase()}</span>
+            ${statusBadge}
           </div>
         </div>
           <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
