@@ -6204,7 +6204,9 @@ function loginSuccess(data) {
   currentUser = data.user;
   HEADERS['Authorization'] = 'Bearer ' + data.access_token;
   localStorage.setItem('nexcrm_token', data.access_token);
+  if (data.refresh_token) localStorage.setItem('nexcrm_refresh_token', data.refresh_token);
   localStorage.setItem('nexcrm_user', JSON.stringify(data.user));
+  startTokenRefreshTimer();
   document.getElementById('auth-overlay').style.display = 'none';
   if(typeof resetLoginAttempts === 'function') resetLoginAttempts(currentUser.email);
   resetSessionTimer();
@@ -9006,8 +9008,12 @@ async function loadAllLeads() {
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc', {
       headers: { ...HEADERS, 'Accept': 'application/json' }
     });
+    if (r.status === 401) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#ef4444">Your session has expired. Please <a href="#" onclick="localStorage.removeItem(\'nexcrm_token\');location.reload();return false;" style="color:#3b82f6">log in again</a>.</td></tr>';
+      return;
+    }
     const data = await r.json();
-    allLeads = data || [];
+    allLeads = Array.isArray(data) ? data : [];
     if(allLeads.length === 0) {
       tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text2)">No leads found</td></tr>';
       return;
@@ -9610,7 +9616,7 @@ function renderDonut(data) {
     <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:20px;color:var(--text);margin-bottom:8px">Trial Expired</div>
     <div id="trial-expired-message" style="font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6">Your 14-day free trial has ended. Upgrade now to keep using NexCRM.</div>
     <button onclick="document.getElementById('trial-expired-overlay').style.display='none';nav('admin-billing',null);" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-bottom:10px">Upgrade Now →</button>
-    <button onclick="supabase.auth.signOut();location.reload();" style="width:100%;padding:10px;background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">Sign out</button>
+    <button onclick="localStorage.removeItem('nexcrm_token');localStorage.removeItem('nexcrm_refresh_token');localStorage.removeItem('nexcrm_user');location.reload();" style="width:100%;padding:10px;background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">Sign out</button>
   </div>
 </div>
 
@@ -11637,12 +11643,45 @@ function resetLoginAttempts(email) {
 let _sessionTimer = null;
 const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
 
+// ── Token refresh (Supabase access tokens expire ~1hr; this renews them
+//    silently in the background so a long-open tab never goes stale) ──
+let _tokenRefreshTimer = null;
+const TOKEN_REFRESH_INTERVAL = 45 * 60 * 1000; // 45 minutes - safely under the ~1hr expiry
+
+async function refreshSession() {
+  const refreshToken = localStorage.getItem('nexcrm_refresh_token');
+  if (!refreshToken) return false;
+  try {
+    const r = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=refresh_token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
+      body: JSON.stringify({ refresh_token: refreshToken })
+    });
+    if (!r.ok) return false;
+    const data = await r.json();
+    if (!data.access_token) return false;
+    HEADERS['Authorization'] = 'Bearer ' + data.access_token;
+    localStorage.setItem('nexcrm_token', data.access_token);
+    if (data.refresh_token) localStorage.setItem('nexcrm_refresh_token', data.refresh_token);
+    return true;
+  } catch (e) { return false; }
+}
+
+function startTokenRefreshTimer() {
+  clearInterval(_tokenRefreshTimer);
+  _tokenRefreshTimer = setInterval(refreshSession, TOKEN_REFRESH_INTERVAL);
+}
+
 function resetSessionTimer() {
   clearTimeout(_sessionTimer);
   _sessionTimer = setTimeout(() => {
     if(currentUser) {
       showToast('⏰ Session expired due to inactivity. Please sign in again.');
-      setTimeout(() => { supabase.auth.signOut(); location.reload(); }, 2000);
+      setTimeout(() => {
+        localStorage.removeItem('nexcrm_token');
+        localStorage.removeItem('nexcrm_user');
+        location.reload();
+      }, 2000);
     }
   }, SESSION_TIMEOUT);
 }
