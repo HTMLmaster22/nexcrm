@@ -4872,9 +4872,9 @@ function renderLeads() {
         </span>
       </td>
       <td style="white-space:nowrap">
-        <button class="action-btn btn-note" onclick="toggleNote(${l.id})" title="${l.notes ? 'Notes (has content)' : 'Notes'}" style="position:relative">
+        <button class="action-btn btn-note" onclick="toggleNote(${l.id})" title="${(l.notes||l.email||l.phone) ? 'Notes & contact info' : 'Notes'}" style="position:relative">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          ${l.notes ? '<span style="position:absolute;top:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:#3b82f6;box-shadow:0 0 0 1.5px var(--bg)"></span>' : ''}
+          ${(l.notes||l.email||l.phone) ? '<span style="position:absolute;top:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:#3b82f6;box-shadow:0 0 0 1.5px var(--bg)"></span>' : ''}
         </button>
         <button class="action-btn" style="background:rgba(245,158,11,0.15);color:var(--warning)" onclick="toggleReminderRow(${l.id})" title="Set Reminder">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -4889,6 +4889,10 @@ function renderLeads() {
     </tr>
     <tr class="notes-row" id="note-row-${l.id}">
       <td colspan="9">
+        ${(l.email || l.phone) ? `<div style="display:flex;gap:16px;flex-wrap:wrap;padding:8px 0;margin-bottom:8px;border-bottom:1px solid var(--border);font-size:12px">
+          ${l.email ? `<span>✉️ <a href="mailto:${l.email}" style="color:var(--text);text-decoration:none">${l.email}</a></span>` : ''}
+          ${l.phone ? `<span>📞 <a href="tel:${l.phone}" style="color:var(--text);text-decoration:none">${l.phone}</a></span>` : ''}
+        </div>` : ''}
         <textarea class="notes-box" id="note-text-${l.id}" placeholder="Add follow-up notes...">${l.notes||''}</textarea>
         <button class="notes-save-btn" onclick="saveNote(${l.id})">💾 Save Note</button>
       </td>
@@ -12172,6 +12176,18 @@ async function pollPendingPhones() {
       });
     } catch(e) {}
   }
+  // Gave up after 90s -- anyone still pending genuinely has no number on
+  // file at Apollo. Say so honestly instead of leaving 'revealing...' stuck
+  // forever, which looks identical to broken.
+  _generatedLeads.forEach((l,i) => {
+    if (!l.phone_pending) return;
+    l.phone_pending = false;
+    const el = document.getElementById('lg-phone-'+i);
+    if (el) {
+      const span = el.querySelector('span');
+      if (span) { span.textContent = 'no number found'; span.style.fontStyle = 'normal'; }
+    }
+  });
 }
 
 async function resolvePendingPhone(l) {
