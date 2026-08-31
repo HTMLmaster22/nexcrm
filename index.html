@@ -7043,7 +7043,9 @@ async function checkSession() {
       loginSuccess({ user, access_token: savedToken });
     } else {
       localStorage.removeItem('nexcrm_token');
+      localStorage.removeItem('nexcrm_refresh_token');
       localStorage.removeItem('nexcrm_user');
+      location.reload();
     }
   }
 }
