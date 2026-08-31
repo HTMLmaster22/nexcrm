@@ -12120,7 +12120,7 @@ async function importSingleLead(index) {
   const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar');
   try {
     const resolvedPhone = await resolvePendingPhone(l);
-    const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:l.email,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
+    const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:(l.email&&l.email!=='—')?l.email:null,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
     if(r.ok||r.status===201){if(btn){btn.textContent=isAr?'✓ تمت':'✓ Added';btn.style.background='var(--success)';}showToast('✅ '+(l.name||'Lead')+(isAr?' تمت الإضافة!':' added!'));}
     else throw new Error();
   } catch(e){if(btn){btn.textContent='+ CRM';btn.disabled=false;}showToast('❌ '+(isAr?'فشل':'Failed'));}
@@ -12130,16 +12130,21 @@ async function importAllLeads() {
   const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar');
   if(!_generatedLeads.length) return;
   showToast(isAr?'جاري الاستيراد...':'Importing...');
-  let ok=0;
+  let ok=0, dup=0, failed=0;
   for(let i=0;i<_generatedLeads.length;i++){
     const l=_generatedLeads[i];
     try{
       const resolvedPhone = await resolvePendingPhone(l);
-      const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:l.email,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
+      const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:(l.email&&l.email!=='—')?l.email:null,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
       if(r.ok||r.status===201){ok++;const btn=document.getElementById('lg-import-btn-'+i);if(btn){btn.textContent='✓';btn.style.background='var(--success)';btn.disabled=true;}}
-    }catch(e){}
+      else if(r.status===409){dup++;const btn=document.getElementById('lg-import-btn-'+i);if(btn){btn.textContent=isAr?'موجود':'Already in CRM';btn.style.background='var(--text2)';btn.disabled=true;}}
+      else{failed++;}
+    }catch(e){failed++;}
   }
-  showToast('✅ '+ok+(isAr?' عميل تم استيراده!':' leads imported!'));
+  let msg = '✅ '+ok+(isAr?' عميل تم استيراده':' imported');
+  if(dup) msg += isAr?(' — '+dup+' موجود مسبقاً'):(' — '+dup+' already in CRM');
+  if(failed) msg += isAr?(' — ❌ '+failed+' فشل'):(' — ❌ '+failed+' failed');
+  showToast(msg);
 }
 
 function exportLeadsCSV() {
