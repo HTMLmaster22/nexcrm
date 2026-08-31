@@ -4885,7 +4885,7 @@ function renderLeads() {
         </button>
       </td>
     </tr>
-    <tr class="notes-row" id="note-row-${l.id}">
+    <tr class="notes-row" id="note-row-${l.id}" style="${l.notes ? 'display:table-row' : ''}">
       <td colspan="9">
         <textarea class="notes-box" id="note-text-${l.id}" placeholder="Add follow-up notes...">${l.notes||''}</textarea>
         <button class="notes-save-btn" onclick="saveNote(${l.id})">💾 Save Note</button>
@@ -12060,7 +12060,7 @@ function renderGeneratedLeads(leads,location,targetProfile,mode) {
             <div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-size:13px;font-weight:700;color:var(--text)">${l.name||'—'}</span>${l.verified?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>':''}<span style="font-size:10px;font-weight:700;color:${urgencyColor};background:${urgencyColor}18;padding:2px 7px;border-radius:20px">${l.urgency||'Medium'}</span>${channelBadge}${leadTypeBadge}</div><div style="font-size:11px;color:var(--text2)">${l.title||'—'} · ${l.company||'—'}</div></div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
-            <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${l.phone||'—'}</div>
+            <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${l.phone && l.phone!=='—' ? l.phone : (l.phone_pending ? '<span style="font-style:italic">revealing\u2026</span>' : '—')}</div>
             <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;overflow:hidden"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.email||'—'}</span></div>
             <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.location||location}</div>
             <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>${l.industry||'—'} ${l.company_size?'· '+l.company_size:''}</div>
@@ -12077,12 +12077,23 @@ function renderGeneratedLeads(leads,location,targetProfile,mode) {
   }).join('');
 }
 
+async function resolvePendingPhone(l) {
+  if (l.phone && l.phone !== '—') return l.phone;
+  if (!l.apollo_person_id) return l.phone;
+  try {
+    const r = await fetch(SUPABASE_URL+'/rest/v1/apollo_phone_reveals?apollo_person_id=eq.'+encodeURIComponent(l.apollo_person_id)+'&select=phone', {headers: HEADERS});
+    if (r.ok) { const rows = await r.json(); if (rows[0]?.phone) return rows[0].phone; }
+  } catch(e) {}
+  return l.phone;
+}
+
 async function importSingleLead(index) {
   const l=_generatedLeads[index]; if(!l) return;
   const btn=document.getElementById('lg-import-btn-'+index); if(btn){btn.textContent='...';btn.disabled=true;}
   const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar');
   try {
-    const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:l.phone,email:l.email,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:currentUser?.email||'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
+    const resolvedPhone = await resolvePendingPhone(l);
+    const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:l.email,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:currentUser?.email||'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
     if(r.ok||r.status===201){if(btn){btn.textContent=isAr?'✓ تمت':'✓ Added';btn.style.background='var(--success)';}showToast('✅ '+(l.name||'Lead')+(isAr?' تمت الإضافة!':' added!'));}
     else throw new Error();
   } catch(e){if(btn){btn.textContent='+ CRM';btn.disabled=false;}showToast('❌ '+(isAr?'فشل':'Failed'));}
@@ -12095,7 +12106,11 @@ async function importAllLeads() {
   let ok=0;
   for(let i=0;i<_generatedLeads.length;i++){
     const l=_generatedLeads[i];
-    try{const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:l.phone,email:l.email,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:currentUser?.email||'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});if(r.ok||r.status===201){ok++;const btn=document.getElementById('lg-import-btn-'+i);if(btn){btn.textContent='✓';btn.style.background='var(--success)';btn.disabled=true;}}}catch(e){}
+    try{
+      const resolvedPhone = await resolvePendingPhone(l);
+      const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:l.email,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:currentUser?.email||'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
+      if(r.ok||r.status===201){ok++;const btn=document.getElementById('lg-import-btn-'+i);if(btn){btn.textContent='✓';btn.style.background='var(--success)';btn.disabled=true;}}
+    }catch(e){}
   }
   showToast('✅ '+ok+(isAr?' عميل تم استيراده!':' leads imported!'));
 }
