@@ -12018,6 +12018,9 @@ async function runLeadGenerator() {
     if(data.success && data.leads && data.leads.length>0) {
       _generatedLeads=data.leads;
       renderGeneratedLeads(data.leads,location,data.target_profile,data.mode);
+      if(data._debug_enrich) {
+        showToast(isAr?'⚠️ فشل جلب الإيميل/الهاتف لهذه الدفعة — جرّب توليد دفعة جديدة':'⚠️ Contact details failed for this batch — try generating again');
+      }
     } else if(_lgMode==='real') {
       // Apollo failed — do NOT silently fall back to fake leads
       loading.style.display='none'; btn.style.display='flex'; results.style.display='block';
