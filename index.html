@@ -4834,13 +4834,15 @@ function sourceTag(src) {
   const s = src.toLowerCase();
   let cls = 'source-tag';
   let icon = '';
-  if(s.includes('instagram'))     { cls += ' source-instagram'; icon = SOURCE_ICONS.instagram; }
+  let label = src;
+  if(s.includes('apollo')) { label = 'Verified'; }
+  else if(s.includes('instagram'))     { cls += ' source-instagram'; icon = SOURCE_ICONS.instagram; }
   else if(s.includes('tiktok'))   { cls += ' source-tiktok';    icon = SOURCE_ICONS.tiktok; }
   else if(s.includes('snapchat')) { cls += ' source-snapchat';  icon = SOURCE_ICONS.snapchat; }
   else if(s.includes('facebook')) { cls += ' source-facebook';  icon = SOURCE_ICONS.facebook; }
   else if(s.includes('whatsapp')) { cls += ' source-whatsapp';  icon = SOURCE_ICONS.whatsapp; }
   else if(s.includes('google'))   { cls += ' source-google';    icon = SOURCE_ICONS.google; }
-  return `<span class="${cls}" style="display:inline-flex;align-items:center;gap:5px">${icon}${src}</span>`;
+  return `<span class="${cls}" style="display:inline-flex;align-items:center;gap:5px">${icon}${label}</span>`;
 }
 
 // ─── RENDER LEADS TABLE ────────────────────────────────────────
@@ -7109,7 +7111,10 @@ function editLead(id) {
   document.getElementById('f-source').value = lead.source || 'WhatsApp';
   document.getElementById('f-status').value = lead.status || 'New';
   document.getElementById('f-value').value = (lead.value || '').replace('$','').replace(',','');
-  document.getElementById('f-assign').value = lead.assigned || 'Tariq Hassan';
+  const assignEl = document.getElementById('f-assign');
+  assignEl.value = lead.assigned || 'Tariq Hassan';
+  assignEl.disabled = !canAssignLeads;
+  assignEl.title = canAssignLeads ? '' : 'Only admins can assign leads';
   // Change save button to update
   const btn = document.querySelector('#modal .btn-primary');
   btn.textContent = '💾 Update Lead';
@@ -7124,7 +7129,11 @@ async function updateLead(id) {
   const source = document.getElementById('f-source').value || 'WhatsApp';
   const status = document.getElementById('f-status').value || 'New';
   const value = document.getElementById('f-value').value;
-  const assigned = document.getElementById('f-assign').value;
+  const existingLead = leads.find(l => l.id === id);
+  const requestedAssign = document.getElementById('f-assign').value;
+  // Non-admins can't change assignment even if the field was somehow re-enabled
+  // client-side - keep whatever it already was.
+  const assigned = canAssignLeads ? requestedAssign : (existingLead?.assigned || '');
   const phone = document.getElementById('f-phone')?.value.trim() || '';
   const email = document.getElementById('f-email')?.value.trim() || '';
   const notes = document.getElementById('f-notes')?.value.trim() || '';
@@ -7143,6 +7152,12 @@ async function updateLead(id) {
       body: JSON.stringify(updated)
     });
     if(!r.ok) { showToast('❌ Failed to update'); return; }
+    if(assigned && assigned !== (existingLead?.assigned || '')) {
+      fetch(SUPABASE_URL + '/functions/v1/notify-lead-event', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assigned_to: assigned, event_type: 'assigned', lead_name: updated.name, lead_company: updated.company, actor_name: currentUser?.email || '' })
+      }).catch(()=>{});
+    }
     await loadLeads();
     closeModal();
     // Reset save button
@@ -7192,6 +7207,12 @@ async function saveNote(id) {
     if(!r.ok) { showToast('❌ Failed to save note'); return; }
     const lead = leads.find(l => l.id === id);
     if(lead) lead.notes = notes;
+    if(lead && lead.assigned) {
+      fetch(SUPABASE_URL + '/functions/v1/notify-lead-event', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assigned_to: lead.assigned, event_type: 'note', lead_name: lead.name, lead_company: lead.company, actor_name: currentUser?.email || '', note_preview: notes })
+      }).catch(()=>{});
+    }
     showToast('📝 Note saved!');
   } catch(e) { console.error(e); showToast('❌ Error saving note'); }
 }
@@ -8515,6 +8536,7 @@ const _origAddLead = window.addLead;
 
 // ─── ADMIN ─────────────────────────────────────────────────────
 let isAdmin = false;
+let canAssignLeads = false;
 let allLeads = [];
 let teamMembers = [];
 
@@ -8525,6 +8547,7 @@ async function checkAdminStatus() {
     const data = await r.json();
     if(r.ok && data.length > 0) {
       isAdmin = true;
+      canAssignLeads = true; // platform super-admin
       document.getElementById('admin-nav-item').style.display = 'flex';
       // Admin loads all orgs
       await loadAdminOrgs();
@@ -8539,6 +8562,7 @@ async function checkAdminStatus() {
         const roles = await rm.json();
         if(rm.ok && Array.isArray(roles) && roles.length > 0) {
           isAdmin = true; // reuse existing flag: it only controls nav visibility
+          canAssignLeads = roles.some(r => r.role === 'admin'); // manager alone doesn't qualify
           document.getElementById('admin-nav-item').style.display = 'flex';
           document.querySelectorAll('.admin-tab').forEach(btn => {
             const oc = btn.getAttribute('onclick') || '';
