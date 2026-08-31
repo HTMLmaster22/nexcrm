@@ -929,7 +929,7 @@
   .score-6, .score-5 { background:rgba(245,158,11,0.2); color:#fcd34d; border:1px solid rgba(245,158,11,0.3); }
   .score-4, .score-3 { background:rgba(239,68,68,0.2); color:#f87171; border:1px solid rgba(239,68,68,0.3); }
   .score-2, .score-1 { background:rgba(148,163,184,0.15); color:#94a3b8; border:1px solid rgba(148,163,184,0.2); }
-  .score-loading { background:rgba(139,92,246,0.15); color:#c4b5fd; border:1px solid rgba(139,92,246,0.2); animation:pulse 1.5s infinite; }
+  .score-loading { background:rgba(139,92,246,0.15); color:#c4b5fd; border:1px solid rgba(139,92,246,0.2); }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
   .ai-modal-overlay {
     display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6);
@@ -4559,6 +4559,7 @@ function renderOrgSwitcher() {
 }
 function switchOrg(orgId) {
   currentOrg = userOrgs.find(o => o.id === orgId);
+  renderOrgSwitcher();
   loadLeads();
   loadDashboard();
   renderOrgsList();
@@ -4871,8 +4872,9 @@ function renderLeads() {
         </span>
       </td>
       <td style="white-space:nowrap">
-        <button class="action-btn btn-note" onclick="toggleNote(${l.id})" title="Notes">
+        <button class="action-btn btn-note" onclick="toggleNote(${l.id})" title="${l.notes ? 'Notes (has content)' : 'Notes'}" style="position:relative">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          ${l.notes ? '<span style="position:absolute;top:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:#3b82f6;box-shadow:0 0 0 1.5px var(--bg)"></span>' : ''}
         </button>
         <button class="action-btn" style="background:rgba(245,158,11,0.15);color:var(--warning)" onclick="toggleReminderRow(${l.id})" title="Set Reminder">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -4885,7 +4887,7 @@ function renderLeads() {
         </button>
       </td>
     </tr>
-    <tr class="notes-row" id="note-row-${l.id}" style="${l.notes ? 'display:table-row' : ''}">
+    <tr class="notes-row" id="note-row-${l.id}">
       <td colspan="9">
         <textarea class="notes-box" id="note-text-${l.id}" placeholder="Add follow-up notes...">${l.notes||''}</textarea>
         <button class="notes-save-btn" onclick="saveNote(${l.id})">💾 Save Note</button>
@@ -11911,7 +11913,29 @@ function selectLeadGenMode(mode) {
   }
 
   const countSel = document.getElementById('lg-count');
-  if(countSel) { if(mode==='real'){countSel.innerHTML='<option value="5">5 (Free trial)</option>';countSel.disabled=true;}else{countSel.innerHTML='<option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option>';countSel.disabled=false;} }
+  if(countSel) {
+    if(mode==='real'){
+      countSel.disabled = true;
+      countSel.innerHTML = '<option>Checking your limit\u2026</option>';
+      const roleDefaults = {admin:50, manager:25, sales:15, member:15};
+      fetch(SUPABASE_URL+'/rest/v1/org_members?user_id=eq.'+encodeURIComponent(currentUser?.id||'')+'&org_id=eq.'+encodeURIComponent(currentOrg?.id||'')+'&select=role,lead_gen_limit',{headers:HEADERS})
+        .then(r=>r.ok?r.json():[])
+        .then(rows=>{
+          const row=rows[0];
+          const limit=row?(row.lead_gen_limit ?? roleDefaults[row.role] ?? 10):10;
+          let opts=[5,10,25,50,100].filter(n=>n<=limit);
+          if(!opts.includes(limit)) opts.push(limit);
+          opts.sort((a,b)=>a-b);
+          const max=opts[opts.length-1];
+          countSel.innerHTML=opts.map(n=>`<option value="${n}"${n===max?' selected':''}>${n}</option>`).join('');
+          countSel.disabled=false;
+        })
+        .catch(()=>{countSel.innerHTML='<option value="10" selected>10</option>';countSel.disabled=false;});
+    }else{
+      countSel.innerHTML='<option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option>';
+      countSel.disabled=false;
+    }
+  }
   const btn = document.getElementById('lg-btn');
   if(btn) { if(mode==='real'){btn.style.background='linear-gradient(135deg,#f59e0b,#ef4444)';btn.querySelector('span').textContent='Get My 5 Free Real Leads';}else{btn.style.background='linear-gradient(135deg,#3b82f6,#8b5cf6)';btn.querySelector('span').textContent='Generate Leads';} }
 }
@@ -12093,7 +12117,7 @@ async function importSingleLead(index) {
   const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar');
   try {
     const resolvedPhone = await resolvePendingPhone(l);
-    const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:l.email,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:currentUser?.email||'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
+    const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:l.email,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
     if(r.ok||r.status===201){if(btn){btn.textContent=isAr?'✓ تمت':'✓ Added';btn.style.background='var(--success)';}showToast('✅ '+(l.name||'Lead')+(isAr?' تمت الإضافة!':' added!'));}
     else throw new Error();
   } catch(e){if(btn){btn.textContent='+ CRM';btn.disabled=false;}showToast('❌ '+(isAr?'فشل':'Failed'));}
@@ -12108,7 +12132,7 @@ async function importAllLeads() {
     const l=_generatedLeads[i];
     try{
       const resolvedPhone = await resolvePendingPhone(l);
-      const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:l.email,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:currentUser?.email||'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
+      const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:l.email,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
       if(r.ok||r.status===201){ok++;const btn=document.getElementById('lg-import-btn-'+i);if(btn){btn.textContent='✓';btn.style.background='var(--success)';btn.disabled=true;}}
     }catch(e){}
   }
