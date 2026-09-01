@@ -5000,6 +5000,11 @@ function nav(page, el) {
 function openModal() {
   populateAssignDropdown();
   leadStep(1); // reset to step 1
+  const assignEl = document.getElementById('f-assign');
+  if(assignEl) {
+    assignEl.disabled = !canAssignLeads;
+    assignEl.title = canAssignLeads ? '' : 'Only managers/admins can assign leads';
+  }
   document.getElementById('modal').classList.add('open');
 }
 
@@ -7127,7 +7132,7 @@ function editLead(id) {
   const assignEl = document.getElementById('f-assign');
   assignEl.value = lead.assigned || 'Tariq Hassan';
   assignEl.disabled = !canAssignLeads;
-  assignEl.title = canAssignLeads ? '' : 'Only admins can assign leads';
+  assignEl.title = canAssignLeads ? '' : 'Only managers/admins can assign leads';
   // Change save button to update
   const btn = document.querySelector('#modal .btn-primary');
   btn.textContent = '💾 Update Lead';
@@ -7171,6 +7176,14 @@ async function updateLead(id) {
         body: JSON.stringify({ assigned_to: assigned, event_type: 'assigned', lead_name: updated.name, lead_company: updated.company, actor_name: currentUser?.email || '' })
       }).catch(()=>{});
     }
+    // Status change on a lead someone's already assigned to — notify them,
+    // unless they're the one who just made the change.
+    if(assigned && assigned !== currentUser?.email && status !== (existingLead?.status || '')) {
+      fetch(SUPABASE_URL + '/functions/v1/notify-lead-event', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assigned_to: assigned, event_type: 'note', lead_name: updated.name, lead_company: updated.company, actor_name: currentUser?.email || '', note_preview: 'Status changed to: ' + status })
+      }).catch(()=>{});
+    }
     await loadLeads();
     closeModal();
     // Reset save button
@@ -7189,6 +7202,7 @@ async function updateLead(id) {
 
 // ─── DELETE LEAD ───────────────────────────────────────────────
 async function deleteLead(id) {
+  if(!canAssignLeads) { showToast('❌ Only managers/admins can remove leads'); return; }
   if(!confirm('Delete this lead? This cannot be undone.')) return;
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + id, {
@@ -7220,7 +7234,7 @@ async function saveNote(id) {
     if(!r.ok) { showToast('❌ Failed to save note'); return; }
     const lead = leads.find(l => l.id === id);
     if(lead) lead.notes = notes;
-    if(lead && lead.assigned) {
+    if(lead && lead.assigned && lead.assigned !== currentUser?.email) {
       fetch(SUPABASE_URL + '/functions/v1/notify-lead-event', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ assigned_to: lead.assigned, event_type: 'note', lead_name: lead.name, lead_company: lead.company, actor_name: currentUser?.email || '', note_preview: notes })
@@ -8575,7 +8589,7 @@ async function checkAdminStatus() {
         const roles = await rm.json();
         if(rm.ok && Array.isArray(roles) && roles.length > 0) {
           isAdmin = true; // reuse existing flag: it only controls nav visibility
-          canAssignLeads = roles.some(r => r.role === 'admin'); // manager alone doesn't qualify
+          canAssignLeads = roles.some(r => r.role === 'admin' || r.role === 'manager');
           document.getElementById('admin-nav-item').style.display = 'flex';
           document.querySelectorAll('.admin-tab').forEach(btn => {
             const oc = btn.getAttribute('onclick') || '';
@@ -12555,7 +12569,7 @@ async function importSingleScrapedLead(index) {
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads', {
       method: 'POST', headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ name: b.name, company: b.name, phone: b.phone, email: null, source: 'Google Places', status: 'New', assigned: currentUser?.email || '', org_id: currentOrg?.id || null, notes: 'Address: ' + (b.address || '—') + (b.website ? '\nWebsite: ' + b.website : '') + (b.rating ? '\nRating: ' + b.rating + ' (' + (b.rating_count||0) + ' reviews)' : ''), created_at: new Date().toISOString() })
+      body: JSON.stringify({ name: b.name, company: b.name, phone: b.phone, email: null, source: 'Google Places', status: 'New', assigned: '', org_id: currentOrg?.id || null, notes: 'Address: ' + (b.address || '—') + (b.website ? '\nWebsite: ' + b.website : '') + (b.rating ? '\nRating: ' + b.rating + ' (' + (b.rating_count||0) + ' reviews)' : ''), created_at: new Date().toISOString() })
     });
     if (r.ok || r.status === 201) { if (btn) { btn.textContent = '✓ Added'; btn.style.background = 'var(--success)'; } showToast('✅ ' + (b.name || 'Business') + ' added!'); }
     else throw new Error();
@@ -12571,7 +12585,7 @@ async function importAllScrapedLeads() {
     try {
       const r = await fetch(SUPABASE_URL + '/rest/v1/leads', {
         method: 'POST', headers: { ...HEADERS, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ name: b.name, company: b.name, phone: b.phone, email: null, source: 'Google Places', status: 'New', assigned: currentUser?.email || '', org_id: currentOrg?.id || null, notes: 'Address: ' + (b.address || '—') + (b.website ? '\nWebsite: ' + b.website : ''), created_at: new Date().toISOString() })
+        body: JSON.stringify({ name: b.name, company: b.name, phone: b.phone, email: null, source: 'Google Places', status: 'New', assigned: '', org_id: currentOrg?.id || null, notes: 'Address: ' + (b.address || '—') + (b.website ? '\nWebsite: ' + b.website : ''), created_at: new Date().toISOString() })
       });
       if (r.ok || r.status === 201) { ok++; const btn = document.getElementById('scraper-import-btn-' + i); if (btn) { btn.textContent = '✓'; btn.style.background = 'var(--success)'; btn.disabled = true; } }
     } catch (e) {}
