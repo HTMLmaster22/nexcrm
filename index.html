@@ -2357,6 +2357,26 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
               <!-- populated by JS: renderLgSizeChips() -->
             </div>
           </div>
+          <div id="lg-contact-section" style="display:none;margin-bottom:16px">
+            <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Contact Details" data-ar="بيانات التواصل">Contact Details</span></label>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <label style="display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);opacity:0.7">
+                <input type="checkbox" checked disabled style="width:16px;height:16px" />
+                <span style="font-size:13px;font-weight:600;color:var(--text)">Work email, name &amp; position</span>
+                <span style="margin-left:auto;font-size:11px;color:var(--text2)">always included</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);cursor:pointer">
+                <input type="checkbox" id="lg-include-phone" checked style="width:16px;height:16px" />
+                <span style="font-size:13px;font-weight:600;color:var(--text)">Phone number</span>
+                <span style="margin-left:auto;font-size:11px;color:var(--text2)">~8 credits/person, adds wait time</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:9px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);cursor:pointer">
+                <input type="checkbox" id="lg-include-personal-email" style="width:16px;height:16px" />
+                <span style="font-size:13px;font-weight:600;color:var(--text)">Personal email (in addition to work email)</span>
+                <span style="margin-left:auto;font-size:11px;color:var(--text2)">+1 credit/person</span>
+              </label>
+            </div>
+          </div>
           <div style="margin-bottom:16px"><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Additional details (optional)" data-ar="تفاصيل إضافية (اختياري)">Additional details (optional)</span></label><textarea class="form-input" id="lg-details" rows="2" placeholder="e.g. Target logistics, manufacturing companies with 50+ employees..." style="resize:none;font-size:13px;line-height:1.6"></textarea></div>
           <button onclick="runLeadGenerator()" id="lg-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(99,102,241,0.4)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
@@ -12065,12 +12085,14 @@ function selectLeadGenMode(mode) {
   const titlesSection = document.getElementById('lg-titles-section');
   const industrySection = document.getElementById('lg-industry-section');
   const sizeSection = document.getElementById('lg-size-section');
+  const contactSection = document.getElementById('lg-contact-section');
   const isReal = mode === 'real';
   if(channelsSection) channelsSection.style.display = isReal ? 'none' : 'block';
   if(categorySection) categorySection.style.display = isReal ? 'none' : 'block';
   if(titlesSection) titlesSection.style.display = isReal ? 'block' : 'none';
   if(industrySection) industrySection.style.display = isReal ? 'block' : 'none';
   if(sizeSection) sizeSection.style.display = isReal ? 'block' : 'none';
+  if(contactSection) contactSection.style.display = isReal ? 'block' : 'none';
   if(isReal) { renderLgTitleChips(); renderLgIndustryChips(); renderLgSizeChips(); }
 
   const btn = document.getElementById('lg-btn');
@@ -12224,7 +12246,7 @@ async function runLeadGenerator() {
   try {
     const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/apollo-leads', {
       method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':HEADERS.Authorization},
-      body:JSON.stringify({mode:_lgMode,mybiz,location,count:parseInt(count)||5,details,channels:_lgSelectedChannels,category:_lgSelectedCategory,person_titles:_lgSelectedTitles,industry_keywords:_lgSelectedIndustries,company_size_ranges:_lgSelectedSizes,org_id:currentOrg?.id,user_email:currentUser?.email})
+      body:JSON.stringify({mode:_lgMode,mybiz,location,count:parseInt(count)||5,details,channels:_lgSelectedChannels,category:_lgSelectedCategory,person_titles:_lgSelectedTitles,industry_keywords:_lgSelectedIndustries,company_size_ranges:_lgSelectedSizes,include_phone:document.getElementById('lg-include-phone')?.checked!==false,include_personal_email:document.getElementById('lg-include-personal-email')?.checked===true,org_id:currentOrg?.id,user_email:currentUser?.email})
     });
     const data = await response.json();
     if(data.success && data.leads && data.leads.length>0) {
