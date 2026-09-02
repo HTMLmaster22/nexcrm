@@ -1736,7 +1736,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
     </div>
     <div class="nav-item" onclick="nav('leads',this)">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span>Leads</span>
-      <span class="badge">24</span>
+      <span class="badge" id="nav-leads-badge">24</span>
     </div>
     <div class="nav-item" onclick="nav('pipeline',this)">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span>Pipeline</span>
@@ -4987,6 +4987,7 @@ function updateLeadStats() {
   const el = (id) => document.getElementById(id);
   if(el('stat-total')) el('stat-total').textContent = total;
   if(el('stat-total-sub')) el('stat-total-sub').textContent = currentOrg ? '📂 ' + currentOrg.name : 'All leads';
+  if(el('nav-leads-badge')) el('nav-leads-badge').textContent = total;
   if(el('stat-new')) el('stat-new').textContent = newLeads;
   if(el('stat-won')) el('stat-won').textContent = won;
   if(el('stat-rate')) el('stat-rate').textContent = '▲ ' + rate + '% ' + __t('conversion rate');
@@ -12395,7 +12396,7 @@ async function importSingleLead(index) {
   const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar');
   try {
     const resolvedPhone = await resolvePendingPhone(l);
-    const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:(l.email&&l.email!=='—')?l.email:null,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
+    const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:(l.email&&l.email!=='—')?l.email:null,apollo_person_id:l.apollo_person_id||null,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
     if(r.ok||r.status===201){if(btn){btn.textContent=isAr?'✓ تمت':'✓ Added';btn.style.background='var(--success)';}showToast('✅ '+(l.name||'Lead')+(isAr?' تمت الإضافة!':' added!'));}
     else throw new Error();
   } catch(e){if(btn){btn.textContent='+ CRM';btn.disabled=false;}showToast('❌ '+(isAr?'فشل':'Failed'));}
@@ -12410,7 +12411,7 @@ async function importAllLeads() {
     const l=_generatedLeads[i];
     try{
       const resolvedPhone = await resolvePendingPhone(l);
-      const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:(l.email&&l.email!=='—')?l.email:null,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
+      const r=await fetch(SUPABASE_URL+'/rest/v1/leads',{method:'POST',headers:{...HEADERS,'Prefer':'return=minimal'},body:JSON.stringify({name:l.name,company:l.company,phone:resolvedPhone,email:(l.email&&l.email!=='—')?l.email:null,apollo_person_id:l.apollo_person_id||null,source:l.source_channel||l.source||'AI Generated',status:'New',assigned:'',org_id:currentOrg?.id||null,notes:(l.why_good_lead||'')+'\n\nApproach: '+(l.approach||''),created_at:new Date().toISOString()})});
       if(r.ok||r.status===201){ok++;const btn=document.getElementById('lg-import-btn-'+i);if(btn){btn.textContent='✓';btn.style.background='var(--success)';btn.disabled=true;}}
       else if(r.status===409){dup++;const btn=document.getElementById('lg-import-btn-'+i);if(btn){btn.textContent=isAr?'موجود':'Already in CRM';btn.style.background='var(--text2)';btn.disabled=true;}}
       else{failed++;}
