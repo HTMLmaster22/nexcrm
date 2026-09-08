@@ -344,6 +344,12 @@
   .pill-cold { background:rgba(148,163,184,0.15); color:#94a3b8; }
   .pill-won { background:rgba(16,185,129,0.2); color:#10b981; }
   .pill-lost { background:rgba(239,68,68,0.15); color:#f87171; }
+  .pill-inprogress { background:rgba(245,158,11,0.15); color:#fcd34d; }
+  .pill-qualified { background:rgba(20,184,166,0.15); color:#5eead4; }
+  .pill-unqualified { background:rgba(148,163,184,0.15); color:#94a3b8; }
+  .pill-converted { background:rgba(16,185,129,0.2); color:#10b981; }
+  .status-select { border:none; cursor:pointer; font-size:11px; font-weight:700; padding:4px 22px 4px 10px; border-radius:20px; appearance:none; -webkit-appearance:none; background-repeat:no-repeat; background-position:right 6px center; background-size:10px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); }
+  .status-select option { background:var(--bg2); color:var(--text); }
   .source-tag {
     display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:6px; font-size:11px; font-weight:600;
     background:rgba(59,130,246,0.1); color:var(--accent2); border:1px solid rgba(59,130,246,0.15);
@@ -2027,14 +2033,14 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <div class="stat-change up">▲ <span data-en="Awaiting contact" data-ar="في انتظار التواصل">Awaiting contact</span></div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Converted / Won</div>
+          <div class="stat-label">Converted</div>
           <div class="stat-value" id="stat-won" style="color:var(--success)">—</div>
           <div class="stat-change up" id="stat-rate">Loading...</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Lost</div>
+          <div class="stat-label">Unqualified</div>
           <div class="stat-value" id="stat-lost" style="color:var(--danger)">—</div>
-          <div class="stat-change down">▼ Closed lost</div>
+          <div class="stat-change down">▼ Not a fit</div>
         </div>
       </div>
       <div class="card">
@@ -2069,6 +2075,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
                 <th>Name</th>
                 <th>Company</th>
                 <th>Phone</th>
+                <th>Email</th>
                 <th>Source</th>
                 <th>Status</th>
                 <th>Value</th>
@@ -4323,17 +4330,25 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
       <div class="form-group">
         <label class="form-label">Status — What stage is this lead at?</label>
         <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
-          <button type="button" onclick="selectStatus(this,'New')" class="stat-pick" style="padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px">
+          <button type="button" onclick="selectStatus(this,'New')" class="stat-pick" style="padding:10px 14px;border-radius:10px;border:1px solid var(--accent);background:rgba(59,130,246,0.08);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px">
             <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;flex-shrink:0"></div>
-            <div><div style="font-size:13px;font-weight:700;color:var(--text)">New</div><div style="font-size:11px;color:var(--text2)">Just came in, haven'''t contacted yet</div></div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--text)">New</div><div style="font-size:11px;color:var(--text2)">A fresh lead that has not been contacted yet</div></div>
           </button>
-          <button type="button" onclick="selectStatus(this,'Warm')" class="stat-pick" style="padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px">
-            <div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;flex-shrink:0"></div>
-            <div><div style="font-size:13px;font-weight:700;color:var(--text)">Warm</div><div style="font-size:11px;color:var(--text2)">Contacted, showing interest</div></div>
+          <button type="button" onclick="selectStatus(this,'In Progress')" class="stat-pick" style="padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px">
+            <div style="width:8px;height:8px;border-radius:50%;background:#fcd34d;flex-shrink:0"></div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--text)">In Progress</div><div style="font-size:11px;color:var(--text2)">The team has started outreach or communication</div></div>
           </button>
-          <button type="button" onclick="selectStatus(this,'Active')" class="stat-pick" style="padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px">
-            <div style="width:8px;height:8px;border-radius:50%;background:#8b5cf6;flex-shrink:0"></div>
-            <div><div style="font-size:13px;font-weight:700;color:var(--text)">Active</div><div style="font-size:11px;color:var(--text2)">In negotiation or proposal stage</div></div>
+          <button type="button" onclick="selectStatus(this,'Qualified')" class="stat-pick" style="padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px">
+            <div style="width:8px;height:8px;border-radius:50%;background:#14b8a6;flex-shrink:0"></div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--text)">Qualified</div><div style="font-size:11px;color:var(--text2)">Fits your criteria and has sales potential</div></div>
+          </button>
+          <button type="button" onclick="selectStatus(this,'Unqualified')" class="stat-pick" style="padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px">
+            <div style="width:8px;height:8px;border-radius:50%;background:#94a3b8;flex-shrink:0"></div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--text)">Unqualified</div><div style="font-size:11px;color:var(--text2)">Not a good fit, or not ready to buy</div></div>
+          </button>
+          <button type="button" onclick="selectStatus(this,'Converted')" class="stat-pick" style="padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;text-align:left;transition:all 0.2s;display:flex;align-items:center;gap:10px">
+            <div style="width:8px;height:8px;border-radius:50%;background:#10b981;flex-shrink:0"></div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--text)">Converted</div><div style="font-size:11px;color:var(--text2)">Turned into an account, contact, or opportunity</div></div>
           </button>
         </div>
         <input type="hidden" id="f-status" value="New"/>
@@ -4845,8 +4860,10 @@ const sb = {
 let leads = [];
 
 const statusClass = {
-  'Won':'pill-won','Active':'pill-active','Warm':'pill-warm','New':'pill-new','Cold':'pill-cold','Lost':'pill-lost'
+  'Won':'pill-won','Active':'pill-active','Warm':'pill-warm','New':'pill-new','Cold':'pill-cold','Lost':'pill-lost',
+  'In Progress':'pill-inprogress','Qualified':'pill-qualified','Unqualified':'pill-unqualified','Converted':'pill-converted'
 };
+const LEAD_STATUSES = ['New','In Progress','Qualified','Unqualified','Converted'];
 
 // ─── SOURCE FILTER ─────────────────────────────────────────────
 let activeSourceFilter = 'all';
@@ -4900,8 +4917,11 @@ function renderLeads() {
       <td><div style="font-weight:600">${l.name}</div></td>
       <td><div style="color:var(--text2)">${l.company||'—'}</div></td>
       <td>${l.phone ? `<a href="https://wa.me/${l.phone.replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--success);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>${l.phone}</a>` : '<span style="color:var(--text2)">—</span>'}</td>
+      <td>${l.email ? `<a href="mailto:${l.email}" style="color:var(--accent);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:4px" title="${l.email}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.email}</span></a>` : '<span style="color:var(--text2)">—</span>'}</td>
       <td>${sourceTag(l.source)}</td>
-      <td><span class="status-pill ${statusClass[l.status]||'pill-new'}">${l.status||'New'}</span></td>
+      <td><select class="status-select ${statusClass[l.status]||'pill-new'}" onchange="quickStatus(${l.id},this.value,this)" onclick="event.stopPropagation()">
+        ${LEAD_STATUSES.map(s=>`<option value="${s}" ${((l.status||'New')===s)?'selected':''}>${s}</option>`).join('')}
+      </select></td>
       <td><span style="font-weight:600;color:var(--success)">${l.value||'—'}</span></td>
       <td><div style="color:var(--text2);font-size:12px">${l.assigned||'—'}</div></td>
       <td><div style="color:var(--text2);font-size:12px">${l.date||'—'}</div></td>
@@ -4929,7 +4949,7 @@ function renderLeads() {
       </td>
     </tr>
     <tr class="notes-row" id="note-row-${l.id}">
-      <td colspan="9">
+      <td colspan="11">
         ${(l.email || l.phone) ? `<div style="display:flex;gap:16px;flex-wrap:wrap;padding:8px 0;margin-bottom:8px;border-bottom:1px solid var(--border);font-size:12px">
           ${l.email ? `<span>✉️ <a href="mailto:${l.email}" style="color:var(--text);text-decoration:none">${l.email}</a></span>` : ''}
           ${l.phone ? `<span>📞 <a href="tel:${l.phone}" style="color:var(--text);text-decoration:none">${l.phone}</a></span>` : ''}
@@ -4939,7 +4959,7 @@ function renderLeads() {
       </td>
     </tr>
     <tr class="reminder-row" id="reminder-row-${l.id}">
-      <td colspan="9">
+      <td colspan="11">
         <div class="reminder-form">
           <span style="font-size:12px;font-weight:600;color:var(--text2)">🔔 Set Reminder:</span>
           <input type="text" id="rem-note-${l.id}" placeholder="e.g. Call about pricing" />
@@ -4980,8 +5000,8 @@ async function loadLeads() {
 function updateLeadStats() {
   const total = leads.length;
   const newLeads = leads.filter(l => l.status === 'New').length;
-  const won = leads.filter(l => l.status === 'Won' || l.status === 'Active').length;
-  const lost = leads.filter(l => l.status === 'Lost').length;
+  const won = leads.filter(l => l.status === 'Converted').length;
+  const lost = leads.filter(l => l.status === 'Unqualified').length;
   const rate = total > 0 ? Math.round((won / total) * 100) : 0;
 
   const el = (id) => document.getElementById(id);
@@ -5032,6 +5052,13 @@ function openModal() {
     assignEl.disabled = !canAssignLeads;
     assignEl.title = canAssignLeads ? '' : 'Only managers/admins can assign leads';
   }
+  const statusEl = document.getElementById('f-status');
+  if(statusEl) statusEl.value = 'New';
+  document.querySelectorAll('.stat-pick').forEach(b => {
+    const isNew = b.getAttribute('onclick') === "selectStatus(this,'New')";
+    b.style.background = isNew ? 'rgba(59,130,246,0.08)' : 'var(--bg3)';
+    b.style.borderColor = isNew ? 'var(--accent)' : 'var(--border)';
+  });
   document.getElementById('modal').classList.add('open');
 }
 
@@ -7155,6 +7182,11 @@ function editLead(id) {
   document.getElementById('f-company').value = lead.company || '';
   document.getElementById('f-source').value = lead.source || 'WhatsApp';
   document.getElementById('f-status').value = lead.status || 'New';
+  document.querySelectorAll('.stat-pick').forEach(b => {
+    const isMatch = b.getAttribute('onclick') === `selectStatus(this,'${lead.status || 'New'}')`;
+    b.style.background = isMatch ? 'rgba(59,130,246,0.08)' : 'var(--bg3)';
+    b.style.borderColor = isMatch ? 'var(--accent)' : 'var(--border)';
+  });
   document.getElementById('f-value').value = (lead.value || '').replace('$','').replace(',','');
   const assignEl = document.getElementById('f-assign');
   assignEl.value = lead.assigned || 'Tariq Hassan';
@@ -9126,7 +9158,9 @@ async function loadAllLeads() {
         <td><div style="font-weight:600">${l.name||'—'}</div></td>
         <td><div style="color:var(--text2)">${l.company||'—'}</div></td>
         <td><span class="source-tag">${l.source||'—'}</span></td>
-        <td><span class="status-pill ${statusClass[l.status]||'pill-new'}">${l.status||'New'}</span></td>
+        <td><select class="status-select ${statusClass[l.status]||'pill-new'}" onchange="quickStatus(${l.id},this.value,this)">
+          ${LEAD_STATUSES.map(s=>`<option value="${s}" ${((l.status||'New')===s)?'selected':''}>${s}</option>`).join('')}
+        </select></td>
         <td><span style="font-weight:600;color:var(--success)">${l.value||'—'}</span></td>
         <td>
           <select class="select-input" onchange="reassignLead(${l.id}, this.value)">
@@ -9236,7 +9270,7 @@ async function loadDashboard() {
     }
 
     const total = data.length;
-    const won = data.filter(l => l.status === 'Won').length;
+    const won = data.filter(l => l.status === 'Converted').length;
     const totalValue = data.reduce((s,l) => s + (parseInt((l.value||'0').replace(/[$,]/g,''))||0), 0);
     const convRate = total > 0 ? Math.round(won/total*100) : 0;
     const orgName = currentOrg ? currentOrg.name : 'All';
@@ -9280,7 +9314,7 @@ async function loadPerformance() {
       byRep[rep].count++;
       const val = parseInt((l.value||'0').replace(/[$,]/g,'')) || 0;
       byRep[rep].value += val;
-      if(l.status === 'Won') byRep[rep].won++;
+      if(l.status === 'Converted') byRep[rep].won++;
     });
 
     const sorted = Object.entries(byRep).sort((a,b) => b[1].value - a[1].value);
@@ -9303,7 +9337,7 @@ async function loadPerformance() {
 
     const totalLeads = data.length;
     const totalValue = data.reduce((s,l) => s + (parseInt((l.value||'0').replace(/[$,]/g,''))||0), 0);
-    const wonLeads = data.filter(l => l.status==='Won').length;
+    const wonLeads = data.filter(l => l.status==='Converted').length;
     const convRate = totalLeads > 0 ? Math.round(wonLeads/totalLeads*100) : 0;
 
     teamStats.innerHTML = `
@@ -9444,7 +9478,8 @@ function renderDashTeamPerf() {
 
 // ─── PIPELINE ──────────────────────────────────────────────────
 function renderPipeline() {
-  const stages = { New:'new', Warm:'warm', Active:'active', Won:'won', Lost:'lost', Cold:'warm' };
+  const stages = { New:'new', 'In Progress':'active', Qualified:'warm', Unqualified:'lost', Converted:'won',
+    Warm:'warm', Active:'active', Won:'won', Lost:'lost', Cold:'warm' }; // legacy values still map sensibly
   const cols = { new:[], warm:[], active:[], won:[], lost:[] };
   let total = 0;
 
@@ -9469,7 +9504,7 @@ function renderPipeline() {
     col.innerHTML = items.map(l => {
       const val = parseInt((l.value||'0').replace(/[$,]/g,''))||0;
       const init = (l.assigned||'?')[0].toUpperCase();
-      const nextStatuses = { new:['Warm','Won','Lost'], warm:['New','Active','Won','Lost'], active:['Won','Lost'], won:['Active'], lost:['New','Warm'] };
+      const nextStatuses = { new:['In Progress','Qualified','Unqualified'], warm:['In Progress','Converted','Unqualified'], active:['Qualified','Converted','Unqualified'], won:[], lost:['New'] };
       const nextBtns = (nextStatuses[stage]||[]).map(s =>
         '<button onclick="event.stopPropagation();quickStatus(' + l.id + ',&quot;' + s + '&quot;)" style="font-size:10px;padding:2px 7px;border-radius:5px;border:1px solid var(--border);background:var(--bg2);color:var(--text2);cursor:pointer;margin-right:3px">→ ' + s + '</button>'
       ).join('');
@@ -9485,22 +9520,30 @@ function renderPipeline() {
 }
 
 // ─── QUICK STATUS CHANGE ───────────────────────────────────────
-async function quickStatus(id, newStatus) {
+async function quickStatus(id, newStatus, selectEl) {
+  const oldStatus = (leads.find(l => l.id === id) || {}).status || 'New';
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + id, {
       method: 'PATCH',
       headers: { ...HEADERS, 'Prefer': 'return=minimal' },
       body: JSON.stringify({ status: newStatus })
     });
-    if(!r.ok) { showToast('❌ Failed to update status'); return; }
+    if(!r.ok) { showToast('❌ Failed to update status'); if(selectEl) selectEl.value = oldStatus; return; }
     // Update locally for instant UI update
     const lead = leads.find(l => l.id === id);
     if(lead) lead.status = newStatus;
+    if(selectEl) selectEl.className = 'status-select ' + (statusClass[newStatus] || 'pill-new');
     renderPipeline();
     renderLeads();
     updateLeadStats();
+    if(lead && lead.assigned && lead.assigned !== currentUser?.email) {
+      fetch(SUPABASE_URL + '/functions/v1/notify-lead-event', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assigned_to: lead.assigned, event_type: 'note', lead_name: lead.name, lead_company: lead.company, actor_name: currentUser?.email || '', note_preview: 'Status changed to: ' + newStatus })
+      }).catch(()=>{});
+    }
     showToast('✅ Moved to ' + newStatus);
-  } catch(e) { showToast('❌ Error'); }
+  } catch(e) { showToast('❌ Error'); if(selectEl) selectEl.value = oldStatus; }
 }
 
 // ─── ANALYTICS ─────────────────────────────────────────────────
@@ -9528,8 +9571,8 @@ function renderAnalytics() {
   }
 
   const total = leads.length;
-  const won = leads.filter(l => l.status === 'Won').length;
-  const lost = leads.filter(l => l.status === 'Lost').length;
+  const won = leads.filter(l => l.status === 'Converted').length;
+  const lost = leads.filter(l => l.status === 'Unqualified').length;
   const totalVal = leads.reduce((s,l) => s + (parseInt((l.value||'0').replace(/[$,]/g,''))||0), 0);
   const convRate = total > 0 ? Math.round(won/total*100) : 0;
 
@@ -10281,10 +10324,10 @@ async function generatePDFReport(btn) {
   // Get leads data
   const reportLeads = leads.length > 0 ? leads : (window.allLeads || []);
   const total = reportLeads.length;
-  const won = reportLeads.filter(l => l.status === 'Won').length;
-  const lost = reportLeads.filter(l => l.status === 'Lost').length;
-  const active = reportLeads.filter(l => l.status === 'Active').length;
-  const warm = reportLeads.filter(l => l.status === 'Warm').length;
+  const won = reportLeads.filter(l => l.status === 'Converted').length;
+  const lost = reportLeads.filter(l => l.status === 'Unqualified').length;
+  const active = reportLeads.filter(l => l.status === 'In Progress').length;
+  const warm = reportLeads.filter(l => l.status === 'Qualified').length;
   const newL = reportLeads.filter(l => l.status === 'New').length;
   const convRate = total > 0 ? Math.round((won / total) * 100) : 0;
   const pipelineVal = reportLeads.reduce((s, l) => s + (parseFloat(l.value) || 0), 0);
@@ -10356,7 +10399,8 @@ async function generatePDFReport(btn) {
       <td style="padding:10px 8px;font-size:12px;color:#555">${l.phone || '—'}</td>
       <td style="padding:10px 8px;font-size:12px;color:#555">${l.source || '—'}</td>
       <td style="padding:10px 8px">
-        <span style="background:${l.status==='Won'?'#dcfce7':l.status==='Lost'?'#fee2e2':l.status==='Active'?'#dbeafe':'#fef9c3'};color:${l.status==='Won'?'#16a34a':l.status==='Lost'?'#dc2626':l.status==='Active'?'#2563eb':'#854d0e'};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">${l.status || 'New'}</span>
+        ${(() => { const c = {New:['#fef9c3','#854d0e'],'In Progress':['#dbeafe','#2563eb'],Qualified:['#ccfbf1','#0d9488'],Unqualified:['#f1f5f9','#64748b'],Converted:['#dcfce7','#16a34a']}[l.status] || ['#fef9c3','#854d0e'];
+          return `<span style="background:${c[0]};color:${c[1]};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">${l.status || 'New'}</span>`; })()}
       </td>
       <td style="padding:10px 8px;font-size:12px;font-weight:700;color:#222">${l.value ? 'SAR ' + Number(l.value).toLocaleString() : '—'}</td>
     </tr>`).join('');
@@ -10437,7 +10481,7 @@ async function generatePDFReport(btn) {
     </div>
     <div style="border:1px solid #e2e8f0;border-radius:14px;padding:24px">
       <div style="font-size:14px;font-weight:800;color:#0f172a;margin-bottom:20px">Pipeline Status</div>
-      ${[['New', newL, '#f59e0b'],['Warm', warm, '#3b82f6'],['Active', active, '#8b5cf6'],['Won', won, '#10b981'],['Lost', lost, '#ef4444']].map(([s,c,col]) => `
+      ${[['New', newL, '#f59e0b'],['Qualified', warm, '#3b82f6'],['In Progress', active, '#8b5cf6'],['Converted', won, '#10b981'],['Unqualified', lost, '#ef4444']].map(([s,c,col]) => `
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
           <div style="width:10px;height:10px;border-radius:50%;background:${col};flex-shrink:0"></div>
           <div style="flex:1;font-size:12px;color:#444;font-weight:600">${s}</div>
