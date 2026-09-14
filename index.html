@@ -2357,7 +2357,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
             <div id="lg-industries" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px">
               <!-- populated by JS: renderLgIndustryChips() -->
             </div>
-            <input class="form-input" id="lg-industry-custom" placeholder="Add a custom industry keyword and press Enter (e.g. med spa, cold storage)" onkeydown="if(event.key==='Enter'){event.preventDefault();addLgCustomIndustry();}" />
+            <input class="form-input" id="lg-industry-custom" placeholder="Add a custom industry keyword in English and press Enter (e.g. construction, call center)" onkeydown="if(event.key==='Enter'){event.preventDefault();addLgCustomIndustry();}" />
           </div>
           <div id="lg-size-section" style="display:none;margin-bottom:16px">
             <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Company Size (optional)" data-ar="حجم الشركة (اختياري)">Company Size (optional) — leave unselected for any size</span></label>
@@ -12218,6 +12218,13 @@ function addLgCustomIndustry() {
   const input = document.getElementById('lg-industry-custom');
   const val = (input?.value || '').trim();
   if(!val) return;
+  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  // Apollo's company database is English-only -- Arabic keywords match zero
+  // companies and silently return an empty result set for the whole search.
+  if(/[\u0600-\u06FF]/.test(val)) {
+    showToast(isAr ? '⚠️ Apollo يبحث بالإنجليزية فقط — استخدم كلمة إنجليزية' : '⚠️ Apollo only matches English — use an English keyword');
+    return;
+  }
   if(!_lgSelectedIndustries.includes(val)) _lgSelectedIndustries.push(val);
   input.value = '';
   renderLgIndustryChips();
@@ -12309,11 +12316,31 @@ async function runLeadGenerator() {
       loading.style.display='none'; btn.style.display='flex'; results.style.display='block';
       const errBox = document.getElementById('lg-results');
       errBox.style.display='block';
-      errBox.innerHTML = `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:16px;padding:24px;text-align:center;">
-        <div style="font-size:28px;margin-bottom:12px">⚠️</div>
-        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">${isAr?'تعذّر الاتصال بقاعدة البيانات الحقيقية':'Could Not Connect to Real Lead Database'}</div>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:16px">${isAr?'مشكلة في الاتصال بـ Apollo API. يرجى التأكد من إعداد مفتاح API في Supabase.':'Apollo API connection failed. Please check APOLLO_API_KEY is set in Supabase Vault.'}</div>
-        <div style="font-size:12px;color:var(--text2);background:var(--bg2);border-radius:8px;padding:10px;margin-bottom:16px;text-align:left;direction:ltr;">Error: ${data.error||'No leads returned'}</div>
+      const rawErr = data.error || 'No leads returned';
+      const isNoResults = /no results/i.test(rawErr);
+      const hasArabicKeyword = _lgSelectedIndustries.some(k => /[\u0600-\u06FF]/.test(k));
+      const headline = isNoResults
+        ? (isAr ? 'لا توجد نتائج مطابقة لهذه الفلاتر' : 'No matches for these filters')
+        : (isAr ? 'تعذّر الاتصال بقاعدة البيانات الحقيقية' : 'Could Not Connect to Real Lead Database');
+      let explain;
+      if (hasArabicKeyword) {
+        explain = isAr
+          ? 'قاعدة بيانات Apollo تبحث بالإنجليزية فقط — الكلمات العربية في "القطاع المستهدف" لا تطابق أي شركة. احذفها واستخدم كلمات إنجليزية مثل hospitality أو construction.'
+          : "Apollo's database only matches English. The Arabic keywords in Target Industry match nothing — remove them and use English terms like hospitality or construction.";
+      } else if (isNoResults) {
+        explain = isAr
+          ? 'الفلاتر ضيقة جداً. جرّب إزالة بعض القطاعات أو أحجام الشركات، أو أضف مناصب وظيفية أكثر.'
+          : 'Your filters are too narrow. Try removing some industries or company sizes, or adding more job positions.';
+      } else {
+        explain = isAr
+          ? 'مشكلة في الاتصال بـ Apollo API. يرجى التأكد من إعداد مفتاح API في Supabase.'
+          : 'Apollo API connection failed. Please check APOLLO_API_KEY is set in Supabase.';
+      }
+      errBox.innerHTML = `<div style="background:${isNoResults?'rgba(245,158,11,0.1)':'rgba(239,68,68,0.1)'};border:1px solid ${isNoResults?'rgba(245,158,11,0.3)':'rgba(239,68,68,0.3)'};border-radius:16px;padding:24px;text-align:center;">
+        <div style="font-size:28px;margin-bottom:12px">${isNoResults?'🔍':'⚠️'}</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">${headline}</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:16px">${explain}</div>
+        <div style="font-size:12px;color:var(--text2);background:var(--bg2);border-radius:8px;padding:10px;margin-bottom:16px;text-align:left;direction:ltr;">Error: ${rawErr}</div>
         <button onclick="document.getElementById('lg-results').style.display='none';document.getElementById('lg-btn').style.display='flex';" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;">Try Again</button>
       </div>`;
       return;
