@@ -2545,6 +2545,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           </div>
           <div id="lg-leads-list"></div>
         </div>
+        <div id="lg-error" style="display:none"></div>
       </div>
     </div>
 
@@ -12314,7 +12315,8 @@ async function runLeadGenerator() {
     } else if(_lgMode==='real') {
       // Apollo failed — do NOT silently fall back to fake leads
       loading.style.display='none'; btn.style.display='flex'; results.style.display='block';
-      const errBox = document.getElementById('lg-results');
+      const errBox = document.getElementById('lg-error');
+      document.getElementById('lg-results').style.display='none';
       errBox.style.display='block';
       const rawErr = data.error || 'No leads returned';
       const isNoResults = /no results/i.test(rawErr);
@@ -12341,7 +12343,7 @@ async function runLeadGenerator() {
         <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">${headline}</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:16px">${explain}</div>
         <div style="font-size:12px;color:var(--text2);background:var(--bg2);border-radius:8px;padding:10px;margin-bottom:16px;text-align:left;direction:ltr;">Error: ${rawErr}</div>
-        <button onclick="document.getElementById('lg-results').style.display='none';document.getElementById('lg-btn').style.display='flex';" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;">Try Again</button>
+        <button onclick="document.getElementById('lg-error').style.display='none';document.getElementById('lg-btn').style.display='flex';" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;">Try Again</button>
       </div>`;
       return;
     } else throw new Error(data.error||'No leads');
@@ -12349,14 +12351,15 @@ async function runLeadGenerator() {
     console.error('Lead generator error:', e);
     if(_lgMode==='real') {
       loading.style.display='none'; btn.style.display='flex';
-      const errBox = document.getElementById('lg-results');
+      const errBox = document.getElementById('lg-error');
+      document.getElementById('lg-results').style.display='none';
       errBox.style.display='block';
       errBox.innerHTML = `<div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:16px;padding:24px;text-align:center;">
         <div style="font-size:28px;margin-bottom:12px">⚠️</div>
-        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">${isAr?'فشل الاتصال بقاعدة البيانات':'Real Lead Database Unreachable'}</div>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:16px">${isAr?'تحقق من إعداد APOLLO_API_KEY في Supabase Edge Functions':'Check APOLLO_API_KEY in Supabase Vault → Secrets'}</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">${isAr?'حدث خطأ أثناء التوليد':'Something went wrong generating leads'}</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:16px">${isAr?'جرّب مرة أخرى. إذا استمر الخطأ، أرسل الرسالة أدناه.':'Try again. If it keeps happening, send the message below.'}</div>
         <div style="font-size:12px;color:var(--text2);background:var(--bg2);border-radius:8px;padding:10px;margin-bottom:16px;text-align:left;direction:ltr;">Error: ${e.message}</div>
-        <button onclick="document.getElementById('lg-results').style.display='none';document.getElementById('lg-btn').style.display='flex';" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;">Try Again</button>
+        <button onclick="document.getElementById('lg-error').style.display='none';document.getElementById('lg-btn').style.display='flex';" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;">Try Again</button>
       </div>`;
     } else {
       _generatedLeads=generateFallbackLeadsLocal(mybiz,location,Math.min(parseInt(count)||5,10));
@@ -12377,7 +12380,12 @@ function generateFallbackLeadsLocal(mybiz,location,count) {
 }
 
 function renderGeneratedLeads(leads,location,targetProfile,mode) {
+  const errBox=document.getElementById('lg-error');
+  if(errBox){ errBox.style.display='none'; errBox.innerHTML=''; }
+  const resultsBox=document.getElementById('lg-results');
+  if(resultsBox) resultsBox.style.display='block';
   const list=document.getElementById('lg-leads-list'); const title=document.getElementById('lg-results-title'); const profileEl=document.getElementById('lg-target-profile');
+  if(!list||!title){ console.error('Lead generator: results container missing'); return; }
   const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar'); const isReal=mode==='real';
   title.innerHTML=`<span style="display:flex;align-items:center;gap:8px">${isReal?`<span style="background:rgba(16,185,129,0.12);color:var(--success);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">${isAr?'متحقق':'Verified'}</span>`:`<span style="background:rgba(59,130,246,0.12);color:var(--accent);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">AI</span>`}${leads.length} ${isAr?'عميل محتمل في':'prospects found in'} ${location}</span>`;
   if(profileEl&&targetProfile) profileEl.textContent=targetProfile;
