@@ -2535,6 +2535,17 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <div id="scraper-leads-list"></div>
         </div>
 
+        <div id="lg-credits-panel" style="display:none;margin-bottom:16px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px 16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Lead Generation Balance</span>
+              <span style="font-size:9px;font-weight:700;background:rgba(239,68,68,0.15);color:#f87171;padding:2px 7px;border-radius:20px">OWNER ONLY</span>
+            </div>
+            <button onclick="loadLeadCredits()" style="background:none;border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit">Refresh</button>
+          </div>
+          <div id="lg-credits-body" style="font-size:12px;color:var(--text2)">Loading…</div>
+        </div>
+
         <div id="lg-results" style="display:none">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
             <div><div style="font-size:14px;font-weight:700;color:var(--text)" id="lg-results-title"></div><div style="font-size:12px;color:var(--text2);margin-top:2px" id="lg-target-profile"></div></div>
@@ -8626,6 +8637,7 @@ const _origAddLead = window.addLead;
 // ─── ADMIN ─────────────────────────────────────────────────────
 let isAdmin = false;
 let canAssignLeads = false;
+let isSuperAdmin = false; // platform owner only - gates the Apollo credit panel
 let allLeads = [];
 let teamMembers = [];
 
@@ -8637,6 +8649,7 @@ async function checkAdminStatus() {
     if(r.ok && data.length > 0) {
       isAdmin = true;
       canAssignLeads = true; // platform super-admin
+      isSuperAdmin = true;
       document.getElementById('admin-nav-item').style.display = 'flex';
       // Admin loads all orgs
       await loadAdminOrgs();
@@ -12074,6 +12087,53 @@ document.addEventListener('click', e => { const m=document.getElementById('follo
 let _generatedLeads = [];
 let _lgMode = 'ai';
 
+async function loadLeadCredits() {
+  const panel = document.getElementById('lg-credits-panel');
+  const body = document.getElementById('lg-credits-body');
+  if(!panel || !body) return;
+  if(!isSuperAdmin) { panel.style.display='none'; return; }
+  panel.style.display='block';
+  body.textContent = 'Loading…';
+  try {
+    const r = await fetch(SUPABASE_URL + '/functions/v1/apollo-credits', {
+      method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':HEADERS.Authorization}, body:'{}'
+    });
+    const d = await r.json();
+    if(!d.success) { body.innerHTML = `<span style="color:#f87171">Couldn't load balance: ${d.error||'unknown'}</span>`; return; }
+
+    const row = (label, c, note) => {
+      if(!c || !c.limit) return '';
+      const left = c.left_over ?? 0, limit = c.limit || 1;
+      const pct = Math.max(0, Math.min(100, Math.round((left/limit)*100)));
+      const col = pct === 0 ? '#ef4444' : pct < 15 ? '#f59e0b' : '#10b981';
+      return `<div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+          <span style="color:var(--text)">${label}${note?` <span style="color:var(--text2)">· ${note}</span>`:''}</span>
+          <span style="color:${col};font-weight:700">${left.toLocaleString()} / ${limit.toLocaleString()} left</span>
+        </div>
+        <div style="height:5px;background:var(--bg2);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${col}"></div></div>
+      </div>`;
+    };
+
+    let cycleNote = '';
+    if(d.cycle?.end_date) {
+      const end = new Date(d.cycle.end_date);
+      const days = Math.max(0, Math.ceil((end - new Date())/86400000));
+      cycleNote = `<div style="font-size:11px;color:var(--text2);margin-top:6px">Resets in ${days} day${days===1?'':'s'} (${end.toLocaleDateString()})</div>`;
+    }
+    const warn = (d.phone && d.phone.left_over === 0)
+      ? `<div style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:11px;color:#f87171"><b>Phone credits exhausted.</b> Phone reveals will return nothing until the cycle resets — untick "Phone number" to stop wasting time waiting on them.</div>`
+      : '';
+
+    body.innerHTML = warn
+      + row('Email &amp; enrichment', d.lead, '1 credit each')
+      + row('Phone reveals', d.phone, '~8 credits each')
+      + cycleNote;
+  } catch(e) {
+    body.innerHTML = `<span style="color:#f87171">Couldn't load balance</span>`;
+  }
+}
+
 function selectLeadGenMode(mode) {
   _lgMode = mode;
   const aiCard = document.getElementById('mode-ai-card');
@@ -12143,6 +12203,11 @@ function selectLeadGenMode(mode) {
   if(sizeSection) sizeSection.style.display = isReal ? 'block' : 'none';
   if(contactSection) contactSection.style.display = isReal ? 'block' : 'none';
   if(isReal) { renderLgTitleChips(); renderLgIndustryChips(); renderLgSizeChips(); }
+  const creditsPanel = document.getElementById('lg-credits-panel');
+  if(creditsPanel) {
+    if(isReal && isSuperAdmin) loadLeadCredits();
+    else creditsPanel.style.display = 'none';
+  }
 
   const btn = document.getElementById('lg-btn');
   if(btn) { if(mode==='real'){btn.style.background='linear-gradient(135deg,#f59e0b,#ef4444)';btn.querySelector('span').textContent='Get My 5 Free Real Leads';}else{btn.style.background='linear-gradient(135deg,#3b82f6,#8b5cf6)';btn.querySelector('span').textContent='Generate Leads';} }
