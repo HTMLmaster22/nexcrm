@@ -4573,11 +4573,7 @@ function renderOrgSwitcher() {
   const isMobile = window.innerWidth <= 900;
   if(isMobile && currentOrg) {
     // Update mobile org name
-    const mobileOrgEl = document.getElementById('mobile-org-name');
-    if(mobileOrgEl) {
-      mobileOrgEl.style.display = 'block';
-      mobileOrgEl.textContent = '● ' + currentOrg.name;
-    }
+    updateMobileOrgLabel();
     // Force load with slight delay to ensure HEADERS are set
     setTimeout(() => { loadDashboard(); loadLeads(); }, 200);
     // Retry after 2s in case first attempt failed
@@ -4608,11 +4604,7 @@ function renderOrgSwitcher() {
   const curRole = currentOrg?.role || 'admin';
 
   // Update mobile header org name
-  const mobileOrgName = document.getElementById('mobile-org-name');
-  if(mobileOrgName && currentOrg) {
-    mobileOrgName.style.display = 'block';
-    mobileOrgName.textContent = '● ' + currentOrg.name;
-  }
+  updateMobileOrgLabel();
 
   switcher.innerHTML = '<div style="padding:0 12px;margin-bottom:8px">' +
     '<div style="font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">WORKSPACE</div>' +
@@ -4626,6 +4618,88 @@ function renderOrgSwitcher() {
     (userOrgs.length > 1 ? '<select onchange="switchOrg(this.value)" style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-family:inherit;font-size:12px;outline:none;cursor:pointer">' + userOrgs.map(o => '<option value="' + o.id + '"' + (currentOrg && currentOrg.id === o.id ? ' selected' : '') + '>' + o.name + '</option>').join('') + '</select>' : '') +
     '</div>';
 }
+// On phones the sidebar (and its workspace switcher) is hidden, so the header
+// label is the only place the workspace shows. Make that block tappable whenever
+// the user belongs to more than one workspace.
+function updateMobileOrgLabel() {
+  const label = document.getElementById('mobile-org-name');
+  const block = document.getElementById('mobile-brand-block');
+  if(!label || !currentOrg) return;
+  const multi = Array.isArray(userOrgs) && userOrgs.length > 1;
+  label.style.display = 'block';
+  label.textContent = '● ' + currentOrg.name + (multi ? ' ▾' : '');
+  if(block) {
+    block.style.cursor = multi ? 'pointer' : 'default';
+    block.onclick = multi ? openMobileOrgSheet : null;
+    if(multi) { block.setAttribute('role','button'); block.setAttribute('aria-label','Switch workspace'); }
+    else { block.removeAttribute('role'); block.removeAttribute('aria-label'); }
+  }
+}
+
+function closeMobileOrgSheet() {
+  const el = document.getElementById('mobile-org-sheet');
+  if(el) el.remove();
+  document.removeEventListener('keydown', _orgSheetEsc);
+}
+function _orgSheetEsc(e) { if(e.key === 'Escape') closeMobileOrgSheet(); }
+
+function openMobileOrgSheet() {
+  if(!Array.isArray(userOrgs) || userOrgs.length < 2) return;
+  closeMobileOrgSheet();
+  const isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+
+  const overlay = document.createElement('div');
+  overlay.id = 'mobile-org-sheet';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.5);display:flex;align-items:flex-end';
+  overlay.addEventListener('click', e => { if(e.target === overlay) closeMobileOrgSheet(); });
+
+  const sheet = document.createElement('div');
+  sheet.setAttribute('role','dialog');
+  sheet.setAttribute('aria-modal','true');
+  sheet.setAttribute('aria-label', isAr ? 'تبديل مساحة العمل' : 'Switch workspace');
+  sheet.style.cssText = 'width:100%;max-height:75vh;max-height:75dvh;overflow-y:auto;background:var(--bg2);border-radius:20px 20px 0 0;padding:10px 16px calc(16px + env(safe-area-inset-bottom, 0px))';
+
+  const handle = document.createElement('div');
+  handle.style.cssText = 'width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 14px';
+  sheet.appendChild(handle);
+
+  const title = document.createElement('div');
+  title.textContent = isAr ? 'تبديل مساحة العمل' : 'Switch workspace';
+  title.style.cssText = 'font-size:15px;font-weight:700;color:var(--text);margin:0 4px 12px';
+  sheet.appendChild(title);
+
+  userOrgs.forEach(org => {
+    const isCurrent = !!(currentOrg && currentOrg.id === org.id);
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.style.cssText = 'width:100%;display:flex;align-items:center;gap:12px;min-height:52px;padding:10px 12px;margin-bottom:6px;border-radius:12px;cursor:pointer;font-family:inherit;text-align:start;'
+      + (isCurrent ? 'border:1px solid var(--accent);background:rgba(59,130,246,0.1)' : 'border:1px solid var(--border);background:var(--bg3)');
+    if(isCurrent) row.setAttribute('aria-current','true');
+
+    const initial = document.createElement('div');
+    initial.textContent = (org.name || '?').trim().charAt(0).toUpperCase();
+    initial.style.cssText = 'width:32px;height:32px;border-radius:9px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--accent3));color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center';
+
+    const name = document.createElement('div');
+    name.textContent = org.name || '—';   // textContent: workspace names are user data, never parsed as HTML
+    name.style.cssText = 'flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+
+    row.append(initial, name);
+    if(isCurrent) {
+      const check = document.createElement('span');
+      check.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+      check.style.cssText = 'color:var(--accent);flex-shrink:0;display:flex';
+      row.appendChild(check);
+    }
+    row.addEventListener('click', () => { closeMobileOrgSheet(); if(!isCurrent) switchOrg(org.id); });
+    sheet.appendChild(row);
+  });
+
+  overlay.appendChild(sheet);
+  document.body.appendChild(overlay);
+  document.addEventListener('keydown', _orgSheetEsc);
+}
+
 function switchOrg(orgId) {
   currentOrg = userOrgs.find(o => o.id === orgId);
   renderOrgSwitcher();
@@ -10213,7 +10287,7 @@ function renderDonut(data) {
 
 <!-- MOBILE HEADER -->
 <div class="mobile-header" id="mobile-header" style="display:none;position:fixed;top:0;left:0;right:0;height:calc(56px + env(safe-area-inset-top, 0px));background:var(--bg2);border-bottom:1px solid var(--border);z-index:150;align-items:center;padding:env(safe-area-inset-top, 0px) max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px));gap:10px;">
-  <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+  <div id="mobile-brand-block" style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;border-radius:10px;-webkit-tap-highlight-color:transparent">
     <div id="mobile-logo-icon" style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0">N</div>
     <div style="min-width:0">
       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--text);line-height:1.1" id="mobile-brand-name">NexCRM</div>
