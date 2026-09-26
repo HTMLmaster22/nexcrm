@@ -1,7 +1,7 @@
-const CACHE_NAME = 'nexcrm-v3';
+const CACHE_NAME = 'nexcrm-v4';
 const STATIC_ASSETS = [
-  '/nexcrm/',
-  '/nexcrm/index.html',
+  '/',
+  '/index.html',
   'https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap'
 ];
 // Install - cache static assets
@@ -45,14 +45,14 @@ self.addEventListener('push', (e) => {
   e.waitUntil(
     self.registration.showNotification(data.title || 'NexCRM', {
       body: data.body || 'You have a new lead!',
-      icon: '/nexcrm/icon-192.png',
-      badge: '/nexcrm/icon-192.png',
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
       vibrate: [200, 100, 200],
-      data: { url: '/nexcrm/' }
+      data: { url: '/' }
     })
   );
 });
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
-  e.waitUntil(clients.openWindow(e.notification.data.url || '/nexcrm/'));
+  e.waitUntil(clients.openWindow(e.notification.data.url || '/'));
 });
