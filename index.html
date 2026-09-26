@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%233b82f6'/><text y='54' font-size='60' font-family='Arial' font-weight='900' fill='white' x='50' text-anchor='middle' dominant-baseline='middle'>N</text></svg>" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#0a0f1e" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="NexCRM" />
 <link rel="manifest" href="manifest.json" />
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%233b82f6'/><text y='.9em' font-size='72' font-family='Arial' font-weight='900' fill='white' x='50%25' text-anchor='middle' dominant-baseline='hanging'>N</text></svg>" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" /><text y='.9em' font-size='72' font-family='Arial' font-weight='900' fill='white' x='50%25' text-anchor='middle' dominant-baseline='hanging'>N</text></svg>" />
 <title>NexCRM — Sales & Marketing Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 <style>
@@ -31,7 +31,7 @@
     --glow: 0 0 30px rgba(59,130,246,0.15);
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; transition:background 0.3s,color 0.3s; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; min-height:100dvh; overflow-x:hidden; transition:background 0.3s,color 0.3s; }
 
   /* ─── LIGHT MODE ─────────────────────────────────────────── */
   body.light-mode {
@@ -110,7 +110,7 @@
 
   /* SIDEBAR */
   .sidebar {
-    position:fixed; left:0; top:0; width:240px; height:100vh;
+    position:fixed; left:0; top:0; width:240px; height:100vh; height:100dvh;
     background:var(--bg2); border-right:1px solid var(--border);
     display:flex; flex-direction:column; padding:24px 0; z-index:100;
     transition: width 0.3s;
@@ -169,7 +169,7 @@
   .user-role { font-size:11px; color:var(--text2); }
 
   /* MAIN */
-  .main { margin-left:240px; min-height:100vh; }
+  .main { margin-left:240px; min-height:100vh; min-height:100dvh; }
 
   /* TOPBAR */
   .topbar {
@@ -1388,8 +1388,10 @@
   /* Mobile header */
   .mobile-header {
     display:none; position:fixed; top:0; left:0; right:0;
-    height:56px; background:var(--bg2); border-bottom:1px solid var(--border);
-    z-index:150; align-items:center; padding:0 16px; gap:12px;
+    height:calc(56px + env(safe-area-inset-top, 0px));
+    padding:env(safe-area-inset-top, 0px) max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px));
+    background:var(--bg2); border-bottom:1px solid var(--border);
+    z-index:150; align-items:center; gap:12px;
   }
   .mobile-logo {
     font-family:'Syne',sans-serif; font-weight:800; font-size:18px;
@@ -1411,8 +1413,8 @@
       margin-left:0 !important;
       margin-right:0 !important;
       margin-top:0 !important;
-      padding-top:64px !important;
-      padding-bottom:90px !important;
+      padding-top:calc(64px + env(safe-area-inset-top, 0px)) !important;
+      padding-bottom:calc(90px + env(safe-area-inset-bottom, 0px)) !important;
     }
 
     /* Content padding */
@@ -2187,7 +2189,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
 
     <!-- CAMPAIGNS -->
     <div class="page" id="page-inbox">
-      <div style="display:flex;height:calc(100vh - 70px);gap:0;overflow:hidden;border-radius:16px;border:1px solid var(--border);background:var(--bg2)">
+      <div style="display:flex;height:calc(100vh - 70px);height:calc(100dvh - 70px);gap:0;overflow:hidden;border-radius:16px;border:1px solid var(--border);background:var(--bg2)">
         <!-- Left: Conversation List -->
         <div style="width:320px;min-width:280px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0">
           <div style="padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
@@ -9784,7 +9786,7 @@ function renderDonut(data) {
 </div>
 
 <!-- TRIAL COUNTDOWN BANNER (non-blocking, shows when ≤3 days left) -->
-<div id="trial-days-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9000;background:linear-gradient(135deg,#f59e0b,#ea580c);color:#fff;padding:9px 20px;align-items:center;justify-content:center;gap:14px;font-size:13px;font-weight:600">
+<div id="trial-days-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9000;background:linear-gradient(135deg,#f59e0b,#ea580c);color:#fff;padding:calc(9px + env(safe-area-inset-top, 0px)) 20px 9px;align-items:center;justify-content:center;gap:14px;font-size:13px;font-weight:600">
   <span class="trial-banner-text">Your trial ends soon.</span>
   <button onclick="nav('admin-billing',null)" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:4px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Upgrade →</button>
 </div>
@@ -10210,7 +10212,7 @@ function renderDonut(data) {
 </div>
 
 <!-- MOBILE HEADER -->
-<div class="mobile-header" id="mobile-header" style="display:none;position:fixed;top:0;left:0;right:0;height:56px;background:var(--bg2);border-bottom:1px solid var(--border);z-index:150;align-items:center;padding:0 16px;gap:10px;">
+<div class="mobile-header" id="mobile-header" style="display:none;position:fixed;top:0;left:0;right:0;height:calc(56px + env(safe-area-inset-top, 0px));background:var(--bg2);border-bottom:1px solid var(--border);z-index:150;align-items:center;padding:env(safe-area-inset-top, 0px) max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px));gap:10px;">
   <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
     <div id="mobile-logo-icon" style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent3));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0">N</div>
     <div style="min-width:0">
@@ -14696,7 +14698,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <!-- VIEW AS CLIENT BANNER -->
-<div id="view-as-client-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#f59e0b,#d97706);padding:10px 20px;display:none;align-items:center;justify-content:space-between">
+<div id="view-as-client-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(135deg,#f59e0b,#d97706);padding:calc(10px + env(safe-area-inset-top, 0px)) 20px 10px;display:none;align-items:center;justify-content:space-between">
   <div style="display:flex;align-items:center;gap:10px">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
     <span style="color:#fff;font-weight:700;font-size:14px">Admin View Mode</span>
