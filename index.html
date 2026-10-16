@@ -2706,12 +2706,12 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
                   <input class="form-input" id="camp-from-name" placeholder="e.g. Hussein Motors" style="font-size:13px"/>
                 </div>
                 <div>
-                  <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">From Email</label>
+                  <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Reply-to email</label>
                   <input class="form-input" id="camp-from-email" type="email" placeholder="sales@yourcompany.com" style="font-size:13px"/>
                 </div>
               </div>
               <div style="font-size:11px;color:var(--text2);margin-top:8px" id="sender-note">
-                Leads will see: <strong style="color:var(--text)">Your Name &lt;yourname@yourdomain.com&gt;</strong> — sent via your SMTP
+                Leads will see: <strong style="color:var(--text)">Your Name &lt;hello@getnexcrm.com&gt;</strong> — replies go to your reply-to email
               </div>
             </div>
             <!-- SMTP Settings -->
@@ -4405,10 +4405,17 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
 </div>
 
 <script>
-// ─── RESEND EMAIL CONFIG ───────────────────────────────────────
-const RESEND_API_KEY = 're_ejpfMweg_3yjBD6cCVuBkpfLCgLhytMd2';
-const FROM_EMAIL = 'onboarding@resend.dev';
+// ─── EMAIL CONFIG ──────────────────────────────────────────────
+// All Resend sending happens server-side in the send-org-email edge function.
+// No email API key lives in this file.
+const FROM_EMAIL = 'hello@getnexcrm.com';
 const FROM_NAME = 'NexCRM';
+
+// Headers for edge functions that must know which signed-in user is calling.
+// Read at call time so a refreshed session token is always used.
+function userFnHeaders() {
+  return { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': HEADERS.Authorization };
+}
 
 // ─── SUPABASE CONFIG (direct fetch, no library) ────────────────
 const SUPABASE_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co';
@@ -5243,40 +5250,15 @@ async function sendOutgoingWebhook(eventType, data) {
 async function sendNewLeadAlert(lead) {
   if (!currentOrg || !currentOrg.id) return;
   try {
-    // Fetch org admins to notify: org_members has the role, profiles has the real email
-    const omR = await fetch(SUPABASE_URL + '/rest/v1/org_members?org_id=eq.' + currentOrg.id + '&role=eq.admin&select=user_id', { headers: HEADERS });
-    const omData = await omR.json();
-    const adminIds = (Array.isArray(omData) ? omData : []).map(m => m.user_id).filter(Boolean);
-    if (!adminIds.length) return;
-    const idFilter = adminIds.map(id => '"' + id + '"').join(',');
-    const r = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=in.(' + idFilter + ')&select=email', { headers: HEADERS });
-    const admins = await r.json();
-    if (!Array.isArray(admins) || admins.length === 0) return;
-
-    const subject = '🆕 New lead: ' + (lead.name || 'Unknown') + ' via ' + (lead.source || 'unknown');
-    const html = '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;background:#f8f9fb">' +
-      '<div style="background:#fff;border-radius:14px;padding:28px;border:1px solid #eee">' +
-      '<h2 style="margin:0 0 12px;color:#3b82f6">🆕 New Lead Captured</h2>' +
-      '<p style="font-size:14px;color:#444"><strong>Name:</strong> ' + (lead.name || '—') + '</p>' +
-      '<p style="font-size:14px;color:#444"><strong>Company:</strong> ' + (lead.company || '—') + '</p>' +
-      '<p style="font-size:14px;color:#444"><strong>Source:</strong> ' + (lead.source || '—') + '</p>' +
-      '<p style="font-size:14px;color:#444"><strong>Phone:</strong> ' + (lead.phone || '—') + '</p>' +
-      '<a href="https://htmlmaster22.github.io/nexcrm/" style="display:inline-block;margin-top:14px;padding:12px 24px;background:#3b82f6;color:#fff;border-radius:8px;text-decoration:none;font-weight:700">Open Leads →</a>' +
-      '</div></div>';
-
-    for (const admin of admins) {
-      if (!admin.email) continue;
-      await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_API_KEY },
-        body: JSON.stringify({
-          from: FROM_NAME + ' <' + FROM_EMAIL + '>',
-          to: [admin.email],
-          subject,
-          html
-        })
-      });
-    }
+    await fetch(SUPABASE_URL + '/functions/v1/send-org-email', {
+      method: 'POST',
+      headers: userFnHeaders(),
+      body: JSON.stringify({
+        action: 'new_lead_alert',
+        org_id: currentOrg.id,
+        lead: { name: lead.name, company: lead.company, source: lead.source, phone: lead.phone }
+      })
+    });
   } catch (e) {
     console.error('sendNewLeadAlert error:', e);
   }
@@ -7321,16 +7303,16 @@ async function updateLead(id) {
     if(!r.ok) { showToast('❌ Failed to update'); return; }
     if(assigned && assigned !== (existingLead?.assigned || '')) {
       fetch(SUPABASE_URL + '/functions/v1/notify-lead-event', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assigned_to: assigned, event_type: 'assigned', lead_name: updated.name, lead_company: updated.company, actor_name: currentUser?.email || '' })
+        method: 'POST', headers: userFnHeaders(),
+        body: JSON.stringify({ org_id: currentOrg?.id, assigned_to: assigned, event_type: 'assigned', lead_name: updated.name, lead_company: updated.company, actor_name: currentUser?.email || '' })
       }).catch(()=>{});
     }
     // Status change on a lead someone's already assigned to — notify them,
     // unless they're the one who just made the change.
     if(assigned && assigned !== currentUser?.email && status !== (existingLead?.status || '')) {
       fetch(SUPABASE_URL + '/functions/v1/notify-lead-event', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assigned_to: assigned, event_type: 'note', lead_name: updated.name, lead_company: updated.company, actor_name: currentUser?.email || '', note_preview: 'Status changed to: ' + status })
+        method: 'POST', headers: userFnHeaders(),
+        body: JSON.stringify({ org_id: currentOrg?.id, assigned_to: assigned, event_type: 'note', lead_name: updated.name, lead_company: updated.company, actor_name: currentUser?.email || '', note_preview: 'Status changed to: ' + status })
       }).catch(()=>{});
     }
     await loadLeads();
@@ -7385,8 +7367,8 @@ async function saveNote(id) {
     if(lead) lead.notes = notes;
     if(lead && lead.assigned && lead.assigned !== currentUser?.email) {
       fetch(SUPABASE_URL + '/functions/v1/notify-lead-event', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assigned_to: lead.assigned, event_type: 'note', lead_name: lead.name, lead_company: lead.company, actor_name: currentUser?.email || '', note_preview: notes })
+        method: 'POST', headers: userFnHeaders(),
+        body: JSON.stringify({ org_id: currentOrg?.id, assigned_to: lead.assigned, event_type: 'note', lead_name: lead.name, lead_company: lead.company, actor_name: currentUser?.email || '', note_preview: notes })
       }).catch(()=>{});
     }
     showToast('📝 Note saved!');
@@ -8496,23 +8478,28 @@ Note: Only leads with email addresses will receive the email.`)) return;
       failed = targetLeads.filter(l => l.email).length;
     }
   } else {
-    // ── Fallback: Send via Resend ──
-    for(const lead of targetLeads) {
-      if(!lead.email) continue;
-      const personalizedBody = body.replace(/{name}/g, lead.name || 'Valued Customer');
+    // ── Default: send through NexCRM (server-side, batches of 100) ──
+    const recipients = targetLeads.filter(l => l.email).map(l => ({ email: l.email, name: l.name || '' }));
+    for(let i = 0; i < recipients.length; i += 100) {
+      const batch = recipients.slice(i, i + 100);
       try {
-        const r = await fetch('https://api.resend.com/emails', {
+        const r = await fetch(SUPABASE_URL + '/functions/v1/send-org-email', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + RESEND_API_KEY },
+          headers: userFnHeaders(),
           body: JSON.stringify({
-            from: (campFromName || FROM_NAME) + ' <' + (campFromEmail || FROM_EMAIL) + '>',
-            to: [lead.email],
+            action: 'campaign',
+            org_id: currentOrg?.id,
+            from_name: campFromName || FROM_NAME,
+            reply_to: campFromEmail && campFromEmail !== FROM_EMAIL ? campFromEmail : '',
             subject: subject,
-            html: '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px"><div style="font-size:15px;line-height:1.8;color:#333;white-space:pre-wrap">' + personalizedBody + '</div><div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;font-size:12px;color:#999;text-align:center">Sent via NexCRM</div></div>'
+            body: body,
+            recipients: batch
           })
         });
-        if(r.ok) sent++; else failed++;
-      } catch(e) { failed++; }
+        const res = await r.json().catch(() => ({}));
+        if(r.ok) { sent += res.sent || 0; failed += res.failed || 0; }
+        else { failed += batch.length; if(res.error) showToast('❌ ' + res.error); }
+      } catch(e) { failed += batch.length; }
     }
   }
 
@@ -9631,8 +9618,8 @@ async function quickStatus(id, newStatus, selectEl) {
     updateLeadStats();
     if(lead && lead.assigned && lead.assigned !== currentUser?.email) {
       fetch(SUPABASE_URL + '/functions/v1/notify-lead-event', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assigned_to: lead.assigned, event_type: 'note', lead_name: lead.name, lead_company: lead.company, actor_name: currentUser?.email || '', note_preview: 'Status changed to: ' + newStatus })
+        method: 'POST', headers: userFnHeaders(),
+        body: JSON.stringify({ org_id: currentOrg?.id, assigned_to: lead.assigned, event_type: 'note', lead_name: lead.name, lead_company: lead.company, actor_name: currentUser?.email || '', note_preview: 'Status changed to: ' + newStatus })
       }).catch(()=>{});
     }
     showToast('✅ Moved to ' + newStatus);
@@ -11487,7 +11474,7 @@ async function startVideoGeneration() {
     // ── STAGE 1: submit silent video + generate narration ──
     var submitRes = await fetch(EDGE_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: userFnHeaders(),
       body: JSON.stringify({ action: 'submit', prompt: state.selectedPrompt, duration: state.duration })
     });
     var submitText = await submitRes.text();
@@ -11513,7 +11500,7 @@ async function startVideoGeneration() {
       await new Promise(function(r) { setTimeout(r, 5000); });
       var checkRes = await fetch(EDGE_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: userFnHeaders(),
         body: JSON.stringify({ action: 'check', requestId: reqId, audioBase64: audioBase64 })
       });
       var checkText = await checkRes.text();
@@ -11548,7 +11535,7 @@ async function startVideoGeneration() {
         await new Promise(function(r) { setTimeout(r, 5000); });
         var lipsyncRes = await fetch(EDGE_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: userFnHeaders(),
           body: JSON.stringify({ action: 'checkLipsync', requestId: lipsyncReqId })
         });
         var lipsyncText = await lipsyncRes.text();
@@ -11621,7 +11608,7 @@ async function fetchBrandFromURL() {
   try {
     var response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-campaign', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: userFnHeaders(),
       body: JSON.stringify({ fetchUrl: url, mode: 'fetch_only' })
     });
     var data = await response.json();
@@ -11667,7 +11654,7 @@ async function generateCampaignIdeas() {
     // Call real Claude API via Edge Function
     const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-campaign', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: userFnHeaders(),
       body: JSON.stringify({ brand, industry, goal, lang, platform, brandDesc })
     });
     const data = await response.json();
@@ -11992,7 +11979,7 @@ Return ONLY valid JSON:
 {"market_position":{"score":<1-10>,"level":"<Emerging|Growing|Established|Market Leader>","summary":"<specific 3-sentence assessment>"},"top_competitors":[{"name":"<real local competitor>","type":"<Online|Physical|Both>","strength":"<strength>","weakness":"<weakness>","how_to_beat_them":"<specific tactic>"},{"name":"<competitor>","type":"<type>","strength":"<>","weakness":"<>","how_to_beat_them":"<>"},{"name":"<competitor>","type":"<type>","strength":"<>","weakness":"<>","how_to_beat_them":"<>"}],"social_media_presence":{"primary_platform":"<best platform>","content_that_works":["<type1>","<type2>","<type3>"],"posting_frequency":"<frequency>","best_times":"<times>","winning_strategy":"<key tip>"},"market_opportunities":["<opportunity 1>","<opportunity 2>","<opportunity 3>"],"differentiation_strategy":{"unique_angle":"<what makes brand stand out>","positioning":"<positioning statement>","key_message":"<core message>"},"pricing_strategy":{"market_range":"<price range in market>","recommendation":"<strategy>","tip":"<specific tip>","bundle_ideas":["<bundle 1>","<bundle 2>","<bundle 3>"],"upsell_opportunities":["<upsell 1>","<upsell 2>"]},"customer_targeting":{"primary_segment":"<segment>","secondary_segment":"<segment>","where_to_find_them":["<channel>","<channel>","<channel>"],"key_motivations":["<motivation>","<motivation>"],"barriers_to_purchase":["<barrier>","<barrier>"]},"growth_plan":{"month_1":{"focus":"<focus>","actions":["<action>","<action>","<action>"]},"month_3":{"focus":"<focus>","actions":["<action>","<action>","<action>"]},"month_6":{"focus":"<focus>","actions":["<action>","<action>"]}},"key_metrics_to_track":[{"metric":"<name>","target":"<target>","why":"<reason>"},{"metric":"<name>","target":"<target>","why":"<reason>"},{"metric":"<name>","target":"<target>","why":"<reason>"}]}`;
   try {
     const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-market', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+      method: 'POST', headers: userFnHeaders(),
       body: JSON.stringify({ prompt, brand, industry, market, desc })
     });
     const data = await response.json();
