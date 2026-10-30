@@ -2240,6 +2240,16 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
     <!-- AI LEAD GENERATOR PAGE -->
     <div class="page" id="page-leadgen">
       <div style="max-width:920px;margin:0 auto">
+        <div id="lg-credits-panel" style="display:none;margin-bottom:16px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px 16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Lead Generation Balance</span>
+              <span style="font-size:9px;font-weight:700;background:rgba(239,68,68,0.15);color:#f87171;padding:2px 7px;border-radius:20px">OWNER ONLY</span>
+            </div>
+            <button onclick="loadLeadCredits()" style="background:none;border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit">Refresh</button>
+          </div>
+          <div id="lg-credits-body" style="font-size:12px;color:var(--text2)">Loading…</div>
+        </div>
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
           <div style="width:48px;height:48px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(99,102,241,0.4)">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
@@ -2535,17 +2545,6 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
             </div>
           </div>
           <div id="scraper-leads-list"></div>
-        </div>
-
-        <div id="lg-credits-panel" style="display:none;margin-bottom:16px;background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px 16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px">Lead Generation Balance</span>
-              <span style="font-size:9px;font-weight:700;background:rgba(239,68,68,0.15);color:#f87171;padding:2px 7px;border-radius:20px">OWNER ONLY</span>
-            </div>
-            <button onclick="loadLeadCredits()" style="background:none;border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:inherit">Refresh</button>
-          </div>
-          <div id="lg-credits-body" style="font-size:12px;color:var(--text2)">Loading…</div>
         </div>
 
         <div id="lg-results" style="display:none">
@@ -8714,6 +8713,7 @@ async function checkAdminStatus() {
       canAssignLeads = true; // platform super-admin
       isSuperAdmin = true;
       document.getElementById('admin-nav-item').style.display = 'flex';
+      setTimeout(() => { try { loadLeadCredits(); } catch(e) {} }, 0);
       // Admin loads all orgs
       await loadAdminOrgs();
     } else {
@@ -12268,7 +12268,7 @@ function selectLeadGenMode(mode) {
   if(isReal) { renderLgTitleChips(); renderLgIndustryChips(); renderLgSizeChips(); }
   const creditsPanel = document.getElementById('lg-credits-panel');
   if(creditsPanel) {
-    if(isReal && isSuperAdmin) loadLeadCredits();
+    if(isSuperAdmin) { if(creditsPanel.style.display === 'none') loadLeadCredits(); }
     else creditsPanel.style.display = 'none';
   }
 
