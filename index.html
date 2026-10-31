@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="NexCRM" />
 <link rel="manifest" href="manifest.json" />
-<link rel="apple-touch-icon" href="apple-touch-icon.png" /><text y='.9em' font-size='72' font-family='Arial' font-weight='900' fill='white' x='50%25' text-anchor='middle' dominant-baseline='hanging'>N</text></svg>" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <title>NexCRM — Sales & Marketing Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
 <style>
@@ -1726,6 +1726,70 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
 .mobile-nav-btn { min-height:48px; min-width:60px; }
 .theme-toggle, .notif-btn { min-width:40px; min-height:40px; }
 </style>
+<style id="nx-polish">
+  /* Light mode: status pills readable on white */
+  body.light-mode .pill-new { background:#dbeafe; color:#1d4ed8; }
+  body.light-mode .pill-active, body.light-mode .pill-won, body.light-mode .pill-converted { background:#d1fae5; color:#047857; }
+  body.light-mode .pill-warm, body.light-mode .pill-inprogress { background:#fef3c7; color:#b45309; }
+  body.light-mode .pill-cold, body.light-mode .pill-unqualified { background:#f1f5f9; color:#475569; }
+  body.light-mode .pill-lost { background:#fee2e2; color:#b91c1c; }
+  body.light-mode .pill-qualified { background:#ccfbf1; color:#0f766e; }
+
+  @media (max-width:768px) {
+    /* WhatsApp inbox: list first, chat full screen, back button */
+    #inbox-shell { height:calc(100vh - 164px) !important; height:calc(100dvh - 164px) !important; border-radius:14px !important; }
+    #inbox-left { width:100% !important; min-width:0 !important; border-right:none !important; }
+    #inbox-right { display:none !important; }
+    #inbox-shell.chat-open #inbox-left { display:none !important; }
+    #inbox-shell.chat-open #inbox-right { display:flex !important; }
+    #inbox-back { display:flex !important; }
+    #inbox-chat-header { padding:10px 12px !important; gap:10px !important; }
+    #inbox-wa-link { padding:7px 10px !important; }
+    body:has(#page-inbox.active #inbox-shell.chat-open) #mobile-fab-btn { visibility:hidden !important; pointer-events:none !important; }
+    .msg-bubble { max-width:85%; }
+    /* Plans pop-up */
+    #lg-plans-modal > div { max-height:90vh; overflow-y:auto; padding:22px !important; }
+  }
+
+  @media (max-width:640px) {
+    /* Leads: one card per lead instead of a table you scroll sideways */
+    #leads-table { min-width:0 !important; width:100%; border-collapse:separate; border-spacing:0; }
+    #leads-table thead { display:none; }
+    #leads-table tbody { display:block; }
+    #leads-table tbody > tr:not(.lead-row):not(.notes-row):not(.reminder-row) { display:block; }
+    #leads-table tbody > tr:not(.lead-row):not(.notes-row):not(.reminder-row) > td { display:block; }
+    #leads-table tr.lead-row { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr) minmax(0,1fr) auto; column-gap:8px; row-gap:8px; align-items:center;
+      padding:14px; margin:0 0 10px; border:1px solid var(--border); border-radius:14px; background:var(--bg2); }
+    body.light-mode #leads-table tr.lead-row { background:#fff; box-shadow:0 1px 6px rgba(15,23,42,0.05); }
+    #leads-table tr.lead-row > td { display:block; padding:0 !important; border:none !important; font-size:12px; min-width:0; }
+    #leads-table tr.lead-row > td:nth-child(1)  { grid-column:1 / 3; grid-row:1; font-size:15px; overflow-wrap:anywhere; }
+    #leads-table tr.lead-row > td:nth-child(11) { grid-column:3; grid-row:1; justify-self:end; }
+    #leads-table tr.lead-row > td:nth-child(7)  { grid-column:4; grid-row:1; justify-self:end; }
+    #leads-table tr.lead-row > td:nth-child(2)  { grid-column:1 / 3; grid-row:2; }
+    #leads-table tr.lead-row > td:nth-child(2) > div { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    #leads-table tr.lead-row > td:nth-child(3)  { grid-column:3 / 5; grid-row:2; text-align:end; }
+    #leads-table tr.lead-row > td:nth-child(3) > div { max-width:100% !important; }
+    #leads-table tr.lead-row > td:nth-child(4)  { grid-column:1 / 3; grid-row:3; }
+    #leads-table tr.lead-row > td:nth-child(5)  { grid-column:3 / 5; grid-row:3; }
+    #leads-table tr.lead-row > td:nth-child(5) > a { justify-content:flex-end; max-width:100%; }
+    #leads-table tr.lead-row > td:nth-child(5) span { max-width:100% !important; min-width:0; }
+    #leads-table tr.lead-row > td:nth-child(6)  { grid-column:1; grid-row:4; }
+    #leads-table tr.lead-row > td:nth-child(8)  { grid-column:2 / 4; grid-row:4; }
+    #leads-table tr.lead-row > td:nth-child(10) { grid-column:4; grid-row:4; justify-self:end; }
+    #leads-table tr.lead-row > td:nth-child(9)  { grid-column:1 / 3; grid-row:5; }
+    #leads-table tr.lead-row > td:nth-child(12) { grid-column:3 / 5; grid-row:5; justify-self:end; }
+    #leads-table tr.notes-row[style*="table-row"], #leads-table tr.reminder-row[style*="table-row"] { display:block !important; margin:-4px 0 12px; }
+    #leads-table tr.notes-row > td, #leads-table tr.reminder-row > td { display:block; padding:12px !important; border:1px solid var(--border) !important; border-radius:12px; background:var(--bg3); }
+    #leads-table .reminder-form { flex-wrap:wrap; }
+    #page-leads .card-header { flex-wrap:wrap; gap:10px; }
+    #page-leads .leads-head-actions .btn { padding:6px 10px !important; }
+    /* Lead Generator modes stack on a phone */
+    .lg-mode-grid { grid-template-columns:1fr !important; gap:10px !important; }
+    .lg-mode-grid > div { padding:14px 16px !important; }
+    /* Plans: one column */
+    #lg-plans-modal [style*="repeat(3,1fr)"], #admin-billing [style*="repeat(3,1fr)"] { grid-template-columns:1fr !important; }
+  }
+</style>
 </head>
 <body>
 
@@ -1757,7 +1821,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
     </div>
     <div class="nav-item" onclick="nav('inbox',this)" id="inbox-nav-item">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span>WhatsApp Inbox</span>
-      <span class="badge" id="inbox-badge" style="background:#25d366">0</span>
+      <span class="badge" id="inbox-badge" style="background:#25d366;display:none">0</span>
     </div>
   </div>
 
@@ -2048,7 +2112,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
       <div class="card">
         <div class="card-header">
           <div class="card-title">All Leads</div>
-          <div style="display:flex;gap:8px">
+          <div class="leads-head-actions" style="display:flex;gap:8px">
             <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="openImportModal()">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               Import
@@ -2104,7 +2168,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           </div>
           <div style="display:flex;gap:8px;align-items:center">
             <span style="font-size:13px;color:var(--text2)">Total Pipeline:</span>
-            <span style="font-size:16px;font-weight:700;color:var(--success)" id="pipeline-total">$0</span>
+            <span style="font-size:16px;font-weight:700;color:var(--success)" id="pipeline-total">SAR 0</span>
           </div>
         </div>
         <div class="pipeline" id="pipeline-board">
@@ -2189,16 +2253,16 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
 
     <!-- CAMPAIGNS -->
     <div class="page" id="page-inbox">
-      <div style="display:flex;height:calc(100vh - 70px);height:calc(100dvh - 70px);gap:0;overflow:hidden;border-radius:16px;border:1px solid var(--border);background:var(--bg2)">
+      <div id="inbox-shell" style="display:flex;height:calc(100vh - 70px);height:calc(100dvh - 70px);gap:0;overflow:hidden;border-radius:16px;border:1px solid var(--border);background:var(--bg2)">
         <!-- Left: Conversation List -->
-        <div style="width:320px;min-width:280px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0">
+        <div id="inbox-left" style="width:320px;min-width:280px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0">
           <div style="padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">
             <div style="width:36px;height:36px;background:linear-gradient(135deg,#25d366,#128c7e);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             </div>
             <div>
               <div style="font-weight:700;font-size:15px;color:var(--text)">WhatsApp Inbox</div>
-              <div style="font-size:11px;color:#25d366">● Connected</div>
+              <div style="font-size:11px;color:var(--text2)"><span data-en="Replies open in WhatsApp" data-ar="الردود تُفتح في واتساب">Replies open in WhatsApp</span></div>
             </div>
           </div>
           <div style="padding:10px 12px;border-bottom:1px solid var(--border)">
@@ -2207,9 +2271,10 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <div id="inbox-list" style="flex:1;overflow-y:auto"></div>
         </div>
         <!-- Right: Chat Window -->
-        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+        <div id="inbox-right" style="flex:1;display:flex;flex-direction:column;min-width:0">
           <!-- Chat Header -->
           <div id="inbox-chat-header" style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+            <button id="inbox-back" onclick="closeInboxChat()" aria-label="Back" style="display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text);cursor:pointer;flex-shrink:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
             <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#fff;flex-shrink:0" id="inbox-avatar">—</div>
             <div style="flex:1;min-width:0">
               <div style="font-weight:700;font-size:15px;color:var(--text)" id="inbox-chat-name">Select a conversation</div>
@@ -2261,19 +2326,19 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
         </div>
 
         <!-- Mode Selector -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px">
+        <div class="lg-mode-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px">
           <div id="mode-ai-card" onclick="selectLeadGenMode('ai')" style="background:var(--bg2);border:2px solid var(--accent);border-radius:16px;padding:20px;cursor:pointer;position:relative">
             <div style="position:absolute;top:12px;right:12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">FREE</div>
             <div style="width:40px;height:40px;background:rgba(59,130,246,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-            <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px"><span data-en="AI Sample Leads" data-ar="عملاء AI تجريبيون">AI Sample Leads</span></div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.6"><span data-en="AI generates realistic prospect profiles matched to your business." data-ar="الذكاء الاصطناعي يولد ملفات عملاء واقعية متطابقة مع نشاطك.">AI generates realistic prospect profiles matched to your business.</span></div>
+            <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px"><span data-en="AI Customer Personas" data-ar="شخصيات العملاء بالذكاء الاصطناعي">AI Customer Personas</span></div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6"><span data-en="Fictional profiles of your ideal buyers — who to target, where to find them, what to say first. Not real contacts." data-ar="ملفات تخيلية لعملائك المثاليين — مَن تستهدف، وأين تجدهم، وبماذا تبدأ الكلام. ليست جهات اتصال حقيقية.">Fictional profiles of your ideal buyers — who to target, where to find them, what to say first. Not real contacts.</span></div>
             <div style="margin-top:12px;font-size:11px;color:var(--accent);font-weight:700"><span data-en="Unlimited · Instant · Free" data-ar="غير محدود · فوري · مجاني">Unlimited · Instant · Free</span></div>
           </div>
           <div id="mode-real-card" onclick="selectLeadGenMode('real')" style="background:var(--bg2);border:2px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;position:relative">
             <div style="position:absolute;top:12px;right:12px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px"><span data-en="5 FREE TRIAL" data-ar="5 مجاناً">5 FREE TRIAL</span></div>
             <div style="width:40px;height:40px;background:rgba(245,158,11,0.12);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
             <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:6px"><span data-en="Real Verified Leads" data-ar="عملاء حقيقيون ومتحققون">Real Verified Leads</span></div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.6"><span data-en="Real people, real companies, real phone numbers you can contact right now." data-ar="أشخاص حقيقيون، شركات حقيقية، أرقام هواتف يمكنك التواصل معها الآن.">Real people, real companies, real phone numbers you can contact right now.</span></div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.6"><span data-en="Real people at real companies, with verified work emails. Mobile numbers when available." data-ar="أشخاص حقيقيون في شركات حقيقية، مع إيميلات عمل متحققة، وأرقام الجوال عند توفرها.">Real people at real companies, with verified work emails. Mobile numbers when available.</span></div>
             <div style="margin-top:12px;font-size:11px;color:#f59e0b;font-weight:700"><span data-en="Try 5 leads free · Upgrade for more" data-ar="جرب 5 عملاء مجاناً · ترقية للمزيد">Try 5 leads free · Upgrade for more</span></div>
           </div>
           <div id="mode-scraper-card" onclick="selectLeadGenMode('scraper')" style="background:var(--bg2);border:2px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;position:relative">
@@ -2305,13 +2370,13 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
         </div>
 
         <!-- Plans Modal -->
-        <div id="lg-plans-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;padding:20px">
+        <div id="lg-plans-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:10001;align-items:center;justify-content:center;padding:20px">
           <div style="background:var(--bg2);border:1px solid var(--border);border-radius:24px;width:100%;max-width:700px;padding:32px;box-shadow:0 40px 80px rgba(0,0,0,0.4)">
             <div style="text-align:center;margin-bottom:28px"><div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px"><span data-en="Choose Your Plan" data-ar="اختر خطتك">Choose Your Plan</span></div></div>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
-              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center"><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Starter</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 350<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">Core CRM + 1 workspace</div><button onclick="contactForUpgrade('Starter - SAR 350')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
-              <div style="background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.08));border:2px solid var(--accent);border-radius:16px;padding:20px;text-align:center;position:relative"><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap">MOST POPULAR</div><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Pro</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 699<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">AI features + 3 workspaces</div><button onclick="contactForUpgrade('Pro - SAR 699')" style="width:100%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
-              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center"><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Agency</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 999<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">Unlimited workspaces + white-label</div><button onclick="contactForUpgrade('Agency - SAR 999')" style="width:100%;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
+              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center"><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Starter</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 349<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">Core CRM · 1 workspace · 3 users</div><button onclick="contactForUpgrade('Starter (SAR 349/month)')" style="width:100%;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
+              <div style="background:linear-gradient(135deg,rgba(59,130,246,0.1),rgba(139,92,246,0.08));border:2px solid var(--accent);border-radius:16px;padding:20px;text-align:center;position:relative"><div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap">MOST POPULAR</div><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Pro</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 699<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">AI features + 10 users</div><button onclick="contactForUpgrade('Pro (SAR 699/month)')" style="width:100%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
+              <div style="background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center"><div style="font-size:13px;font-weight:700;color:var(--text2);margin-bottom:8px">Agency</div><div style="font-size:28px;font-weight:900;color:var(--text);font-family:'Syne',sans-serif">SAR 1,199<span style="font-size:13px;font-weight:400;color:var(--text2)">/mo</span></div><div style="font-size:12px;color:var(--accent);font-weight:700;margin:8px 0">Unlimited workspaces + white-label</div><button onclick="contactForUpgrade('Agency (SAR 1,199/month)')" style="width:100%;background:var(--bg2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">Get Started</button></div>
             </div>
             <div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.3);border-radius:12px;padding:12px 16px;text-align:center;margin-bottom:4px">
                 <span style="font-size:12px;font-weight:700;color:#f59e0b">➕ Lead Generator Add-on</span>
@@ -2400,7 +2465,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <div style="margin-bottom:16px"><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px"><span data-en="Additional details (optional)" data-ar="تفاصيل إضافية (اختياري)">Additional details (optional)</span></label><textarea class="form-input" id="lg-details" rows="2" placeholder="e.g. Target logistics, manufacturing companies with 50+ employees..." style="resize:none;font-size:13px;line-height:1.6"></textarea></div>
           <button onclick="runLeadGenerator()" id="lg-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:14px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(99,102,241,0.4)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-            <span data-en="Generate Leads" data-ar="توليد العملاء">Generate Leads</span>
+            <span data-en="Build Customer Personas" data-ar="ولّد شخصيات عملائك">Build Customer Personas</span>
           </button>
           <div id="lg-loading" style="display:none;text-align:center;padding:32px;color:var(--text2)">
             <div style="width:36px;height:36px;border:3px solid rgba(99,102,241,0.2);border-top-color:#6366f1;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px"></div>
@@ -2551,7 +2616,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
             <div><div style="font-size:14px;font-weight:700;color:var(--text)" id="lg-results-title"></div><div style="font-size:12px;color:var(--text2);margin-top:2px" id="lg-target-profile"></div></div>
             <div style="display:flex;gap:8px">
-              <button onclick="importAllLeads()" style="background:var(--success);color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><span data-en="Import All to CRM" data-ar="استيراد الكل">Import All to CRM</span></button>
+              <button id="lg-import-all" onclick="importAllLeads()" style="background:var(--success);color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit"><span data-en="Import All to CRM" data-ar="استيراد الكل">Import All to CRM</span></button>
               <button onclick="exportLeadsCSV()" style="background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">CSV</button>
             </div>
           </div>
@@ -2580,7 +2645,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
           <div>
             <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Brand Name</label>
-            <input class="form-input" id="ai-brand" placeholder="e.g. Hussein Motors"/>
+            <input class="form-input" id="ai-brand" placeholder="e.g. Your brand name"/>
           </div>
           <div>
             <label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:5px">Industry</label>
@@ -2616,7 +2681,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           </div>
           <!-- Manual description -->
           <div id="ctx-manual">
-            <textarea class="form-input" id="ai-brand-desc" rows="2" placeholder="e.g. Silah is a premium shooting range in Riyadh offering firearms training, tactical courses for individuals and corporates..." style="resize:none;font-size:13px;line-height:1.6"></textarea>
+            <textarea class="form-input" id="ai-brand-desc" rows="2" placeholder="e.g. A family dental clinic in Riyadh offering check-ups, braces and cosmetic treatments..." style="resize:none;font-size:13px;line-height:1.6"></textarea>
           </div>
           <!-- URL input -->
           <div id="ctx-url" style="display:none">
@@ -2702,7 +2767,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
                 <div>
                   <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">From Name</label>
-                  <input class="form-input" id="camp-from-name" placeholder="e.g. Hussein Motors" style="font-size:13px"/>
+                  <input class="form-input" id="camp-from-name" placeholder="e.g. Your company name" style="font-size:13px"/>
                 </div>
                 <div>
                   <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px">Reply-to email</label>
@@ -3153,7 +3218,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
           <div><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px"><span data-en="Industry" data-ar="القطاع">Industry</span></label><select class="form-input" id="mi-industry"><option data-en="Furniture & Home Decor" data-ar="أثاث وديكور منزلي">Furniture & Home Decor</option><option data-en="Fashion Retail" data-ar="أزياء وملابس">Fashion Retail</option><option data-en="Car Dealership" data-ar="معرض سيارات">Car Dealership</option><option data-en="Real Estate" data-ar="عقارات">Real Estate</option><option data-en="Restaurant & Food" data-ar="مطاعم وأغذية">Restaurant & Food</option><option data-en="Cafe & Coffee Shop" data-ar="كافيه ومقاهي">Cafe & Coffee Shop</option><option data-en="Marketing Agency" data-ar="وكالة تسويق">Marketing Agency</option><option data-en="Gym / Fitness" data-ar="جيم ولياقة بدنية">Gym / Fitness</option><option data-en="Medical / Healthcare" data-ar="طبي / رعاية صحية">Medical / Healthcare</option><option data-en="Beauty & Skincare" data-ar="جمال وعناية بالبشرة">Beauty & Skincare</option><option data-en="Technology / SaaS" data-ar="تقنية / برمجيات">Technology / SaaS</option><option data-en="Education & Training" data-ar="تعليم وتدريب">Education & Training</option><option data-en="Other" data-ar="أخرى">Other</option></select></div>
           <div><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px"><span data-en="Target Market" data-ar="السوق المستهدف">Target Market</span></label><select class="form-input" id="mi-market"><option>Saudi Arabia</option><option>UAE</option><option>GCC Region</option><option>MENA Region</option><option>Global</option></select></div>
         </div>
-        <div style="margin-bottom:14px"><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px"><span data-en="Business Description" data-ar="وصف النشاط التجاري">Business Description</span></label><textarea class="form-input" id="mi-desc" rows="2" placeholder="e.g. Premium shooting range in Riyadh..." style="resize:none;font-size:13px;line-height:1.6"></textarea></div>
+        <div style="margin-bottom:14px"><label style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px"><span data-en="Business Description" data-ar="وصف النشاط التجاري">Business Description</span></label><textarea class="form-input" id="mi-desc" rows="2" placeholder="e.g. A family dental clinic in Riyadh offering check-ups, braces and cosmetic treatments..." style="resize:none;font-size:13px;line-height:1.6"></textarea></div>
         <button onclick="runMarketIntelligence()" id="mi-btn" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:13px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 20px rgba(99,102,241,0.4)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
           <span data-en="Analyze My Market Position" data-ar="تحليل موقعي في السوق">Analyze My Market Position</span>
@@ -3583,8 +3648,8 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
     <div class="page" id="page-invoices">
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
         <div class="stat-card"><div class="stat-label"><span data-en="Total Invoiced" data-ar="إجمالي الفواتير">Total Invoiced</span></div><div class="stat-value" id="inv-total">SAR 0</div></div>
-        <div class="stat-card"><div class="stat-label"><span data-en="Paid" data-ar="مدفوع">Paid</span></div><div class="stat-value" style="color:var(--success)" id="inv-paid">$0</div></div>
-        <div class="stat-card"><div class="stat-label"><span data-en="Outstanding" data-ar="غير مدفوع">Outstanding</span></div><div class="stat-value" style="color:var(--warning)" id="inv-outstanding">$0</div></div>
+        <div class="stat-card"><div class="stat-label"><span data-en="Paid" data-ar="مدفوع">Paid</span></div><div class="stat-value" style="color:var(--success)" id="inv-paid">SAR 0</div></div>
+        <div class="stat-card"><div class="stat-label"><span data-en="Outstanding" data-ar="غير مدفوع">Outstanding</span></div><div class="stat-value" style="color:var(--warning)" id="inv-outstanding">SAR 0</div></div>
       </div>
       <div class="card">
         <div class="card-header">
@@ -4405,6 +4470,70 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
 </div>
 
 <script>
+// ─── SAFE DATA LAYER ──────────────────────────────────────────
+// Every string our own API returns (database + server functions) is cleaned before the app sees it:
+// < > " ' ` become harmless look-alike characters, so text from outside (web forms, Apollo, WhatsApp,
+// call logs, a user's own display name) can never run as code wherever it is displayed.
+(function () {
+  const API = 'https://xpcmoaxosppgaoprjnhu.supabase.co/';
+  const MAP = { '<': '\u2039', '>': '\u203A', '"': '\u201D', "'": '\u2019', '`': '\u02CB' };
+  function clean(v) {
+    if (typeof v === 'string') {
+      const t = v.trimStart();
+      if (t[0] === '[' || t[0] === '{') return v.replace(/[<>]/g, function (c) { return MAP[c]; }); // JSON kept intact
+      return /[<>"'`]/.test(v) ? v.replace(/[<>"'`]/g, function (c) { return MAP[c]; }) : v;
+    }
+    if (Array.isArray(v)) { for (let i = 0; i < v.length; i++) v[i] = clean(v[i]); return v; }
+    if (v && typeof v === 'object') { for (const k in v) v[k] = clean(v[k]); return v; }
+    return v;
+  }
+  window.__nxClean = clean;
+  const origFetch = window.fetch.bind(window);
+  window.fetch = async function (input, init) {
+    const res = await origFetch(input, init);
+    const url = typeof input === 'string' ? input : (input && input.url) || '';
+    if (url.indexOf(API) !== 0 || !res || typeof res.json !== 'function') return res;
+    const origJson = res.json.bind(res);
+    try { res.json = async function () { return clean(await origJson()); }; } catch (e) {}
+    return res;
+  };
+})();
+
+// ─── SHARED HELPERS ───────────────────────────────────────────
+// Lead values are free text ("30000", "SAR 30,000", "$12,356", "٣٠٠٠٠"). Read the number out of any of them.
+function leadValue(v) {
+  if (v == null) return 0;
+  const s = String(v).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/,/g, '');
+  const m = s.match(/\d+(\.\d+)?/);
+  const n = m ? parseFloat(m[0]) : 0;
+  return isFinite(n) ? n : 0;
+}
+// Show a lead value: plain amounts become "SAR 30,000"; descriptive text stays as typed.
+function fmtLeadValue(v) {
+  if (v == null || v === '' || v === '—') return '—';
+  const t = String(v).trim();
+  if (/^(sar|ر\.?س\.?|\$)?\s*[\d٠-٩][\d٠-٩,.\s]*\s*(sar|ر\.?س\.?|ريال)?$/i.test(t)) return 'SAR ' + leadValue(t).toLocaleString();
+  return t;
+}
+// WhatsApp links need the full international number without + or a leading 0 (Saudi 05XXXXXXXX → 9665XXXXXXXX).
+function waNumber(phone) {
+  let d = String(phone || '').replace(/[٠-٩]/g, c => '٠١٢٣٤٥٦٧٨٩'.indexOf(c)).replace(/\D/g, '');
+  if (!d) return '';
+  if (d.indexOf('00') === 0) d = d.slice(2);
+  if (d.length === 10 && d.indexOf('05') === 0) d = '966' + d.slice(1);
+  else if (d.length === 9 && d[0] === '5') d = '966' + d;
+  return d.length >= 8 ? d : '';
+}
+// Keep the phone bottom bar in step with the page that is open.
+function syncMobileNav(page) {
+  const map = { dashboard: 'mnav-dashboard', leads: 'mnav-leads', pipeline: 'mnav-pipeline', contacts: 'mnav-contacts' };
+  const activeId = map[page] || 'mnav-more';
+  ['mnav-dashboard', 'mnav-leads', 'mnav-pipeline', 'mnav-contacts', 'mnav-more'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.style.color = id === activeId ? 'var(--accent)' : 'var(--text2)';
+  });
+}
+
 // ─── EMAIL CONFIG ──────────────────────────────────────────────
 // All Resend sending happens server-side in the send-org-email edge function.
 // No email API key lives in this file.
@@ -4420,7 +4549,7 @@ function userFnHeaders() {
 // ─── SUPABASE CONFIG (direct fetch, no library) ────────────────
 const SUPABASE_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co';
 // Anthropic API key removed from frontend — now handled via Edge Function (ai-score)
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk3NTEsImV4cCI6MjA4OTEwNTc1MX0.h4NClLHPJwnSkhMBccB8hpPJrrMU3hkKMCqHu4KNv8g';
+const SUPABASE_KEY = 'sb_publishable_RQ9HH75sKDnC6esaPlrYgg_AtMFRXtY';
 const HEADERS = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Prefer': 'return=minimal' };
 // SERVICE_KEY removed from frontend for security — all admin operations go through Edge Function
 const ADMIN_ACTION_URL = 'https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/admin-action';
@@ -4512,7 +4641,7 @@ async function loadUserOrgs() {
           if(!aGood && bGood) return 1;
           return (a.name||'').localeCompare(b.name||'');
         });
-        currentOrg = userOrgs[0];
+        currentOrg = pickStartOrg(userOrgs);
         renderOrgSwitcher();
         autoApplyBranding();
         checkTrialStatus();
@@ -4542,7 +4671,7 @@ async function loadAdminOrgs() {
         if(!aGood && bGood) return 1;
         return (a.name||'').localeCompare(b.name||'');
       });
-      currentOrg = userOrgs[0];
+      currentOrg = pickStartOrg(userOrgs);
       renderOrgSwitcher();
       loadDashboard();
       loadLeads();
@@ -4561,7 +4690,7 @@ async function loadAdminOrgs() {
         return { id: m.org_id, name: org ? org.name : ('Workspace ' + m.org_id.slice(0,6)), role: m.role || 'admin' };
       }).filter(o => o.id);
       if(userOrgs.length > 0) {
-        currentOrg = userOrgs[0];
+        currentOrg = pickStartOrg(userOrgs);
         renderOrgSwitcher();
         loadDashboard();
         loadLeads();
@@ -4707,8 +4836,19 @@ function openMobileOrgSheet() {
   document.addEventListener('keydown', _orgSheetEsc);
 }
 
+// Open the workspace this user had open last time (falls back to the first one).
+function pickStartOrg(list) {
+  try {
+    const saved = currentUser && localStorage.getItem('nexcrm_last_org_' + currentUser.id);
+    const hit = saved && list.find(o => o.id === saved);
+    if (hit) return hit;
+  } catch (e) {}
+  return list[0];
+}
+
 function switchOrg(orgId) {
   currentOrg = userOrgs.find(o => o.id === orgId);
+  try { if (currentUser && currentOrg) localStorage.setItem('nexcrm_last_org_' + currentUser.id, currentOrg.id); } catch (e) {}
   renderOrgSwitcher();
   loadLeads();
   loadDashboard();
@@ -4817,7 +4957,7 @@ function onboardStep(step) {
     const review = document.getElementById('onboard-review');
     if(review) {
       const plan = document.getElementById('onboard-plan').value;
-      const planLabels = {starter:'Starter — SAR 350/mo', pro:'Pro — SAR 699/mo', agency:'Agency — SAR 999/mo'};
+      const planLabels = {starter:'Starter — SAR 349/mo', pro:'Pro — SAR 699/mo', agency:'Agency — SAR 1,199/mo'};
       review.innerHTML =
         '<div><strong>🏢 Company:</strong> ' + document.getElementById('onboard-org-name').value + '</div>' +
         '<div><strong>📋 Plan:</strong> ' + (planLabels[plan] || plan) + '</div>' +
@@ -4895,8 +5035,8 @@ async function submitOnboarding() {
     renderOrgsList();
 
     // Step 5: Notify
-    const crmUrl = 'https://htmlmaster22.github.io/nexcrm/';
-    const planLabels = {starter:'Starter (SAR 350/شهر)', pro:'Pro (SAR 699/شهر)', agency:'Agency (SAR 999/شهر)'};
+    const crmUrl = 'https://nexcrm-jet.vercel.app/';
+    const planLabels = {starter:'Starter (SAR 349/شهر)', pro:'Pro (SAR 699/شهر)', agency:'Agency (SAR 1,199/شهر)'};
 
     if(notifyVia === 'whatsapp' && phone) {
       const msgLines = [
@@ -4917,7 +5057,7 @@ async function submitOnboarding() {
         'تواصل معنا لأي استفسار ✅'
       ];
       const msg = encodeURIComponent(msgLines.join('\n'));
-      window.open('https://wa.me/' + phone.replace(/[^0-9]/g, '') + '?text=' + msg, '_blank');
+      window.open('https://wa.me/' + waNumber(phone) + '?text=' + msg, '_blank');
     } else {
       // Copy credentials to clipboard
       const creds = ['Company: ' + orgName, 'Email: ' + email, 'Password: ' + password, 'URL: ' + crmUrl].join('\n');
@@ -5009,17 +5149,17 @@ function renderLeads() {
     return;
   }
   tbody.innerHTML = filtered.map((l,i) => `
-    <tr>
+    <tr class="lead-row">
       <td><div style="font-weight:600">${l.name}</div></td>
       <td><div style="color:var(--text2)">${l.company||'—'}</div></td>
       <td><div style="color:var(--text2);font-size:12px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${l.title||''}">${l.title||'—'}</div></td>
-      <td>${l.phone ? `<a href="https://wa.me/${l.phone.replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--success);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>${l.phone}</a>` : '<span style="color:var(--text2)">—</span>'}</td>
+      <td>${l.phone ? `<a href="https://wa.me/${waNumber(l.phone)}" target="_blank" style="color:var(--success);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>${l.phone}</a>` : '<span style="color:var(--text2)">—</span>'}</td>
       <td>${l.email ? `<a href="mailto:${l.email}" style="color:var(--accent);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:4px" title="${l.email}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.email}</span></a>` : '<span style="color:var(--text2)">—</span>'}</td>
       <td>${sourceTag(l.source)}</td>
       <td><select class="status-select ${statusClass[l.status]||'pill-new'}" onchange="quickStatus(${l.id},this.value,this)" onclick="event.stopPropagation()">
         ${LEAD_STATUSES.map(s=>`<option value="${s}" ${((l.status||'New')===s)?'selected':''}>${s}</option>`).join('')}
       </select></td>
-      <td><span style="font-weight:600;color:var(--success)">${l.value||'—'}</span></td>
+      <td><span style="font-weight:600;color:var(--success)">${fmtLeadValue(l.value)}</span></td>
       <td><div style="color:var(--text2);font-size:12px">${l.assigned||'—'}</div></td>
       <td><div style="color:var(--text2);font-size:12px">${l.date||'—'}</div></td>
       <td>
@@ -5118,8 +5258,11 @@ const titles = {
   calendar:'Content Calendar', deliverables:'Deliverables', invoices:'Invoices', calls:'Call Logs', settings:'Settings'
 };
 function nav(page, el) {
+  const pageEl = document.getElementById('page-'+page);
+  if(!pageEl) return;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
+  pageEl.classList.add('active');
+  syncMobileNav(page);
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if(el) el.classList.add('active');
   document.getElementById('page-title').textContent = titles[page];
@@ -5855,6 +5998,7 @@ function mobileNav(page, el) {
   // Update mobile nav buttons
   document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
   if(el) el.classList.add('active');
+  syncMobileNav(page);
 
   // Update page title
   const titles = {
@@ -6253,7 +6397,8 @@ const _srcDisplayMap = {
   'snapchat':'Snapchat','سناب شات':'Snapchat','سناب':'Snapchat','سناب شاتس':'Snapchat',
   'facebook':'Facebook','فيسبوك':'Facebook','فيس بوك':'Facebook',
   'whatsapp':'WhatsApp','واتساب':'WhatsApp','واتس اب':'WhatsApp','واتس':'WhatsApp',
-  'google ads':'Google Ads','جوجل':'Google Ads','اعلانات جوجل':'Google Ads','google':'Google Ads'
+  'google ads':'Google Ads','جوجل':'Google Ads','اعلانات جوجل':'Google Ads','google':'Google Ads',
+  'apollo verified':'Verified','apollo':'Verified'
 };
 function normalizeSrcName(s) {
   if(!s) return s;
@@ -7112,7 +7257,7 @@ async function addTranscriptToNotes() {
 }
 
 function scheduleCallback(id, name, phone) {
-  const waNum = phone.replace(/[^0-9]/g,'');
+  const waNum = waNumber(phone);
   if (waNum) {
     window.open('https://wa.me/' + waNum, '_blank');
   } else {
@@ -7192,6 +7337,22 @@ async function checkSession() {
       const user = await r.json();
       loginSuccess({ user, access_token: savedToken });
     } else {
+      // Access tokens expire after about an hour. Before signing the person out,
+      // try the refresh token so reopening the app later doesn't force a new login.
+      const rt = localStorage.getItem('nexcrm_refresh_token');
+      if (rt) {
+        try {
+          const rr = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=refresh_token', {
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
+            body: JSON.stringify({ refresh_token: rt })
+          });
+          const d = rr.ok ? await rr.json() : null;
+          if (d && d.access_token && d.user) {
+            loginSuccess({ user: d.user, access_token: d.access_token, refresh_token: d.refresh_token });
+            return;
+          }
+        } catch (e) {}
+      }
       localStorage.removeItem('nexcrm_token');
       localStorage.removeItem('nexcrm_refresh_token');
       localStorage.removeItem('nexcrm_user');
@@ -7259,7 +7420,7 @@ function editLead(id) {
     b.style.background = isMatch ? 'rgba(59,130,246,0.08)' : 'var(--bg3)';
     b.style.borderColor = isMatch ? 'var(--accent)' : 'var(--border)';
   });
-  document.getElementById('f-value').value = (lead.value || '').replace('$','').replace(',','');
+  document.getElementById('f-value').value = String(lead.value || '').replace(/[$,]/g,'');
   const assignEl = document.getElementById('f-assign');
   assignEl.value = lead.assigned || 'Tariq Hassan';
   assignEl.disabled = !canAssignLeads;
@@ -8319,7 +8480,7 @@ async function testSmtpSettings() {
   try {
     const r = await fetch(SUPABASE_URL + '/functions/v1/send-email', {
       method: 'POST',
-      headers: { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY },
+      headers: userFnHeaders(),
       body: JSON.stringify({ action:'test', smtp:{ host, port, user, pass } })
     });
     const data = await r.json();
@@ -8461,7 +8622,7 @@ Note: Only leads with email addresses will receive the email.`)) return;
       const smtpLeads = targetLeads.filter(l => l.email);
       const r = await fetch(SUPABASE_URL + '/functions/v1/send-email', {
         method: 'POST',
-        headers: { 'Content-Type':'application/json', 'apikey':SUPABASE_KEY, 'Authorization':'Bearer '+SUPABASE_KEY },
+        headers: userFnHeaders(),
         body: JSON.stringify({
           action: 'send',
           smtp: { host: _smtpConfig.host, port: _smtpConfig.port, user: _smtpConfig.user, pass: _smtpConfig.pass },
@@ -8907,9 +9068,9 @@ function renderUsersList(users) {
   }
 
   const roleInfo = {
-    admin:   { icon:'👑', color:'#c4b5fd', bg:'rgba(139,92,246,0.15)', label:'Admin' },
-    manager: { icon:'🧑‍💼', color:'#93c5fd', bg:'rgba(59,130,246,0.15)', label:'Manager' },
-    sales:   { icon:'🎯', color:'#6ee7b7', bg:'rgba(16,185,129,0.15)', label:'Sales Rep' },
+    admin:   { icon:'👑', color:document.body.classList.contains('light-mode')?'#6d28d9':'#c4b5fd', bg:'rgba(139,92,246,0.15)', label:'Admin' },
+    manager: { icon:'🧑‍💼', color:document.body.classList.contains('light-mode')?'#1d4ed8':'#93c5fd', bg:'rgba(59,130,246,0.15)', label:'Manager' },
+    sales:   { icon:'🎯', color:document.body.classList.contains('light-mode')?'#047857':'#6ee7b7', bg:'rgba(16,185,129,0.15)', label:'Sales Rep' },
   };
 
   list.innerHTML = users.map(u => {
@@ -9045,9 +9206,9 @@ async function loadTeam() {
     teamMembers = data;
     const validRoles = ['admin','manager','sales'];
     const roleColors = {
-      admin: { bg:'rgba(139,92,246,0.15)', color:'#c4b5fd', icon:'👑' },
-      manager: { bg:'rgba(59,130,246,0.15)', color:'#93c5fd', icon:'🧑‍💼' },
-      sales: { bg:'rgba(16,185,129,0.15)', color:'#6ee7b7', icon:'🎯' },
+      admin: { bg:'rgba(139,92,246,0.15)', color:document.body.classList.contains('light-mode')?'#6d28d9':'#c4b5fd', icon:'👑' },
+      manager: { bg:'rgba(59,130,246,0.15)', color:document.body.classList.contains('light-mode')?'#1d4ed8':'#93c5fd', icon:'🧑‍💼' },
+      sales: { bg:'rgba(16,185,129,0.15)', color:document.body.classList.contains('light-mode')?'#047857':'#6ee7b7', icon:'🎯' },
     };
     list.innerHTML = data.map(m => {
       const p = profileMap[m.user_id];
@@ -9174,7 +9335,7 @@ async function createMemberAccount(mode) {
   try {
     const res = await fetch(SUPABASE_URL + '/functions/v1/invite-member', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': HEADERS['Authorization'] || ('Bearer ' + SUPABASE_KEY) },
+      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': HEADERS['Authorization'] },
       body: JSON.stringify({ email, name, org_id: orgId, role, mode })
     });
     const data = await res.json();
@@ -9250,7 +9411,7 @@ async function loadAllLeads() {
         <td><select class="status-select ${statusClass[l.status]||'pill-new'}" onchange="quickStatus(${l.id},this.value,this)">
           ${LEAD_STATUSES.map(s=>`<option value="${s}" ${((l.status||'New')===s)?'selected':''}>${s}</option>`).join('')}
         </select></td>
-        <td><span style="font-weight:600;color:var(--success)">${l.value||'—'}</span></td>
+        <td><span style="font-weight:600;color:var(--success)">${fmtLeadValue(l.value)}</span></td>
         <td>
           <select class="select-input" onchange="reassignLead(${l.id}, this.value)">
             ${['Tariq Hassan','Nora Al-Qahtani','Khalid Al-Dosari','Sara Al-Mutairi'].map(name =>
@@ -9360,7 +9521,7 @@ async function loadDashboard() {
 
     const total = data.length;
     const won = data.filter(l => l.status === 'Converted').length;
-    const totalValue = data.reduce((s,l) => s + (parseInt((l.value||'0').replace(/[$,]/g,''))||0), 0);
+    const totalValue = data.reduce((s,l) => s + (leadValue(l.value)||0), 0);
     const convRate = total > 0 ? Math.round(won/total*100) : 0;
     const orgName = currentOrg ? currentOrg.name : 'All';
 
@@ -9401,7 +9562,7 @@ async function loadPerformance() {
       if(!rep) return;
       if(!byRep[rep]) byRep[rep] = { count:0, value:0, won:0 };
       byRep[rep].count++;
-      const val = parseInt((l.value||'0').replace(/[$,]/g,'')) || 0;
+      const val = leadValue(l.value) || 0;
       byRep[rep].value += val;
       if(l.status === 'Converted') byRep[rep].won++;
     });
@@ -9425,7 +9586,7 @@ async function loadPerformance() {
     }
 
     const totalLeads = data.length;
-    const totalValue = data.reduce((s,l) => s + (parseInt((l.value||'0').replace(/[$,]/g,''))||0), 0);
+    const totalValue = data.reduce((s,l) => s + (leadValue(l.value)||0), 0);
     const wonLeads = data.filter(l => l.status==='Converted').length;
     const convRate = totalLeads > 0 ? Math.round(wonLeads/totalLeads*100) : 0;
 
@@ -9436,7 +9597,7 @@ async function loadPerformance() {
       </div>
       <div class="stat-card" style="margin-bottom:12px">
         <div class="stat-label">Total Pipeline Value</div>
-        <div class="stat-value">$${totalValue.toLocaleString()}</div>
+        <div class="stat-value">SAR ${totalValue.toLocaleString()}</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Conversion Rate</div>
@@ -9554,7 +9715,7 @@ function renderDashTeamPerf() {
     if(!rep) return; // skip unassigned
     if(orgNames.includes(rep.toLowerCase())) return; // skip org names
     if(!byRep[rep]) byRep[rep] = 0;
-    byRep[rep] += parseInt((l.value||'0').replace(/[$,]/g,''))||0;
+    byRep[rep] += leadValue(l.value)||0;
   });
   const sorted = Object.entries(byRep).sort((a,b)=>b[1]-a[1]).slice(0,5);
   if(!sorted.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">No data yet</div>'; return; }
@@ -9575,7 +9736,7 @@ function renderPipeline() {
   leads.forEach(l => {
     const stage = stages[l.status] || 'new';
     cols[stage].push(l);
-    total += parseInt((l.value||'0').replace(/[$,]/g,''))||0;
+    total += leadValue(l.value)||0;
   });
 
   const el = id => document.getElementById(id);
@@ -9591,7 +9752,7 @@ function renderPipeline() {
       return;
     }
     col.innerHTML = items.map(l => {
-      const val = parseInt((l.value||'0').replace(/[$,]/g,''))||0;
+      const val = leadValue(l.value)||0;
       const init = (l.assigned||'?')[0].toUpperCase();
       const nextStatuses = { new:['In Progress','Qualified','Unqualified'], warm:['In Progress','Converted','Unqualified'], active:['Qualified','Converted','Unqualified'], won:[], lost:['New'] };
       const nextBtns = (nextStatuses[stage]||[]).map(s =>
@@ -9662,7 +9823,7 @@ function renderAnalytics() {
   const total = leads.length;
   const won = leads.filter(l => l.status === 'Converted').length;
   const lost = leads.filter(l => l.status === 'Unqualified').length;
-  const totalVal = leads.reduce((s,l) => s + (parseInt((l.value||'0').replace(/[$,]/g,''))||0), 0);
+  const totalVal = leads.reduce((s,l) => s + (leadValue(l.value)||0), 0);
   const convRate = total > 0 ? Math.round(won/total*100) : 0;
 
   if(el('an-conv')) el('an-conv').textContent = convRate + '%';
@@ -9673,7 +9834,7 @@ function renderAnalytics() {
 
   // Sources breakdown
   const bySrc = {};
-  leads.forEach(l => { const s = l.source||'Unknown'; bySrc[s] = (bySrc[s]||0) + 1; });
+  leads.forEach(l => { const s = normalizeSrcName(l.source)||'Unknown'; bySrc[s] = (bySrc[s]||0) + 1; });
   const srcColors = { Instagram:'#e1306c', TikTok:'#ff2d55', Snapchat:'#e6d800', Facebook:'#1877f2', WhatsApp:'#25d366', 'Google Ads':'#4285f4' };
   const srcSorted = Object.entries(bySrc).sort((a,b)=>b[1]-a[1]);
   const maxSrc = srcSorted[0] ? srcSorted[0][1] : 1;
@@ -9681,21 +9842,21 @@ function renderAnalytics() {
     const pct = Math.round(cnt/total*100);
     const color = srcColors[src] || '#3b82f6';
     return '<div class="analytics-bar-row"><div class="analytics-label">' + src + '</div>' +
-      '<div class="analytics-bar-wrap"><div class="analytics-bar-fill" style="width:' + Math.round(cnt/maxSrc*100) + '%;background:' + color + '"></div></div>' +
+      '<div class="analytics-bar-wrap"><div class="analytics-bar-fill" style="width:' + Math.max(2, pct) + '%;background:' + color + '"></div></div>' +
       '<div class="analytics-value">' + pct + '%</div></div>';
   }).join('');
 
   // Status breakdown
   const byStat = {};
   leads.forEach(l => { const s = l.status||'New'; byStat[s] = (byStat[s]||0) + 1; });
-  const statColors = { New:'#3b82f6', Warm:'#f59e0b', Active:'#06b6d4', Won:'#10b981', Lost:'#ef4444', Cold:'#94a3b8' };
+  const statColors = { New:'#3b82f6', 'In Progress':'#f59e0b', Qualified:'#14b8a6', Unqualified:'#94a3b8', Converted:'#10b981', Warm:'#f59e0b', Active:'#06b6d4', Won:'#10b981', Lost:'#ef4444', Cold:'#94a3b8' };
   const statSorted = Object.entries(byStat).sort((a,b)=>b[1]-a[1]);
   const maxStat = statSorted[0] ? statSorted[0][1] : 1;
   if(el('an-statuses')) el('an-statuses').innerHTML = statSorted.map(([stat, cnt]) => {
     const pct = Math.round(cnt/total*100);
     const color = statColors[stat] || '#3b82f6';
     return '<div class="analytics-bar-row"><div class="analytics-label">' + stat + '</div>' +
-      '<div class="analytics-bar-wrap"><div class="analytics-bar-fill" style="width:' + Math.round(cnt/maxStat*100) + '%;background:' + color + '"></div></div>' +
+      '<div class="analytics-bar-wrap"><div class="analytics-bar-fill" style="width:' + Math.max(2, pct) + '%;background:' + color + '"></div></div>' +
       '<div class="analytics-value">' + pct + '%</div></div>';
   }).join('');
 }
@@ -9850,7 +10011,7 @@ function renderDonut(data) {
     <div style="font-size:42px;margin-bottom:14px">⏰</div>
     <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:20px;color:var(--text);margin-bottom:8px">Trial Expired</div>
     <div id="trial-expired-message" style="font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.6">Your 14-day free trial has ended. Upgrade now to keep using NexCRM.</div>
-    <button onclick="document.getElementById('trial-expired-overlay').style.display='none';nav('admin-billing',null);" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-bottom:10px">Upgrade Now →</button>
+    <button onclick="showUpgradePlans()" class="btn btn-primary" style="width:100%;padding:13px;font-size:14px;margin-bottom:10px">Upgrade Now →</button>
     <button onclick="localStorage.removeItem('nexcrm_token');localStorage.removeItem('nexcrm_refresh_token');localStorage.removeItem('nexcrm_user');location.reload();" style="width:100%;padding:10px;background:none;border:none;color:var(--text2);font-size:12px;cursor:pointer;font-family:inherit;text-decoration:underline">Sign out</button>
   </div>
 </div>
@@ -9858,7 +10019,7 @@ function renderDonut(data) {
 <!-- TRIAL COUNTDOWN BANNER (non-blocking, shows when ≤3 days left) -->
 <div id="trial-days-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9000;background:linear-gradient(135deg,#f59e0b,#ea580c);color:#fff;padding:calc(9px + env(safe-area-inset-top, 0px)) 20px 9px;align-items:center;justify-content:center;gap:14px;font-size:13px;font-weight:600">
   <span class="trial-banner-text">Your trial ends soon.</span>
-  <button onclick="nav('admin-billing',null)" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:4px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Upgrade →</button>
+  <button onclick="showUpgradePlans()" style="background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:4px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Upgrade →</button>
 </div>
 
 
@@ -9874,24 +10035,24 @@ function renderDonut(data) {
             <div style="border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;background:var(--bg2)">
               <div style="font-size:22px;margin-bottom:8px">⭐</div>
               <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Starter</div>
-              <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px">350 <span style="font-size:13px;font-weight:400;color:var(--text2)">SAR/mo</span></div>
-              <div style="font-size:11px;color:var(--text2);margin-bottom:16px;line-height:1.7">3 users • 500 leads<br/>Basic features</div>
-              <button onclick="openMoyasar('starter',350)" class="btn btn-ghost" style="width:100%;font-size:12px">Subscribe</button>
+              <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px">349 <span style="font-size:13px;font-weight:400;color:var(--text2)">SAR/mo</span></div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:16px;line-height:1.7">3 users • Unlimited leads<br/>1 workspace</div>
+              <button onclick="openMoyasar('starter',349)" class="btn btn-ghost" style="width:100%;font-size:12px">Subscribe</button>
             </div>
             <div style="border:2px solid var(--accent);border-radius:16px;padding:20px;text-align:center;background:rgba(59,130,246,0.04);position:relative">
               <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px">Most Popular</div>
               <div style="font-size:22px;margin-bottom:8px">🚀</div>
               <div style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:4px">Pro</div>
               <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px">699 <span style="font-size:13px;font-weight:400;color:var(--text2)">SAR/mo</span></div>
-              <div style="font-size:11px;color:var(--text2);margin-bottom:16px;line-height:1.7">10 users • Unlimited<br/>AI + Campaigns</div>
+              <div style="font-size:11px;color:var(--text2);margin-bottom:16px;line-height:1.7">10 users • AI scoring<br/>AI WhatsApp replies</div>
               <button onclick="openMoyasar('pro',699)" class="btn btn-primary" style="width:100%;font-size:12px">Subscribe</button>
             </div>
             <div style="border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;background:var(--bg2)">
               <div style="font-size:22px;margin-bottom:8px">🏢</div>
               <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Agency</div>
-              <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px">999 <span style="font-size:13px;font-weight:400;color:var(--text2)">SAR/mo</span></div>
+              <div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px">1,199 <span style="font-size:13px;font-weight:400;color:var(--text2)">SAR/mo</span></div>
               <div style="font-size:11px;color:var(--text2);margin-bottom:16px;line-height:1.7">Unlimited • Multi-workspace<br/>White label</div>
-              <button onclick="openMoyasar('agency',999)" class="btn btn-ghost" style="width:100%;font-size:12px">Subscribe</button>
+              <button onclick="openMoyasar('agency',1199)" class="btn btn-ghost" style="width:100%;font-size:12px">Subscribe</button>
             </div>
           </div>
           <div style="border-top:1px solid var(--border);padding-top:20px">
@@ -10017,7 +10178,7 @@ function renderDonut(data) {
               <div style="font-size:12px;color:var(--text2);line-height:1.7">
                 LinkedIn Lead Gen Forms also route through Zapier or Make.com's LinkedIn connector to your
                 Incoming Webhook URL with <code>source: "LinkedIn"</code>. (For LinkedIn <em>contact discovery</em>
-                instead of ad-form leads, use the Real Leads / Apollo mode in Lead Generator.)
+                instead of ad-form leads, use Real Verified Leads in the Lead Generator.)
               </div>
             </div>
 
@@ -10211,9 +10372,9 @@ function renderDonut(data) {
       <div class="form-group">
         <label class="form-label">Subscription Plan</label>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-          <button type="button" onclick="selectPlan(this,'starter')" class="plan-pick" style="padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:700;color:var(--text2);text-align:center;transition:all 0.2s"><div style="font-size:16px;margin-bottom:3px">⭐</div><div>Starter</div><div style="font-size:10px;font-weight:400">SAR 350/mo</div></button>
+          <button type="button" onclick="selectPlan(this,'starter')" class="plan-pick" style="padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:700;color:var(--text2);text-align:center;transition:all 0.2s"><div style="font-size:16px;margin-bottom:3px">⭐</div><div>Starter</div><div style="font-size:10px;font-weight:400">SAR 349/mo</div></button>
           <button type="button" onclick="selectPlan(this,'pro')" class="plan-pick selected-plan" style="padding:10px 6px;border-radius:10px;border:2px solid var(--accent);background:rgba(59,130,246,0.08);cursor:pointer;font-size:11px;font-weight:700;color:var(--accent);text-align:center;transition:all 0.2s"><div style="font-size:16px;margin-bottom:3px">🚀</div><div>Pro</div><div style="font-size:10px;font-weight:400">SAR 699/mo</div></button>
-          <button type="button" onclick="selectPlan(this,'agency')" class="plan-pick" style="padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:700;color:var(--text2);text-align:center;transition:all 0.2s"><div style="font-size:16px;margin-bottom:3px">🏢</div><div>Agency</div><div style="font-size:10px;font-weight:400">SAR 999/mo</div></button>
+          <button type="button" onclick="selectPlan(this,'agency')" class="plan-pick" style="padding:10px 6px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:11px;font-weight:700;color:var(--text2);text-align:center;transition:all 0.2s"><div style="font-size:16px;margin-bottom:3px">🏢</div><div>Agency</div><div style="font-size:10px;font-weight:400">SAR 1,199/mo</div></button>
         </div>
         <input type="hidden" id="onboard-plan" value="pro"/>
       </div>
@@ -10324,7 +10485,7 @@ function renderDonut(data) {
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span>Contacts</span>
     </button>
-    <button onclick="toggleMobileMenu()" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;border-radius:10px;cursor:pointer;background:none;border:none;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;min-width:52px">
+    <button id="mnav-more" onclick="toggleMobileMenu()" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;border-radius:10px;cursor:pointer;background:none;border:none;color:var(--text2);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;min-width:52px">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       <span>More</span>
     </button>
@@ -10419,7 +10580,7 @@ async function generatePDFReport(btn) {
   const warm = reportLeads.filter(l => l.status === 'Qualified').length;
   const newL = reportLeads.filter(l => l.status === 'New').length;
   const convRate = total > 0 ? Math.round((won / total) * 100) : 0;
-  const pipelineVal = reportLeads.reduce((s, l) => s + (parseFloat(l.value) || 0), 0);
+  const pipelineVal = reportLeads.reduce((s, l) => s + leadValue(l.value), 0);
 
   // Fetch call center data for this org (for the new Call Center Analytics section)
   let callStats = { total: 0, positive: 0, neutral: 0, negative: 0, avgQuality: '—', intents: {} };
@@ -10491,7 +10652,7 @@ async function generatePDFReport(btn) {
         ${(() => { const c = {New:['#fef9c3','#854d0e'],'In Progress':['#dbeafe','#2563eb'],Qualified:['#ccfbf1','#0d9488'],Unqualified:['#f1f5f9','#64748b'],Converted:['#dcfce7','#16a34a']}[l.status] || ['#fef9c3','#854d0e'];
           return `<span style="background:${c[0]};color:${c[1]};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700">${l.status || 'New'}</span>`; })()}
       </td>
-      <td style="padding:10px 8px;font-size:12px;font-weight:700;color:#222">${l.value ? 'SAR ' + Number(l.value).toLocaleString() : '—'}</td>
+      <td style="padding:10px 8px;font-size:12px;font-weight:700;color:#222">${leadValue(l.value) ? 'SAR ' + leadValue(l.value).toLocaleString() : '—'}</td>
     </tr>`).join('');
 
   const intentLabels = { complaint: 'Complaint', refund_request: 'Refund Request', inquiry: 'Inquiry', support: 'Support', sales: 'Sales', other: 'Other' };
@@ -12131,7 +12292,7 @@ function showFollowupList() {
     const hoursStr = h>48?Math.round(h/24)+(isAr?' يوم':'d'):Math.round(h)+(isAr?' ساعة':'h');
     const template = waTemplates[(l.status||'new').toLowerCase()]||waTemplates.new;
     const msg = encodeURIComponent(template.replace('{name}',(l.name||'').split(' ')[0]));
-    const phone = (l.phone||'').replace(/\D/g,'');
+    const phone = waNumber(l.phone);
     const waLink = phone ? 'https://wa.me/'+phone+'?text='+msg : null;
     return `<div style="background:var(--bg3);border-radius:14px;padding:16px;margin-bottom:10px;border-left:3px solid ${urgency}">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">
@@ -12282,7 +12443,12 @@ function selectLeadGenMode(mode) {
   }
 
   const btn = document.getElementById('lg-btn');
-  if(btn) { if(mode==='real'){btn.style.background='linear-gradient(135deg,#f59e0b,#ef4444)';btn.querySelector('span').textContent='Get My 5 Free Real Leads';}else{btn.style.background='linear-gradient(135deg,#3b82f6,#8b5cf6)';btn.querySelector('span').textContent='Generate Leads';} }
+  if(btn) {
+    const sp = btn.querySelector('span'); const _ar = (typeof currentLang!=='undefined'&&currentLang==='ar');
+    const t = mode==='real' ? ['Find Verified Leads','ابحث عن عملاء متحققين'] : ['Build Customer Personas','ولّد شخصيات عملائك'];
+    btn.style.background = mode==='real' ? 'linear-gradient(135deg,#f59e0b,#ef4444)' : 'linear-gradient(135deg,#3b82f6,#8b5cf6)';
+    if(sp) { sp.setAttribute('data-en', t[0]); sp.setAttribute('data-ar', t[1]); sp.textContent = _ar ? t[1] : t[0]; }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -12301,8 +12467,15 @@ function claimFreeRealLeads() {
   runLeadGenerator();
 }
 
-function showUpgradePlans() { const m=document.getElementById('lg-plans-modal'); if(m) m.style.display='flex'; }
-function contactForUpgrade(plan) { const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar'); window.open('https://wa.me/966500000000?text='+encodeURIComponent((isAr?'مرحباً! أود الاشتراك في خطة ':'Hi! I want to subscribe to the ')+plan), '_blank'); }
+function showUpgradePlans() { const m=document.getElementById('lg-plans-modal'); if(!m) return; if(m.parentElement!==document.body) document.body.appendChild(m); m.style.display='flex'; }
+const NEXCRM_SALES_WA = '966548334354';
+function contactForUpgrade(plan) {
+  const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar');
+  const lines=[(isAr?'مرحباً! أود الاشتراك في NexCRM — ':'Hi! I would like to subscribe to NexCRM — ')+plan];
+  if(typeof currentOrg!=='undefined'&&currentOrg&&currentOrg.name) lines.push((isAr?'مساحة العمل: ':'Workspace: ')+currentOrg.name);
+  if(typeof currentUser!=='undefined'&&currentUser&&currentUser.email) lines.push((isAr?'الإيميل: ':'Email: ')+currentUser.email);
+  window.open('https://wa.me/'+NEXCRM_SALES_WA+'?text='+encodeURIComponent(lines.join('\n')), '_blank');
+}
 
 // ─── LEAD GENERATOR: Channel & Category selectors ──────────────
 let _lgSelectedChannels = ['TikTok']; // default selection matches the pre-active chip
@@ -12360,7 +12533,7 @@ function addLgCustomIndustry() {
   // Apollo's company database is English-only -- Arabic keywords match zero
   // companies and silently return an empty result set for the whole search.
   if(/[\u0600-\u06FF]/.test(val)) {
-    showToast(isAr ? '⚠️ Apollo يبحث بالإنجليزية فقط — استخدم كلمة إنجليزية' : '⚠️ Apollo only matches English — use an English keyword');
+    showToast(isAr ? '⚠️ قاعدة البيانات تبحث بالإنجليزية فقط — استخدم كلمة إنجليزية' : '⚠️ The verified database only matches English — use an English keyword');
     return;
   }
   if(!_lgSelectedIndustries.includes(val)) _lgSelectedIndustries.push(val);
@@ -12435,7 +12608,7 @@ async function runLeadGenerator() {
   const btn=document.getElementById('lg-btn'); const loading=document.getElementById('lg-loading'); const results=document.getElementById('lg-results');
   btn.style.display='none'; loading.style.display='block'; results.style.display='none'; _generatedLeads=[];
   const loadingText=document.getElementById('lg-loading-text');
-  if(loadingText) loadingText.innerHTML = _lgMode==='real'?(isAr?'<span>جاري البحث في قاعدة بيانات 265 مليون...</span>':'<span>Searching database of 265M+ verified contacts...</span>'):(isAr?'<span>الذكاء الاصطناعي يحلل ويجد العملاء...</span>':'<span>AI is analyzing your business and finding prospects...</span>');
+  if(loadingText) loadingText.innerHTML = _lgMode==='real'?(isAr?'<span>جاري البحث في قاعدة بيانات 265 مليون...</span>':'<span>Searching database of 265M+ verified contacts...</span>'):(isAr?'<span>الذكاء الاصطناعي يبني شخصيات عملائك...</span>':'<span>AI is building your customer personas...</span>');
   try {
     const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/apollo-leads', {
       method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':HEADERS.Authorization},
@@ -12464,22 +12637,22 @@ async function runLeadGenerator() {
       let explain;
       if (hasArabicKeyword) {
         explain = isAr
-          ? 'قاعدة بيانات Apollo تبحث بالإنجليزية فقط — الكلمات العربية في "القطاع المستهدف" لا تطابق أي شركة. احذفها واستخدم كلمات إنجليزية مثل hospitality أو construction.'
-          : "Apollo's database only matches English. The Arabic keywords in Target Industry match nothing — remove them and use English terms like hospitality or construction.";
+          ? 'قاعدة البيانات المتحققة تبحث بالإنجليزية فقط — الكلمات العربية في "القطاع المستهدف" لا تطابق أي شركة. احذفها واستخدم كلمات إنجليزية مثل hospitality أو construction.'
+          : "The verified database only matches English. The Arabic keywords in Target Industry match nothing — remove them and use English terms like hospitality or construction.";
       } else if (isNoResults) {
         explain = isAr
           ? 'الفلاتر ضيقة جداً. جرّب إزالة بعض القطاعات أو أحجام الشركات، أو أضف مناصب وظيفية أكثر.'
           : 'Your filters are too narrow. Try removing some industries or company sizes, or adding more job positions.';
       } else {
         explain = isAr
-          ? 'مشكلة في الاتصال بـ Apollo API. يرجى التأكد من إعداد مفتاح API في Supabase.'
-          : 'Apollo API connection failed. Please check APOLLO_API_KEY is set in Supabase.';
+          ? 'تعذّر الوصول إلى قاعدة البيانات المتحققة. حاول مرة أخرى بعد دقيقة.'
+          : 'Could not reach the verified database. Try again in a minute.';
       }
       errBox.innerHTML = `<div style="background:${isNoResults?'rgba(245,158,11,0.1)':'rgba(239,68,68,0.1)'};border:1px solid ${isNoResults?'rgba(245,158,11,0.3)':'rgba(239,68,68,0.3)'};border-radius:16px;padding:24px;text-align:center;">
         <div style="font-size:28px;margin-bottom:12px">${isNoResults?'🔍':'⚠️'}</div>
         <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">${headline}</div>
         <div style="font-size:13px;color:var(--text2);margin-bottom:16px">${explain}</div>
-        <div style="font-size:12px;color:var(--text2);background:var(--bg2);border-radius:8px;padding:10px;margin-bottom:16px;text-align:left;direction:ltr;">Error: ${rawErr}</div>
+        <div style="font-size:12px;color:var(--text2);background:var(--bg2);border-radius:8px;padding:10px;margin-bottom:16px;text-align:left;direction:ltr;">Error: ${String(rawErr).replace(/apollo(\.io)?/gi,'database')}</div>
         <button onclick="document.getElementById('lg-error').style.display='none';document.getElementById('lg-btn').style.display='flex';" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;">Try Again</button>
       </div>`;
       return;
@@ -12499,22 +12672,13 @@ async function runLeadGenerator() {
         <button onclick="document.getElementById('lg-error').style.display='none';document.getElementById('lg-btn').style.display='flex';" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;">Try Again</button>
       </div>`;
     } else {
-      _generatedLeads=generateFallbackLeadsLocal(mybiz,location,Math.min(parseInt(count)||5,10));
-      loading.style.display='none'; btn.style.display='flex'; results.style.display='block';
-      renderGeneratedLeads(_generatedLeads,location,'AI-generated prospects matching your business','ai');
-      showToast(isAr?'يعرض نتائج AI':'Showing AI sample leads');
+      loading.style.display='none'; btn.style.display='flex';
+      showToast(isAr?'❌ تعذّر توليد الشخصيات — حاول مرة أخرى':'❌ Could not build personas — try again');
       return;
     }
-  } finally { loading.style.display='none'; btn.style.display='flex'; results.style.display='block'; }
+  } finally { loading.style.display='none'; btn.style.display='flex'; if(_generatedLeads.length) results.style.display='block'; }
 }
 
-function generateFallbackLeadsLocal(mybiz,location,count) {
-  const city=location.split(',')[0]; const n=Math.min(parseInt(count)||10,15);
-  const names=['Mohammed Al-Otaibi','Faisal Al-Zahrani','Khalid Al-Dosari','Abdullah Al-Shammari','Saad Al-Qahtani','Nour Al-Shammari','Reem Al-Ahmadi','Ahmed Al-Ghamdi','Sultan Al-Anazi','Manal Al-Harbi','Omar Al-Rashid','Sara Al-Mutairi','Abdulaziz Al-Tamimi','Hind Al-Yami','Turki Al-Malki'];
-  const companies=['Al-Riyadh Trading Group','Najma Advanced Solutions','Saudi Tech Ventures','Al-Amal Services','Horizon Business Group','Al-Nakheel Development','Gulf Operations LLC','Tamkeen Solutions','Al-Faisal Enterprises','Crown Commercial Group','Al-Majd Logistics','Platinum Services KSA','Al-Watan Industries','Future Vision Co.','Reach Business Center'];
-  const industries=['Logistics','Manufacturing','Retail','Technology','Construction','Healthcare','Education','F&B','Real Estate','Finance'];
-  return Array.from({length:n},(_,i)=>({name:names[i],company:companies[i],title:['CEO','HR Director','Operations Manager','General Manager','Owner'][i%5],industry:industries[i%industries.length],location:city,phone:'+966 5'+(Math.floor(Math.random()*9)+1)+' '+Math.floor(Math.random()*900+100)+' '+Math.floor(Math.random()*9000+1000),email:companies[i].toLowerCase().replace(/[^a-z]/g,'').slice(0,8)+'@'+companies[i].toLowerCase().replace(/[^a-z]/g,'').slice(0,6)+'.com.sa',company_size:['50-100','100-250','250-500'][i%3]+' employees',why_good_lead:'This company profile matches your target based on industry and size in '+city,approach:'Lead with a quick ROI example from a similar company in '+city,urgency:['High','High','Medium'][i%3],source:'AI Generated',status:'New',verified:false}));
-}
 
 function renderGeneratedLeads(leads,location,targetProfile,mode) {
   const errBox=document.getElementById('lg-error');
@@ -12524,12 +12688,15 @@ function renderGeneratedLeads(leads,location,targetProfile,mode) {
   const list=document.getElementById('lg-leads-list'); const title=document.getElementById('lg-results-title'); const profileEl=document.getElementById('lg-target-profile');
   if(!list||!title){ console.error('Lead generator: results container missing'); return; }
   const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar'); const isReal=mode==='real';
-  title.innerHTML=`<span style="display:flex;align-items:center;gap:8px">${isReal?`<span style="background:rgba(16,185,129,0.12);color:var(--success);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">${isAr?'متحقق':'Verified'}</span>`:`<span style="background:rgba(59,130,246,0.12);color:var(--accent);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">AI</span>`}${leads.length} ${isAr?'عميل محتمل في':'prospects found in'} ${location}</span>`;
-  if(profileEl&&targetProfile) profileEl.textContent=targetProfile;
+  _lgResultMode = mode;
+  const importAllBtn=document.getElementById('lg-import-all'); if(importAllBtn) importAllBtn.style.display=isReal?'':'none';
+  if(!isReal){ title.innerHTML=`<span style="display:flex;align-items:center;gap:8px"><span style="background:rgba(59,130,246,0.12);color:var(--accent);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">${isAr?'شخصيات':'Personas'}</span>${leads.length} ${isAr?'شخصيات عملاء لـ':'customer personas for'} ${location}</span>`; }
+  else title.innerHTML=`<span style="display:flex;align-items:center;gap:8px">${isReal?`<span style="background:rgba(16,185,129,0.12);color:var(--success);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">${isAr?'متحقق':'Verified'}</span>`:`<span style="background:rgba(59,130,246,0.12);color:var(--accent);font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px">AI</span>`}${leads.length} ${isAr?'عميل محتمل في':'prospects found in'} ${location}</span>`;
+  if(profileEl) profileEl.textContent=(targetProfile||'')+(isReal?'':(isAr?' — ملفات تخيلية للتخطيط، ليست أشخاصاً حقيقيين. للحصول على جهات اتصال استخدم «عملاء حقيقيون ومتحققون».':' — fictional profiles for planning, not real people. For contacts, use Real Verified Leads.'));
   list.innerHTML=leads.map((l,i)=>{
     const phone=(l.phone||'').replace(/[\s\-\(\)]/g,'');
     const waMsg=encodeURIComponent(isAr?'مرحباً '+(l.name||'').split(' ')[0]+'، تواصلت معك بخصوص خدماتنا التي قد تفيد '+(l.company||'شركتكم')+'. هل لديك دقيقة؟':'Hi '+(l.name||'').split(' ')[0]+', reaching out about services that could help '+(l.company||'your company')+'. Do you have a minute?');
-    const waLink=phone&&phone.length>7?'https://wa.me/'+phone.replace('+','')+'?text='+waMsg:null;
+    const waLink=waNumber(l.phone)?'https://wa.me/'+waNumber(l.phone)+'?text='+waMsg:null;
     const urgencyColor=l.urgency==='High'?'var(--danger)':l.urgency==='Medium'?'var(--warning)':'var(--success)';
     const channelIcons={TikTok:'🎵',Instagram:'📷',Snapchat:'👻',LinkedIn:'💼'};
     const channelBadge=l.source_channel?`<span style="font-size:10px;font-weight:700;color:var(--text2);background:var(--bg3);padding:2px 7px;border-radius:20px">${channelIcons[l.source_channel]||''} ${l.source_channel}</span>`:'';
@@ -12542,17 +12709,18 @@ function renderGeneratedLeads(leads,location,targetProfile,mode) {
             <div><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-size:13px;font-weight:700;color:var(--text)">${l.name||'—'}</span>${l.verified?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>':''}<span style="font-size:10px;font-weight:700;color:${urgencyColor};background:${urgencyColor}18;padding:2px 7px;border-radius:20px">${l.urgency||'Medium'}</span>${channelBadge}${leadTypeBadge}</div><div style="font-size:11px;color:var(--text2)">${l.title||'—'} · ${l.company||'—'}</div></div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
-            <div id="lg-phone-${i}" style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>${l.phone && l.phone!=='—' ? l.phone : (l.phone_pending ? '<span style="font-style:italic">revealing\u2026</span>' : '—')}</span></div>
-            <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;overflow:hidden"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.email||'—'}</span></div>
+            ${isReal?`<div id="lg-phone-${i}" style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>${l.phone && l.phone!=='—' ? l.phone : (l.phone_pending ? '<span style="font-style:italic">revealing\u2026</span>' : '—')}</span></div>
+            <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;overflow:hidden"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.email||'—'}</span></div>`:''}
             <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${l.location||location}</div>
             <div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>${l.industry||'—'} ${l.company_size?'· '+l.company_size:''}</div>
           </div>
-          <div style="background:rgba(59,130,246,0.06);border-radius:8px;padding:8px 10px;margin-bottom:6px"><div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:3px">${isAr?'لماذا هو عميل جيد':'Why good lead'}</div><div style="font-size:12px;color:var(--text);line-height:1.6">${l.why_good_lead||'—'}</div></div>
-          <div style="background:rgba(16,185,129,0.06);border-radius:8px;padding:8px 10px"><div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;margin-bottom:3px">${isAr?'كيفية التواصل':'Opening line'}</div><div style="font-size:12px;color:var(--text);line-height:1.6">${l.approach||'—'}</div></div>
+          <div style="background:rgba(59,130,246,0.06);border-radius:8px;padding:8px 10px;margin-bottom:6px"><div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;margin-bottom:3px">${isReal?(isAr?'لماذا هو عميل جيد':'Why good lead'):(isAr?'لماذا هذه الشريحة':'Why this persona')}</div><div style="font-size:12px;color:var(--text);line-height:1.6">${l.why_good_lead||'—'}</div></div>
+          <div style="background:rgba(16,185,129,0.06);border-radius:8px;padding:8px 10px"><div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;margin-bottom:3px">${isAr?'كيفية التواصل':'Opening line'}</div><div dir="auto" style="font-size:12px;color:var(--text);line-height:1.6">${l.approach||'—'}</div></div>
+          ${(!isReal&&l.where_to_find)?`<div style="background:rgba(139,92,246,0.06);border-radius:8px;padding:8px 10px;margin-top:6px"><div style="font-size:10px;font-weight:700;color:#8b5cf6;text-transform:uppercase;margin-bottom:3px">${isAr?'أين تجدهم':'Where to find them'}</div><div dir="auto" style="font-size:12px;color:var(--text);line-height:1.6">${l.where_to_find}</div></div>`:''}
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;min-width:110px">
-          ${waLink?`<a href="${waLink}" target="_blank" style="background:#25d366;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp</a>`:''}
-          <button onclick="importSingleLead(${i})" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" id="lg-import-btn-${i}">+ CRM</button>
+          ${(isReal&&waLink)?`<a href="${waLink}" target="_blank" style="background:#25d366;color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp</a>`:''}
+          ${isReal?`<button onclick="importSingleLead(${i})" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" id="lg-import-btn-${i}">+ CRM</button>`:''}
         </div>
       </div>
     </div>`;
@@ -12609,8 +12777,10 @@ async function resolvePendingPhone(l) {
   return l.phone;
 }
 
+let _lgResultMode = 'ai';
 async function importSingleLead(index) {
   const l=_generatedLeads[index]; if(!l) return;
+  if(_lgResultMode!=='real'){ showToast((typeof currentLang!=='undefined'&&currentLang==='ar')?'الشخصيات للتخطيط فقط ولا تُضاف للـ CRM':'Personas are for planning only — they are not added to the CRM'); return; }
   const btn=document.getElementById('lg-import-btn-'+index); if(btn){btn.textContent='...';btn.disabled=true;}
   const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar');
   try {
@@ -12624,6 +12794,7 @@ async function importSingleLead(index) {
 async function importAllLeads() {
   const isAr=(typeof currentLang!=='undefined'&&currentLang==='ar');
   if(!_generatedLeads.length) return;
+  if(_lgResultMode!=='real'){ showToast(isAr?'الشخصيات للتخطيط فقط ولا تُضاف للـ CRM':'Personas are for planning only — they are not added to the CRM'); return; }
   showToast(isAr?'جاري الاستيراد...':'Importing...');
   let ok=0, dup=0, failed=0;
   for(let i=0;i<_generatedLeads.length;i++){
@@ -12669,7 +12840,7 @@ async function fetchScraperLocationSuggestions(query) {
   try {
     const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/places-autocomplete', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+      headers: userFnHeaders(),
       body: JSON.stringify({ input: query, sessionToken: _scraperLocationSessionToken })
     });
     const data = await response.json();
@@ -12738,7 +12909,7 @@ async function runScraperSearch() {
   try {
     const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/places-scraper', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+      headers: userFnHeaders(),
       body: JSON.stringify({
         category, location, count: Math.min(parseInt(count) || 20, 60),
         minRating: minRating || null,
@@ -12801,7 +12972,7 @@ function renderScrapedLeads(businesses, category, location) {
 
   list.innerHTML = businesses.map((b, i) => {
     const phone = (b.phone || '').replace(/[\s\-\(\)]/g, '');
-    const waLink = phone && phone.length > 7 ? 'https://wa.me/' + phone.replace('+', '') + '?text=' + encodeURIComponent('Hi ' + (b.name || '') + ', reaching out regarding your business.') : null;
+    const waLink = waNumber(b.phone) ? 'https://wa.me/' + waNumber(b.phone) + '?text=' + encodeURIComponent('Hi ' + (b.name || '') + ', reaching out regarding your business.') : null;
     const stars = b.rating ? '⭐ ' + b.rating + (b.rating_count ? ' (' + b.rating_count + ')' : '') : '';
     const openLabel = isAr ? ' · 🟢 مفتوح الآن' : ' · 🟢 Open now';
     const closedLabel = isAr ? ' · 🔴 مغلق' : ' · 🔴 Closed';
@@ -12875,7 +13046,7 @@ async function findHRContacts() {
   try {
     const r = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/find-hr-contact', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+      headers: userFnHeaders(),
       body: JSON.stringify({ businesses: _scrapedLeads, sender: (typeof currentOrg !== 'undefined' && currentOrg && currentOrg.name) || (isAr ? 'فريقنا' : 'our team') })
     });
     const data = await r.json();
@@ -13263,7 +13434,6 @@ async function confirmApprove() {
     }
 
     // Check if user already exists in auth
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk3NTEsImV4cCI6MjA4OTEwNTc1MX0.h4NClLHPJwnSkhMBccB8hpPJrrMU3hkKMCqHu4KNv8g';
     const inviteR = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/approve-user', {
       method: 'POST',
       headers: userFnHeaders(),
@@ -13573,7 +13743,7 @@ function renderResponseTime() {
       html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg3);border-radius:10px;margin-bottom:8px;border:1px solid ' + (waitMs > 86400000 ? 'rgba(239,68,68,0.2)' : 'var(--border)') + '">';
       html += '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--text)">' + (lead.name||'—') + '</div><div style="font-size:11px;color:var(--text2);margin-top:2px">' + (lead.source||'—') + ' · ' + (lead.phone||'—') + '</div><div style="height:4px;background:var(--bg2);border-radius:4px;margin-top:6px;overflow:hidden"><div style="width:' + pct + '%;height:100%;background:' + color + ';border-radius:4px"></div></div></div>';
       html += '<div style="text-align:right;flex-shrink:0"><div style="font-size:14px;font-weight:800;color:' + color + '">' + formatDuration(waitMs) + '</div><div style="font-size:10px;color:var(--text2);margin-top:2px">' + label + '</div></div>';
-      html += '<a href="https://wa.me/' + (lead.phone||'').replace(/[^0-9]/g,'') + '" target="_blank" style="background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);border-radius:8px;padding:6px 10px;color:#25d366;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">WhatsApp</a>';
+      html += '<a href="https://wa.me/' + waNumber(lead.phone) + '" target="_blank" style="background:rgba(37,211,102,0.15);border:1px solid rgba(37,211,102,0.3);border-radius:8px;padding:6px 10px;color:#25d366;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">WhatsApp</a>';
       html += '</div>';
     });
     html += '</div>';
@@ -14010,14 +14180,9 @@ Write a WhatsApp message in English only. It must be:
 Write the message only, no explanation or preamble.`;
 
   try {
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk3NTEsImV4cCI6MjA4OTEwNTc1MX0.h4NClLHPJwnSkhMBccB8hpPJrrMU3hkKMCqHu4KNv8g';
     const response = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/ai-reply', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_ANON,
-        'Authorization': 'Bearer ' + SUPABASE_ANON
-      },
+      headers: userFnHeaders(),
       body: JSON.stringify({ prompt })
     });
 
@@ -14171,7 +14336,11 @@ async function loadInbox() {
     } catch(e) { inboxMessages = {}; }
     renderInboxList(inboxLeads);
     var badge = document.getElementById('inbox-badge');
-    if (badge) badge.textContent = inboxLeads.length;
+    if (badge) {
+      // Conversations whose last message came from the lead = waiting for a reply.
+      var waiting = inboxLeads.filter(function(l){ var m = inboxMessages[l.id]; return m && m.length && m[m.length-1].direction === 'in'; }).length;
+      badge.textContent = waiting; badge.style.display = waiting ? '' : 'none';
+    }
   } catch(e) {
     listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger)">Failed to load</div>';
   }
@@ -14188,7 +14357,7 @@ function renderInboxList(leads) {
     var msgs = inboxMessages[lead.id] || [];
     var lastMsg = msgs[msgs.length - 1];
     var initials = (lead.name || '?').split(' ').map(function(n){return n[0];}).join('').substring(0,2).toUpperCase();
-    var preview = lastMsg ? lastMsg.message : (lead.notes || lead.source || 'No messages yet');
+    var preview = lastMsg ? lastMsg.message : (lead.notes || normalizeSrcName(lead.source) || 'No messages yet');
     var time = lastMsg ? new Date(lastMsg.created_at).toLocaleTimeString('en', {hour:'2-digit',minute:'2-digit'}) : (lead.date || '');
     var isActive = activeInboxLead && activeInboxLead.id === lead.id;
     return '<div class="inbox-item' + (isActive ? ' active' : '') + '" onclick="openInboxChat(' + lead.id + ')">' +
@@ -14199,7 +14368,7 @@ function renderInboxList(leads) {
       '</div>' +
       '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">' +
         '<div class="inbox-item-time">' + time + '</div>' +
-        (msgs.length === 0 ? '<div class="inbox-unread"></div>' : '') +
+        (lastMsg && lastMsg.direction === 'in' ? '<div class="inbox-unread"></div>' : '') +
       '</div></div>';
   }).join('');
 }
@@ -14218,7 +14387,8 @@ function openInboxChat(id) {
   document.getElementById('inbox-chat-name').textContent = lead.name || '—';
   document.getElementById('inbox-chat-status').textContent = lead.phone || lead.source || 'Lead';
   var waLink = document.getElementById('inbox-wa-link');
-  if (waLink && lead.phone) waLink.href = 'https://wa.me/' + lead.phone.replace(/[^0-9]/g,'');
+  if (waLink) { var _wn = waNumber(lead.phone); waLink.href = _wn ? 'https://wa.me/' + _wn : '#'; waLink.style.display = _wn ? '' : 'none'; }
+  var shell = document.getElementById('inbox-shell'); if (shell) shell.classList.add('chat-open');
   renderInboxList(inboxLeads);
   renderInboxMessages(lead);
   setTimeout(function(){ var inp = document.getElementById('inbox-reply-input'); if(inp) inp.focus(); }, 100);
@@ -14229,37 +14399,49 @@ function renderInboxMessages(lead) {
   if (!el) return;
   var msgs = inboxMessages[lead.id] || [];
   if (msgs.length === 0) {
-    el.innerHTML = '<div style="text-align:center;margin:10px 0"><span style="background:var(--bg3);color:var(--text2);font-size:11px;padding:4px 12px;border-radius:20px">' + (lead.date||'Recently') + '</span></div>' +
-      '<div class="msg-bubble msg-in"><div>مرحبا، أنا مهتم بـ ' + (lead.value||'منتجاتكم') + '</div><div class="msg-time">' + (lead.date||'') + ' · via ' + normalizeSrcName(lead.source||'') + '</div></div>' +
-      (lead.notes ? '<div class="msg-note">Note: ' + lead.notes + '</div>' : '') +
-      '<div style="text-align:center;margin:20px 0;color:var(--text2);font-size:12px">Type a reply below ↓</div>';
+    var _ar = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+    el.innerHTML = '<div style="text-align:center;padding:36px 20px 16px;color:var(--text2)">' +
+        '<div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px">' + (_ar ? 'لا توجد رسائل مسجلة بعد' : 'No messages logged yet') + '</div>' +
+        '<div style="font-size:13px;line-height:1.6">' + (_ar ? 'اكتب رسالتك بالأسفل — تنفتح في واتساب وتُحفظ هنا.' : 'Type below — it opens in WhatsApp and is saved here.') + '</div>' +
+        '<div style="font-size:12px;margin-top:10px">' + (lead.date || '') + (lead.source ? ' · ' + normalizeSrcName(lead.source) : '') + '</div>' +
+      '</div>' +
+      (lead.notes ? '<div class="msg-note">Note: ' + lead.notes + '</div>' : '');
   } else {
     el.innerHTML = msgs.map(function(m) {
       var isOut = m.direction === 'out';
       var time = new Date(m.created_at).toLocaleTimeString('en', {hour:'2-digit',minute:'2-digit'});
-      return '<div class="msg-bubble ' + (isOut?'msg-out':'msg-in') + '"><div>' + m.message + '</div><div class="msg-time">' + time + (isOut?' ✓✓':'') + '</div></div>';
+      return '<div class="msg-bubble ' + (isOut?'msg-out':'msg-in') + '"><div>' + m.message + '</div><div class="msg-time">' + time + '</div></div>';
     }).join('');
   }
   el.scrollTop = el.scrollHeight;
 }
 
-async function sendInboxMessage() {
+// Sending = open the chat in WhatsApp with the text ready, and keep a copy in this thread.
+// (No WhatsApp Business API is connected, so the CRM cannot send on its own.)
+function sendInboxMessage() {
   var input = document.getElementById('inbox-reply-input');
   if (!input || !activeInboxLead) return;
   var msg = input.value.trim();
   if (!msg) return;
+  var isAr = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  var num = waNumber(activeInboxLead.phone);
+  if (!num) { showToast(isAr ? '❌ لا يوجد رقم جوال لهذا العميل — أضفه أولاً' : '❌ This lead has no phone number — add one first'); return; }
+  window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank'); // inside the click, so it is not blocked
   input.value = '';
   input.style.height = 'auto';
-  var now = new Date().toISOString();
-  var newMsg = { lead_id: activeInboxLead.id, message: msg, direction: 'out', created_at: now, org_id: currentOrg ? currentOrg.id : null };
+  var newMsg = { lead_id: activeInboxLead.id, message: msg, direction: 'out', created_at: new Date().toISOString(), org_id: currentOrg ? currentOrg.id : null };
   if (!inboxMessages[activeInboxLead.id]) inboxMessages[activeInboxLead.id] = [];
   inboxMessages[activeInboxLead.id].push(newMsg);
   renderInboxMessages(activeInboxLead);
   renderInboxList(inboxLeads);
-  try {
-    await fetch(SUPABASE_URL + '/rest/v1/inbox_messages', { method:'POST', headers:{...HEADERS,'Prefer':'return=minimal'}, body:JSON.stringify(newMsg) });
-  } catch(e) {}
-  showToast('Message sent!');
+  fetch(SUPABASE_URL + '/rest/v1/inbox_messages', { method:'POST', headers:{...HEADERS,'Prefer':'return=minimal'}, body:JSON.stringify(newMsg) })
+    .then(function(r){ if (!r.ok) showToast(isAr ? '⚠️ فُتح واتساب، لكن لم تُحفظ الرسالة في السجل' : '⚠️ WhatsApp opened, but the copy was not saved here'); })
+    .catch(function(){ showToast(isAr ? '⚠️ فُتح واتساب، لكن لم تُحفظ الرسالة في السجل' : '⚠️ WhatsApp opened, but the copy was not saved here'); });
+  showToast(isAr ? '✅ فُتح واتساب — اضغط إرسال هناك' : '✅ WhatsApp opened — press send there');
+}
+
+function closeInboxChat() {
+  var shell = document.getElementById('inbox-shell'); if (shell) shell.classList.remove('chat-open');
 }
 
 function inboxKeyDown(e) {
@@ -14671,7 +14853,6 @@ async function approveRequest(id, name, email, company) {
     }
 
     // Step 3: Invite user via Supabase Edge Function
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhwY21vYXhvc3BwZ2FvcHJqbmh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1Mjk3NTEsImV4cCI6MjA4OTEwNTc1MX0.h4NClLHPJwnSkhMBccB8hpPJrrMU3hkKMCqHu4KNv8g';
     const inviteR = await fetch('https://xpcmoaxosppgaoprjnhu.supabase.co/functions/v1/approve-user', {
       method: 'POST',
       headers: userFnHeaders(),
@@ -14822,10 +15003,34 @@ function exitViewAsClient() {
 
 // ─── MOYASAR PAYMENT ───────────────────────────────────────────
 const MOYASAR_API_KEY = 'pk_live_wQLNzmEBfB2xDbeEyBwnaqX6Dh8JzTYsYyFtLeLW'; // Moyasar Live Key
+// Moyasar answers "Entity not activated to use live account" (checked 31 Oct 2026), so card payments
+// cannot go through yet. Until the account is activated, Subscribe sends the customer to WhatsApp.
+const PAYMENTS_LIVE = false;
+// Coming back from the bank's 3-D Secure page: Moyasar adds ?id=…&status=…&message=… to the URL.
+(function () {
+  try {
+    const q = new URLSearchParams(location.search);
+    const id = q.get('id'), status = q.get('status');
+    if (!id || !status || !/^[0-9a-f-]{20,}$/i.test(id)) return;
+    const message = (q.get('message') || '').replace(/[<>"'`]/g, '').slice(0, 80);
+    history.replaceState(null, '', location.pathname + location.hash);
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        if (status === 'paid') showToast('✅ Payment received (ref ' + id.slice(0, 8) + '). We will activate your plan and confirm on WhatsApp.');
+        else showToast('❌ Payment not completed' + (message ? ': ' + message : '') + '. Your card was not charged.');
+      }, 1200);
+    });
+  } catch (e) {}
+})();
 let _moyasarPlan = '';
 let _moyasarAmount = 0;
 
 function openMoyasar(plan, amount) {
+  if (!PAYMENTS_LIVE) {
+    const names = { starter:'Starter', pro:'Pro', agency:'Agency', 'lead-gen':'Lead Generator add-on', social:'All Social Bundle add-on' };
+    contactForUpgrade((names[plan] || plan) + ' (SAR ' + Number(amount).toLocaleString() + '/month)');
+    return;
+  }
   _moyasarPlan = plan;
   _moyasarAmount = amount;
   const planNames = {'starter':'Starter Plan','pro':'Pro Plan','agency':'Agency Plan','lead-gen':'Lead Generator AI Add-on','social':'All Social Bundle Add-on'};
@@ -14834,7 +15039,7 @@ function openMoyasar(plan, amount) {
     summary.innerHTML =
       '<div style="display:flex;justify-content:space-between;align-items:center">' +
         '<div><div style="font-weight:700;color:var(--text)">' + (planNames[plan]||plan) + '</div>' +
-        '<div style="font-size:11px;color:var(--text2)">Monthly subscription — renews automatically</div></div>' +
+        '<div style="font-size:11px;color:var(--text2)">Monthly plan · one payment covers 30 days</div></div>' +
         '<div style="font-size:20px;font-weight:800;color:var(--accent)">' + amount + ' SAR</div>' +
       '</div>';
   }
