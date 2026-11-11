@@ -1727,6 +1727,55 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
 .theme-toggle, .notif-btn { min-width:40px; min-height:40px; }
 </style>
 <style id="nx-polish">
+  /* Limit notice */
+  #nx-limit { position:fixed; left:50%; bottom:28px; transform:translate(-50%,20px); z-index:10050; width:min(440px,calc(100vw - 32px)); background:var(--bg2,#111827); color:var(--text,#fff); border:1px solid rgba(245,158,11,0.45); border-radius:14px; padding:14px 16px; box-shadow:0 18px 50px rgba(0,0,0,0.35); opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; font-size:13px; line-height:1.6; }
+  #nx-limit.show { opacity:1; pointer-events:auto; transform:translate(-50%,0); }
+  body.light-mode #nx-limit { background:#fff; color:#0f172a; }
+  .nx-limit-actions { display:flex; gap:8px; margin-top:10px; }
+  .nx-limit-up, .nx-limit-x { border-radius:9px; padding:7px 14px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .nx-limit-up { background:var(--accent); color:#fff; border:none; }
+  .nx-limit-x { background:transparent; color:var(--text2); border:1px solid var(--border); }
+  /* Get started */
+  #nx-start { background:var(--bg2); border:1px solid rgba(59,130,246,0.3); border-radius:16px; padding:18px 20px; margin-bottom:18px; }
+  body.light-mode #nx-start { background:#fff; box-shadow:0 2px 12px rgba(0,0,0,0.06); }
+  .nx-start-head { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:14px; }
+  .nx-start-title { font-size:16px; font-weight:800; color:var(--text); }
+  .nx-start-sub { font-size:12px; color:var(--text2); margin-top:2px; }
+  .nx-start-x { background:none; border:none; color:var(--text2); font-size:12px; cursor:pointer; font-family:inherit; padding:4px 6px; }
+  .nx-start-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:10px; }
+  .nx-start-step { display:flex; align-items:center; gap:12px; text-align:start; background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:12px 14px; cursor:pointer; font-family:inherit; color:var(--text); min-height:60px; }
+  .nx-start-step:hover { border-color:var(--accent); }
+  .nx-start-ic { width:34px; height:34px; flex-shrink:0; border-radius:10px; background:rgba(59,130,246,0.14); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:800; }
+  .nx-start-step.done .nx-start-ic { background:rgba(16,185,129,0.16); color:var(--success); }
+  .nx-start-t { display:block; font-size:13px; font-weight:700; }
+  .nx-start-d { display:block; font-size:11.5px; color:var(--text2); margin-top:2px; }
+  /* Trial chip */
+  #nx-trial-chip { margin-inline-end:auto; background:rgba(245,158,11,0.12); color:#d97706; border:1px solid rgba(245,158,11,0.35); border-radius:999px; padding:7px 14px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; }
+  /* Empty leads */
+  .nx-empty { text-align:center; padding:48px 16px !important; }
+  .nx-empty-t { font-size:16px; font-weight:800; color:var(--text); }
+  .nx-empty-d { font-size:13px; color:var(--text2); margin:6px 0 16px; }
+  .nx-empty-a { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  .stat-card.nx-go { cursor:pointer; }
+  @media (max-width:768px) {
+    /* Phone: the number is the point — the corner icon was sitting on top of long values */
+    .stats-grid .stat-icon { display:none !important; }
+    .stats-grid .stat-value { font-size:20px !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    /* Date strip: one compact row instead of a quarter of the screen */
+    #hijri-widget { flex-direction:row !important; align-items:center !important; justify-content:space-between !important; padding:10px 14px !important; gap:8px !important; text-align:start !important; margin-bottom:12px !important; }
+    #hijri-widget > div { text-align:start !important; }
+    #hijri-widget > div:last-child { text-align:end !important; }
+    #hijri-widget div { font-size:12px !important; letter-spacing:0 !important; }
+    #hijri-widget > div > div:first-child { display:none !important; }
+    #nx-limit { bottom:calc(84px + env(safe-area-inset-bottom,0px)); }
+    .nx-start-grid { grid-template-columns:1fr 1fr !important; gap:8px !important; }
+    .nx-start-d { display:none !important; }
+    .nx-start-step { padding:10px !important; gap:8px !important; min-height:52px !important; }
+    .nx-start-t { font-size:12.5px !important; }
+    #nx-start { padding:14px !important; }
+    #dash-customize-bar { flex-wrap:wrap; }
+  }
+
   /* Light mode: status pills readable on white */
   body.light-mode .pill-new { background:#dbeafe; color:#1d4ed8; }
   body.light-mode .pill-active, body.light-mode .pill-won, body.light-mode .pill-converted { background:#d1fae5; color:#047857; }
@@ -1937,13 +1986,13 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
       <div class="dash-widget" data-widget-id="stats" id="dw-stats">
         <div class="dash-widget-bar"><span class="dw-drag-handle">⠿</span><span class="dw-widget-name">Stats Overview</span><button class="dw-hide-btn" onclick="hideDashWidget('stats')">✕ Hide</button></div>
       <div class="stats-grid">
-        <div class="stat-card">
+        <div class="stat-card nx-go" onclick="nav('leads', document.querySelector('[onclick*=&quot;nav(\'leads\'&quot;]'))">
           <div class="stat-icon" style="background:rgba(59,130,246,0.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
           <div class="stat-label">Total Leads</div>
           <div class="stat-value" id="dash-total">—</div>
           <div class="stat-change up" id="dash-total-sub">Loading...</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card nx-go" onclick="nav('pipeline', document.querySelector('[onclick*=&quot;nav(\'pipeline\'&quot;]'))">
           <div class="stat-icon" style="background:rgba(16,185,129,0.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
           <div class="stat-label">Pipeline Value</div>
           <div class="stat-value" id="dash-revenue">—</div>
@@ -4493,11 +4542,84 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
     const res = await origFetch(input, init);
     const url = typeof input === 'string' ? input : (input && input.url) || '';
     if (url.indexOf(API) !== 0 || !res || typeof res.json !== 'function') return res;
+    if (res.status === 429 && url.indexOf('/functions/v1/') !== -1 && typeof res.clone === 'function') {
+      try { res.clone().json().then(function (b) { if (b && b.limit_reached && typeof window.nxLimitNotice === 'function') window.nxLimitNotice(b.reason, b.tier); }).catch(function () {}); } catch (e) {}
+    }
     const origJson = res.json.bind(res);
     try { res.json = async function () { return clean(await origJson()); }; } catch (e) {}
     return res;
   };
 })();
+
+// ─── USAGE LIMIT NOTICE ───────────────────────────────────────
+function nxLimitText(reason, tier) {
+  const ar = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  const T = {
+    day:     ['You\u2019ve reached today\u2019s limit for this feature. It resets within 24 hours.', 'وصلت للحد اليومي لهذه الميزة. يتجدد خلال 24 ساعة.'],
+    month:   ['You\u2019ve reached this month\u2019s limit for this feature.', 'وصلت للحد الشهري لهذه الميزة.'],
+    busy:    ['This feature has reached its daily limit for trial accounts. Try again tomorrow, or upgrade to keep going now.', 'هذه الميزة وصلت لحدها اليومي للحسابات التجريبية. حاول غداً أو قم بالترقية.'],
+    no_plan: ['Your free trial has ended. Upgrade to keep using this feature.', 'انتهت فترتك التجريبية. قم بالترقية لمتابعة استخدام هذه الميزة.'],
+    blocked: ['This account is suspended.', 'هذا الحساب موقوف.']
+  };
+  const t = T[reason] || T.day;
+  let msg = ar ? t[1] : t[0];
+  if (tier === 'trial' && (reason === 'day' || reason === 'month')) msg += ar ? ' الباقات المدفوعة حدودها أعلى بكثير.' : ' Paid plans get much higher limits.';
+  return msg;
+}
+function nxLimitNotice(reason, tier) {
+  const ar = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  let box = document.getElementById('nx-limit');
+  if (!box) {
+    box = document.createElement('div'); box.id = 'nx-limit';
+    document.body.appendChild(box);
+  }
+  box.setAttribute('dir', ar ? 'rtl' : 'ltr');
+  box.innerHTML = '';
+  const txt = document.createElement('div'); txt.className = 'nx-limit-text'; txt.textContent = nxLimitText(reason, tier);
+  const row = document.createElement('div'); row.className = 'nx-limit-actions';
+  if (reason !== 'blocked' && tier !== 'paid' && tier !== 'owner') {
+    const up = document.createElement('button'); up.className = 'nx-limit-up'; up.textContent = ar ? 'عرض الباقات' : 'See plans';
+    up.onclick = function () { box.classList.remove('show'); if (typeof showUpgradePlans === 'function') showUpgradePlans(); };
+    row.appendChild(up);
+  }
+  const x = document.createElement('button'); x.className = 'nx-limit-x'; x.textContent = ar ? 'إغلاق' : 'Close';
+  x.onclick = function () { box.classList.remove('show'); };
+  row.appendChild(x);
+  box.appendChild(txt); box.appendChild(row);
+  box.classList.add('show');
+  clearTimeout(nxLimitNotice._t); nxLimitNotice._t = setTimeout(function () { box.classList.remove('show'); }, 12000);
+}
+window.nxLimitNotice = nxLimitNotice;
+
+// ─── GET STARTED (new workspaces) ─────────────────────────────
+function nxGoIntegrations() {
+  nav('admin', document.querySelector('[onclick*="nav(\'admin\'"]'));
+  setTimeout(function () { try { adminTab('integrations', document.querySelector('.admin-tab[onclick*="integrations"]')); } catch (e) {} }, 150);
+}
+function renderGetStarted() {
+  const page = document.getElementById('page-dashboard'); if (!page) return;
+  let card = document.getElementById('nx-start');
+  const orgId = (typeof currentOrg !== 'undefined' && currentOrg && currentOrg.id) || '';
+  let dismissed = false; try { dismissed = localStorage.getItem('nexcrm_start_done_' + orgId) === '1'; } catch (e) {}
+  const count = (typeof leads !== 'undefined' && Array.isArray(leads)) ? leads.length : 0;
+  if (!orgId || dismissed || count >= 5) { if (card) card.remove(); return; }
+  const ar = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  const admin = (typeof isAdmin !== 'undefined' && isAdmin);
+  const steps = [
+    ['＋', ar ? 'أضف أول عميل' : 'Add your first lead', ar ? 'اسم ورقم جوال يكفي للبداية' : 'A name and a mobile number is enough', 'openModal()', count >= 1],
+    ['⇪', ar ? 'استورد من Excel' : 'Import from Excel', ar ? 'انقل قائمتك الحالية في دقيقة' : 'Bring your existing list in one minute', 'openImportModal()', count >= 2],
+    ['◎', ar ? 'ابحث عن عملاء موثّقين' : 'Find verified leads', ar ? 'مدراء وأصحاب قرار في السعودية' : 'Decision makers at Saudi companies', "nav('leadgen', document.querySelector('[onclick*=\"nav(\\'leadgen\\'\"]'))", false]
+  ];
+  if (admin) steps.push(['⚡', ar ? 'اربط نموذج موقعك' : 'Connect your website form', ar ? 'العملاء يدخلون تلقائياً' : 'New enquiries land here automatically', 'nxGoIntegrations()', false]);
+  if (!card) { card = document.createElement('div'); card.id = 'nx-start'; page.insertBefore(card, page.firstChild); }
+  card.setAttribute('dir', ar ? 'rtl' : 'ltr');
+  card.innerHTML = '<div class="nx-start-head"><div><div class="nx-start-title">' + (ar ? 'ابدأ من هنا' : 'Start here') + '</div><div class="nx-start-sub">' + (ar ? 'خطوات بسيطة وفريقك جاهز للبيع.' : 'A few steps and your team is ready to sell.') + '</div></div><button class="nx-start-x" onclick="nxDismissStart()">' + (ar ? 'إخفاء' : 'Hide') + '</button></div><div class="nx-start-grid">' +
+    steps.map(function (st) { return '<button class="nx-start-step' + (st[4] ? ' done' : '') + '" onclick="' + st[3].replace(/"/g, '&quot;') + '"><span class="nx-start-ic">' + (st[4] ? '✓' : st[0]) + '</span><span><span class="nx-start-t">' + st[1] + '</span><span class="nx-start-d">' + st[2] + '</span></span></button>'; }).join('') + '</div>';
+}
+function nxDismissStart() {
+  try { localStorage.setItem('nexcrm_start_done_' + ((currentOrg && currentOrg.id) || ''), '1'); } catch (e) {}
+  const c = document.getElementById('nx-start'); if (c) c.remove();
+}
 
 // ─── SHARED HELPERS ───────────────────────────────────────────
 // Lead values are free text ("30000", "SAR 30,000", "$12,356", "٣٠٠٠٠"). Read the number out of any of them.
@@ -4597,12 +4719,20 @@ function checkTrialStatus() {
 function showTrialBanner(daysLeft) {
   let banner = document.getElementById('trial-days-banner');
   if (!banner) return;
+  const ar = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  let chip = document.getElementById('nx-trial-chip');
   if (daysLeft <= 3) {
+    if (chip) chip.remove();
     banner.style.display = 'flex';
     banner.querySelector('.trial-banner-text').textContent =
-      daysLeft <= 0 ? 'Your trial ends today!' : 'Your trial ends in ' + daysLeft + ' day' + (daysLeft > 1 ? 's' : '') + '.';
+      daysLeft <= 0 ? (ar ? 'تجربتك تنتهي اليوم!' : 'Your trial ends today!') : (ar ? 'تجربتك تنتهي خلال ' + daysLeft + ' يوم.' : 'Your trial ends in ' + daysLeft + ' day' + (daysLeft > 1 ? 's' : '') + '.');
   } else {
     banner.style.display = 'none';
+    const bar = document.getElementById('dash-customize-bar');
+    if (bar) {
+      if (!chip) { chip = document.createElement('button'); chip.id = 'nx-trial-chip'; chip.onclick = function () { showUpgradePlans(); }; bar.insertBefore(chip, bar.firstChild); }
+      chip.textContent = ar ? ('تجربة مجانية · باقي ' + daysLeft + ' يوم · ترقية') : ('Free trial · ' + daysLeft + ' days left · Upgrade');
+    }
   }
 }
 
@@ -5145,7 +5275,11 @@ function renderLeads() {
     filtered = leads.filter(l => (l.source||'').toLowerCase() === activeSourceFilter.toLowerCase());
   }
   if(filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text2)">${activeSourceFilter !== 'all' ? __t('No leads yet — add your first one!') : __t('No leads yet — add your first one!')}</td></tr>`;
+    const _ar = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+    tbody.innerHTML = activeSourceFilter !== 'all'
+      ? `<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--text2)">${_ar ? 'لا يوجد عملاء من هذا المصدر.' : 'No leads from this source yet.'} <a href="#" onclick="var b=document.querySelector('.source-filter-btn,[onclick*=&quot;filterBySource(\\'all\\'&quot;]');if(b)b.click();return false" style="color:var(--accent);font-weight:600">${_ar ? 'عرض الكل' : 'Show all'}</a></td></tr>`
+      : `<tr><td colspan="12" class="nx-empty"><div class="nx-empty-t">${_ar ? 'لا يوجد عملاء بعد' : 'No leads yet'}</div><div class="nx-empty-d">${_ar ? 'أضف عميلاً، استورد قائمتك، أو ابحث عن عملاء موثّقين.' : 'Add one, import your list, or find verified leads.'}</div><div class="nx-empty-a"><button class="btn btn-primary" onclick="openModal()">${_ar ? '+ إضافة عميل' : '+ Add lead'}</button><button class="btn btn-ghost" onclick="openImportModal()">${_ar ? 'استيراد من Excel' : 'Import from Excel'}</button><button class="btn btn-ghost" onclick="nav('leadgen', document.querySelector('[onclick*=&quot;nav(\\'leadgen\\'&quot;]'))">${_ar ? 'ابحث عن عملاء' : 'Find leads'}</button></div></td></tr>`;
+    try { renderGetStarted(); } catch (e) {}
     return;
   }
   tbody.innerHTML = filtered.map((l,i) => `
@@ -5226,6 +5360,7 @@ async function loadLeads() {
     if (!r.ok) { showToast('❌ Failed to load leads'); console.error(data); hideLoader(); return; }
     leads = data || [];
     renderLeads();
+    try { renderGetStarted(); } catch (e) {}
     updateLeadStats();
     renderActivityFeed();
     renderDashTeamPerf();
@@ -12615,9 +12750,21 @@ async function runLeadGenerator() {
       body:JSON.stringify({mode:_lgMode,mybiz,location,count:parseInt(count)||5,details,channels:_lgSelectedChannels,category:_lgSelectedCategory,person_titles:_lgSelectedTitles,industry_keywords:_lgSelectedIndustries,company_size_ranges:_lgSelectedSizes,include_phone:document.getElementById('lg-include-phone')?.checked!==false,include_personal_email:document.getElementById('lg-include-personal-email')?.checked===true,org_id:currentOrg?.id,user_email:currentUser?.email})
     });
     const data = await response.json();
+    if(response.status===429 && data && data.limit_reached) {
+      loading.style.display='none'; btn.style.display='flex';
+      document.getElementById('lg-results').style.display='none';
+      const lb = document.getElementById('lg-error');
+      lb.style.display='block';
+      lb.innerHTML = '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:16px;padding:24px;text-align:center"><div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px">'+(isAr?'وصلت للحد':'Limit reached')+'</div><div style="font-size:13px;color:var(--text2);margin-bottom:16px" id="lg-limit-text"></div>'+((data.tier==='paid'||data.tier==='owner'||data.reason==='blocked')?'':'<button onclick="showUpgradePlans()" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;margin:0 4px">'+(isAr?'عرض الباقات':'See plans')+'</button>')+'<button onclick="document.getElementById(\'lg-error\').style.display=\'none\'" style="background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 20px;cursor:pointer;font-family:inherit;font-size:13px;margin:0 4px">'+(isAr?'إغلاق':'Close')+'</button></div>';
+      document.getElementById('lg-limit-text').textContent = nxLimitText(data.reason, data.tier);
+      return;
+    }
     if(data.success && data.leads && data.leads.length>0) {
       _generatedLeads=data.leads;
       renderGeneratedLeads(data.leads,location,data.target_profile,data.mode);
+      if(data.phone_note==='phone_paid_only') showToast(isAr?'أرقام الجوال متاحة في الباقات المدفوعة — النتائج تشمل الإيميل':'Mobile numbers are part of paid plans — these results include emails');
+      else if(data.phone_note==='phone_limit') showToast(isAr?'وصلت لحد أرقام الجوال اليوم — النتائج تشمل الإيميل':'Mobile-number limit reached for today — these results include emails');
+      else if(typeof data.remaining_today==='number' && data.remaining_today<=5 && data.mode==='real') showToast(isAr?('باقي لك اليوم '+data.remaining_today+' عميل موثّق'):(data.remaining_today+' verified leads left today'));
       if(data.mode==='real' && data.leads.some(l=>l.phone_pending)) pollPendingPhones();
       if(data._debug_enrich) {
         showToast(isAr?'⚠️ فشل جلب الإيميل/الهاتف لهذه الدفعة — جرّب توليد دفعة جديدة':'⚠️ Contact details failed for this batch — try generating again');
@@ -12735,8 +12882,7 @@ async function pollPendingPhones() {
     if (!pendingIdx.length) return; // all resolved already, nothing left to poll
     const ids = pendingIdx.map(x=>x.l.apollo_person_id);
     try {
-      const idFilter = ids.map(id=>'"'+id+'"').join(',');
-      const r = await fetch(SUPABASE_URL+'/rest/v1/apollo_phone_reveals?apollo_person_id=in.('+idFilter+')&select=apollo_person_id,phone', {headers: HEADERS});
+      const r = await fetch(SUPABASE_URL+'/rest/v1/rpc/get_revealed_phones', {method:'POST', headers: HEADERS, body: JSON.stringify({p_ids: ids})});
       if (!r.ok) continue;
       const rows = await r.json();
       (Array.isArray(rows)?rows:[]).forEach(row => {
@@ -12771,8 +12917,8 @@ async function resolvePendingPhone(l) {
   if (l.phone && l.phone !== '—') return l.phone;
   if (!l.apollo_person_id) return l.phone;
   try {
-    const r = await fetch(SUPABASE_URL+'/rest/v1/apollo_phone_reveals?apollo_person_id=eq.'+encodeURIComponent(l.apollo_person_id)+'&select=phone', {headers: HEADERS});
-    if (r.ok) { const rows = await r.json(); if (rows[0]?.phone) return rows[0].phone; }
+    const r = await fetch(SUPABASE_URL+'/rest/v1/rpc/get_revealed_phones', {method:'POST', headers: HEADERS, body: JSON.stringify({p_ids: [l.apollo_person_id]})});
+    if (r.ok) { const rows = await r.json(); if (Array.isArray(rows) && rows[0]?.phone) return rows[0].phone; }
   } catch(e) {}
   return l.phone;
 }
