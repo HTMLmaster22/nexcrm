@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.json" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <title>NexCRM — Sales & Marketing Platform</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=Alexandria:wght@600;700;800&display=swap" rel="stylesheet" />
 <style>
   :root {
     --bg: #0a0f1e;
@@ -1727,6 +1727,111 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
 .theme-toggle, .notif-btn { min-width:40px; min-height:40px; }
 </style>
 <style id="nx-polish">
+  /* Lead filters */
+  .nx-lf-search { display:flex; align-items:center; gap:8px; background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:0 12px; margin-bottom:12px; color:var(--text2); }
+  body.light-mode .nx-lf-search { background:#f8fafc; border-color:#e2e8f0; }
+  .nx-lf-search:focus-within { border-color:var(--accent); }
+  #nx-lf-q { flex:1; min-width:0; height:38px; background:none; border:none; outline:none; color:var(--text); font-family:inherit; font-size:13.5px; }
+  .nx-lf-panel { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px 12px; align-items:end; background:var(--bg3); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .nx-lf-panel[hidden] { display:none; }
+  body.light-mode .nx-lf-panel { background:#f8fafc; border-color:#e2e8f0; }
+  .nx-lf-field { display:flex; flex-direction:column; gap:5px; font-size:12px; font-weight:600; color:var(--text2); margin:0; }
+  .nx-lf-field input, .nx-lf-field select { height:36px; border-radius:8px; border:1px solid var(--border); background:var(--bg2); color:var(--text); font-family:inherit; font-size:13px; padding:0 10px; width:100%; }
+  body.light-mode .nx-lf-field input, body.light-mode .nx-lf-field select { background:#fff; border-color:#dbe2ea; }
+  .nx-lf-field input:focus, .nx-lf-field select:focus { outline:none; border-color:var(--accent); }
+  .nx-lf-end { justify-content:flex-end; }
+  .nx-lf-count { font-weight:700; color:var(--accent); }
+  .nx-lf-btn[aria-expanded="true"] { border-color:var(--accent) !important; color:var(--text) !important; }
+  .nx-lf-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:12px; }
+  .nx-lf-bar[hidden] { display:none; }
+  .nx-lf-shown { font-size:12.5px; font-weight:700; color:var(--text); margin-inline-end:4px; }
+  .nx-lf-chips { display:contents; }
+  .nx-lf-chip { display:inline-flex; align-items:center; gap:4px; background:rgba(59,130,246,0.14); color:var(--text); border-radius:999px; padding:3px 4px 3px 10px; font-size:12px; max-width:280px; }
+  body[dir="rtl"] .nx-lf-chip, body.rtl .nx-lf-chip { padding:3px 10px 3px 4px; }
+  body.light-mode .nx-lf-chip { background:#E7EDFC; color:#0E2F96; }
+  .nx-lf-chip > span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .nx-lf-chip button { width:20px; height:20px; border-radius:50%; border:none; background:transparent; color:inherit; cursor:pointer; font-size:15px; line-height:1; }
+  .nx-lf-chip button:hover { background:rgba(0,0,0,0.12); }
+  .nx-lf-clear { background:none; border:none; color:var(--accent); font-family:inherit; font-size:12px; font-weight:700; cursor:pointer; padding:4px 6px; }
+  .nx-nophone { font-size:11.5px; color:var(--text2); background:var(--bg3); border:1px dashed var(--border); border-radius:6px; padding:2px 7px; white-space:nowrap; }
+  tr.nx-lf-more td { text-align:center; padding:16px !important; color:var(--text2); font-size:12.5px; }
+  tr.nx-lf-more .btn { font-size:12.5px; padding:7px 16px; margin-inline-end:8px; }
+  .nx-lf-end .btn { width:auto; align-self:flex-start; }
+  @media (max-width:768px) { .nx-lf-panel { grid-template-columns:1fr 1fr; } .nx-lf-end, .nx-lf-phone { grid-column:1 / -1; } }
+
+  /* ── Nov 14: calmer brand, grouped menu, quick actions, frosted layers ── */
+  body.light-mode { --accent:#1746D1; }
+  .logo span, .mobile-logo, .card-title, .modal-title, .topbar-title { font-family:'Alexandria','IBM Plex Sans Arabic','DM Sans',sans-serif !important; letter-spacing:-0.01em !important; }
+  .logo span { font-weight:800 !important; }
+  .card-title, .modal-title { font-weight:700 !important; }
+  .logo-icon { background:var(--accent) !important; box-shadow:none !important; }
+  .nav-item.active { background:rgba(59,130,246,0.14) !important; }
+  body.light-mode .nav-item.active { background:#E7EDFC !important; color:#0E2F96 !important; }
+  .nx-pill { background:var(--accent); color:#fff; font-size:9px; font-weight:700; padding:2px 6px; border-radius:10px; margin-inline-start:4px; }
+  .sidebar .nav-section { margin-bottom:10px; }
+  .nx-group { display:flex; align-items:center; justify-content:space-between; width:100%; background:none; border:none; cursor:pointer; font-family:inherit; font-size:11.5px; font-weight:700; color:var(--text2); padding:8px 12px 6px; text-align:start; border-radius:8px; }
+  .nx-group-static { cursor:default; }
+  button.nx-group:hover { color:var(--text); }
+  button.nx-group::after { content:''; width:6px; height:6px; border-inline-end:1.8px solid currentColor; border-bottom:1.8px solid currentColor; transform:rotate(45deg); transition:transform .18s ease; margin-inline-end:4px; margin-top:-3px; }
+  .nx-folded button.nx-group::after { transform:rotate(-45deg); margin-top:0; }
+  body.rtl button.nx-group::after { transform:rotate(-45deg); }
+  body.rtl .nx-folded button.nx-group::after { transform:rotate(45deg); margin-top:0; }
+  .nx-folded .nav-item:not(.active) { display:none !important; }
+  .sidebar .nav-section[data-group="admin"]:has(#admin-nav-item[style*="display:none"]), .sidebar .nav-section[data-group="admin"]:has(#admin-nav-item[style*="display: none"]) { display:none; }
+  body[dir="rtl"] .nx-group { font-family:'IBM Plex Sans Arabic',sans-serif; font-size:13px; }
+  @media (max-width:900px) { .nx-group { display:none; } .nx-folded .nav-item:not(.active) { display:flex !important; } }
+
+  /* top bar: frosted, with the small search button */
+  .topbar { background:rgba(15,22,41,0.72) !important; -webkit-backdrop-filter:blur(14px) saturate(1.4); backdrop-filter:blur(14px) saturate(1.4); }
+  body.light-mode .topbar { background:rgba(255,255,255,0.72) !important; }
+  .topbar .search-bar { display:none !important; }
+  .nx-search { display:inline-flex; align-items:center; gap:8px; height:36px; padding:0 10px 0 12px; border-radius:10px; border:1px solid var(--border); background:var(--bg3); color:var(--text2); font-family:inherit; font-size:13px; cursor:pointer; transition:border-color .15s ease,color .15s ease; }
+  body.light-mode .nx-search { background:#f1f5f9; border-color:#e2e8f0; }
+  .nx-search:hover { border-color:var(--accent); color:var(--text); }
+  .nx-search kbd, .nx-pal-top kbd { font-family:inherit; font-size:11px; font-weight:600; color:var(--text2); background:var(--bg2); border:1px solid var(--border); border-radius:6px; padding:2px 6px; direction:ltr; }
+  body.light-mode .nx-search kbd, body.light-mode .nx-pal-top kbd { background:#fff; border-color:#dbe2ea; }
+  @media (max-width:768px) { .nx-search { display:none; } }
+
+  /* Add Lead: the plus turns and the words change when you point at it */
+  .topbar .btn.nx-add { display:inline-flex; align-items:center; gap:8px; background:var(--accent) !important; animation:none !important; }
+  .nx-plus { display:inline-block; font-size:17px; line-height:1; font-weight:700; transition:transform .3s cubic-bezier(.3,1.4,.5,1); }
+  .nx-swap { display:inline-grid; }
+  .nx-swap > span { grid-area:1/1; transition:opacity .18s ease, transform .22s ease; white-space:nowrap; text-align:center; }
+  .nx-swap .l2 { opacity:0; transform:translateY(9px); }
+  @media (hover:hover) {
+    .nx-add:hover .nx-plus { transform:rotate(180deg) scale(1.15); }
+    .nx-add:hover .nx-swap .l1 { opacity:0; transform:translateY(-9px); }
+    .nx-add:hover .nx-swap .l2 { opacity:1; transform:none; }
+  }
+
+  /* layered panels: frosted glass */
+  .modal-overlay { background:rgba(6,10,22,0.45) !important; -webkit-backdrop-filter:blur(12px) saturate(1.3) !important; backdrop-filter:blur(12px) saturate(1.3) !important; }
+  body.light-mode .modal-overlay { background:rgba(15,23,42,0.28) !important; }
+  .modal-overlay .modal { background:rgba(15,22,41,0.86) !important; -webkit-backdrop-filter:blur(24px); backdrop-filter:blur(24px); }
+  body.light-mode .modal-overlay .modal { background:rgba(255,255,255,0.9) !important; box-shadow:0 30px 80px rgba(15,23,42,0.22) !important; }
+  .reminder-dropdown, .user-dropdown { background:rgba(15,22,41,0.82) !important; -webkit-backdrop-filter:blur(18px) saturate(1.3); backdrop-filter:blur(18px) saturate(1.3); }
+  body.light-mode .reminder-dropdown, body.light-mode .user-dropdown { background:rgba(255,255,255,0.82) !important; }
+
+  /* quick actions */
+  #nx-pal { position:fixed; inset:0; z-index:10040; display:none; align-items:flex-start; justify-content:center; padding:14vh 16px 16px; background:rgba(6,10,22,0.4); -webkit-backdrop-filter:blur(10px) saturate(1.3); backdrop-filter:blur(10px) saturate(1.3); }
+  body.light-mode #nx-pal { background:rgba(15,23,42,0.22); }
+  #nx-pal.open { display:flex; }
+  .nx-pal-box { width:min(580px,100%); background:rgba(15,22,41,0.88); border:1px solid var(--border); border-radius:16px; overflow:hidden; box-shadow:0 30px 90px rgba(0,0,0,0.45); -webkit-backdrop-filter:blur(24px); backdrop-filter:blur(24px); color:var(--text); }
+  body.light-mode .nx-pal-box { background:rgba(255,255,255,0.92); border-color:#e2e8f0; box-shadow:0 30px 90px rgba(15,23,42,0.25); }
+  .nx-pal-top { display:flex; align-items:center; gap:10px; padding:14px 16px; border-bottom:1px solid var(--border); color:var(--text2); }
+  body.light-mode .nx-pal-top { border-color:#e2e8f0; }
+  #nx-pal-input { flex:1; min-width:0; background:none; border:none; outline:none; color:var(--text); font-family:inherit; font-size:16px; }
+  #nx-pal-list { max-height:min(56vh,440px); overflow:auto; padding:6px; }
+  .nx-pal-head { font-size:11.5px; font-weight:700; color:var(--text2); padding:10px 10px 4px; }
+  .nx-pal-item { display:flex; align-items:center; gap:10px; width:100%; background:none; border:none; border-radius:10px; padding:9px 10px; color:var(--text); font-family:inherit; font-size:14px; cursor:pointer; text-align:start; }
+  .nx-pal-item.on { background:rgba(59,130,246,0.16); }
+  body.light-mode .nx-pal-item.on { background:#E7EDFC; }
+  .nx-pal-ic { width:28px; height:28px; border-radius:8px; background:var(--bg3); color:var(--text2); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .nx-pal-item.on .nx-pal-ic { color:var(--accent); }
+  .nx-pal-tx { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .nx-pal-sub { font-size:12px; color:var(--text2); white-space:nowrap; direction:ltr; }
+  .nx-pal-empty { padding:28px; text-align:center; color:var(--text2); font-size:13px; }
+
   /* Limit notice */
   #nx-limit { position:fixed; left:50%; bottom:28px; transform:translate(-50%,20px); z-index:10050; width:min(440px,calc(100vw - 32px)); background:var(--bg2,#111827); color:var(--text,#fff); border:1px solid rgba(245,158,11,0.45); border-radius:14px; padding:14px 16px; box-shadow:0 18px 50px rgba(0,0,0,0.35); opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; font-size:13px; line-height:1.6; }
   #nx-limit.show { opacity:1; pointer-events:auto; transform:translate(-50%,0); }
@@ -1850,8 +1955,8 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
   </div>
 
   <div id="org-switcher" style="display:none;margin-bottom:8px"></div>
-  <div class="nav-section">
-    <div class="nav-label">Main</div>
+  <div class="nav-section" data-group="sales">
+    <div class="nx-group nx-group-static"><span data-en="Sales" data-ar="المبيعات">Sales</span></div>
     <div class="nav-item active" onclick="nav('dashboard',this)">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span><span>Dashboard</span>
     </div>
@@ -1865,43 +1970,51 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
     <div class="nav-item" onclick="nav('contacts',this)">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span>Contacts</span>
     </div>
+  </div>
+
+  <div class="nav-section" data-group="talk">
+    <button type="button" class="nx-group" onclick="nxFold('talk')" aria-expanded="true"><span data-en="Conversations" data-ar="المحادثات">Conversations</span></button>
     <div class="nav-item" onclick="nav('calls',this)" id="calls-nav-item">
-      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span>Call Logs</span>
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span><span data-en="Call Logs" data-ar="سجل المكالمات">Call Logs</span>
     </div>
     <div class="nav-item" onclick="nav('inbox',this)" id="inbox-nav-item">
-      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span>WhatsApp Inbox</span>
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span data-en="WhatsApp Inbox" data-ar="صندوق واتساب">WhatsApp Inbox</span>
       <span class="badge" id="inbox-badge" style="background:#25d366;display:none">0</span>
     </div>
   </div>
 
-  <div class="nav-section">
-    <div class="nav-label">Admin</div>
-    <div class="nav-item" onclick="nav('admin',this)" id="admin-nav-item" style="display:none">
-      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></span><span>Admin Panel<span class="admin-badge">ADMIN</span></span>
-    </div>
-  </div>
-
-  <div class="nav-section">
-    <div class="nav-label">Marketing</div>
+  <div class="nav-section" data-group="grow">
+    <button type="button" class="nx-group" onclick="nxFold('grow')" aria-expanded="true"><span data-en="Grow" data-ar="التسويق">Grow</span></button>
     <div class="nav-item" onclick="nav('leadgen',this)">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></span>
       <span data-en="Lead Generator" data-ar="مولد العملاء">Lead Generator</span>
-      <span style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;margin-right:4px">AI</span>
+      <span class="nx-pill">AI</span>
     </div>
     <div class="nav-item" onclick="nav('campaigns',this)">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></span><span>Campaigns</span>
     </div>
     <div class="nav-item" onclick="nav('calendar',this)">
-      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>Content Calendar</span>
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span data-en="Content Calendar" data-ar="تقويم المحتوى">Content Calendar</span>
     </div>
+  </div>
+
+  <div class="nav-section" data-group="ops">
+    <button type="button" class="nx-group" onclick="nxFold('ops')" aria-expanded="true"><span data-en="Operations" data-ar="التشغيل">Operations</span></button>
     <div class="nav-item" onclick="nav('deliverables',this)">
-      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span>Deliverables</span>
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span data-en="Deliverables" data-ar="التسليمات">Deliverables</span>
     </div>
     <div class="nav-item" onclick="nav('invoices',this)">
-      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span>Invoices</span>
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span data-en="Invoices" data-ar="الفواتير">Invoices</span>
     </div>
     <div class="nav-item" onclick="nav('analytics',this)">
       <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span>Analytics</span>
+    </div>
+  </div>
+
+  <div class="nav-section" data-group="admin">
+    <button type="button" class="nx-group" onclick="nxFold('admin')" aria-expanded="true"><span data-en="Admin" data-ar="الإدارة">Admin</span></button>
+    <div class="nav-item" onclick="nav('admin',this)" id="admin-nav-item" style="display:none">
+      <span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></span><span>Admin Panel<span class="admin-badge">ADMIN</span></span>
     </div>
   </div>
 
@@ -1939,6 +2052,11 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
   <!-- TOPBAR -->
   <div class="topbar">
     <div class="topbar-title" id="page-title">Dashboard</div>
+    <button type="button" class="nx-search" onclick="nxPalette()" aria-label="Search and quick actions">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span data-en="Search" data-ar="بحث">Search</span>
+      <kbd id="nx-kbd">Ctrl K</kbd>
+    </button>
     <div class="search-bar">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text2);flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input id="global-search" type="search" name="nexcrm-search-noautofill" autocomplete="off" placeholder="Search leads, contacts..." oninput="handleSearch(this.value)" />
@@ -1968,7 +2086,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
         </div>
       </div>
     </div>
-    <button class="btn btn-primary" onclick="openModal()">＋ Add Lead</button>
+    <button class="btn btn-primary nx-add" onclick="openModal()"><span class="nx-plus">+</span><span class="nx-swap"><span class="l1">Add Lead</span><span class="l2">New deal</span></span></button>
   </div>
 
   <div class="content">
@@ -2162,6 +2280,10 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
         <div class="card-header">
           <div class="card-title">All Leads</div>
           <div class="leads-head-actions" style="display:flex;gap:8px">
+            <button class="btn btn-ghost nx-lf-btn" id="nx-lf-btn" style="font-size:12px;padding:6px 12px" onclick="nxToggleFilters()" aria-expanded="false" aria-controls="nx-lf-panel">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+              <span data-en="Filter" data-ar="فلترة">Filter</span><span class="nx-lf-count" id="nx-lf-count"></span>
+            </button>
             <button class="btn btn-ghost" style="font-size:12px;padding:6px 12px" onclick="openImportModal()">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               Import
@@ -2173,6 +2295,37 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
             <button class="btn btn-primary" style="font-size:12px;padding:6px 14px" onclick="openModal()">＋ Add Lead</button>
           </div>
         </div>
+        <div class="nx-lf-search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="nx-lf-q" type="search" autocomplete="off" spellcheck="false" oninput="nxSetFilter('q', this.value, true)" placeholder="Search name, company, title, email or phone" data-en-ph="Search name, company, title, email or phone" data-ar-ph="ابحث بالاسم أو الشركة أو المسمى أو الإيميل أو الجوال" />
+        </div>
+        <div class="nx-lf-panel" id="nx-lf-panel" hidden>
+          <label class="nx-lf-field"><span data-en="Job title" data-ar="المسمى الوظيفي">Job title</span>
+            <input id="nx-lf-title" list="nx-lf-titles" autocomplete="off" oninput="nxSetFilter('title', this.value, true)" placeholder="e.g. CEO, HR Manager" data-en-ph="e.g. CEO, HR Manager" data-ar-ph="مثال: CEO، مدير الموارد البشرية" />
+            <datalist id="nx-lf-titles"></datalist>
+          </label>
+          <label class="nx-lf-field"><span data-en="Company" data-ar="الشركة">Company</span>
+            <input id="nx-lf-company" list="nx-lf-companies" autocomplete="off" oninput="nxSetFilter('company', this.value, true)" placeholder="Part of the name" data-en-ph="Part of the name" data-ar-ph="جزء من اسم الشركة" />
+            <datalist id="nx-lf-companies"></datalist>
+          </label>
+          <label class="nx-lf-field nx-lf-phone"><span data-en="Phone" data-ar="الجوال">Phone</span>
+            <select id="nx-lf-phone" onchange="nxSetFilter('phone', this.value)">
+              <option value="" data-en="Any" data-ar="الكل">Any</option>
+              <option value="has" data-en="Has a phone number" data-ar="لديه رقم جوال">Has a phone number</option>
+              <option value="none" data-en="No phone number" data-ar="بدون رقم">No phone number</option>
+              <option value="not_found" data-en="No phone: checked, none exists" data-ar="بدون رقم: تم البحث ولا يوجد رقم">No phone: checked, none exists</option>
+              <option value="not_checked" data-en="No phone: not checked yet" data-ar="بدون رقم: لم يتم البحث بعد">No phone: not checked yet</option>
+            </select>
+          </label>
+          <label class="nx-lf-field"><span data-en="Status" data-ar="الحالة">Status</span>
+            <select id="nx-lf-status" onchange="nxSetFilter('status', this.value)"></select>
+          </label>
+          <label class="nx-lf-field"><span data-en="Source" data-ar="المصدر">Source</span>
+            <select id="nx-lf-source" onchange="nxSetFilter('source', this.value)"></select>
+          </label>
+          <div class="nx-lf-field nx-lf-end"><button type="button" class="btn btn-ghost" style="font-size:12px;padding:8px 12px" onclick="nxClearFilters()" data-en="Clear all" data-ar="مسح الكل">Clear all</button></div>
+        </div>
+        <div class="nx-lf-bar" id="nx-lf-bar" hidden><span class="nx-lf-shown" id="nx-lf-shown"></span><span class="nx-lf-chips" id="nx-lf-chips"></span></div>
         <div class="source-filter-bar" id="source-filter-bar">
           <span style="font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-right:4px">Source:</span>
           <button class="source-filter-btn active" onclick="filterBySource('all',this)">All</button>
@@ -4621,6 +4774,123 @@ function nxDismissStart() {
   const c = document.getElementById('nx-start'); if (c) c.remove();
 }
 
+// ─── MENU GROUPS THAT FOLD ────────────────────────────────────
+function nxFoldState() { try { return JSON.parse(localStorage.getItem('nexcrm_nav_fold') || 'null') || { ops: true }; } catch (e) { return { ops: true }; } }
+function nxApplyFold() {
+  const st = nxFoldState();
+  document.querySelectorAll('.sidebar .nav-section[data-group]').forEach(function (sec) {
+    const folded = !!st[sec.getAttribute('data-group')];
+    sec.classList.toggle('nx-folded', folded);
+    const b = sec.querySelector('button.nx-group'); if (b) b.setAttribute('aria-expanded', folded ? 'false' : 'true');
+  });
+}
+function nxFold(key) {
+  const st = nxFoldState(); st[key] = !st[key];
+  try { localStorage.setItem('nexcrm_nav_fold', JSON.stringify(st)); } catch (e) {}
+  nxApplyFold();
+}
+
+// ─── QUICK ACTIONS (Ctrl/⌘ K) ─────────────────────────────────
+let _nxPalItems = [], _nxPalIdx = 0;
+function nxPalIcon(d) { return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + d + '</svg>'; }
+function nxPalSource(q) {
+  const ar = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  const go = function (page) { return function () { nav(page, document.querySelector('.sidebar .nav-item[onclick*="\'' + page + '\'"]')); }; };
+  const I = { plus: '<path d="M12 5v14M5 12h14"/>', up: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/>', down: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>', find: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>', doc: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>', user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>', globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/>', sun: '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>', arrow: '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>' };
+  const actions = [
+    { g: 'a', en: 'Add lead', arl: 'إضافة عميل', ic: I.plus, run: function () { openModal(); } },
+    { g: 'a', en: 'Import leads from Excel', arl: 'استيراد عملاء من Excel', ic: I.up, run: function () { go('leads')(); openImportModal(); } },
+    { g: 'a', en: 'Find verified leads', arl: 'ابحث عن عملاء موثّقين', ic: I.find, run: go('leadgen') },
+    { g: 'a', en: 'New invoice', arl: 'فاتورة جديدة', ic: I.doc, run: function () { go('invoices')(); if (typeof openInvoiceModal === 'function') openInvoiceModal(); } },
+    { g: 'a', en: 'Add contact', arl: 'إضافة جهة اتصال', ic: I.user, run: function () { go('contacts')(); if (typeof openContactModal === 'function') openContactModal(); } },
+    { g: 'a', en: 'Export leads', arl: 'تصدير العملاء', ic: I.down, run: function () { if (typeof exportLeads === 'function') exportLeads(); } },
+    { g: 'a', en: 'Switch to Arabic', arl: 'التبديل إلى الإنجليزية', ic: I.globe, run: function () { toggleLang(); } },
+    { g: 'a', en: 'Light / dark mode', arl: 'الوضع الفاتح / الداكن', ic: I.sun, run: function () { toggleTheme(); } }
+  ];
+  const pages = [];
+  document.querySelectorAll('.sidebar .nav-item').forEach(function (el) {
+    if (el.style.display === 'none') return;
+    const lab = el.querySelector('span:not(.icon):not(.badge):not(.nx-pill)');
+    const text = lab ? (lab.childNodes[0] ? lab.childNodes[0].textContent : lab.textContent).trim() : '';
+    if (text) pages.push({ g: 'p', en: text, arl: text, ic: I.arrow, run: function () { el.click(); } });
+  });
+  pages.push({ g: 'p', en: 'Settings', arl: 'الإعدادات', ic: I.arrow, run: function () { nav('settings', document.getElementById('settings-nav-item')); } });
+  let list = actions.concat(pages);
+  const qq = String(q || '').toLowerCase().trim();
+  if (qq) {
+    list = list.filter(function (it) { return (it.en + ' ' + it.arl).toLowerCase().indexOf(qq) !== -1; });
+    const src = (typeof leads !== 'undefined' && Array.isArray(leads)) ? leads : [];
+    src.filter(function (l) { return ((l.name || '') + ' ' + (l.company || '') + ' ' + (l.phone || '') + ' ' + (l.email || '')).toLowerCase().indexOf(qq) !== -1; }).slice(0, 6).forEach(function (l) {
+      list.push({ g: 'l', en: l.name || '—', arl: l.name || '—', sub: [l.company, l.phone].filter(Boolean).join('  ·  '), ic: I.user, run: function () {
+        const inp = document.getElementById('global-search'); if (inp) inp.value = l.name || '';
+        handleSearch(l.name || '');
+        document.querySelectorAll('.nav-item').forEach(function (n) { n.classList.remove('active'); });
+        const li = document.querySelector('.sidebar .nav-item[onclick*="\'leads\'"]'); if (li) li.classList.add('active');
+        if (typeof syncMobileNav === 'function') syncMobileNav('leads');
+      } });
+    });
+  }
+  return { list: list, heads: { a: ar ? 'إجراءات سريعة' : 'Quick actions', p: ar ? 'انتقل إلى' : 'Go to', l: ar ? 'العملاء' : 'Leads' }, ar: ar };
+}
+function nxPalRender() {
+  const box = document.getElementById('nx-pal-list'); if (!box) return;
+  const r = nxPalSource(document.getElementById('nx-pal-input').value);
+  _nxPalItems = r.list; if (_nxPalIdx >= _nxPalItems.length) _nxPalIdx = 0;
+  box.innerHTML = '';
+  if (!_nxPalItems.length) { const e = document.createElement('div'); e.className = 'nx-pal-empty'; e.textContent = r.ar ? 'لا توجد نتائج' : 'Nothing found'; box.appendChild(e); return; }
+  let last = '';
+  _nxPalItems.forEach(function (it, i) {
+    if (it.g !== last) { const h = document.createElement('div'); h.className = 'nx-pal-head'; h.textContent = r.heads[it.g]; box.appendChild(h); last = it.g; }
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'nx-pal-item' + (i === _nxPalIdx ? ' on' : '');
+    const ic = document.createElement('span'); ic.className = 'nx-pal-ic'; ic.innerHTML = nxPalIcon(it.ic);
+    const tx = document.createElement('span'); tx.className = 'nx-pal-tx'; tx.textContent = r.ar ? it.arl : it.en;
+    b.appendChild(ic); b.appendChild(tx);
+    if (it.sub) { const sb = document.createElement('span'); sb.className = 'nx-pal-sub'; sb.textContent = it.sub; b.appendChild(sb); }
+    b.onmouseenter = function () { _nxPalIdx = i; box.querySelectorAll('.nx-pal-item').forEach(function (x, k) { x.classList.toggle('on', k === i); }); };
+    b.onclick = function () { nxPalRun(i); };
+    box.appendChild(b);
+  });
+  const on = box.querySelector('.nx-pal-item.on'); if (on && on.scrollIntoView) on.scrollIntoView({ block: 'nearest' });
+}
+function nxPalRun(i) { const it = _nxPalItems[i]; nxPaletteClose(); if (it) { try { it.run(); } catch (e) { console.error(e); } } }
+function nxPalette() {
+  let ov = document.getElementById('nx-pal');
+  const ar = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+  if (!ov) {
+    ov = document.createElement('div'); ov.id = 'nx-pal';
+    ov.innerHTML = '<div class="nx-pal-box" role="dialog" aria-modal="true"><div class="nx-pal-top">' + nxPalIcon('<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>') + '<input id="nx-pal-input" type="text" autocomplete="off" spellcheck="false"/><kbd>Esc</kbd></div><div id="nx-pal-list"></div></div>';
+    ov.addEventListener('mousedown', function (e) { if (e.target === ov) nxPaletteClose(); });
+    document.body.appendChild(ov);
+    const inp = ov.querySelector('#nx-pal-input');
+    inp.addEventListener('input', function () { _nxPalIdx = 0; nxPalRender(); });
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); _nxPalIdx = Math.min(_nxPalItems.length - 1, _nxPalIdx + 1); nxPalRender(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); _nxPalIdx = Math.max(0, _nxPalIdx - 1); nxPalRender(); }
+      else if (e.key === 'Enter') { e.preventDefault(); nxPalRun(_nxPalIdx); }
+    });
+  }
+  ov.setAttribute('dir', ar ? 'rtl' : 'ltr');
+  const inp = document.getElementById('nx-pal-input');
+  inp.value = ''; inp.placeholder = ar ? 'ابحث عن عميل، صفحة أو إجراء…' : 'Search a lead, a page or an action…';
+  _nxPalIdx = 0; nxPalRender();
+  ov.classList.add('open');
+  inp.focus(); setTimeout(function () { inp.focus(); }, 30);
+}
+function nxPaletteClose() { const ov = document.getElementById('nx-pal'); if (ov) ov.classList.remove('open'); }
+document.addEventListener('keydown', function (e) {
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && String(e.key).toLowerCase() === 'k') {
+    if (typeof currentUser === 'undefined' || !currentUser) return;
+    e.preventDefault();
+    const ov = document.getElementById('nx-pal');
+    if (ov && ov.classList.contains('open')) nxPaletteClose(); else nxPalette();
+  } else if (e.key === 'Escape') nxPaletteClose();
+});
+document.addEventListener('DOMContentLoaded', function () {
+  nxApplyFold();
+  const k = document.getElementById('nx-kbd');
+  if (k && /Mac|iPhone|iPad/.test(navigator.platform || '')) k.textContent = '⌘K';
+});
+
 // ─── SHARED HELPERS ───────────────────────────────────────────
 // Lead values are free text ("30000", "SAR 30,000", "$12,356", "٣٠٠٠٠"). Read the number out of any of them.
 function leadValue(v) {
@@ -5231,11 +5501,131 @@ const statusClass = {
 };
 const LEAD_STATUSES = ['New','In Progress','Qualified','Unqualified','Converted'];
 
+// ─── LEAD FILTERS ──────────────────────────────────────────────
+const NX_LF_EMPTY = { q: '', title: '', company: '', phone: '', status: '', source: '' };
+let nxLF = Object.assign({}, NX_LF_EMPTY);
+let nxLFOrg = null;
+const NX_LF_PAGE = 200;
+let nxLFLimit = NX_LF_PAGE;
+let _nxLFTimer = null;
+function nxPhoneOf(l) { const p = String((l && l.phone) || '').trim(); return (p && p !== '—' && p !== '-' && p.toUpperCase() !== 'N/A') ? p : ''; }
+function nxAr() { return typeof currentLang !== 'undefined' && currentLang === 'ar'; }
+function nxAnyFilter() { return activeSourceFilter !== 'all' || Object.keys(NX_LF_EMPTY).some(function (k) { return !!String(nxLF[k] || '').trim(); }); }
+function nxVisibleLeads() {
+  if (typeof currentOrg !== 'undefined' && currentOrg && nxLFOrg !== currentOrg.id) { nxLFOrg = currentOrg.id; nxLF = Object.assign({}, NX_LF_EMPTY); nxLFLimit = NX_LF_PAGE; nxSyncFilterInputs(); }
+  const has = function (v, q) { return String(v || '').toLowerCase().indexOf(q) !== -1; };
+  const q = String(nxLF.q || '').toLowerCase().trim();
+  const t = String(nxLF.title || '').toLowerCase().trim();
+  const c = String(nxLF.company || '').toLowerCase().trim();
+  return (leads || []).filter(function (l) {
+    if (activeSourceFilter !== 'all' && String(l.source || '').toLowerCase() !== activeSourceFilter.toLowerCase()) return false;
+    if (q && !(has(l.name, q) || has(l.company, q) || has(l.title, q) || has(l.email, q) || has(nxPhoneOf(l), q) || has(l.assigned, q) || has(l.status, q) || has(l.source, q))) return false;
+    if (t && !has(l.title, t)) return false;
+    if (c && !has(l.company, c)) return false;
+    if (nxLF.phone) {
+      const p = nxPhoneOf(l);
+      if (nxLF.phone === 'has' && !p) return false;
+      if (nxLF.phone === 'none' && p) return false;
+      if (nxLF.phone === 'not_found' && (p || l.phone_lookup !== 'not_found')) return false;
+      if (nxLF.phone === 'not_checked' && (p || l.phone_lookup === 'not_found')) return false;
+    }
+    if (nxLF.status && (l.status || 'New') !== nxLF.status) return false;
+    if (nxLF.source && String(l.source || '') !== nxLF.source) return false;
+    return true;
+  });
+}
+function nxSetFilter(key, val, typed) {
+  nxLF[key] = val || '';
+  nxLFLimit = NX_LF_PAGE;
+  clearTimeout(_nxLFTimer);
+  if (typed) _nxLFTimer = setTimeout(renderLeads, 220); else renderLeads();
+}
+function nxClearFilters() {
+  nxLF = Object.assign({}, NX_LF_EMPTY); nxLFLimit = NX_LF_PAGE;
+  activeSourceFilter = 'all';
+  document.querySelectorAll('.source-filter-btn').forEach(function (b) { b.classList.toggle('active', /filterBySource\('all'/.test(b.getAttribute('onclick') || '')); });
+  nxSyncFilterInputs(); renderLeads();
+}
+function nxToggleFilters(force) {
+  const p = document.getElementById('nx-lf-panel'); const b = document.getElementById('nx-lf-btn'); if (!p) return;
+  const open = typeof force === 'boolean' ? force : p.hidden;
+  p.hidden = !open; if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) { nxFillFilterOptions(); const f = document.getElementById('nx-lf-title'); if (f) f.focus(); }
+}
+function nxSyncFilterInputs() {
+  const set = function (id, v) { const el = document.getElementById(id); if (el && el.value !== v) el.value = v; };
+  set('nx-lf-q', nxLF.q); set('nx-lf-title', nxLF.title); set('nx-lf-company', nxLF.company); set('nx-lf-phone', nxLF.phone);
+  nxFillFilterOptions(); set('nx-lf-status', nxLF.status); set('nx-lf-source', nxLF.source);
+}
+function nxFillFilterOptions() {
+  const ar = nxAr();
+  const fillSelect = function (id, values, anyLabel, labelFn) {
+    const sel = document.getElementById(id); if (!sel) return;
+    const keep = sel.value; sel.textContent = '';
+    const o0 = document.createElement('option'); o0.value = ''; o0.textContent = anyLabel; sel.appendChild(o0);
+    values.forEach(function (v) { const o = document.createElement('option'); o.value = v; o.textContent = labelFn ? labelFn(v) : v; sel.appendChild(o); });
+    sel.value = values.indexOf(keep) !== -1 ? keep : '';
+  };
+  const top = function (field, n) {
+    const m = {}; (leads || []).forEach(function (l) { const v = String(l[field] || '').trim(); if (v && v !== '—') m[v] = (m[v] || 0) + 1; });
+    return Object.keys(m).sort(function (a, b) { return m[b] - m[a] || a.localeCompare(b); }).slice(0, n);
+  };
+  fillSelect('nx-lf-status', (typeof LEAD_STATUSES !== 'undefined' ? LEAD_STATUSES : []), ar ? 'الكل' : 'Any');
+  fillSelect('nx-lf-source', top('source', 30).sort(), ar ? 'الكل' : 'Any', function (v) { return /apollo/i.test(v) ? 'Verified' : v; });
+  const fillList = function (id, values) { const dl = document.getElementById(id); if (!dl) return; dl.textContent = ''; values.forEach(function (v) { const o = document.createElement('option'); o.value = v; dl.appendChild(o); }); };
+  fillList('nx-lf-titles', top('title', 40));
+  fillList('nx-lf-companies', top('company', 40));
+}
+function nxUpdateFilterBar(shown) {
+  const ar = nxAr();
+  document.querySelectorAll('[data-en-ph]').forEach(function (el) { const v = el.getAttribute(ar ? 'data-ar-ph' : 'data-en-ph'); if (v && el.placeholder !== v) el.placeholder = v; });
+  const total = (leads || []).length;
+  const active = Object.keys(NX_LF_EMPTY).filter(function (k) { return !!String(nxLF[k] || '').trim(); });
+  const cnt = document.getElementById('nx-lf-count');
+  if (cnt) cnt.textContent = active.filter(function (k) { return k !== 'q'; }).length ? ' (' + active.filter(function (k) { return k !== 'q'; }).length + ')' : '';
+  const bar = document.getElementById('nx-lf-bar'); if (!bar) return;
+  const on = nxAnyFilter();
+  bar.hidden = !on;
+  if (!on) return;
+  document.getElementById('nx-lf-shown').textContent = ar ? ('يظهر ' + shown.toLocaleString() + ' من ' + total.toLocaleString()) : ('Showing ' + shown.toLocaleString() + ' of ' + total.toLocaleString());
+  const names = { q: ar ? 'بحث' : 'Search', title: ar ? 'المسمى' : 'Title', company: ar ? 'الشركة' : 'Company', phone: ar ? 'الجوال' : 'Phone', status: ar ? 'الحالة' : 'Status', source: ar ? 'المصدر' : 'Source' };
+  const phoneText = { has: ar ? 'لديه رقم' : 'has a number', none: ar ? 'بدون رقم' : 'no number', not_found: ar ? 'لا يوجد رقم' : 'none exists', not_checked: ar ? 'لم يتم البحث' : 'not checked yet' };
+  const box = document.getElementById('nx-lf-chips'); box.textContent = '';
+  const chip = function (label, onX) {
+    const c = document.createElement('span'); c.className = 'nx-lf-chip';
+    const t = document.createElement('span'); t.textContent = label; c.appendChild(t);
+    const x = document.createElement('button'); x.type = 'button'; x.textContent = '×'; x.setAttribute('aria-label', ar ? 'إزالة' : 'Remove'); x.onclick = onX; c.appendChild(x);
+    box.appendChild(c);
+  };
+  active.forEach(function (k) {
+    let v = String(nxLF[k]);
+    if (k === 'phone') v = phoneText[v] || v;
+    if (k === 'source' && /apollo/i.test(v)) v = 'Verified';
+    chip(names[k] + ': ' + v, function () { nxLF[k] = ''; nxSyncFilterInputs(); renderLeads(); });
+  });
+  if (activeSourceFilter !== 'all') chip(names.source + ': ' + activeSourceFilter, function () { nxClearSourceButtons(); });
+  if (active.length + (activeSourceFilter !== 'all' ? 1 : 0) > 1) {
+    const all = document.createElement('button'); all.type = 'button'; all.className = 'nx-lf-clear'; all.textContent = ar ? 'مسح الكل' : 'Clear all'; all.onclick = nxClearFilters; box.appendChild(all);
+  }
+}
+function nxClearSourceButtons() {
+  activeSourceFilter = 'all';
+  document.querySelectorAll('.source-filter-btn').forEach(function (b) { b.classList.toggle('active', /filterBySource\('all'/.test(b.getAttribute('onclick') || '')); });
+  renderLeads();
+}
+function nxShowMore() { nxLFLimit += NX_LF_PAGE; renderLeads(); }
+function nxNoPhoneTag(l) {
+  const ar = nxAr();
+  if (l && l.phone_lookup === 'not_found') return '<span class="nx-nophone" title="' + (ar ? 'تم البحث ولا يوجد رقم لهذا الشخص' : 'Checked: no number exists for this person') + '">' + (ar ? 'لا يوجد رقم' : 'No number') + '</span>';
+  return '<span style="color:var(--text2)">—</span>';
+}
+
 // ─── SOURCE FILTER ─────────────────────────────────────────────
 let activeSourceFilter = 'all';
 
 function filterBySource(source, el) {
   activeSourceFilter = source;
+  nxLFLimit = NX_LF_PAGE;
   document.querySelectorAll('.source-filter-btn').forEach(b => b.classList.remove('active'));
   if(el) el.classList.add('active');
   renderLeads();
@@ -5270,12 +5660,16 @@ function sourceTag(src) {
 // ─── RENDER LEADS TABLE ────────────────────────────────────────
 function renderLeads() {
   const tbody = document.getElementById('leads-tbody');
-  let filtered = leads;
-  if(activeSourceFilter !== 'all') {
-    filtered = leads.filter(l => (l.source||'').toLowerCase() === activeSourceFilter.toLowerCase());
-  }
+  let filtered = nxVisibleLeads();
+  const _nxShown = filtered.length;
+  nxUpdateFilterBar(_nxShown);
+  filtered = filtered.slice(0, nxLFLimit);
   if(filtered.length === 0) {
     const _ar = (typeof currentLang !== 'undefined' && currentLang === 'ar');
+    if ((leads || []).length && nxAnyFilter()) {
+      tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--text2)">${_ar ? 'لا يوجد عملاء يطابقون هذه الفلاتر.' : 'No leads match these filters.'} <a href="#" onclick="nxClearFilters();return false" style="color:var(--accent);font-weight:600">${_ar ? 'مسح الفلاتر' : 'Clear filters'}</a></td></tr>`;
+      return;
+    }
     tbody.innerHTML = activeSourceFilter !== 'all'
       ? `<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--text2)">${_ar ? 'لا يوجد عملاء من هذا المصدر.' : 'No leads from this source yet.'} <a href="#" onclick="var b=document.querySelector('.source-filter-btn,[onclick*=&quot;filterBySource(\\'all\\'&quot;]');if(b)b.click();return false" style="color:var(--accent);font-weight:600">${_ar ? 'عرض الكل' : 'Show all'}</a></td></tr>`
       : `<tr><td colspan="12" class="nx-empty"><div class="nx-empty-t">${_ar ? 'لا يوجد عملاء بعد' : 'No leads yet'}</div><div class="nx-empty-d">${_ar ? 'أضف عميلاً، استورد قائمتك، أو ابحث عن عملاء موثّقين.' : 'Add one, import your list, or find verified leads.'}</div><div class="nx-empty-a"><button class="btn btn-primary" onclick="openModal()">${_ar ? '+ إضافة عميل' : '+ Add lead'}</button><button class="btn btn-ghost" onclick="openImportModal()">${_ar ? 'استيراد من Excel' : 'Import from Excel'}</button><button class="btn btn-ghost" onclick="nav('leadgen', document.querySelector('[onclick*=&quot;nav(\\'leadgen\\'&quot;]'))">${_ar ? 'ابحث عن عملاء' : 'Find leads'}</button></div></td></tr>`;
@@ -5287,7 +5681,7 @@ function renderLeads() {
       <td><div style="font-weight:600">${l.name}</div></td>
       <td><div style="color:var(--text2)">${l.company||'—'}</div></td>
       <td><div style="color:var(--text2);font-size:12px;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${l.title||''}">${l.title||'—'}</div></td>
-      <td>${l.phone ? `<a href="https://wa.me/${waNumber(l.phone)}" target="_blank" style="color:var(--success);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>${l.phone}</a>` : '<span style="color:var(--text2)">—</span>'}</td>
+      <td>${nxPhoneOf(l) ? `<a href="https://wa.me/${waNumber(nxPhoneOf(l))}" target="_blank" style="color:var(--success);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>${nxPhoneOf(l)}</a>` : nxNoPhoneTag(l)}</td>
       <td>${l.email ? `<a href="mailto:${l.email}" style="color:var(--accent);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:4px" title="${l.email}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.email}</span></a>` : '<span style="color:var(--text2)">—</span>'}</td>
       <td>${sourceTag(l.source)}</td>
       <td><select class="status-select ${statusClass[l.status]||'pill-new'}" onchange="quickStatus(${l.id},this.value,this)" onclick="event.stopPropagation()">
@@ -5323,7 +5717,7 @@ function renderLeads() {
       <td colspan="12">
         ${(l.email || l.phone) ? `<div style="display:flex;gap:16px;flex-wrap:wrap;padding:8px 0;margin-bottom:8px;border-bottom:1px solid var(--border);font-size:12px">
           ${l.email ? `<span>✉️ <a href="mailto:${l.email}" style="color:var(--text);text-decoration:none">${l.email}</a></span>` : ''}
-          ${l.phone ? `<span>📞 <a href="tel:${l.phone}" style="color:var(--text);text-decoration:none">${l.phone}</a></span>` : ''}
+          ${nxPhoneOf(l) ? `<span>📞 <a href="tel:${nxPhoneOf(l)}" style="color:var(--text);text-decoration:none">${nxPhoneOf(l)}</a></span>` : ''}
         </div>` : ''}
         <textarea class="notes-box" id="note-text-${l.id}" placeholder="Add follow-up notes...">${l.notes||''}</textarea>
         <button class="notes-save-btn" onclick="saveNote(${l.id})">💾 Save Note</button>
@@ -5340,7 +5734,7 @@ function renderLeads() {
         </div>
       </td>
     </tr>
-  `).join('');
+  `).join('') + (_nxShown > filtered.length ? `<tr class="nx-lf-more"><td colspan="12"><button type="button" class="btn btn-ghost" onclick="nxShowMore()">${nxAr() ? ('عرض ' + Math.min(NX_LF_PAGE, _nxShown - filtered.length) + ' إضافية') : ('Show ' + Math.min(NX_LF_PAGE, _nxShown - filtered.length) + ' more')}</button> <span>${nxAr() ? ('يظهر ' + filtered.length + ' من ' + _nxShown) : (filtered.length + ' of ' + _nxShown + ' shown')}</span></td></tr>` : '');
 }
 
 // ─── LOAD LEADS FROM SUPABASE ──────────────────────────────────
@@ -5915,9 +6309,8 @@ async function startImport() {
 // ─── EXPORT LEADS ──────────────────────────────────────────────
 async function exportLeads() {
   try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc', { headers: HEADERS });
-    const data = await r.json();
-    if(!r.ok || !data.length) { showToast('❌ No leads to export'); return; }
+    const data = nxVisibleLeads().map(l => Object.assign({}, l, { phone: nxPhoneOf(l), source: /apollo/i.test(l.source || '') ? 'Verified' : l.source }));
+    if(!data.length) { showToast(nxAr() ? 'لا يوجد عملاء للتصدير' : 'No leads to export'); return; }
 
     const fields = ['name','company','title','phone','email','source','status','value','assigned','date','notes'];
     const csv = [
@@ -5928,12 +6321,13 @@ async function exportLeads() {
       }).join(','))
     ].join('\n');
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'nexcrm-leads-' + new Date().toISOString().split('T')[0] + '.csv';
-    a.click(); URL.revokeObjectURL(url);
-    showToast('✅ Leads exported!');
+    const ws = (currentOrg && currentOrg.name ? currentOrg.name : 'leads').replace(/[^\w\u0600-\u06FF-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    a.href = url; a.download = 'nexcrm-' + ws + (nxAnyFilter() ? '-filtered' : '') + '-' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast(nxAr() ? ('تم تصدير ' + data.length + ' عميل') : ('Exported ' + data.length + ' leads'));
   } catch(e) { showToast('❌ Export failed'); }
 }
 
@@ -6394,7 +6788,7 @@ function applyTranslations() {
 
   // Topbar
   const addLeadBtn = document.querySelector('.topbar .btn-primary');
-  if(addLeadBtn) addLeadBtn.textContent = lang.addLead;
+  if(addLeadBtn) { const l1 = addLeadBtn.querySelector('.l1'), l2 = addLeadBtn.querySelector('.l2'); if (l1 && l2) { l1.textContent = String(lang.addLead || 'Add Lead').replace(/[＋+]/g, '').trim(); l2.textContent = isAr ? 'صفقة جديدة' : 'New deal'; } else addLeadBtn.textContent = lang.addLead; }
   const searchInput = document.querySelector('.search-bar input');
   if(searchInput) searchInput.placeholder = lang.search;
 
@@ -6425,7 +6819,7 @@ function applyTranslations() {
 
   // Dashboard stat labels
   const statLabels = document.querySelectorAll('.stat-label');
-  const statKeys = [lang.totalLeads, lang.revenue, lang.convRate, lang.adSpend];
+  const statKeys = [lang.totalLeads, lang.revenue, lang.convRate, isAr ? 'صفقات مكتملة' : 'Won Leads'];
   statLabels.forEach((el, i) => { if(statKeys[i]) el.textContent = statKeys[i]; });
 
   // Card titles
@@ -9773,24 +10167,9 @@ function handleSearch(val) {
     leadsPage.classList.add('active');
     document.getElementById('page-title').textContent = 'Leads';
   }
-  if(!q) { renderLeads(); return; }
-  const filtered = leads.filter(l =>
-    (l.name||'').toLowerCase().includes(q) ||
-    (l.company||'').toLowerCase().includes(q) ||
-    (l.phone||'').toLowerCase().includes(q) ||
-    (l.source||'').toLowerCase().includes(q) ||
-    (l.status||'').toLowerCase().includes(q) ||
-    (l.assigned||'').toLowerCase().includes(q)
-  );
-  const tbody = document.getElementById('leads-tbody');
-  if(filtered.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text2)">No results for <b>' + val + '</b></td></tr>';
-    return;
-  }
-  const saved = leads;
-  leads = filtered;
+  nxLF.q = String(val || ''); nxLFLimit = NX_LF_PAGE;
+  const box = document.getElementById('nx-lf-q'); if (box && box.value !== nxLF.q) box.value = nxLF.q;
   renderLeads();
-  leads = saved;
 }
 
 // ─── REAL ACTIVITY FEED ────────────────────────────────────────
