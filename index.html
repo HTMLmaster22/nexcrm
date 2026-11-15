@@ -4704,6 +4704,36 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
   };
 })();
 
+// ─── ALL LEADS, PAGE BY PAGE ──────────────────────────────────
+// A plain read of /rest/v1/leads stops at 1,000 rows. Reads without their own limit are fetched
+// in pages of 1,000 here and handed back as one list, so every screen sees the whole workspace.
+(function () {
+  const BASE = 'https://xpcmoaxosppgaoprjnhu.supabase.co/rest/v1/leads?';
+  const PAGE = 1000, MAX_PAGES = 50;
+  const inner = window.fetch;
+  window.fetch = async function (input, init) {
+    const url = typeof input === 'string' ? input : '';
+    const method = String((init && init.method) || 'GET').toUpperCase();
+    if (!url || url.indexOf(BASE) !== 0 || method !== 'GET' || /[?&](limit|offset)=/.test(url) || (init && init.headers && (init.headers.Range || init.headers.range))) return inner(input, init);
+    const first = await inner(url + '&limit=' + PAGE + '&offset=0', init);
+    if (!first.ok) return first;
+    let rows = await first.json();
+    if (!Array.isArray(rows) || rows.length < PAGE) return nxWrapRows(rows, first.status);
+    for (let p = 1; p < MAX_PAGES; p++) {
+      const r = await inner(url + '&limit=' + PAGE + '&offset=' + (p * PAGE), init);
+      if (!r.ok) break;
+      const more = await r.json();
+      if (!Array.isArray(more) || !more.length) break;
+      rows = rows.concat(more);
+      if (more.length < PAGE) break;
+    }
+    return nxWrapRows(rows, first.status);
+  };
+  function nxWrapRows(rows, status) {
+    return { ok: true, status: status || 200, headers: new Headers({ 'Content-Type': 'application/json' }), json: async function () { return rows; }, text: async function () { return JSON.stringify(rows); }, clone: function () { return nxWrapRows(rows, status); } };
+  }
+})();
+
 // ─── USAGE LIMIT NOTICE ───────────────────────────────────────
 function nxLimitText(reason, tier) {
   const ar = (typeof currentLang !== 'undefined' && currentLang === 'ar');
