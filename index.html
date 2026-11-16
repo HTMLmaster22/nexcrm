@@ -3313,12 +3313,12 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
             </div>
             <div id="sms-fields-taqnyat" style="display:flex;flex-direction:column;gap:14px">
               <div style="font-size:12.5px;color:var(--text2);line-height:1.7">In your <a href="https://portal.taqnyat.sa" target="_blank" rel="noopener" style="color:var(--accent)">Taqnyat portal</a>: create an API token (Bearer token) and use a sender name that is already approved on your account.</div>
-              <div class="form-group" style="margin:0"><label class="form-label" for="sms-tq-token">API token</label><input class="form-input" type="password" id="sms-tq-token" autocomplete="off" /></div>
+              <div class="form-group" style="margin:0"><label class="form-label" for="sms-tq-token">API token</label><input class="form-input" type="password" id="sms-tq-token" autocomplete="new-password" /></div>
               <div class="form-group" style="margin:0"><label class="form-label" for="sms-tq-sender">Sender name</label><input class="form-input" id="sms-tq-sender" maxlength="11" placeholder="e.g. MyCompany" autocomplete="off" /></div>
             </div>
             <div id="sms-fields-twilio" style="display:none;flex-direction:column;gap:14px">
               <div class="form-group" style="margin:0"><label class="form-label" for="sms-account-sid">Account SID</label><input class="form-input" id="sms-account-sid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" /></div>
-              <div class="form-group" style="margin:0"><label class="form-label" for="sms-auth-token">Auth Token</label><input class="form-input" type="password" id="sms-auth-token" autocomplete="off" /></div>
+              <div class="form-group" style="margin:0"><label class="form-label" for="sms-auth-token">Auth Token</label><input class="form-input" type="password" id="sms-auth-token" autocomplete="new-password" /></div>
               <div class="form-group" style="margin:0"><label class="form-label" for="sms-from-number">Sender (Twilio number or name)</label><input class="form-input" id="sms-from-number" placeholder="+1xxxxxxxxxx" autocomplete="off" /></div>
             </div>
             <div style="font-size:11.5px;color:var(--text2)">Your token is checked and stored on the server. It never stays in the browser.</div>
@@ -3359,7 +3359,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
             </div>
             <div class="form-group">
               <label class="form-label">Permanent Access Token</label>
-              <input class="form-input" type="password" id="wa-auth-token" placeholder="EAAxxxxxxxxxxxxxx..." />
+              <input class="form-input" type="password" id="wa-auth-token" autocomplete="new-password" placeholder="EAAxxxxxxxxxxxxxx..." />
               <div style="font-size:11px;color:var(--text2);margin-top:4px">From Meta Business Suite → System Users</div>
             </div>
             <div style="font-size:11.5px;color:var(--text2)">Checked with Meta and stored on the server. It never stays in the browser.</div>
@@ -5798,9 +5798,12 @@ async function loadLeads() {
     if(savedToken && HEADERS['Authorization'] === 'Bearer ' + SUPABASE_KEY) {
       HEADERS['Authorization'] = 'Bearer ' + savedToken;
     }
-    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const reqOrg = currentOrg ? currentOrg.id : null;
+    const orgFilter = reqOrg ? '&org_id=eq.' + reqOrg : '';
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + orgFilter, { headers: HEADERS });
     const data = await r.json();
+    // A load started before the workspace was picked (or for another workspace) must not overwrite the current one
+    if ((currentOrg ? currentOrg.id : null) !== reqOrg) { hideLoader(); return; }
     if (!r.ok) { showToast('❌ Failed to load leads'); console.error(data); hideLoader(); return; }
     leads = data || [];
     renderLeads();
@@ -10216,10 +10219,11 @@ async function loadAndRenderAnalytics() {
   const el = id => document.getElementById(id);
   ['an-conv','an-value','an-total','an-won'].forEach(id => { if(el(id)) el(id).textContent = '…'; });
   try {
-    const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
+    const reqOrg = currentOrg ? currentOrg.id : null;
+    const orgFilter = reqOrg ? '&org_id=eq.' + reqOrg : '';
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*&order=id.desc' + orgFilter, { headers: HEADERS });
     const data = await r.json();
-    if(r.ok && Array.isArray(data)) leads = data;
+    if(r.ok && Array.isArray(data) && (currentOrg ? currentOrg.id : null) === reqOrg) leads = data;
   } catch(e) {}
   renderAnalytics();
   if(typeof renderResponseTime === 'function') try { renderResponseTime(); } catch(e) {}
