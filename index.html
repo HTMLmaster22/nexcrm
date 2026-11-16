@@ -1727,6 +1727,31 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
 .theme-toggle, .notif-btn { min-width:40px; min-height:40px; }
 </style>
 <style id="nx-polish">
+  /* Campaigns */
+  .nx-wa-mode { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .nx-wa-mode label { display:flex; gap:8px; align-items:flex-start; border:1px solid var(--border); border-radius:10px; padding:10px 12px; cursor:pointer; background:var(--bg3); }
+  .nx-wa-mode label:has(input:checked) { border-color:#25d366; background:rgba(37,211,102,0.08); }
+  .nx-wa-mode b { display:block; font-size:13px; color:var(--text); }
+  .nx-wa-mode small { display:block; font-size:11.5px; color:var(--text2); line-height:1.5; margin-top:2px; }
+  .nx-cs-box { max-width:460px !important; }
+  .nx-cs-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0; }
+  .nx-cs-stat { background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:12px; }
+  .nx-cs-stat b { display:block; font-size:24px; font-weight:800; color:var(--text); line-height:1.2; }
+  .nx-cs-stat span { font-size:12px; color:var(--text2); }
+  .nx-cs-skip { font-size:12.5px; color:var(--text2); line-height:1.8; margin:0 0 12px; padding:0; list-style:none; }
+  .nx-cs-bar { height:8px; border-radius:99px; background:var(--bg3); overflow:hidden; margin:14px 0 8px; }
+  .nx-cs-bar > i { display:block; height:100%; width:0; background:var(--accent); transition:width .3s ease; }
+  .nx-cs-msg { font-size:13px; color:var(--text); min-height:20px; }
+  .nx-hist { display:flex; flex-direction:column; gap:8px; }
+  .nx-hist-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:var(--bg3); }
+  .nx-hist-row .grow { flex:1; min-width:0; }
+  .nx-hist-row b { display:block; font-size:13px; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .nx-hist-row small { font-size:11.5px; color:var(--text2); }
+  .nx-hist-empty { text-align:center; padding:40px; color:var(--text2); }
+  .nx-wa-q-name { font-size:17px; font-weight:800; color:var(--text); }
+  .nx-wa-q-num { font-size:13px; color:var(--text2); direction:ltr; display:inline-block; }
+  .nx-wa-q-msg { white-space:pre-wrap; font-size:13.5px; line-height:1.7; background:#DCF7C5; color:#111; border-radius:12px; padding:10px 12px; margin:12px 0; max-height:180px; overflow:auto; }
+
   /* Lead filters */
   .nx-lf-search { display:flex; align-items:center; gap:8px; background:var(--bg3); border:1px solid var(--border); border-radius:10px; padding:0 12px; margin-bottom:12px; color:var(--text2); }
   body.light-mode .nx-lf-search { background:#f8fafc; border-color:#e2e8f0; }
@@ -3029,12 +3054,12 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
             <div class="form-group">
               <label class="form-label">Send To</label>
               <select class="form-input" id="camp-filter" onchange="toggleCsvUpload(this.value)">
-                <option value="all">All Leads in CRM</option>
-                <option value="New">New Leads Only</option>
-                <option value="Warm">Warm Leads Only</option>
-                <option value="Active">Active Leads Only</option>
-                <option value="Cold">Cold Leads Only</option>
-                <option value="Won">Won Clients Only</option>
+<option value="all">All leads in this workspace</option>
+                <option value="New">New</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Qualified">Qualified</option>
+                <option value="Converted">Converted (clients)</option>
+                <option value="Unqualified">Unqualified</option>
                 <option value="csv">📂 Upload CSV/Excel File</option>
                 <option value="linkedin">💼 LinkedIn Leads Only</option>
               </select>
@@ -3100,9 +3125,9 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
               <div>
                 <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:2px">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-                  Connect Twilio for SMS
+                  Connect your SMS account
                 </div>
-                <div style="font-size:12px;color:var(--text2)">Paste your Twilio credentials to send SMS to your leads</div>
+                <div style="font-size:12px;color:var(--text2)">Taqnyat (Saudi) or Twilio. Messages are sent and paid from your own account.</div>
               </div>
               <button onclick="openSMSSetup()" style="background:var(--accent);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit">Connect</button>
             </div>
@@ -3117,11 +3142,12 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
             <div class="form-group">
               <label class="form-label">Send To</label>
               <select class="form-input" id="sms-filter">
-                <option value="all">All Leads</option>
-                <option value="New">New Leads Only</option>
-                <option value="Warm">Warm Leads Only</option>
-                <option value="Active">Active Leads Only</option>
-                <option value="Won">Won Clients Only</option>
+<option value="all">All leads in this workspace</option>
+                <option value="New">New</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Qualified">Qualified</option>
+                <option value="Converted">Converted (clients)</option>
+                <option value="Unqualified">Unqualified</option>
               </select>
             </div>
             <div class="form-group">
@@ -3170,11 +3196,11 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
               </div>
             </div>
             <div id="wa-connection-banner" style="background:rgba(37,211,102,0.15);border:1.5px solid rgba(37,211,102,0.5);border-radius:10px;padding:12px 14px;margin-bottom:16px">
-              <div style="font-size:13px;font-weight:700;color:#25d366;margin-bottom:6px">
+              <div style="font-size:13px;font-weight:700;color:#25d366;margin-bottom:6px" data-nx="wa-banner-title">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                 Connect WhatsApp Business API
               </div>
-              <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Connect via Meta WhatsApp Business API to send bulk messages.</div>
+              <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Optional. Without it you can still send one by one from your own WhatsApp below. The Business API (Meta) sends in bulk, using templates Meta has approved.</div>
               <div style="display:flex;gap:8px">
                 <button onclick="openWASetup()" style="background:#25d366;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Connect Number</button>
                 <a href="https://developers.facebook.com" target="_blank" style="background:rgba(37,211,102,0.1);color:#25d366;border:1px solid rgba(37,211,102,0.3);padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center">Learn more ↗</a>
@@ -3191,14 +3217,29 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
             <div class="form-group">
               <label class="form-label">Send To</label>
               <select class="form-input" id="wa-filter">
-                <option value="all">All Leads</option>
-                <option value="New">New Leads Only</option>
-                <option value="Warm">Warm Leads Only</option>
-                <option value="Active">Active Leads Only</option>
-                <option value="Won">Won Clients Only</option>
+<option value="all">All leads in this workspace</option>
+                <option value="New">New</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Qualified">Qualified</option>
+                <option value="Converted">Converted (clients)</option>
+                <option value="Unqualified">Unqualified</option>
               </select>
             </div>
             <div class="form-group">
+              <label class="form-label">How to send</label>
+              <div class="nx-wa-mode" role="radiogroup">
+                <label><input type="radio" name="wa-mode" value="app" checked onchange="nxWaMode()" /> <span><b>From my WhatsApp</b><small>Opens each chat with your message typed in. You tap Send.</small></span></label>
+                <label><input type="radio" name="wa-mode" value="api" onchange="nxWaMode()" /> <span><b>Business API</b><small>Sends in bulk with a Meta-approved template.</small></span></label>
+              </div>
+            </div>
+            <div id="wa-api-fields" style="display:none">
+              <div class="form-group"><label class="form-label" for="wa-tpl-name">Approved template name</label><input class="form-input" id="wa-tpl-name" placeholder="e.g. eid_offer" autocomplete="off" /></div>
+              <div class="form-group" style="display:flex;gap:12px;align-items:flex-end">
+                <div style="flex:1"><label class="form-label" for="wa-tpl-lang">Template language</label><select class="form-input" id="wa-tpl-lang"><option value="ar">Arabic (ar)</option><option value="en">English (en)</option><option value="en_US">English US (en_US)</option></select></div>
+                <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--text2);padding-bottom:10px"><input type="checkbox" id="wa-tpl-name-var" checked /> Put the lead's name in {{1}}</label>
+              </div>
+            </div>
+            <div class="form-group" id="wa-body-group">
               <label class="form-label">WhatsApp Message</label>
               <textarea class="form-input" id="wa-body" rows="5" placeholder="Write your WhatsApp message here...&#10;&#10;Use {name} to personalize. Supports emojis." style="resize:vertical;min-height:120px"></textarea>
             </div>
@@ -3259,36 +3300,32 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
       <div class="modal-overlay" id="sms-setup-modal">
         <div class="modal" style="max-width:500px">
           <div class="modal-header">
-            <div class="modal-title">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.42 2 2 0 0 1 3.6 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.77a16 16 0 0 0 6.29 6.29l.94-.94a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              Connect Twilio for SMS
-            </div>
-            <button class="modal-close" onclick="document.getElementById('sms-setup-modal').classList.remove('open')">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
+            <div class="modal-title">Connect your SMS account</div>
+            <button class="modal-close" onclick="document.getElementById('sms-setup-modal').classList.remove('open')" aria-label="Close">×</button>
           </div>
-          <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
-            <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px;font-size:13px;color:var(--text2);line-height:1.6">
-              Get your credentials from <a href="https://twilio.com" target="_blank" style="color:var(--accent)">twilio.com</a> — Account SID, Auth Token, and phone number.
+          <div style="padding:4px 0 0;display:flex;flex-direction:column;gap:14px">
+            <div class="form-group" style="margin:0">
+              <label class="form-label" for="sms-provider">Provider</label>
+              <select class="form-input" id="sms-provider" onchange="nxSmsProviderFields()">
+                <option value="taqnyat">Taqnyat (Saudi, about 0.11 SAR per SMS)</option>
+                <option value="twilio">Twilio (international)</option>
+              </select>
             </div>
-            <div class="form-group">
-              <label class="form-label">Account SID</label>
-              <input class="form-input" id="sms-account-sid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
+            <div id="sms-fields-taqnyat" style="display:flex;flex-direction:column;gap:14px">
+              <div style="font-size:12.5px;color:var(--text2);line-height:1.7">In your <a href="https://portal.taqnyat.sa" target="_blank" rel="noopener" style="color:var(--accent)">Taqnyat portal</a>: create an API token (Bearer token) and use a sender name that is already approved on your account.</div>
+              <div class="form-group" style="margin:0"><label class="form-label" for="sms-tq-token">API token</label><input class="form-input" type="password" id="sms-tq-token" autocomplete="off" /></div>
+              <div class="form-group" style="margin:0"><label class="form-label" for="sms-tq-sender">Sender name</label><input class="form-input" id="sms-tq-sender" maxlength="11" placeholder="e.g. MyCompany" autocomplete="off" /></div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Auth Token</label>
-              <input class="form-input" type="password" id="sms-auth-token" placeholder="Your auth token" />
+            <div id="sms-fields-twilio" style="display:none;flex-direction:column;gap:14px">
+              <div class="form-group" style="margin:0"><label class="form-label" for="sms-account-sid">Account SID</label><input class="form-input" id="sms-account-sid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" /></div>
+              <div class="form-group" style="margin:0"><label class="form-label" for="sms-auth-token">Auth Token</label><input class="form-input" type="password" id="sms-auth-token" autocomplete="off" /></div>
+              <div class="form-group" style="margin:0"><label class="form-label" for="sms-from-number">Sender (Twilio number or name)</label><input class="form-input" id="sms-from-number" placeholder="+1xxxxxxxxxx" autocomplete="off" /></div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Twilio Phone Number</label>
-              <input class="form-input" id="sms-from-number" placeholder="+1xxxxxxxxxx" />
-            </div>
+            <div style="font-size:11.5px;color:var(--text2)">Your token is checked and stored on the server. It never stays in the browser.</div>
             <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1" id="sms-disconnect-btn" onclick="nxDisconnect('sms')" hidden>Disconnect</button>
               <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('sms-setup-modal').classList.remove('open')">Cancel</button>
-              <button class="btn btn-primary" style="flex:2" onclick="saveSMSCredentials()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                Save & Connect
-              </button>
+              <button class="btn btn-primary" style="flex:2" id="sms-connect-btn" onclick="saveSMSCredentials()">Check &amp; connect</button>
             </div>
           </div>
         </div>
@@ -3325,13 +3362,11 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
               <input class="form-input" type="password" id="wa-auth-token" placeholder="EAAxxxxxxxxxxxxxx..." />
               <div style="font-size:11px;color:var(--text2);margin-top:4px">From Meta Business Suite → System Users</div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Your WhatsApp Business Number</label>
-              <input class="form-input" id="wa-from-number" placeholder="+966 5X XXX XXXX" />
-            </div>
+            <div style="font-size:11.5px;color:var(--text2)">Checked with Meta and stored on the server. It never stays in the browser.</div>
             <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1" id="wa-disconnect-btn" onclick="nxDisconnect('whatsapp')" hidden>Disconnect</button>
               <button class="btn btn-ghost" style="flex:1" onclick="document.getElementById('wa-setup-modal').classList.remove('open')">Cancel</button>
-              <button class="btn btn-primary" style="flex:2;background:#25d366" onclick="saveWACredentials()">
+              <button class="btn btn-primary" style="flex:2;background:#25d366" id="wa-connect-btn" onclick="saveWACredentials()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                 Save & Connect
               </button>
@@ -4993,7 +5028,7 @@ function checkTrialStatus() {
   if (!overlay) return;
 
   // Super admin always bypasses trial restrictions
-  if (currentUser && currentUser.id === '5f338ea8-b071-445b-97a5-47e7c7c4bfa4') {
+  if (typeof isSuperAdmin !== 'undefined' && isSuperAdmin) {
     overlay.style.display = 'none';
     return;
   }
@@ -6425,7 +6460,7 @@ async function loadReminders() {
   try {
     const today = new Date().toISOString().split('T')[0];
     const r = await fetch(
-      SUPABASE_URL + '/rest/v1/leads?select=id,name,reminder_date,reminder_note&reminder_date=not.is.null&order=reminder_date.asc',
+      SUPABASE_URL + '/rest/v1/leads?select=id,name,reminder_date,reminder_note&reminder_date=not.is.null&order=reminder_date.asc' + (currentOrg ? '&org_id=eq.' + currentOrg.id : ''),
       { headers: HEADERS }
     );
     const data = await r.json();
@@ -7165,7 +7200,7 @@ async function loadCallLogs() {
     : { data: null };
 
   // Fallback: fetch via REST
-  const r = await fetch(SUPABASE_URL + '/rest/v1/call_logs?select=*&order=created_at.desc', { headers: HEADERS });
+  const r = await fetch(SUPABASE_URL + '/rest/v1/call_logs?select=*&order=created_at.desc' + (currentOrg ? '&org_id=eq.' + currentOrg.id : ''), { headers: HEADERS });
   if (!r.ok) {
     // Table might not exist yet — show empty state
     allCalls = [];
@@ -8627,60 +8662,343 @@ async function deleteInvoice(id) {
 // ─── EMAIL CAMPAIGNS ───────────────────────────────────────────
 let isSending = false;
 
-async function getFilteredLeads(filter) {
+// ─── CAMPAIGNS ────────────────────────────────────────────────
+// Email, SMS and WhatsApp-API campaigns are sent by the campaign-send server function:
+// it picks the recipients from the current workspace, holds each workspace's own SMS/WhatsApp
+// account (the browser never sees the token), applies the usage limits, and never sends
+// the same campaign to the same person twice. Older builds kept SMS/WhatsApp tokens in the
+// browser; they are wiped here.
+let smsCredentials = null, waCredentials = null;
+try { ['nexcrm_sms_creds', 'nexcrm_wa_creds', 'nexcrm_wa_camp_creds'].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
+const NX_CS_URL = SUPABASE_URL + '/functions/v1/campaign-send';
+let nxChannels = {}, nxCampHistory = [], _nxCampRunning = false;
+
+async function nxCS(body) {
   try {
-    const url = filter === 'all'
-      ? SUPABASE_URL + '/rest/v1/leads?select=name,company,assigned&order=id.desc'
-      : SUPABASE_URL + '/rest/v1/leads?select=name,company,assigned&status=eq.' + filter + '&order=id.desc';
-    const r = await fetch(url, { headers: HEADERS });
-    const data = await r.json();
-    return r.ok ? (data || []) : [];
-  } catch(e) { return []; }
+    const r = await fetch(NX_CS_URL, { method: 'POST', headers: userFnHeaders(), body: JSON.stringify(body) });
+    let d = {}; try { d = await r.json(); } catch (e) {}
+    return { ok: r.ok, status: r.status, data: d || {} };
+  } catch (e) { return { ok: false, status: 0, data: { error: nxAr() ? 'تعذر الاتصال. تحقق من الإنترنت.' : 'Could not connect. Check your internet.' } }; }
+}
+
+// Used by the "your own SMTP" email route: this workspace only, with email and phone.
+async function getFilteredLeads(filter) {
+  if (!currentOrg) return [];
+  let url = SUPABASE_URL + '/rest/v1/leads?select=id,name,company,assigned,email,phone,source,status&org_id=eq.' + currentOrg.id + '&order=id.desc';
+  if (filter === 'linkedin') url += '&source=ilike.*linkedin*';
+  else if (filter && filter !== 'all' && filter !== 'csv') url += '&status=eq.' + encodeURIComponent(filter);
+  try { const r = await fetch(url, { headers: HEADERS }); const d = await r.json(); return r.ok ? (d || []) : []; } catch (e) { return []; }
+}
+
+// ── Connected accounts and history ──
+async function nxLoadCampaignStatus() {
+  if (!currentOrg) return;
+  const r = await nxCS({ action: 'status', org_id: currentOrg.id });
+  if (!r.ok) return;
+  nxChannels = r.data.connected || {};
+  nxCampHistory = r.data.history || [];
+  nxRenderChannels();
+  nxRenderHistory('email', 'campaign-history');
+  nxRenderHistory('sms', 'sms-history');
+  nxRenderHistory('whatsapp', 'wa-history');
+}
+function loadCampaignHistory() { return nxLoadCampaignStatus(); }
+function loadSMSHistory() { return nxLoadCampaignStatus(); }
+function loadWAHistory() { return nxLoadCampaignStatus(); }
+
+function nxRenderChannels() {
+  const show = function (id, on, disp) { const el = document.getElementById(id); if (el) el.style.display = on ? (disp || 'flex') : 'none'; };
+  const sms = nxChannels.sms, wa = nxChannels.whatsapp;
+  show('sms-connection-banner', !sms); show('sms-connected-banner', !!sms);
+  const sd = document.getElementById('sms-phone-display');
+  if (sd) sd.textContent = sms ? ((sms.provider === 'taqnyat' ? 'Taqnyat' : 'Twilio') + ' · ' + (sms.sender || '')) : '';
+  show('wa-connection-banner', !wa, 'block'); show('wa-connected-banner', !!wa);
+  const wd = document.getElementById('wa-phone-display');
+  if (wd) wd.textContent = wa ? ((wa.name ? wa.name + ' · ' : '') + (wa.sender || '')) : '';
+  const sdb = document.getElementById('sms-disconnect-btn'); if (sdb) sdb.hidden = !sms;
+  const wdb = document.getElementById('wa-disconnect-btn'); if (wdb) wdb.hidden = !wa;
+}
+
+function nxRenderHistory(channel, boxId) {
+  const box = document.getElementById(boxId); if (!box) return;
+  const ar = nxAr();
+  const rows = nxCampHistory.filter(function (c) { return (c.channel || 'email') === channel; });
+  box.textContent = '';
+  if (!rows.length) {
+    const e = document.createElement('div'); e.className = 'nx-hist-empty';
+    e.textContent = ar ? 'لا توجد حملات بعد' : (channel === 'sms' ? 'No SMS campaigns sent yet' : channel === 'whatsapp' ? 'No WhatsApp campaigns sent yet' : 'No campaigns sent yet');
+    box.appendChild(e); return;
+  }
+  const list = document.createElement('div'); list.className = 'nx-hist';
+  rows.forEach(function (c) {
+    const row = document.createElement('div'); row.className = 'nx-hist-row';
+    const g = document.createElement('div'); g.className = 'grow';
+    const b = document.createElement('b'); b.textContent = c.name || '—';
+    const sm = document.createElement('small');
+    const when = c.sent_at ? new Date(c.sent_at).toLocaleDateString(ar ? 'ar-SA' : 'en-GB', { day: 'numeric', month: 'short' }) : '';
+    sm.textContent = (ar ? ('أُرسلت ' + (c.sent_count || 0) + ' من ' + (c.total_count || 0)) : ('Sent ' + (c.sent_count || 0) + ' of ' + (c.total_count || 0))) +
+      (c.failed_count ? (ar ? ' · فشل ' : ' · failed ') + c.failed_count : '') + (when ? ' · ' + when : '');
+    g.appendChild(b); g.appendChild(sm); row.appendChild(g);
+    if (c.status === 'sending' && (c.sent_count || 0) + (c.failed_count || 0) < (c.total_count || 0)) {
+      const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'btn btn-ghost'; btn.style.cssText = 'font-size:12px;padding:6px 12px';
+      btn.textContent = ar ? 'متابعة الإرسال' : 'Resume';
+      btn.onclick = function () { nxDriveCampaign(c.id, { channel: channel, name: c.name, total: c.total_count }); };
+      row.appendChild(btn);
+    }
+    list.appendChild(row);
+  });
+  box.appendChild(list);
+}
+
+// ── Connect / disconnect (workspace admins; checked on the server) ──
+function openSMSSetup() {
+  const sel = document.getElementById('sms-provider');
+  if (sel && nxChannels.sms) sel.value = nxChannels.sms.provider;
+  nxSmsProviderFields();
+  document.getElementById('sms-setup-modal').classList.add('open');
+}
+function nxSmsProviderFields() {
+  const p = (document.getElementById('sms-provider') || {}).value || 'taqnyat';
+  const t = document.getElementById('sms-fields-taqnyat'), w = document.getElementById('sms-fields-twilio');
+  if (t) t.style.display = p === 'taqnyat' ? 'flex' : 'none';
+  if (w) w.style.display = p === 'twilio' ? 'flex' : 'none';
+}
+async function saveSMSCredentials() {
+  if (!currentOrg) return;
+  const v = function (id) { return ((document.getElementById(id) || {}).value || '').trim(); };
+  const provider = v('sms-provider') || 'taqnyat';
+  const credentials = provider === 'taqnyat' ? { token: v('sms-tq-token'), sender: v('sms-tq-sender') } : { sid: v('sms-account-sid'), token: v('sms-auth-token'), sender: v('sms-from-number') };
+  await nxConnect('sms', provider, credentials, 'sms-connect-btn', 'sms-setup-modal', ['sms-tq-token', 'sms-auth-token']);
+}
+function openWASetup() { nxRenderChannels(); document.getElementById('wa-setup-modal').classList.add('open'); }
+async function saveWACredentials() {
+  if (!currentOrg) return;
+  const v = function (id) { return ((document.getElementById(id) || {}).value || '').trim(); };
+  await nxConnect('whatsapp', 'meta', { phone_number_id: v('wa-account-sid'), token: v('wa-auth-token') }, 'wa-connect-btn', 'wa-setup-modal', ['wa-auth-token']);
+}
+async function nxConnect(channel, provider, credentials, btnId, modalId, secretFields) {
+  const ar = nxAr(); const btn = document.getElementById(btnId); const label = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = ar ? 'جاري التحقق…' : 'Checking…'; }
+  const r = await nxCS({ action: 'connect', org_id: currentOrg.id, channel: channel, provider: provider, credentials: credentials });
+  if (btn) { btn.disabled = false; btn.textContent = label; }
+  if (!r.ok || !r.data.success) { showToast('❌ ' + (r.data.error || (ar ? 'تعذر الربط' : 'Could not connect'))); return; }
+  secretFields.forEach(function (id) { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById(modalId).classList.remove('open');
+  showToast(ar ? 'تم الربط' : 'Connected');
+  nxLoadCampaignStatus();
+}
+async function nxDisconnect(channel) {
+  if (!currentOrg || !confirm(nxAr() ? 'فصل هذا الحساب؟' : 'Disconnect this account?')) return;
+  const r = await nxCS({ action: 'disconnect', org_id: currentOrg.id, channel: channel });
+  if (!r.ok) { showToast('❌ ' + (r.data.error || 'Could not disconnect')); return; }
+  document.querySelectorAll('#sms-setup-modal, #wa-setup-modal').forEach(function (m) { m.classList.remove('open'); });
+  nxLoadCampaignStatus();
+}
+
+// ── Sending: preview → confirm → start → batches with progress ──
+const NX_SKIP = {
+  en: { no_phone: 'no phone number', landline: 'landline (cannot get SMS/WhatsApp)', invalid: 'invalid number or email', duplicate: 'duplicates', no_email: 'no email' },
+  ar: { no_phone: 'بدون رقم جوال', landline: 'رقم أرضي (لا يستقبل الرسائل)', invalid: 'رقم أو إيميل غير صالح', duplicate: 'مكرر', no_email: 'بدون إيميل' }
+};
+function nxCampModal() {
+  let ov = document.getElementById('nx-cs');
+  if (!ov) {
+    ov = document.createElement('div'); ov.id = 'nx-cs'; ov.className = 'modal-overlay';
+    ov.innerHTML = '<div class="modal nx-cs-box" role="dialog" aria-modal="true"><div class="modal-header"><div class="modal-title" id="nx-cs-title"></div></div><div id="nx-cs-body"></div><div style="display:flex;gap:10px;margin-top:14px" id="nx-cs-actions"></div></div>';
+    document.body.appendChild(ov);
+  }
+  ov.setAttribute('dir', nxAr() ? 'rtl' : 'ltr');
+  return ov;
+}
+function nxCampButtons(btns) {
+  const box = document.getElementById('nx-cs-actions'); box.textContent = '';
+  btns.forEach(function (b) { const e = document.createElement('button'); e.type = 'button'; e.className = 'btn ' + (b.primary ? 'btn-primary' : 'btn-ghost'); e.style.flex = b.primary ? '2' : '1'; e.textContent = b.label; e.onclick = b.onClick; box.appendChild(e); });
+}
+function nxConfirmSend(o, pv) {
+  const ar = nxAr(); const ov = nxCampModal();
+  document.getElementById('nx-cs-title').textContent = (ar ? 'إرسال: ' : 'Send: ') + o.name;
+  const body = document.getElementById('nx-cs-body'); body.textContent = '';
+  const stats = document.createElement('div'); stats.className = 'nx-cs-stats';
+  [[pv.will_send, ar ? 'سيستلمونها' : 'will receive it'], [pv.total, ar ? 'في هذا الاختيار' : 'in this selection']].forEach(function (x) {
+    const d = document.createElement('div'); d.className = 'nx-cs-stat'; const b = document.createElement('b'); b.textContent = Number(x[0] || 0).toLocaleString(); const sp = document.createElement('span'); sp.textContent = x[1]; d.appendChild(b); d.appendChild(sp); stats.appendChild(d);
+  });
+  body.appendChild(stats);
+  const sk = pv.skipped || {}; const keys = Object.keys(sk).filter(function (k) { return sk[k] > 0; });
+  if (keys.length) {
+    const ul = document.createElement('ul'); ul.className = 'nx-cs-skip';
+    const h = document.createElement('li'); h.textContent = ar ? 'لن تُرسل إلى:' : 'Skipped:'; ul.appendChild(h);
+    keys.forEach(function (k) { const li = document.createElement('li'); li.textContent = '• ' + sk[k].toLocaleString() + ' ' + ((ar ? NX_SKIP.ar : NX_SKIP.en)[k] || k); ul.appendChild(li); });
+    body.appendChild(ul);
+  }
+  if (o.channel !== 'email') {
+    const n = document.createElement('div'); n.style.cssText = 'font-size:12px;color:var(--text2)';
+    n.textContent = ar ? 'تُرسل وتُحسب من حسابك لدى مزود الخدمة.' : 'Sent and billed through your own provider account.';
+    body.appendChild(n);
+  }
+  ov.classList.add('open');
+  return new Promise(function (resolve) {
+    nxCampButtons([
+      { label: ar ? 'إلغاء' : 'Cancel', onClick: function () { ov.classList.remove('open'); resolve(false); } },
+      { label: (ar ? 'إرسال إلى ' : 'Send to ') + Number(pv.will_send || 0).toLocaleString(), primary: true, onClick: function () { resolve(true); } }
+    ]);
+  });
+}
+async function nxRunCampaign(o) {
+  const ar = nxAr();
+  if (_nxCampRunning) { showToast(ar ? 'هناك حملة قيد الإرسال' : 'A campaign is already sending'); return false; }
+  if (!currentOrg) { showToast(ar ? 'اختر مساحة عمل أولاً' : 'Choose a workspace first'); return false; }
+  const base = { org_id: currentOrg.id, channel: o.channel, filter: o.filter || 'all', recipients: o.recipients };
+  const pv = await nxCS(Object.assign({ action: 'preview' }, base));
+  if (!pv.ok) {
+    if (pv.data.need_connect) { if (o.channel === 'sms') openSMSSetup(); else openWASetup(); }
+    showToast('❌ ' + (pv.data.error || (ar ? 'تعذر التجهيز' : 'Could not prepare the campaign'))); return false;
+  }
+  if (!pv.data.will_send) { showToast(ar ? 'لا يوجد من يمكنه استلامها في هذا الاختيار' : 'No one in this selection can receive it'); return false; }
+  if (!(await nxConfirmSend(o, pv.data))) return false;
+  const st = await nxCS(Object.assign({ action: 'start', name: o.name, subject: o.subject, body: o.body, template: o.template }, base));
+  if (!st.ok) { showToast('❌ ' + (st.data.error || 'Could not start')); nxCampModal().classList.remove('open'); return false; }
+  return nxDriveCampaign(st.data.campaign_id, Object.assign({ total: st.data.will_send }, o));
+}
+async function nxDriveCampaign(id, o) {
+  const ar = nxAr(); const ov = nxCampModal();
+  _nxCampRunning = true;
+  document.getElementById('nx-cs-title').textContent = (ar ? 'جاري الإرسال: ' : 'Sending: ') + (o.name || '');
+  const body = document.getElementById('nx-cs-body'); body.textContent = '';
+  const bar = document.createElement('div'); bar.className = 'nx-cs-bar'; const fill = document.createElement('i'); bar.appendChild(fill);
+  const msg = document.createElement('div'); msg.className = 'nx-cs-msg';
+  body.appendChild(bar); body.appendChild(msg);
+  let stop = false;
+  nxCampButtons([{ label: ar ? 'إيقاف مؤقت' : 'Pause', onClick: function () { stop = true; } }]);
+  ov.classList.add('open');
+  const show = function (d) { const total = d.total || o.total || 0, done = (d.sent || 0) + (d.failed || 0); fill.style.width = (total ? Math.round(done * 100 / total) : 0) + '%'; msg.textContent = ar ? ('أُرسلت ' + (d.sent || 0) + ' من ' + total + (d.failed ? ' · فشل ' + d.failed : '')) : ('Sent ' + (d.sent || 0) + ' of ' + total + (d.failed ? ' · ' + d.failed + ' failed' : '')); };
+  let finished = false, last = {};
+  while (!stop) {
+    const r = await nxCS({ action: 'send_batch', campaign_id: id, from_name: o.from_name, reply_to: o.reply_to });
+    last = r.data || {};
+    if (r.data.done) { finished = true; show(r.data); break; }
+    if (r.status === 429 || r.data.paused) {
+      show(r.data);
+      msg.textContent += ' — ' + (r.data.reason === 'ceiling'
+        ? (ar ? 'وصلت للحد اليومي للإرسال. اضغط «متابعة الإرسال» من السجل غداً.' : 'Daily sending limit reached. Press Resume in the history tomorrow.')
+        : nxLimitText(r.data.reason, r.data.tier));
+      break;
+    }
+    if (!r.ok) { msg.textContent = '❌ ' + (r.data.error || 'Error'); break; }
+    show(r.data);
+    if (r.data.batch_sent === 0 && r.data.error_sample) msg.textContent += ' — ' + r.data.error_sample;
+  }
+  _nxCampRunning = false;
+  if (finished) msg.textContent = (ar ? '✅ اكتملت: ' : '✅ Done: ') + msg.textContent;
+  else if (stop) msg.textContent += ar ? ' — متوقفة. يمكنك المتابعة من السجل.' : ' — paused. Resume it from the history.';
+  nxCampButtons([{ label: ar ? 'إغلاق' : 'Close', primary: true, onClick: function () { ov.classList.remove('open'); } }]);
+  nxLoadCampaignStatus();
+  return finished;
+}
+
+// ── Email ──
+async function sendCampaign(confirmed) {
+  if (isSending) return;
+  const ar = nxAr();
+  const val = function (id) { return ((document.getElementById(id) || {}).value || '').trim(); };
+  const name = val('camp-name'), subject = val('camp-subject'), body = val('camp-body'), filter = val('camp-filter') || 'all';
+  const fromName = val('camp-from-name') || FROM_NAME, fromEmail = val('camp-from-email');
+  if (!name) { showToast('❌ ' + (ar ? 'اكتب اسم الحملة' : 'Enter campaign name')); return; }
+  if (!subject) { showToast('❌ ' + (ar ? 'اكتب عنوان الإيميل' : 'Enter email subject')); return; }
+  if (!body) { showToast('❌ ' + (ar ? 'اكتب نص الرسالة' : 'Write your email message')); return; }
+  if (filter === 'csv' && (!_csvContacts || !_csvContacts.length)) { showToast('❌ ' + (ar ? 'ارفع ملف CSV أولاً' : 'Upload a CSV file first')); return; }
+  let savedSmtp = null; try { savedSmtp = JSON.parse(localStorage.getItem('nexcrm_smtp_' + (currentOrg ? currentOrg.id : 'default')) || 'null'); } catch (e) {}
+  isSending = true;
+  let ok = false;
+  try {
+    if (savedSmtp && savedSmtp.host && _smtpConfig && _smtpConfig.pass) ok = await nxSendViaSmtp({ name: name, subject: subject, body: body, filter: filter, fromName: fromName || savedSmtp.user });
+    else ok = await nxRunCampaign({ channel: 'email', name: name, subject: subject, body: body, filter: filter, from_name: fromName, reply_to: fromEmail && fromEmail !== FROM_EMAIL ? fromEmail : '',
+      recipients: filter === 'csv' ? _csvContacts.map(function (c) { return { email: c.email, name: c.name || '' }; }) : undefined });
+  } finally { isSending = false; }
+  if (ok) ['camp-name', 'camp-subject', 'camp-body'].forEach(function (id) { const el = document.getElementById(id); if (el) el.value = ''; });
+}
+// The workspace's own SMTP server (credentials stay in this browser, as before). Same recipient rules.
+async function nxSendViaSmtp(o) {
+  const ar = nxAr();
+  let list = o.filter === 'csv' ? _csvContacts.slice() : await getFilteredLeads(o.filter);
+  const seen = {}; list = list.filter(function (l) { const e = String(l.email || '').trim().toLowerCase(); if (!e || seen[e]) return false; seen[e] = 1; return true; });
+  if (!list.length) { showToast(ar ? 'لا يوجد من لديه إيميل في هذا الاختيار' : 'No one in this selection has an email'); return false; }
+  if (!confirm((ar ? 'إرسال «' + o.name + '» إلى ' : 'Send "' + o.name + '" to ') + list.length + (ar ? ' شخص من بريدك؟' : ' people from your own email?'))) return false;
+  let sent = 0, failed = 0, err = '';
+  for (let i = 0; i < list.length; i += 50) {
+    const r = await fetch(SUPABASE_URL + '/functions/v1/send-email', { method: 'POST', headers: userFnHeaders(), body: JSON.stringify({
+      action: 'send', smtp: { host: _smtpConfig.host, port: _smtpConfig.port, user: _smtpConfig.user, pass: _smtpConfig.pass },
+      fromName: o.fromName, leads: list.slice(i, i + 50).map(function (l) { return { email: l.email, name: l.name || '' }; }), subject: o.subject, html: o.body }) });
+    const d = await r.json().catch(function () { return {}; });
+    if (r.status === 429) { err = nxLimitText(d.reason, d.tier); break; }
+    if (!r.ok || d.error) { failed += Math.min(50, list.length - i); err = d.error || ''; break; }
+    sent += d.sent || 0; failed += d.failed || 0;
+  }
+  try { await fetch(SUPABASE_URL + '/rest/v1/campaigns', { method: 'POST', headers: HEADERS, body: JSON.stringify({ name: o.name, subject: o.subject, body: o.body, filter: o.filter, sent_count: sent, failed_count: failed, total_count: list.length, user_id: currentUser ? currentUser.id : null, org_id: currentOrg ? currentOrg.id : null, channel: 'email', status: 'done', sent_at: new Date().toISOString() }) }); } catch (e) {}
+  showToast((sent ? '✅ ' : '❌ ') + (ar ? ('أُرسلت ' + sent + '، فشل ' + failed) : (sent + ' sent, ' + failed + ' failed')) + (err ? ' — ' + err : ''));
+  nxLoadCampaignStatus();
+  return sent > 0;
+}
+
+// ── SMS ──
+async function sendSMSCampaign() {
+  const ar = nxAr(); const val = function (id) { return ((document.getElementById(id) || {}).value || '').trim(); };
+  const name = val('sms-name'), body = val('sms-body'), filter = val('sms-filter') || 'all';
+  if (!name) { showToast(ar ? 'اكتب اسم الحملة' : 'Enter campaign name'); return; }
+  if (!body) { showToast(ar ? 'اكتب نص الرسالة' : 'Write your SMS message'); return; }
+  if (!nxChannels.sms) { showToast(ar ? 'اربط حساب الرسائل أولاً' : 'Connect your SMS account first'); openSMSSetup(); return; }
+  if (await nxRunCampaign({ channel: 'sms', name: name, body: body, filter: filter })) ['sms-name', 'sms-body'].forEach(function (id) { document.getElementById(id).value = ''; });
+}
+
+// ── WhatsApp ──
+function nxWaModeValue() { const r = document.querySelector('input[name="wa-mode"]:checked'); return r ? r.value : 'app'; }
+function nxWaMode() {
+  const api = nxWaModeValue() === 'api';
+  const f = document.getElementById('wa-api-fields'), b = document.getElementById('wa-body-group');
+  if (f) f.style.display = api ? 'block' : 'none';
+  if (b) b.style.display = api ? 'none' : 'block';
+}
+async function sendWACampaign() {
+  const ar = nxAr(); const val = function (id) { return ((document.getElementById(id) || {}).value || '').trim(); };
+  const name = val('wa-camp-name'), filter = val('wa-filter') || 'all';
+  if (!name) { showToast(ar ? 'اكتب اسم الحملة' : 'Enter campaign name'); return; }
+  if (nxWaModeValue() === 'app') { const body = val('wa-body'); if (!body) { showToast(ar ? 'اكتب نص الرسالة' : 'Write your WhatsApp message'); return; } return nxWaQueue(name, body, filter); }
+  if (!nxChannels.whatsapp) { showToast(ar ? 'اربط واتساب للأعمال أولاً' : 'Connect the WhatsApp Business API first'); openWASetup(); return; }
+  const tpl = { name: val('wa-tpl-name').toLowerCase(), lang: val('wa-tpl-lang') || 'ar', useName: !!(document.getElementById('wa-tpl-name-var') || {}).checked };
+  if (!/^[a-z0-9_]+$/.test(tpl.name)) { showToast(ar ? 'اكتب اسم القالب المعتمد كما هو في Meta' : 'Enter the approved template name exactly as in Meta'); return; }
+  await nxRunCampaign({ channel: 'whatsapp', name: name, filter: filter, template: tpl });
+}
+// Without the API: open each chat in WhatsApp with the message already typed, one after another.
+function nxWaQueue(name, body, filter) {
+  const ar = nxAr(); const seen = {};
+  const q = (leads || []).filter(function (l) { return filter === 'all' || (l.status || 'New') === filter; }).map(function (l) { return { name: l.name || '', num: waNumber(nxPhoneOf(l)) }; })
+    .filter(function (x) { if (!x.num || x.num.length < 11 || seen[x.num]) return false; seen[x.num] = 1; return true; });
+  if (!q.length) { showToast(ar ? 'لا يوجد أرقام جوال في هذا الاختيار' : 'No phone numbers in this selection'); return; }
+  const ov = nxCampModal(); let i = 0, opened = 0;
+  const step = function () {
+    document.getElementById('nx-cs-title').textContent = name + ' — ' + (i + 1) + (ar ? ' من ' : ' of ') + q.length;
+    const box = document.getElementById('nx-cs-body'); box.textContent = '';
+    if (i >= q.length) {
+      const d = document.createElement('div'); d.className = 'nx-cs-msg'; d.textContent = (ar ? '✅ انتهت القائمة. فُتحت ' : '✅ List finished. Opened ') + opened + (ar ? ' محادثة.' : ' chats.');
+      box.appendChild(d); document.getElementById('nx-cs-title').textContent = name;
+      nxCampButtons([{ label: ar ? 'إغلاق' : 'Close', primary: true, onClick: function () { ov.classList.remove('open'); } }]); return;
+    }
+    const x = q[i], text = body.replace(/\{name\}/g, x.name || (ar ? 'عميلنا العزيز' : 'there'));
+    const nm = document.createElement('div'); nm.className = 'nx-wa-q-name'; nm.textContent = x.name || '—';
+    const nu = document.createElement('div'); nu.className = 'nx-wa-q-num'; nu.textContent = '+' + x.num;
+    const m = document.createElement('div'); m.className = 'nx-wa-q-msg'; m.textContent = text;
+    const bar = document.createElement('div'); bar.className = 'nx-cs-bar'; const f = document.createElement('i'); f.style.width = Math.round(i * 100 / q.length) + '%'; bar.appendChild(f);
+    [nm, nu, m, bar].forEach(function (e) { box.appendChild(e); });
+    nxCampButtons([
+      { label: ar ? 'إيقاف' : 'Stop', onClick: function () { i = q.length; step(); } },
+      { label: ar ? 'تخطي' : 'Skip', onClick: function () { i++; step(); } },
+      { label: ar ? 'فتح واتساب' : 'Open WhatsApp', primary: true, onClick: function () { window.open('https://wa.me/' + x.num + '?text=' + encodeURIComponent(text), '_blank'); opened++; i++; step(); } }
+    ]);
+  };
+  ov.setAttribute('dir', ar ? 'rtl' : 'ltr'); ov.classList.add('open'); step();
 }
 
 // ─── CAMPAIGN TAB SWITCHER ─────────────────────────────────────
 let currentCampTab = 'email';
-
-
-// ─── SMS CREDENTIALS ──────────────────────────────────────────
-let smsCredentials = null;
-
-function checkSMSConnection() {
-  const stored = localStorage.getItem('nexcrm_sms_creds');
-  if(stored) {
-    smsCredentials = JSON.parse(stored);
-    document.getElementById('sms-connection-banner').style.display = 'none';
-    const connBanner = document.getElementById('sms-connected-banner');
-    connBanner.style.display = 'flex';
-    document.getElementById('sms-phone-display').textContent = smsCredentials.fromNumber;
-  }
-}
-
-
-
-
-
-
-
-// ─── WHATSAPP CREDENTIALS ─────────────────────────────────────
-let waCredentials = null;
-
-function checkWAConnection() {
-  const stored = localStorage.getItem('nexcrm_wa_camp_creds');
-  if(stored) {
-    waCredentials = JSON.parse(stored);
-    document.getElementById('wa-connection-banner').style.display = 'none';
-    const connBanner = document.getElementById('wa-connected-banner');
-    connBanner.style.display = 'flex';
-    document.getElementById('wa-phone-display').textContent = waCredentials.fromNumber;
-  }
-}
-
-
-
-
-
-
 
 
 // ─── CSV/SMTP CAMPAIGN FUNCTIONS ──────────────────────────────
@@ -8827,134 +9145,6 @@ async function importCsvToLeads() {
   showToast(imported + ' contacts added to CRM!');
 }
 
-async function sendCampaign(confirmed = false) {
-  if(isSending) return;
-  const campFromName = document.getElementById('camp-from-name')?.value.trim() || FROM_NAME;
-  const campFromEmail = document.getElementById('camp-from-email')?.value.trim() || FROM_EMAIL;
-  const name = document.getElementById('camp-name').value.trim();
-  const subject = document.getElementById('camp-subject').value.trim();
-  const body = document.getElementById('camp-body').value.trim();
-  const filter = document.getElementById('camp-filter').value;
-
-  if(!name) { showToast('❌ Enter campaign name'); return; }
-  if(!subject) { showToast('❌ Enter email subject'); return; }
-  if(!body) { showToast('❌ Write your email message'); return; }
-
-  // Get leads to send to — handle CSV mode
-  let targetLeads;
-  if(filter === 'csv') {
-    if(!_csvContacts || !_csvContacts.length) { showToast('❌ Upload a CSV file first'); return; }
-    targetLeads = _csvContacts;
-  } else if(filter === 'linkedin') {
-    const all = await getFilteredLeads('all');
-    targetLeads = all.filter(l => (l.source||'').toLowerCase().includes('linkedin'));
-  } else {
-    targetLeads = await getFilteredLeads(filter);
-  }
-  if(!targetLeads.length) { showToast('❌ No contacts found for this selection'); return; }
-
-  // Get leads with emails from contacts table
-  const leadsWithEmails = targetLeads.filter(l => l.email);
-
-  // Since leads may not have emails, we send to what we have
-  // For demo, we'll show count and send
-  if(!confirmed) {
-    const filterLabel = document.getElementById('camp-filter').options[document.getElementById('camp-filter').selectedIndex].text;
-    if(!confirm(`Send "${name}" to ${targetLeads.length} leads (${filterLabel})?
-
-Note: Only leads with email addresses will receive the email.`)) return;
-  }
-
-  isSending = true;
-  const btn = document.querySelector('#page-campaigns .btn-primary');
-  const originalText = btn.textContent;
-  btn.textContent = '⏳ Sending...';
-  btn.disabled = true;
-
-  let sent = 0;
-  let failed = 0;
-
-  // Send emails — use SMTP edge function if configured, fallback to Resend
-  const smtpKey = 'nexcrm_smtp_' + (currentOrg?.id || 'default');
-  let savedSmtp = null;
-  try { savedSmtp = JSON.parse(localStorage.getItem(smtpKey) || 'null'); } catch(e) {}
-
-  if(savedSmtp && savedSmtp.host && _smtpConfig && _smtpConfig.pass) {
-    // ── Send via SMTP edge function ──
-    showToast('Sending via ' + savedSmtp.user + '...');
-    try {
-      const smtpLeads = targetLeads.filter(l => l.email);
-      const r = await fetch(SUPABASE_URL + '/functions/v1/send-email', {
-        method: 'POST',
-        headers: userFnHeaders(),
-        body: JSON.stringify({
-          action: 'send',
-          smtp: { host: _smtpConfig.host, port: _smtpConfig.port, user: _smtpConfig.user, pass: _smtpConfig.pass },
-          fromName: campFromName || savedSmtp.user,
-          leads: smtpLeads,
-          subject: subject,
-          html: body
-        })
-      });
-      const result = await r.json();
-      sent = result.sent || 0;
-      failed = result.failed || 0;
-    } catch(e) {
-      failed = targetLeads.filter(l => l.email).length;
-    }
-  } else {
-    // ── Default: send through NexCRM (server-side, batches of 100) ──
-    const recipients = targetLeads.filter(l => l.email).map(l => ({ email: l.email, name: l.name || '' }));
-    for(let i = 0; i < recipients.length; i += 100) {
-      const batch = recipients.slice(i, i + 100);
-      try {
-        const r = await fetch(SUPABASE_URL + '/functions/v1/send-org-email', {
-          method: 'POST',
-          headers: userFnHeaders(),
-          body: JSON.stringify({
-            action: 'campaign',
-            org_id: currentOrg?.id,
-            from_name: campFromName || FROM_NAME,
-            reply_to: campFromEmail && campFromEmail !== FROM_EMAIL ? campFromEmail : '',
-            subject: subject,
-            body: body,
-            recipients: batch
-          })
-        });
-        const res = await r.json().catch(() => ({}));
-        if(r.ok) { sent += res.sent || 0; failed += res.failed || 0; }
-        else { failed += batch.length; if(res.error) showToast('❌ ' + res.error); }
-      } catch(e) { failed += batch.length; }
-    }
-  }
-
-  // Save campaign to Supabase
-  await fetch(SUPABASE_URL + '/rest/v1/campaigns', {
-    method: 'POST',
-    headers: HEADERS,
-    body: JSON.stringify({
-      name, subject, body, filter,
-      sent_count: sent,
-      total_count: targetLeads.length,
-      user_id: currentUser ? currentUser.id : null,
-      sent_at: new Date().toISOString()
-    })
-  });
-
-  isSending = false;
-  btn.textContent = originalText;
-  btn.disabled = false;
-
-  if(targetLeads.filter(l => l.email).length === 0) {
-    showToast('⚠️ Campaign saved! Add emails to leads to send emails.');
-  } else {
-    showToast(`✅ Campaign sent! ${sent} delivered, ${failed} failed.`);
-  }
-
-  // Clear form
-  ['camp-name','camp-subject','camp-body'].forEach(id => document.getElementById(id).value = '');
-  loadCampaignHistory();
-}
 
 
 // Load campaign history when campaigns page opens
@@ -9112,6 +9302,7 @@ async function checkAdminStatus() {
       isAdmin = true;
       canAssignLeads = true; // platform super-admin
       isSuperAdmin = true;
+      try { checkTrialStatus(); } catch (e) {}
       document.getElementById('admin-nav-item').style.display = 'flex';
       setTimeout(() => { try { loadLeadCredits(); } catch(e) {} }, 0);
       // Admin loads all orgs
@@ -11345,29 +11536,8 @@ function updateSMSCount(el) {
 // ═══════════════════════════════════════════════════════
 // SMS CREDENTIALS
 // ═══════════════════════════════════════════════════════
-// smsCredentials declared above
-try { smsCredentials = JSON.parse(localStorage.getItem('nexcrm_sms_creds')); } catch(e) {}
 
-function openSMSSetup() {
-  document.getElementById('sms-setup-modal').classList.add('open');
-}
 
-function saveSMSCredentials() {
-  var sid = document.getElementById('sms-account-sid').value.trim();
-  var token = document.getElementById('sms-auth-token').value.trim();
-  var from = document.getElementById('sms-from-number').value.trim();
-  if(!sid || !token || !from) { showToast('Fill in all fields'); return; }
-  smsCredentials = { sid: sid, token: token, from: from };
-  localStorage.setItem('nexcrm_sms_creds', JSON.stringify(smsCredentials));
-  document.getElementById('sms-setup-modal').classList.remove('open');
-  var banner = document.getElementById('sms-connection-banner');
-  var connected = document.getElementById('sms-connected-banner');
-  var display = document.getElementById('sms-phone-display');
-  if(banner) banner.style.display = 'none';
-  if(connected) { connected.style.display = 'flex'; }
-  if(display) display.textContent = from;
-  showToast('SMS connected!');
-}
 
 function previewSMS() {
   var body = document.getElementById('sms-body').value.trim();
@@ -11382,74 +11552,13 @@ function previewSMS() {
   document.getElementById('preview-modal').classList.add('open');
 }
 
-async function sendSMSCampaign(confirmed) {
-  if(!smsCredentials) { showToast('Connect Twilio first'); openSMSSetup(); return; }
-  var name = document.getElementById('sms-name').value.trim();
-  var body = document.getElementById('sms-body').value.trim();
-  var filter = document.getElementById('sms-filter').value;
-  if(!name) { showToast('Enter campaign name'); return; }
-  if(!body) { showToast('Write your SMS message'); return; }
 
-  var targetLeads = await getFilteredLeads(filter);
-  var leadsWithPhone = targetLeads.filter(function(l) { return l.phone; });
-  if(!leadsWithPhone.length) { showToast('No leads with phone numbers found'); return; }
-  if(!confirmed && !confirm('Send SMS to ' + leadsWithPhone.length + ' leads with phone numbers?')) return;
-
-  var btn = document.querySelector('#camp-pane-sms .btn-primary');
-  if(btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
-
-  var sent = 0, failed = 0;
-  for(var i = 0; i < leadsWithPhone.length; i++) {
-    var lead = leadsWithPhone[i];
-    var msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
-    try {
-      var r = await fetch('https://api.twilio.com/2010-04-01/Accounts/' + smsCredentials.sid + '/Messages.json', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Basic ' + btoa(smsCredentials.sid + ':' + smsCredentials.token),
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'To=' + encodeURIComponent(lead.phone) + '&From=' + encodeURIComponent(smsCredentials.from) + '&Body=' + encodeURIComponent(msg)
-      });
-      if(r.ok) sent++; else failed++;
-    } catch(e) { failed++; }
-  }
-  if(btn) { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send SMS'; btn.disabled = false; }
-  showToast('SMS sent! ' + sent + ' delivered, ' + failed + ' failed.');
-  loadSMSHistory();
-}
-
-function loadSMSHistory() {
-  var el = document.getElementById('sms-history');
-  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No SMS campaigns sent yet</div>';
-}
 
 // ═══════════════════════════════════════════════════════
 // WHATSAPP CREDENTIALS
 // ═══════════════════════════════════════════════════════
-// waCredentials declared above
-try { waCredentials = JSON.parse(localStorage.getItem('nexcrm_wa_creds')); } catch(e) {}
 
-function openWASetup() {
-  document.getElementById('wa-setup-modal').classList.add('open');
-}
 
-function saveWACredentials() {
-  var phoneId = document.getElementById('wa-account-sid').value.trim();
-  var token = document.getElementById('wa-auth-token').value.trim();
-  var from = document.getElementById('wa-from-number').value.trim();
-  if(!phoneId || !token || !from) { showToast('Fill in all fields'); return; }
-  waCredentials = { phoneId: phoneId, token: token, from: from };
-  localStorage.setItem('nexcrm_wa_creds', JSON.stringify(waCredentials));
-  document.getElementById('wa-setup-modal').classList.remove('open');
-  var banner = document.getElementById('wa-connection-banner');
-  var connected = document.getElementById('wa-connected-banner');
-  var display = document.getElementById('wa-phone-display');
-  if(banner) banner.style.display = 'none';
-  if(connected) connected.style.display = 'flex';
-  if(display) display.textContent = from;
-  showToast('WhatsApp connected!');
-}
 
 function previewWA() {
   var body = document.getElementById('wa-body').value.trim();
@@ -11462,44 +11571,7 @@ function previewWA() {
   document.getElementById('preview-modal').classList.add('open');
 }
 
-async function sendWACampaign(confirmed) {
-  if(!waCredentials) { showToast('Connect WhatsApp first'); openWASetup(); return; }
-  var name = document.getElementById('wa-camp-name').value.trim();
-  var body = document.getElementById('wa-body').value.trim();
-  var filter = document.getElementById('wa-filter').value;
-  if(!name) { showToast('Enter campaign name'); return; }
-  if(!body) { showToast('Write your WhatsApp message'); return; }
 
-  var targetLeads = await getFilteredLeads(filter);
-  var leadsWithPhone = targetLeads.filter(function(l) { return l.phone; });
-  if(!leadsWithPhone.length) { showToast('No leads with phone numbers found'); return; }
-  if(!confirmed && !confirm('Send WhatsApp to ' + leadsWithPhone.length + ' leads?')) return;
-
-  var btn = document.querySelector('#camp-pane-whatsapp .btn-primary');
-  if(btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
-
-  var sent = 0, failed = 0;
-  for(var i = 0; i < leadsWithPhone.length; i++) {
-    var lead = leadsWithPhone[i];
-    var msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
-    try {
-      var r = await fetch('https://graph.facebook.com/v18.0/' + waCredentials.phoneId + '/messages', {
-        method: 'POST',
-        headers: { 'Authorization': 'Bearer ' + waCredentials.token, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messaging_product: 'whatsapp', to: lead.phone.replace(/\s/g,''), type: 'text', text: { body: msg } })
-      });
-      if(r.ok) sent++; else failed++;
-    } catch(e) { failed++; }
-  }
-  if(btn) { btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg> Send WhatsApp'; btn.disabled = false; }
-  showToast('WhatsApp sent! ' + sent + ' delivered, ' + failed + ' failed.');
-  loadWAHistory();
-}
-
-function loadWAHistory() {
-  var el = document.getElementById('wa-history');
-  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No WhatsApp campaigns sent yet</div>';
-}
 
 function closePreview() {
   document.getElementById('preview-modal').classList.remove('open');
@@ -11525,30 +11597,7 @@ function previewCampaign() {
   document.getElementById('preview-modal').classList.add('open');
 }
 
-function loadCampaignHistory() {
-  var el = document.getElementById('campaign-history');
-  if(el) el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>';
-}
 
-// Init SMS/WA connection state on load
-document.addEventListener('DOMContentLoaded', function() {
-  if(smsCredentials) {
-    var b = document.getElementById('sms-connection-banner');
-    var c = document.getElementById('sms-connected-banner');
-    var d = document.getElementById('sms-phone-display');
-    if(b) b.style.display = 'none';
-    if(c) c.style.display = 'flex';
-    if(d) d.textContent = smsCredentials.from;
-  }
-  if(waCredentials) {
-    var b2 = document.getElementById('wa-connection-banner');
-    var c2 = document.getElementById('wa-connected-banner');
-    var d2 = document.getElementById('wa-phone-display');
-    if(b2) b2.style.display = 'none';
-    if(c2) c2.style.display = 'flex';
-    if(d2) d2.textContent = waCredentials.from;
-  }
-});
 
 // ═══════════════════════════════════════════════════════
 // AI CAMPAIGN IDEAS GENERATOR
@@ -14323,9 +14372,6 @@ function renderAIReplyResult(text) {
   `;
 }
 
-function escapeHtml(text) {
-  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
 
 function copyAIReply(btn, text) {
   navigator.clipboard.writeText(text).then(() => {
