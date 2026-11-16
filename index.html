@@ -1739,6 +1739,12 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
   .nx-cs-stat b { display:block; font-size:24px; font-weight:800; color:var(--text); line-height:1.2; }
   .nx-cs-stat span { font-size:12px; color:var(--text2); }
   .nx-cs-skip { font-size:12.5px; color:var(--text2); line-height:1.8; margin:0 0 12px; padding:0; list-style:none; }
+  .nx-tq-steps { margin:0; padding-left:18px; font-size:12.5px; color:var(--text2); line-height:1.7; display:flex; flex-direction:column; gap:4px; }
+  .nx-sm-body { display:flex; flex-direction:column; gap:14px; padding-top:4px; }
+  .nx-sm-bal { font-size:13px; color:var(--text2); }
+  .nx-sm-bal b { color:var(--text); font-size:15px; }
+  .nx-sm-note { font-size:11.5px; color:var(--text2); line-height:1.6; }
+  .nx-sm-err { font-size:12px; color:var(--danger, #ef4444); }
   .nx-cs-bar { height:8px; border-radius:99px; background:var(--bg3); overflow:hidden; margin:14px 0 8px; }
   .nx-cs-bar > i { display:block; height:100%; width:0; background:var(--accent); transition:width .3s ease; }
   .nx-cs-msg { font-size:13px; color:var(--text); min-height:20px; }
@@ -3132,8 +3138,8 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
               <button onclick="openSMSSetup()" style="background:var(--accent);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit">Connect</button>
             </div>
             <div id="sms-connected-banner" style="display:none;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--success)">
-              Connected: <span id="sms-phone-display"></span>
-              <button onclick="openSMSSetup()" style="background:none;border:none;color:var(--text2);font-size:11px;cursor:pointer;margin-left:8px;font-family:inherit">Change</button>
+              Connected: <span id="sms-phone-display"></span> <span id="sms-balance-display" style="color:var(--text2)"></span>
+              <button onclick="nxOpenSmsManage()" style="background:none;border:none;color:var(--accent);font-size:11.5px;font-weight:700;cursor:pointer;margin-left:8px;font-family:inherit">Manage</button>
             </div>
             <div class="form-group">
               <label class="form-label">Campaign Name</label>
@@ -3158,6 +3164,7 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
             <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
               SMS has <b style="color:var(--success)">98% open rate</b> vs 20% for email. Keep it short and clear.
+              <div style="margin-top:6px">From 2027, Saudi networks only deliver SMS that match a template approved for your sender name. Register your wording in Taqnyat (<b>Manage SMS → Message Templates</b>) and send it exactly as approved.</div>
             </div>
             <div style="display:flex;gap:10px">
               <button class="btn btn-ghost" style="flex:1" onclick="previewSMS()">
@@ -3312,9 +3319,13 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
               </select>
             </div>
             <div id="sms-fields-taqnyat" style="display:flex;flex-direction:column;gap:14px">
-              <div style="font-size:12.5px;color:var(--text2);line-height:1.7">In your <a href="https://portal.taqnyat.sa" target="_blank" rel="noopener" style="color:var(--accent)">Taqnyat portal</a>: create an API token (Bearer token) and use a sender name that is already approved on your account.</div>
+              <ol class="nx-tq-steps">
+                <li>In the <a href="https://portal.taqnyat.sa" target="_blank" rel="noopener" style="color:var(--accent)">Taqnyat portal</a> go to <b>Developers → Applications</b>, add an app with <b>SMS</b> on, and copy its token.</li>
+                <li>Go to <b>Developers → Security</b> and switch NexCRM's address <b id="nx-tq-ip">…</b> to <b>authorized</b> (Taqnyat sends you a code to confirm).</li>
+                <li>Paste the token below. Leave the sender as <b>Taqnyat.sa</b> to test; once Taqnyat approves your own sender name, pick it under <b>Manage</b>.</li>
+              </ol>
               <div class="form-group" style="margin:0"><label class="form-label" for="sms-tq-token">API token</label><input class="form-input" type="password" id="sms-tq-token" autocomplete="new-password" /></div>
-              <div class="form-group" style="margin:0"><label class="form-label" for="sms-tq-sender">Sender name</label><input class="form-input" id="sms-tq-sender" maxlength="11" placeholder="e.g. MyCompany" autocomplete="off" /></div>
+              <div class="form-group" style="margin:0"><label class="form-label" for="sms-tq-sender">Sender name</label><input class="form-input" id="sms-tq-sender" maxlength="11" placeholder="Taqnyat.sa" autocomplete="off" /></div>
             </div>
             <div id="sms-fields-twilio" style="display:none;flex-direction:column;gap:14px">
               <div class="form-group" style="margin:0"><label class="form-label" for="sms-account-sid">Account SID</label><input class="form-input" id="sms-account-sid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off" /></div>
@@ -8758,7 +8769,83 @@ function openSMSSetup() {
   const sel = document.getElementById('sms-provider');
   if (sel && nxChannels.sms) sel.value = nxChannels.sms.provider;
   nxSmsProviderFields();
+  document.querySelectorAll('.nx-sm-overlay').forEach(function (m) { m.remove(); });
   document.getElementById('sms-setup-modal').classList.add('open');
+  const ipEl = document.getElementById('nx-tq-ip');
+  if (ipEl && currentOrg && !ipEl.dataset.ip) {
+    nxCS({ action: 'server_ip', org_id: currentOrg.id }).then(function (r) {
+      if (r.ok && r.data.ip) { ipEl.textContent = r.data.ip; ipEl.dataset.ip = r.data.ip; } else ipEl.textContent = nxAr() ? '(تظهر في رسالة الخطأ)' : '(shown in the error if blocked)';
+    });
+  }
+}
+
+// ── Manage the connected SMS account: sender, balance, test message ──
+async function nxOpenSmsManage() {
+  if (!currentOrg || !nxChannels.sms) { openSMSSetup(); return; }
+  const ar = nxAr(), ch = nxChannels.sms;
+  document.querySelectorAll('.nx-sm-overlay').forEach(function (m) { m.remove(); });
+  const ov = document.createElement('div'); ov.className = 'modal-overlay nx-sm-overlay open';
+  const md = document.createElement('div'); md.className = 'modal'; md.style.maxWidth = '480px'; ov.appendChild(md);
+  const head = document.createElement('div'); head.className = 'modal-header';
+  const title = document.createElement('div'); title.className = 'modal-title'; title.textContent = ar ? 'حساب الرسائل' : 'SMS account';
+  const x = document.createElement('button'); x.className = 'modal-close'; x.setAttribute('aria-label', 'Close'); x.textContent = '×'; x.onclick = function () { ov.remove(); };
+  head.appendChild(title); head.appendChild(x); md.appendChild(head);
+  const body = document.createElement('div'); body.className = 'nx-sm-body'; md.appendChild(body);
+  const el = function (tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const field = function (label, input) { const g = el('div', 'form-group'); g.style.margin = '0'; const l = el('label', 'form-label', label); g.appendChild(l); g.appendChild(input); return g; };
+
+  const bal = el('div', 'nx-sm-bal', ar ? 'جاري التحميل…' : 'Loading…'); body.appendChild(bal);
+  const sel = el('select', 'form-input'); const senderGroup = field(ar ? 'اسم المرسل' : 'Sender name', sel); body.appendChild(senderGroup);
+  const sNote = el('div', 'nx-sm-note'); body.appendChild(sNote);
+  const err = el('div', 'nx-sm-err'); body.appendChild(err);
+  const to = el('input', 'form-input'); to.type = 'tel'; to.placeholder = '05xxxxxxxx'; to.autocomplete = 'off';
+  const msg = el('textarea', 'form-input'); msg.rows = 2; msg.maxLength = 1000;
+  msg.value = 'test sms from Taqnyat.sa, for testing internal sms service';
+  body.appendChild(field(ar ? 'إرسال رسالة تجريبية إلى' : 'Send a test to', to));
+  body.appendChild(field(ar ? 'نص الرسالة التجريبية' : 'Test message', msg));
+  const tNote = el('div', 'nx-sm-note', ar ? 'المرسل التجريبي Taqnyat.sa يرسل نصاً ثابتاً من تقنيات. بعد اعتماد اسمك، اكتب نص قالب معتمد.' : 'The Taqnyat.sa test sender always delivers Taqnyat\u2019s fixed test text. With your own sender, use the wording of an approved template.');
+  body.appendChild(tNote);
+  const btns = el('div'); btns.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap';
+  const bChange = el('button', 'btn btn-ghost', ar ? 'تغيير الحساب' : 'Change account'); bChange.style.flex = '1'; bChange.onclick = function () { ov.remove(); openSMSSetup(); };
+  const bTest = el('button', 'btn btn-primary', ar ? 'إرسال تجربة' : 'Send test'); bTest.style.flex = '2';
+  btns.appendChild(bChange); btns.appendChild(bTest); body.appendChild(btns);
+  document.body.appendChild(ov);
+
+  const opt = function (v, label) { const o = document.createElement('option'); o.value = v; o.textContent = label; return o; };
+  const r = await nxCS({ action: 'sms_account', org_id: currentOrg.id });
+  if (!r.ok) { bal.textContent = ''; err.textContent = r.data.error || (ar ? 'تعذر تحميل الحساب' : 'Could not load the account'); }
+  const d = r.ok ? r.data : { provider: ch.provider, sender: ch.sender, senders: [] };
+  if (r.ok) bal.innerHTML = '';
+  if (r.ok && d.balance != null) { bal.appendChild(document.createTextNode(ar ? 'الرصيد: ' : 'Balance: ')); bal.appendChild(el('b', null, d.balance + ' ' + (d.currency || 'SAR'))); nxShowSmsBalance(d.balance, d.currency); }
+  else if (r.ok) bal.textContent = d.provider === 'twilio' ? 'Twilio' : '';
+  const names = [];
+  if (d.provider === 'taqnyat') {
+    (d.senders || []).forEach(function (x) { names.push(x.name); sel.appendChild(opt(x.name, x.name + (x.status && x.status !== 'active' ? ' (' + x.status + ')' : '') + (x.destination ? ' · ' + x.destination : ''))); if (x.status && x.status !== 'active') sel.lastChild.disabled = true; });
+    if (names.indexOf(d.test_sender || 'Taqnyat.sa') < 0) sel.appendChild(opt(d.test_sender || 'Taqnyat.sa', (d.test_sender || 'Taqnyat.sa') + (ar ? ' (تجريبي)' : ' (test sender)')));
+    sNote.textContent = (d.senders || []).length ? '' : (ar ? 'لا يوجد اسم مرسل معتمد بعد. سجّل اسمك في تقنيات (يتطلب سجلاً تجارياً)، وسيظهر هنا بعد اعتماده.' : 'No approved sender name yet. Register yours in Taqnyat (it needs a commercial registration); it appears here once approved.');
+  } else sel.appendChild(opt(d.sender || '', d.sender || ''));
+  sel.value = d.sender || ch.sender || '';
+  sel.onchange = async function () {
+    err.textContent = ''; sel.disabled = true;
+    const s2 = await nxCS({ action: 'set_sender', org_id: currentOrg.id, sender: sel.value });
+    sel.disabled = false;
+    if (!s2.ok || !s2.data.success) { err.textContent = s2.data.error || 'Error'; sel.value = (nxChannels.sms || {}).sender || ''; return; }
+    showToast(ar ? 'تم تغيير المرسل' : 'Sender updated'); nxLoadCampaignStatus();
+  };
+  bTest.onclick = async function () {
+    err.textContent = '';
+    if (!to.value.trim()) { err.textContent = ar ? 'أدخل رقم الجوال' : 'Enter a mobile number'; to.focus(); return; }
+    const label = bTest.textContent; bTest.disabled = true; bTest.textContent = ar ? 'جاري الإرسال…' : 'Sending…';
+    const t = await nxCS({ action: 'test_send', org_id: currentOrg.id, to: to.value.trim(), body: msg.value });
+    bTest.disabled = false; bTest.textContent = label;
+    if (t.status === 429) { err.textContent = nxLimitText(t.data.reason, t.data.tier); return; }
+    if (!t.ok || !t.data.success) { err.textContent = t.data.error || 'Error'; return; }
+    showToast(ar ? 'أُرسلت الرسالة التجريبية' : 'Test sent');
+  };
+}
+function nxShowSmsBalance(balance, currency) {
+  const b = document.getElementById('sms-balance-display');
+  if (b) b.textContent = balance != null ? '· ' + (nxAr() ? 'الرصيد ' : 'Balance ') + balance + ' ' + (currency || 'SAR') : '';
 }
 function nxSmsProviderFields() {
   const p = (document.getElementById('sms-provider') || {}).value || 'taqnyat';
@@ -8788,7 +8875,8 @@ async function nxConnect(channel, provider, credentials, btnId, modalId, secretF
   secretFields.forEach(function (id) { const el = document.getElementById(id); if (el) el.value = ''; });
   document.getElementById(modalId).classList.remove('open');
   showToast(ar ? 'تم الربط' : 'Connected');
-  nxLoadCampaignStatus();
+  await nxLoadCampaignStatus();
+  if (channel === 'sms') nxOpenSmsManage();
 }
 async function nxDisconnect(channel) {
   if (!currentOrg || !confirm(nxAr() ? 'فصل هذا الحساب؟' : 'Disconnect this account?')) return;
