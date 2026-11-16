@@ -5323,21 +5323,6 @@ async function openNewOrgModal() {
   if(inp) inp.value = '';
 }
 
-async function createOrg() {
-  const name = document.getElementById('new-org-name')?.value.trim() || document.getElementById('onboard-org-name')?.value.trim();
-  if(!name) { showToast('❌ Enter org name'); return; }
-  try {
-    const data = await adminAction('create_org', { name, admin_user_id: currentUser.id });
-    if(!data || !data.id) { showToast('❌ Failed to create org'); return; }
-    const newOrg = { id: data.id, name: data.name, role: 'admin' };
-    userOrgs.push(newOrg);
-    renderOrgSwitcher();
-    renderOrgsList();
-    document.getElementById('new-org-modal').classList.remove('open');
-    showToast('✅ Organization "' + name + '" created!');
-    return data;
-  } catch(e) { showToast('❌ Network error'); }
-}
 
 function closeOnboardModal() {
   document.getElementById('new-org-modal').classList.remove('open');
@@ -6977,16 +6962,6 @@ if(savedLang && savedLang !== 'en') {
 let currentTab = 'login';
 let currentUser = null;
 
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.auth-tab').forEach((t,i) => {
-    t.classList.toggle('active', (tab==='login' && i===0)||(tab==='signup' && i===1));
-  });
-  document.getElementById('auth-name').style.display = tab === 'signup' ? 'block' : 'none';
-  document.getElementById('auth-submit-btn').textContent = tab === 'login' ? 'Sign In' : 'Create Account';
-  document.getElementById('auth-error').classList.remove('show');
-  document.getElementById('auth-success').classList.remove('show');
-}
 
 function showAuthError(msg) {
   const el = document.getElementById('auth-error');
@@ -7044,15 +7019,6 @@ async function handleAuth() {
   btn.disabled = false;
 }
 
-async function handleGoogle() {
-  try {
-    const r = await fetch(SUPABASE_URL + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(window.location.href), {
-      headers: { 'apikey': SUPABASE_KEY }
-    });
-    const data = await r.json();
-    if(data.url) window.location.href = data.url;
-  } catch(e) { showAuthError('Google login unavailable'); }
-}
 
 function loginSuccess(data) {
   currentUser = data.user;
@@ -8675,21 +8641,6 @@ async function getFilteredLeads(filter) {
 // ─── CAMPAIGN TAB SWITCHER ─────────────────────────────────────
 let currentCampTab = 'email';
 
-function switchCampTab(tab) {
-  currentCampTab = tab;
-  ['email','sms','whatsapp'].forEach(t => {
-    const pane = document.getElementById('camp-pane-' + t);
-    const btn = document.getElementById('camp-tab-' + t);
-    if(pane) pane.style.display = t === tab ? 'block' : 'none';
-    if(btn) {
-      btn.style.background = t === tab ? 'var(--accent)' : 'transparent';
-      btn.style.color = t === tab ? '#fff' : 'var(--text2)';
-    }
-  });
-  if(tab === 'sms') { loadSMSHistory(); checkSMSConnection(); }
-  if(tab === 'whatsapp') { loadWAHistory(); checkWAConnection(); }
-  if(tab === 'email') loadCampaignHistory();
-}
 
 // ─── SMS CREDENTIALS ──────────────────────────────────────────
 let smsCredentials = null;
@@ -8705,123 +8656,11 @@ function checkSMSConnection() {
   }
 }
 
-function openSMSSetup() {
-  if(smsCredentials) {
-    document.getElementById('sms-account-sid').value = smsCredentials.accountSid || '';
-    document.getElementById('sms-from-number').value = smsCredentials.fromNumber || '';
-  }
-  document.getElementById('sms-setup-modal').classList.add('open');
-}
 
-function saveSMSCredentials() {
-  const sid = document.getElementById('sms-account-sid').value.trim();
-  const token = document.getElementById('sms-auth-token').value.trim();
-  const from = document.getElementById('sms-from-number').value.trim();
-  if(!sid || !token || !from) { showToast('❌ Fill in all fields'); return; }
-  smsCredentials = { accountSid: sid, authToken: token, fromNumber: from };
-  localStorage.setItem('nexcrm_sms_creds', JSON.stringify(smsCredentials));
-  document.getElementById('sms-setup-modal').classList.remove('open');
-  checkSMSConnection();
-  showToast('✅ SMS connected!');
-}
 
-function updateSMSCount(el) {
-  const count = el.value.length;
-  document.getElementById('sms-char-count').textContent = count;
-  document.getElementById('sms-char-count').style.color = count > 160 ? 'var(--danger)' : 'var(--text2)';
-}
 
-function previewSMS() {
-  const body = document.getElementById('sms-body').value.trim();
-  const name = document.getElementById('sms-name').value.trim();
-  if(!body) { showToast('❌ Write your SMS message'); return; }
-  const preview = body.replace(/{name}/g, 'Mohammed Al-Otaibi');
-  document.getElementById('preview-modal-title').textContent = '📱 SMS Preview';
-  document.getElementById('preview-content').innerHTML = `
-    <div style="background:#25d366;border-radius:14px;padding:14px 16px;max-width:280px;color:#fff;font-size:14px;line-height:1.6;white-space:pre-wrap;margin:0 auto">${preview}</div>
-    <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--text2)">This is how your SMS will look on the recipient's phone</div>
-  `;
-  document.getElementById('preview-send-btn').onclick = function() { closePreview(); sendSMSCampaign(true); };
-  document.getElementById('preview-modal').classList.add('open');
-}
 
-async function sendSMSCampaign(confirmed = false) {
-  if(!smsCredentials) { showToast('❌ Connect Twilio first'); openSMSSetup(); return; }
-  const name = document.getElementById('sms-name').value.trim();
-  const body = document.getElementById('sms-body').value.trim();
-  const filter = document.getElementById('sms-filter').value;
-  if(!name) { showToast('❌ Enter campaign name'); return; }
-  if(!body) { showToast('❌ Write your SMS message'); return; }
 
-  const targetLeads = await getFilteredLeads(filter);
-  const leadsWithPhone = targetLeads.filter(l => l.phone);
-  if(!leadsWithPhone.length) { showToast('❌ No leads with phone numbers found'); return; }
-
-  if(!confirmed) {
-    const filterLabel = document.getElementById('sms-filter').options[document.getElementById('sms-filter').selectedIndex].text;
-    if(!confirm(`Send SMS "${name}" to ${leadsWithPhone.length} leads with phone numbers (${filterLabel})?`)) return;
-  }
-
-  const btn = document.querySelector('#camp-pane-sms .btn-primary');
-  if(btn) { btn.textContent = '⏳ Sending...'; btn.disabled = true; }
-
-  let sent = 0, failed = 0;
-  const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${smsCredentials.accountSid}/Messages.json`;
-  const authHeader = 'Basic ' + btoa(smsCredentials.accountSid + ':' + smsCredentials.authToken);
-
-  for(const lead of leadsWithPhone) {
-    const msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
-    let phone = lead.phone.replace(/\s/g,'');
-    if(!phone.startsWith('+')) phone = '+966' + phone.replace(/^0/, '');
-    try {
-      const r = await fetch(twilioUrl, {
-        method: 'POST',
-        headers: { 'Authorization': authHeader, 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ From: smsCredentials.fromNumber, To: phone, Body: msg })
-      });
-      if(r.ok) sent++; else failed++;
-    } catch(e) { failed++; }
-  }
-
-  // Save to Supabase
-  await fetch(SUPABASE_URL + '/rest/v1/campaigns', {
-    method: 'POST',
-    headers: HEADERS,
-    body: JSON.stringify({
-      name, body, filter, campaign_type: 'sms',
-      sent_count: sent, total_count: leadsWithPhone.length,
-      user_id: currentUser ? currentUser.id : null,
-      sent_at: new Date().toISOString()
-    })
-  }).catch(()=>{});
-
-  if(btn) { btn.textContent = '📱 Send SMS'; btn.disabled = false; }
-  showToast(`✅ SMS sent! ${sent} delivered, ${failed} failed.`);
-  loadSMSHistory();
-}
-
-async function loadSMSHistory() {
-  const el = document.getElementById('sms-history');
-  if(!el) return;
-  try {
-    const r = await fetch(SUPABASE_URL + `/rest/v1/campaigns?campaign_type=eq.sms&user_id=eq.${currentUser?.id}&order=sent_at.desc&limit=20`, { headers: HEADERS });
-    if(!r.ok) return;
-    const data = await r.json();
-    if(!data.length) { el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No SMS campaigns sent yet</div>'; return; }
-    el.innerHTML = data.map(c => `
-      <div style="padding:12px 0;border-bottom:1px solid var(--border)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-          <div style="font-weight:600;font-size:13px">📱 ${c.name}</div>
-          <div style="font-size:11px;color:var(--text2)">${new Date(c.sent_at).toLocaleDateString()}</div>
-        </div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${(c.body||'').slice(0,80)}${(c.body||'').length>80?'...':''}</div>
-        <div style="display:flex;gap:10px;font-size:11px">
-          <span style="background:rgba(16,185,129,0.1);color:var(--success);padding:2px 8px;border-radius:100px">✓ ${c.sent_count} sent</span>
-          <span style="color:var(--text2)">${c.total_count} targeted</span>
-        </div>
-      </div>`).join('');
-  } catch(e) {}
-}
 
 // ─── WHATSAPP CREDENTIALS ─────────────────────────────────────
 let waCredentials = null;
@@ -8837,146 +8676,12 @@ function checkWAConnection() {
   }
 }
 
-function openWASetup() {
-  if(waCredentials) {
-    document.getElementById('wa-account-sid').value = waCredentials.accountSid || '';
-    document.getElementById('wa-from-number').value = waCredentials.fromNumber || '';
-  }
-  document.getElementById('wa-setup-modal').classList.add('open');
-}
 
-function saveWACredentials() {
-  const sid = document.getElementById('wa-account-sid').value.trim();
-  const token = document.getElementById('wa-auth-token').value.trim();
-  const from = document.getElementById('wa-from-number').value.trim();
-  if(!sid || !token || !from) { showToast('❌ Fill in all fields'); return; }
-  waCredentials = { accountSid: sid, authToken: token, fromNumber: from.startsWith('whatsapp:') ? from : 'whatsapp:' + from };
-  localStorage.setItem('nexcrm_wa_camp_creds', JSON.stringify(waCredentials));
-  document.getElementById('wa-setup-modal').classList.remove('open');
-  checkWAConnection();
-  showToast('✅ WhatsApp connected!');
-}
 
-function previewWA() {
-  const body = document.getElementById('wa-body').value.trim();
-  if(!body) { showToast('❌ Write your WhatsApp message'); return; }
-  const preview = body.replace(/{name}/g, 'Mohammed Al-Otaibi');
-  document.getElementById('preview-modal-title').textContent = '💬 WhatsApp Preview';
-  document.getElementById('preview-content').innerHTML = `
-    <div style="background:#dcf8c6;border-radius:14px 14px 4px 14px;padding:12px 16px;max-width:300px;color:#111;font-size:14px;line-height:1.6;white-space:pre-wrap;margin:0 auto;box-shadow:0 1px 2px rgba(0,0,0,0.15)">${preview}</div>
-    <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--text2)">This is how your WhatsApp message will appear</div>
-  `;
-  document.getElementById('preview-send-btn').onclick = function() { closePreview(); sendWACampaign(true); };
-  document.getElementById('preview-modal').classList.add('open');
-}
 
-async function sendWACampaign(confirmed = false) {
-  if(!waCredentials) { showToast('❌ Connect WhatsApp first'); openWASetup(); return; }
-  const name = document.getElementById('wa-camp-name').value.trim();
-  const body = document.getElementById('wa-body').value.trim();
-  const filter = document.getElementById('wa-filter').value;
-  if(!name) { showToast('❌ Enter campaign name'); return; }
-  if(!body) { showToast('❌ Write your WhatsApp message'); return; }
 
-  const targetLeads = await getFilteredLeads(filter);
-  const leadsWithPhone = targetLeads.filter(l => l.phone);
-  if(!leadsWithPhone.length) { showToast('❌ No leads with phone numbers found'); return; }
 
-  if(!confirmed) {
-    if(!confirm(`Send WhatsApp message "${name}" to ${leadsWithPhone.length} leads?`)) return;
-  }
 
-  const btn = document.querySelector('#camp-pane-whatsapp .btn-primary');
-  if(btn) { btn.textContent = '⏳ Sending...'; btn.disabled = true; }
-
-  let sent = 0, failed = 0;
-  const twilioUrl = `https://api.twilio.com/2010-04-01/Accounts/${waCredentials.accountSid}/Messages.json`;
-  const authHeader = 'Basic ' + btoa(waCredentials.accountSid + ':' + waCredentials.authToken);
-
-  for(const lead of leadsWithPhone) {
-    const msg = body.replace(/{name}/g, lead.name || 'Valued Customer');
-    let phone = lead.phone.replace(/\s/g,'');
-    if(!phone.startsWith('+')) phone = '+966' + phone.replace(/^0/, '');
-    try {
-      const r = await fetch(twilioUrl, {
-        method: 'POST',
-        headers: { 'Authorization': authHeader, 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ From: waCredentials.fromNumber, To: 'whatsapp:' + phone, Body: msg })
-      });
-      if(r.ok) sent++; else failed++;
-    } catch(e) { failed++; }
-  }
-
-  // Save to Supabase
-  await fetch(SUPABASE_URL + '/rest/v1/campaigns', {
-    method: 'POST',
-    headers: HEADERS,
-    body: JSON.stringify({
-      name, body, filter, campaign_type: 'whatsapp',
-      sent_count: sent, total_count: leadsWithPhone.length,
-      user_id: currentUser ? currentUser.id : null,
-      sent_at: new Date().toISOString()
-    })
-  }).catch(()=>{});
-
-  if(btn) { btn.textContent = '💬 Send WhatsApp'; btn.disabled = false; }
-  showToast(`✅ WhatsApp sent! ${sent} delivered, ${failed} failed.`);
-  loadWAHistory();
-}
-
-async function loadWAHistory() {
-  const el = document.getElementById('wa-history');
-  if(!el) return;
-  try {
-    const r = await fetch(SUPABASE_URL + `/rest/v1/campaigns?campaign_type=eq.whatsapp&user_id=eq.${currentUser?.id}&order=sent_at.desc&limit=20`, { headers: HEADERS });
-    if(!r.ok) return;
-    const data = await r.json();
-    if(!data.length) { el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No WhatsApp campaigns sent yet</div>'; return; }
-    el.innerHTML = data.map(c => `
-      <div style="padding:12px 0;border-bottom:1px solid var(--border)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-          <div style="font-weight:600;font-size:13px">💬 ${c.name}</div>
-          <div style="font-size:11px;color:var(--text2)">${new Date(c.sent_at).toLocaleDateString()}</div>
-        </div>
-        <div style="font-size:12px;color:var(--text2);margin-bottom:6px">${(c.body||'').slice(0,80)}${(c.body||'').length>80?'...':''}</div>
-        <div style="display:flex;gap:10px;font-size:11px">
-          <span style="background:rgba(37,211,102,0.1);color:#25d366;padding:2px 8px;border-radius:100px">✓ ${c.sent_count} sent</span>
-          <span style="color:var(--text2)">${c.total_count} targeted</span>
-        </div>
-      </div>`).join('');
-  } catch(e) {}
-}
-
-function previewCampaign() {
-  const subject = document.getElementById('camp-subject').value.trim();
-  const body = document.getElementById('camp-body').value.trim();
-  const campFromName = document.getElementById('camp-from-name')?.value.trim() || FROM_NAME;
-  const campFromEmail = document.getElementById('camp-from-email')?.value.trim() || FROM_EMAIL;
-  const name = document.getElementById('camp-name').value.trim();
-  const filter = document.getElementById('camp-filter').value;
-  if(!subject || !body) { showToast('❌ Fill in subject and message'); return; }
-
-  const previewBody = body.replace(/{name}/g, 'Mohammed Al-Otaibi');
-  const filterLabel = document.getElementById('camp-filter').options[document.getElementById('camp-filter').selectedIndex].text;
-
-  document.getElementById('preview-content').innerHTML = `
-    <div style="margin-bottom:12px;font-size:12px;color:var(--text2)">
-      <b>To:</b> ${filterLabel} &nbsp;|&nbsp; <b>From:</b> ${FROM_NAME} &lt;${FROM_EMAIL}&gt;
-    </div>
-    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
-      ${subject}
-    </div>
-    <div style="font-size:14px;color:var(--text);line-height:1.8;white-space:pre-wrap">${previewBody}</div>
-    <div style="margin-top:16px;font-size:11px;color:var(--text2);padding-top:12px;border-top:1px solid var(--border)">
-      Sent via NexCRM · Unsubscribe
-    </div>
-  `;
-  document.getElementById('preview-modal').classList.add('open');
-}
-
-function closePreview() {
-  document.getElementById('preview-modal').classList.remove('open');
-}
 
 // ─── CSV/SMTP CAMPAIGN FUNCTIONS ──────────────────────────────
 
@@ -9251,32 +8956,6 @@ Note: Only leads with email addresses will receive the email.`)) return;
   loadCampaignHistory();
 }
 
-async function loadCampaignHistory() {
-  const el = document.getElementById('campaign-history');
-  try {
-    const r = await fetch(SUPABASE_URL + '/rest/v1/campaigns?select=*&order=id.desc&limit=10', { headers: HEADERS });
-    const data = await r.json();
-    if(!r.ok || !data.length) {
-      el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No campaigns sent yet</div>';
-      return;
-    }
-    el.innerHTML = data.map(c => `
-      <div style="padding:12px;border-bottom:1px solid var(--border)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-          <div style="font-size:13px;font-weight:600;color:var(--text)">${c.name}</div>
-          <span class="status-pill pill-active" style="font-size:10px">${c.sent_count || 0} sent</span>
-        </div>
-        <div style="font-size:12px;color:var(--text2)">${c.subject}</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:4px">
-          ${c.filter === 'all' ? 'All leads' : c.filter + ' leads'} · 
-          ${new Date(c.sent_at).toLocaleDateString()}
-        </div>
-      </div>
-    `).join('');
-  } catch(e) {
-    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">No campaigns yet</div>';
-  }
-}
 
 // Load campaign history when campaigns page opens
 const _origNav = nav;
@@ -11640,55 +11319,6 @@ function autoApplyBranding() {
 // ═══════════════════════════════════════════════════════
 
 
-function generateFallbackIdeas(brand, industry, goal, lang, platform) {
-  const ar = lang === 'Arabic';
-  return [
-    {
-      name: ar ? 'حملة لحظة القرار' : 'The Decision Moment',
-      hook: ar ? '"كم مرة قلت بكره؟ اليوم قرارك يختلف..."' : '"How many times did you say tomorrow? Today is different..."',
-      script: ar
-        ? 'المشهد 1: شخص يتردد (3 ثوان)\nالمشهد 2: "مع ' + brand + ' ما في تردد" (5 ثوان)\nالمشهد 3: عرض المنتج (10 ثوان)\nالمشهد 4: نتائج حقيقية (7 ثوان)\nالمشهد 5: CTA واضح (5 ثوان)'
-        : 'Scene 1: Person hesitating (3s)\nScene 2: "' + brand + ' — no more hesitation" (5s)\nScene 3: Quick product showcase (10s)\nScene 4: Real customer results (7s)\nScene 5: Clear CTA (5s)',
-      caption: ar
-        ? brand + ' — لما تكون جاهز للقرار الصح، نحن هنا\n\n#' + brand.replace(/\s/g,'') + ' #السعودية #الرياض'
-        : brand + ' — When you\'re ready to make the right choice, we\'re here\n\n#' + brand.replace(/\s/g,'') + ' #Saudi #Riyadh',
-      cta: ar ? 'تواصل الآن عبر الواتساب' : 'Contact us on WhatsApp now'
-    },
-    {
-      name: ar ? 'قبل وبعد' : 'Before & After',
-      hook: ar ? '"شوف الفرق بنفسك..."' : '"See the difference yourself..."',
-      script: ar
-        ? 'المشهد 1: الوضع "قبل" — المشكلة (5 ثوان)\nالمشهد 2: لحظة التحول مع ' + brand + ' (5 ثوان)\nالمشهد 3: "بعد" — النتيجة (10 ثوان)\nالمشهد 4: شهادة عميل (7 ثوان)\nالمشهد 5: عرض خاص (3 ثوان)'
-        : 'Scene 1: "Before" — the problem (5s)\nScene 2: Transformation with ' + brand + ' (5s)\nScene 3: "After" — result (10s)\nScene 4: Customer testimonial (7s)\nScene 5: Special offer (3s)',
-      caption: ar
-        ? 'الفرق واضح مع ' + brand + '\n\nانضم لمئات العملاء الراضين\n\n#' + brand.replace(/\s/g,'') + ' #نتائج_حقيقية'
-        : 'The difference is clear with ' + brand + '\n\nJoin hundreds of happy customers\n\n#' + brand.replace(/\s/g,'') + ' #RealResults',
-      cta: ar ? 'اضغط الرابط في البايو' : 'Click the link in bio'
-    },
-    {
-      name: ar ? 'عرض محدود' : 'Limited Offer',
-      hook: ar ? '"24 ساعة بس... بعدها ما في فرصة ثانية"' : '"Only 24 hours... after that no second chance"',
-      script: ar
-        ? 'المشهد 1: كاونت داون (3 ثوان)\nالمشهد 2: العرض بالتفصيل (8 ثوان)\nالمشهد 3: ما يحصل عليه العميل (7 ثوان)\nالمشهد 4: سعر قبل وبعد الخصم (5 ثوان)\nالمشهد 5: رابط التواصل (7 ثوان)'
-        : 'Scene 1: Countdown (3s)\nScene 2: Offer details (8s)\nScene 3: What customer gets (7s)\nScene 4: Price before/after (5s)\nScene 5: Contact link (7s)',
-      caption: ar
-        ? 'العرض ينتهي الليلة!\n\n' + brand + ' يقدم عرض حصري للمتابعين فقط\n\n#عرض_محدود #' + brand.replace(/\s/g,'') + ' #السعودية'
-        : 'Offer ends tonight!\n\n' + brand + ' exclusive deal for followers only\n\n#LimitedOffer #' + brand.replace(/\s/g,'') + ' #Saudi',
-      cta: ar ? 'تواصل قبل انتهاء العرض' : 'Contact before offer ends'
-    },
-    {
-      name: ar ? 'خلف الكواليس' : 'Behind the Scenes',
-      hook: ar ? '"شو اللي ما تشوفه عادةً عن ' + brand + '؟"' : '"What you don\'t normally see about ' + brand + '"',
-      script: ar
-        ? 'المشهد 1: يوم عمل في ' + brand + ' (8 ثوان)\nالمشهد 2: الفريق والجهد (8 ثوان)\nالمشهد 3: لحظة سعادة عميل (7 ثوان)\nالمشهد 4: رسالة من المؤسس (7 ثوان)\nالمشهد 5: دعوة للتواصل (5 ثوان)'
-        : 'Scene 1: A real workday at ' + brand + ' (8s)\nScene 2: The team and effort (8s)\nScene 3: Happy customer moment (7s)\nScene 4: Message from founder (7s)\nScene 5: Call to connect (5s)',
-      caption: ar
-        ? 'هذا اللي يصير كل يوم في ' + brand + ' عشانك\n\nفريقنا ما يتوقف من أجلك\n\n#' + brand.replace(/\s/g,'') + ' #خلف_الكواليس'
-        : 'This is what happens every day at ' + brand + ' for you\n\nOur team never stops for you\n\n#' + brand.replace(/\s/g,'') + ' #BehindTheScenes',
-      cta: ar ? 'انضم لعيلتنا' : 'Join our family'
-    }
-  ];
-}
 
 
 
@@ -11925,55 +11555,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // ═══════════════════════════════════════════════════════
 
 
-function generateFallbackIdeas(brand, industry, goal, lang, platform) {
-  const ar = lang === 'Arabic';
-  return [
-    {
-      name: ar ? 'حملة لحظة القرار' : 'The Decision Moment',
-      hook: ar ? '"كم مرة قلت بكره؟ اليوم قرارك يختلف..."' : '"How many times did you say tomorrow? Today is different..."',
-      script: ar
-        ? 'المشهد 1: شخص يتردد (3 ثوان)\nالمشهد 2: "مع ' + brand + ' ما في تردد" (5 ثوان)\nالمشهد 3: عرض المنتج (10 ثوان)\nالمشهد 4: نتائج حقيقية (7 ثوان)\nالمشهد 5: CTA واضح (5 ثوان)'
-        : 'Scene 1: Person hesitating (3s)\nScene 2: "' + brand + ' — no more hesitation" (5s)\nScene 3: Quick product showcase (10s)\nScene 4: Real customer results (7s)\nScene 5: Clear CTA (5s)',
-      caption: ar
-        ? brand + ' — لما تكون جاهز للقرار الصح، نحن هنا\n\n#' + brand.replace(/\s/g,'') + ' #السعودية #الرياض'
-        : brand + ' — When you\'re ready to make the right choice, we\'re here\n\n#' + brand.replace(/\s/g,'') + ' #Saudi #Riyadh',
-      cta: ar ? 'تواصل الآن عبر الواتساب' : 'Contact us on WhatsApp now'
-    },
-    {
-      name: ar ? 'قبل وبعد' : 'Before & After',
-      hook: ar ? '"شوف الفرق بنفسك..."' : '"See the difference yourself..."',
-      script: ar
-        ? 'المشهد 1: الوضع "قبل" — المشكلة (5 ثوان)\nالمشهد 2: لحظة التحول مع ' + brand + ' (5 ثوان)\nالمشهد 3: "بعد" — النتيجة (10 ثوان)\nالمشهد 4: شهادة عميل (7 ثوان)\nالمشهد 5: عرض خاص (3 ثوان)'
-        : 'Scene 1: "Before" — the problem (5s)\nScene 2: Transformation with ' + brand + ' (5s)\nScene 3: "After" — result (10s)\nScene 4: Customer testimonial (7s)\nScene 5: Special offer (3s)',
-      caption: ar
-        ? 'الفرق واضح مع ' + brand + '\n\nانضم لمئات العملاء الراضين\n\n#' + brand.replace(/\s/g,'') + ' #نتائج_حقيقية'
-        : 'The difference is clear with ' + brand + '\n\nJoin hundreds of happy customers\n\n#' + brand.replace(/\s/g,'') + ' #RealResults',
-      cta: ar ? 'اضغط الرابط في البايو' : 'Click the link in bio'
-    },
-    {
-      name: ar ? 'عرض محدود' : 'Limited Offer',
-      hook: ar ? '"24 ساعة بس... بعدها ما في فرصة ثانية"' : '"Only 24 hours... after that no second chance"',
-      script: ar
-        ? 'المشهد 1: كاونت داون (3 ثوان)\nالمشهد 2: العرض بالتفصيل (8 ثوان)\nالمشهد 3: ما يحصل عليه العميل (7 ثوان)\nالمشهد 4: سعر قبل وبعد الخصم (5 ثوان)\nالمشهد 5: رابط التواصل (7 ثوان)'
-        : 'Scene 1: Countdown (3s)\nScene 2: Offer details (8s)\nScene 3: What customer gets (7s)\nScene 4: Price before/after (5s)\nScene 5: Contact link (7s)',
-      caption: ar
-        ? 'العرض ينتهي الليلة!\n\n' + brand + ' يقدم عرض حصري للمتابعين فقط\n\n#عرض_محدود #' + brand.replace(/\s/g,'') + ' #السعودية'
-        : 'Offer ends tonight!\n\n' + brand + ' exclusive deal for followers only\n\n#LimitedOffer #' + brand.replace(/\s/g,'') + ' #Saudi',
-      cta: ar ? 'تواصل قبل انتهاء العرض' : 'Contact before offer ends'
-    },
-    {
-      name: ar ? 'خلف الكواليس' : 'Behind the Scenes',
-      hook: ar ? '"شو اللي ما تشوفه عادةً عن ' + brand + '؟"' : '"What you don\'t normally see about ' + brand + '"',
-      script: ar
-        ? 'المشهد 1: يوم عمل في ' + brand + ' (8 ثوان)\nالمشهد 2: الفريق والجهد (8 ثوان)\nالمشهد 3: لحظة سعادة عميل (7 ثوان)\nالمشهد 4: رسالة من المؤسس (7 ثوان)\nالمشهد 5: دعوة للتواصل (5 ثوان)'
-        : 'Scene 1: A real workday at ' + brand + ' (8s)\nScene 2: The team and effort (8s)\nScene 3: Happy customer moment (7s)\nScene 4: Message from founder (7s)\nScene 5: Call to connect (5s)',
-      caption: ar
-        ? 'هذا اللي يصير كل يوم في ' + brand + ' عشانك\n\nفريقنا ما يتوقف من أجلك\n\n#' + brand.replace(/\s/g,'') + ' #خلف_الكواليس'
-        : 'This is what happens every day at ' + brand + ' for you\n\nOur team never stops for you\n\n#' + brand.replace(/\s/g,'') + ' #BehindTheScenes',
-      cta: ar ? 'انضم لعيلتنا' : 'Join our family'
-    }
-  ];
-}
 
 
 // ── VIDEO MODAL STYLES ───────────────────────────────────────────────────────
@@ -12647,13 +12228,6 @@ function sanitizeLeadData(data) {
 }
 
 // ── 7. Content Security check for lead imports ──
-function validateLeadImport(lead) {
-  const errors = [];
-  if(!lead.name || lead.name.trim().length < 1) errors.push('Name required');
-  if(lead.email && !isValidEmail(lead.email)) errors.push('Invalid email format');
-  if(lead.phone && !/^[\d\s\+\-\(\)]{7,20}$/.test(lead.phone)) errors.push('Invalid phone format');
-  return errors;
-}
 
 // ── 8. Detect suspicious activity ──
 const _suspiciousPatterns = [/<script/i, /javascript:/i, /on\w+\s*=/i, /eval\s*\(/i, /document\.\w/i];
@@ -12661,17 +12235,6 @@ function isSuspiciousInput(str) {
   return _suspiciousPatterns.some(p => p.test(str));
 }
 
-function secureSave(data) {
-  // Check all string values for XSS patterns
-  for(const [key, val] of Object.entries(data)) {
-    if(typeof val === 'string' && isSuspiciousInput(val)) {
-      console.warn('Suspicious input blocked in field:', key);
-      showToast('⚠️ Invalid characters detected in ' + key);
-      return null;
-    }
-  }
-  return sanitizeLeadData(data);
-}
 
 // ─── AI MARKET INTELLIGENCE ────────────────────────────────────
 async function runMarketIntelligence() {
@@ -14090,27 +13653,7 @@ function toHijriShort(date) {
 }
 
 // Format date showing both Gregorian + Hijri
-function dualDate(dateStr) {
-  if(!dateStr) return '—';
-  try {
-    const d = new Date(dateStr + (dateStr.length === 10 ? 'T00:00:00' : ''));
-    if(isNaN(d)) return dateStr;
-    const greg = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    const hijri = toHijriShort(d);
-    return `<span style="line-height:1.6">${greg}<br/><span style="font-size:10px;color:var(--text2);font-family:'Tajawal',sans-serif;direction:rtl">${hijri}</span></span>`;
-  } catch(e) { return dateStr; }
-}
 
-function dualDateText(dateStr) {
-  if(!dateStr) return '—';
-  try {
-    const d = new Date(dateStr + (dateStr.length === 10 ? 'T00:00:00' : ''));
-    if(isNaN(d)) return dateStr;
-    const greg = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    const hijri = toHijriShort(d);
-    return `${greg} · ${hijri}`;
-  } catch(e) { return dateStr; }
-}
 
 // Patch all date displays after render
 function patchHijriDates() {
@@ -15009,18 +14552,6 @@ function autoResizeInbox(el) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  var origNav = window.nav;
-  if (typeof origNav === 'function') {
-    var _navWrapped = false;
-    if (!_navWrapped) {
-      _navWrapped = true;
-      var _navOrig = window.nav;
-      window.nav = function(page, el) {
-        _navOrig.apply(this, arguments);
-        if (page === 'inbox') setTimeout(loadInbox, 150);
-      };
-    }
-  }
 });
 </script>
 
