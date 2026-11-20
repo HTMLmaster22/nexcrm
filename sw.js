@@ -1,8 +1,8 @@
-const CACHE_NAME = 'nexcrm-v5';
+const CACHE_NAME = 'nexcrm-v6';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap'
+  'https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap'
 ];
 // Install - cache static assets
 self.addEventListener('install', (e) => {
