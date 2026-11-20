@@ -8295,9 +8295,11 @@ function openCalendarModal() {
 
 async function loadCalendar() {
   try {
+    const __reqOrg = currentOrg ? currentOrg.id : null;
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
     const r = await fetch(SUPABASE_URL + '/rest/v1/content_calendar?select=*&order=post_date.asc' + orgFilter, { headers: HEADERS });
     const data = await r.json();
+    if ((currentOrg ? currentOrg.id : null) !== __reqOrg) return; // workspace changed while loading
     if(!r.ok) { renderCalendar(); return; }
     calendarPosts = data || [];
     renderCalendar();
@@ -8386,9 +8388,11 @@ function openDeliverableModal() {
 
 async function loadDeliverables() {
   try {
+    const __reqOrg = currentOrg ? currentOrg.id : null;
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
     const r = await fetch(SUPABASE_URL + '/rest/v1/deliverables?select=*&order=id.desc' + orgFilter, { headers:HEADERS });
     const data = await r.json();
+    if ((currentOrg ? currentOrg.id : null) !== __reqOrg) return; // workspace changed while loading
     if(!r.ok) { renderDeliverables(); return; }
     deliverablesList = data || [];
     renderDeliverables();
@@ -8497,9 +8501,11 @@ function openInvoiceModal() {
 
 async function loadInvoices() {
   try {
+    const __reqOrg = currentOrg ? currentOrg.id : null;
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
     const r = await fetch(SUPABASE_URL + '/rest/v1/invoices?select=*&order=id.desc' + orgFilter, { headers:HEADERS });
     const data = await r.json();
+    if ((currentOrg ? currentOrg.id : null) !== __reqOrg) return; // workspace changed while loading
     if(!r.ok) { renderInvoices(); return; }
     invoicesList = data || [];
     renderInvoices();
@@ -9609,11 +9615,13 @@ async function loadTeam() {
   showLoader('Loading team...');
   const list = document.getElementById('team-list');
   try {
+    const __reqOrg = currentOrg ? currentOrg.id : null;
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
     // Get org members — source of truth for who has access + their role
     const r = await fetch(SUPABASE_URL + '/rest/v1/org_members?select=*&order=created_at.asc' + orgFilter, { headers: HEADERS });
     const data = await r.json();
     hideLoader();
+    if ((currentOrg ? currentOrg.id : null) !== __reqOrg) return; // workspace changed while loading
     if(!r.ok || !Array.isArray(data) || data.length === 0) {
       list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No team members yet, invite your first one!</div>';
       return;
@@ -9887,9 +9895,11 @@ async function loadAuditLog() {
   if(!list) return;
   list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text2)">Loading...</div>';
   try {
+    const __reqOrg = currentOrg ? currentOrg.id : null;
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
     const r = await fetch(SUPABASE_URL + '/rest/v1/audit_log?select=*&order=created_at.desc&limit=200' + orgFilter, { headers: HEADERS });
     const data = await r.json();
+    if ((currentOrg ? currentOrg.id : null) !== __reqOrg) return; // workspace changed while loading
     if(!r.ok || !Array.isArray(data) || data.length === 0) {
       list.innerHTML = '<div style="text-align:center;padding:30px;color:var(--text2)">No activity logged yet.</div>';
       return;
@@ -9940,9 +9950,11 @@ async function loadDashboard() {
     if(savedToken && HEADERS['Authorization'] === 'Bearer ' + SUPABASE_KEY) {
       HEADERS['Authorization'] = 'Bearer ' + savedToken;
     }
+    const __reqOrg = currentOrg ? currentOrg.id : null;
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*' + orgFilter, { headers: HEADERS });
     const data = await r.json();
+    if ((currentOrg ? currentOrg.id : null) !== __reqOrg) return; // workspace changed while loading
     // If RLS blocks and returns error, try without org filter
     if(!r.ok || !Array.isArray(data)) {
       if(!currentOrg) {
@@ -9985,9 +9997,11 @@ async function loadPerformance() {
   const perfList = document.getElementById('perf-list');
   const teamStats = document.getElementById('team-stats');
   try {
+    const __reqOrg = currentOrg ? currentOrg.id : null;
     const orgFilter = currentOrg ? '&org_id=eq.' + currentOrg.id : '';
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?select=*' + orgFilter, { headers: HEADERS });
     const data = await r.json();
+    if ((currentOrg ? currentOrg.id : null) !== __reqOrg) return; // workspace changed while loading
     if(!r.ok || !Array.isArray(data)) return;
 
     // Group by assigned sales rep (exclude org names)
