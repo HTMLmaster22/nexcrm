@@ -4708,6 +4708,12 @@ body.light-mode .modal-overlay { backdrop-filter:blur(4px); }
         <label class="form-label">Notes <span style="color:var(--text2);font-weight:400">— optional</span></label>
         <textarea class="form-input" id="f-notes" placeholder="Any notes about this lead..." rows="3" style="resize:vertical"></textarea>
       </div>
+      <div class="form-group" style="margin-top:-4px">
+        <label style="display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--text2);cursor:pointer">
+          <input type="checkbox" id="f-optout" />
+          <span data-en="Asked to stop marketing messages (excluded from campaigns)" data-ar="طلب إيقاف الرسائل التسويقية (يُستثنى من الحملات)">Asked to stop marketing messages (excluded from campaigns)</span>
+        </label>
+      </div>
       <div style="display:flex;gap:10px;margin-top:16px">
         <button class="btn btn-ghost" style="flex:1" onclick="leadStep(2)">← Back</button>
         <button class="btn btn-primary" style="flex:2" onclick="addLead()">💾 Save Lead</button>
@@ -5954,6 +5960,7 @@ function selectStatus(btn, status) {
 }
 function closeModal() {
   document.getElementById('modal').classList.remove('open');
+  const optEl = document.getElementById('f-optout'); if (optEl) optEl.checked = false;
   const btn = document.querySelector('#modal .btn-primary');
   if(btn) { btn.textContent = '💾 Save Lead'; btn.onclick = addLead; }
 }
@@ -8000,6 +8007,7 @@ function editLead(id) {
     b.style.borderColor = isMatch ? 'var(--accent)' : 'var(--border)';
   });
   document.getElementById('f-value').value = String(lead.value || '').replace(/[$,]/g,'');
+  const optEl = document.getElementById('f-optout'); if (optEl) optEl.checked = !!lead.marketing_opt_out;
   const assignEl = document.getElementById('f-assign');
   assignEl.value = lead.assigned || 'Tariq Hassan';
   assignEl.disabled = !canAssignLeads;
@@ -8034,6 +8042,11 @@ async function updateLead(id) {
     value: value ? 'SAR ' + parseInt(value).toLocaleString() : '—',
     assigned
   };
+  const optOut = !!(document.getElementById('f-optout') || {}).checked;
+  if (optOut !== !!(existingLead && existingLead.marketing_opt_out)) {
+    updated.marketing_opt_out = optOut;
+    updated.marketing_opt_out_at = optOut ? new Date().toISOString() : null;
+  }
   try {
     const r = await fetch(SUPABASE_URL + '/rest/v1/leads?id=eq.' + id, {
       method: 'PATCH',
@@ -8899,8 +8912,8 @@ async function nxDisconnect(channel) {
 
 // ── Sending: preview → confirm → start → batches with progress ──
 const NX_SKIP = {
-  en: { no_phone: 'no phone number', landline: 'landline (cannot get SMS/WhatsApp)', invalid: 'invalid number or email', duplicate: 'duplicates', no_email: 'no email' },
-  ar: { no_phone: 'بدون رقم جوال', landline: 'رقم أرضي (لا يستقبل الرسائل)', invalid: 'رقم أو إيميل غير صالح', duplicate: 'مكرر', no_email: 'بدون إيميل' }
+  en: { no_phone: 'no phone number', landline: 'landline (cannot get SMS/WhatsApp)', invalid: 'invalid number or email', duplicate: 'duplicates', no_email: 'no email', opted_out: 'asked to stop marketing messages' },
+  ar: { no_phone: 'بدون رقم جوال', landline: 'رقم أرضي (لا يستقبل الرسائل)', invalid: 'رقم أو إيميل غير صالح', duplicate: 'مكرر', no_email: 'بدون إيميل', opted_out: 'طلبوا إيقاف الرسائل التسويقية' }
 };
 function nxCampModal() {
   let ov = document.getElementById('nx-cs');
@@ -8937,11 +8950,23 @@ function nxConfirmSend(o, pv) {
     n.textContent = ar ? 'تُرسل وتُحسب من حسابك لدى مزود الخدمة.' : 'Sent and billed through your own provider account.';
     body.appendChild(n);
   }
+  const cl = document.createElement('label'); cl.style.cssText = 'display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.55;color:var(--text);margin-top:12px;cursor:pointer';
+  const cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = 'nx-cs-consent'; cb.style.marginTop = '3px';
+  const ct = document.createElement('span');
+  ct.textContent = ar ? 'أؤكد أن المستلمين وافقوا على استلام رسائل تسويقية منا، وأن الرسالة تذكر اسم منشأتنا وطريقة إيقاف الرسائل.'
+                      : 'I confirm these people agreed to receive marketing messages from us, and the message names our business and how to stop receiving them.';
+  cl.appendChild(cb); cl.appendChild(ct); body.appendChild(cl);
+  if (o.channel !== 'email') {
+    const qh = document.createElement('div'); qh.style.cssText = 'font-size:12px;color:var(--text2);margin-top:6px';
+    qh.textContent = ar ? 'رسائل SMS والواتساب التسويقية تُرسل فقط من 9 صباحاً حتى 8 مساءً بتوقيت الرياض، وتتوقف تلقائياً خارج هذا الوقت.'
+                        : 'Marketing SMS and WhatsApp messages only go out 9am to 8pm Riyadh time and pause automatically outside those hours.';
+    body.appendChild(qh);
+  }
   ov.classList.add('open');
   return new Promise(function (resolve) {
     nxCampButtons([
       { label: ar ? 'إلغاء' : 'Cancel', onClick: function () { ov.classList.remove('open'); resolve(false); } },
-      { label: (ar ? 'إرسال إلى ' : 'Send to ') + Number(pv.will_send || 0).toLocaleString(), primary: true, onClick: function () { resolve(true); } }
+      { label: (ar ? 'إرسال إلى ' : 'Send to ') + Number(pv.will_send || 0).toLocaleString(), primary: true, onClick: function () { if (!cb.checked) { showToast(ar ? 'أكّد موافقة المستلمين أولاً' : 'Confirm the recipients agreed first'); cb.focus(); return; } resolve(true); } }
     ]);
   });
 }
@@ -8957,7 +8982,7 @@ async function nxRunCampaign(o) {
   }
   if (!pv.data.will_send) { showToast(ar ? 'لا يوجد من يمكنه استلامها في هذا الاختيار' : 'No one in this selection can receive it'); return false; }
   if (!(await nxConfirmSend(o, pv.data))) return false;
-  const st = await nxCS(Object.assign({ action: 'start', name: o.name, subject: o.subject, body: o.body, template: o.template }, base));
+  const st = await nxCS(Object.assign({ action: 'start', name: o.name, subject: o.subject, body: o.body, template: o.template, consent: true }, base));
   if (!st.ok) { showToast('❌ ' + (st.data.error || 'Could not start')); nxCampModal().classList.remove('open'); return false; }
   return nxDriveCampaign(st.data.campaign_id, Object.assign({ total: st.data.will_send }, o));
 }
@@ -8982,6 +9007,8 @@ async function nxDriveCampaign(id, o) {
       show(r.data);
       msg.textContent += ' — ' + (r.data.reason === 'ceiling'
         ? (ar ? 'وصلت للحد اليومي للإرسال. اضغط «متابعة الإرسال» من السجل غداً.' : 'Daily sending limit reached. Press Resume in the history tomorrow.')
+        : r.data.reason === 'quiet_hours'
+        ? (ar ? 'خارج أوقات الإرسال المسموحة (9 صباحاً حتى 8 مساءً بتوقيت الرياض). اضغط «متابعة الإرسال» من السجل خلال هذا الوقت.' : 'Outside allowed sending hours (9am to 8pm Riyadh time). Press Resume in the history during those hours.')
         : nxLimitText(r.data.reason, r.data.tier));
       break;
     }
