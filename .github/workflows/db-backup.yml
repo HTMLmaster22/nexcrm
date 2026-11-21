@@ -1,0 +1,69 @@
+name: Nightly database backup
+
+# Encrypted nightly dump of the Supabase database, kept 30 days as a workflow artifact.
+# Needs two repository secrets (Settings > Secrets and variables > Actions):
+#   SUPABASE_DB_URL     Session pooler connection string from Supabase > Connect (port 5432)
+#   BACKUP_PASSPHRASE   A long random passphrase. Keep a copy somewhere safe: without it the backups can't be opened.
+# The repository is public, so the dump is encrypted before it is uploaded.
+# Restore: gpg --decrypt nexcrm-<date>.sql.gz.gpg | gunzip | psql "<target db url>"
+
+on:
+  schedule:
+    - cron: '17 23 * * *'   # 02:17 Riyadh time
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check secrets are set
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          [ -n "$DB" ] || { echo "::error::SUPABASE_DB_URL secret is missing"; exit 1; }
+          [ ${#PASS} -ge 20 ] || { echo "::error::BACKUP_PASSPHRASE secret is missing or shorter than 20 characters"; exit 1; }
+
+      - name: Install PostgreSQL 17 client
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-17
+          /usr/lib/postgresql/17/bin/pg_dump --version
+
+      - name: Dump, compress and encrypt
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -o pipefail
+          F="nexcrm-$(date -u +%Y-%m-%d).sql.gz.gpg"
+          /usr/lib/postgresql/17/bin/pg_dump "$DB" --no-owner --no-privileges --quote-all-identifiers \
+            --schema=public --schema=auth --schema=storage \
+            | gzip -9 \
+            | gpg --batch --yes --symmetric --cipher-algo AES256 --passphrase-fd 3 -o "$F" 3<<<"$PASS"
+          SIZE=$(stat -c %s "$F")
+          echo "Backup $F: $SIZE bytes"
+          [ "$SIZE" -gt 20000 ] || { echo "::error::Backup is suspiciously small ($SIZE bytes)"; exit 1; }
+          echo "FILE=$F" >> "$GITHUB_ENV"
+
+      - name: Check the backup opens
+        env:
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -o pipefail
+          TABLES=$(gpg --batch --quiet --decrypt --passphrase-fd 3 "$FILE" 3<<<"$PASS" | gunzip | grep -c '^CREATE TABLE')
+          echo "Tables in backup: $TABLES"
+          [ "$TABLES" -ge 10 ] || { echo "::error::Backup has only $TABLES tables"; exit 1; }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.FILE }}
+          path: ${{ env.FILE }}
+          retention-days: 30
+          compression-level: 0

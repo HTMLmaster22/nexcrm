@@ -1,0 +1,34 @@
+name: Uptime check
+
+# Every 15 minutes: the website, the app and the Supabase API must answer.
+# A failed run makes GitHub email the account owner (Settings > Notifications > Actions).
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check endpoints
+        run: |
+          fail=0
+          check () {
+            local name="$1" url="$2" want="$3" code=""
+            for i in 1 2 3; do
+              code=$(curl -s -o /dev/null -w '%{http_code}' -m 20 -L "$url" || true)
+              [ "$code" = "$want" ] && break
+              sleep 10
+            done
+            if [ "$code" = "$want" ]; then echo "OK   $name ($code)"; else echo "::error::$name is down: HTTP $code from $url"; fail=1; fi
+          }
+          check "Website"       "https://www.getnexcrm.com/"                              200
+          check "Website (en)"  "https://www.getnexcrm.com/en/"                           200
+          check "App"           "https://nexcrm-jet.vercel.app/"                          200
+          check "Supabase Auth" "https://xpcmoaxosppgaoprjnhu.supabase.co/auth/v1/health?apikey=sb_publishable_RQ9HH75sKDnC6esaPlrYgg_AtMFRXtY" 200
+          exit $fail
